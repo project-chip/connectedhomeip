@@ -380,7 +380,9 @@ void ConnectivityManagerImpl::OnStationConnected()
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
     (void) PlatformMgr().PostEvent(&event);
-
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    wfx_power_save();
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
     UpdateInternetConnectivityState();
 }
 

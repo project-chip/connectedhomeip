@@ -91,6 +91,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
+void wfx_rsi_power_save();
 #define SILABS_LOG(...) efr32Log(__VA_ARGS__);
 
 #ifdef __cplusplus
