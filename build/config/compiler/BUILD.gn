@@ -207,10 +207,6 @@ config("disabled_warnings") {
       "-Wno-cast-function-type",
       "-Wno-psabi",
       "-Wno-maybe-uninitialized",
-
-      # When upgrading to gcc 12.2 new compiler warnings were encountered, this suppress
-      # compiler errors to allow gcc rollup, over time these warnings should be addressed.
-      "-Wno-address",
     ]
   }
 }
