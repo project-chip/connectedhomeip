@@ -437,8 +437,6 @@ def BuildCyw30739Target():
         TargetPart('switch', app=Cyw30739App.SWITCH),
     ])
 
-    target.AppendModifier(name="no-progress-logging", progress_logging=False)
-
     return target
 
 
