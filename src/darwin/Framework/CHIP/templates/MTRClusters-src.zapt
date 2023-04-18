@@ -40,7 +40,7 @@ static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *err
 }
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
@@ -291,6 +291,6 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 @end
 {{/if}}
 
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

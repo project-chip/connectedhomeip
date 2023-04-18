@@ -7,7 +7,7 @@
 
 #include <zap-generated/CHIPClusters.h>
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} ()
@@ -16,4 +16,4 @@
 @end
 {{/if}}
 
-{{/all_user_clusters}}
+{{/zcl_clusters}}

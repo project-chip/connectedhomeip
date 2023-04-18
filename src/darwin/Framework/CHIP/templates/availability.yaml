@@ -6566,9 +6566,10 @@
       watchos: "9.5"
       tvos: "16.5"
   introduced:
-      attributes:
-          TimeSynchronization:
-              - DSTOffset
+      ids:
+          attributes:
+              TimeSynchronization:
+                  - DSTOffset
       command fields:
           DiagnosticLogs:
               RetrieveLogsRequest:

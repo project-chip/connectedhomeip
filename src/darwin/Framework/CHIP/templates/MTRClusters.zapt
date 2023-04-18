@@ -8,7 +8,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 
 
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
@@ -59,9 +59,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 {{/if}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
 {{#if (isSupported (compatClusterNameRemapping name))}}
 {{availability (compatClusterNameRemapping name) deprecationMessage=(concat "Please use MTRCluster" (asUpperCamelCase name preserveAcronyms=true))}}
@@ -70,9 +70,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{/if}}
 {{/unless}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 {{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
            (isSupported (compatClusterNameRemapping name)))}}
 @interface MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
@@ -113,6 +113,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 {{/if}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
 NS_ASSUME_NONNULL_END

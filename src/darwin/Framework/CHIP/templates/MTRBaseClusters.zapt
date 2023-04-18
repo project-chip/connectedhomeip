@@ -7,7 +7,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 
 
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
@@ -72,9 +72,9 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 @end
 {{/if}}
 
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
 {{#if (isSupported (compatClusterNameRemapping name))}}
 {{availability (compatClusterNameRemapping name) deprecationMessage=(concat "Please use MTRBaseCluster" (asUpperCamelCase name preserveAcronyms=true))}}
@@ -83,7 +83,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 
 {{/if}}
 {{/unless}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
@@ -179,7 +179,7 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
 {{/zcl_bitmaps}}
 {{/zcl_clusters}}
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 {{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
            (isSupported (compatClusterNameRemapping name)))}}
 @interface MTRBaseCluster{{compatClusterNameRemapping name}} (Deprecated)
@@ -234,6 +234,6 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 @end
 
 {{/if}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
 NS_ASSUME_NONNULL_END
