@@ -87,7 +87,7 @@ public:
     void StartWiFiManagement();
     void StopWiFiManagement();
     bool IsWiFiManagementStarted();
-    CHIP_ERROR GetWiFiBssId(ByteSpan & value);
+    CHIP_ERROR GetWiFiBssId(MutableByteSpan & value);
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
     const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }

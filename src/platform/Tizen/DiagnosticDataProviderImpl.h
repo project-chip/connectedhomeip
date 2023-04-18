@@ -68,6 +68,12 @@ public:
     CHIP_ERROR ResetEthNetworkDiagnosticsCounts() override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    /*
+    CHIP_ERROR chip::DeviceLayer::DiagnosticDataProvider::GetWiFiBssId(ByteSpan & value)
+    The API signature is broken. it has to change from ByteSpan to MutableByteSpan.
+    After this is changed, it will be changed to next API and added.
+    CHIP_ERROR GetWiFiBssId(MutableByteSpan & bssId) override;
+    */
     CHIP_ERROR GetWiFiBssId(ByteSpan & bssId) override;
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion) override;
