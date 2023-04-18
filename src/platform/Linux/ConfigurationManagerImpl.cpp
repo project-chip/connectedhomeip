@@ -23,9 +23,6 @@
  *          for Linux platforms.
  */
 
-
-
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <ifaddrs.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>

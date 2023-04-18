@@ -845,7 +845,8 @@ CHIP_ERROR WiFiManager::GetBssId(uint8_t * bssId)
         return CHIP_ERROR_READ_FAILED;
     }
 
-    if (sscanf(bssIdStr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &mWiFiBSSID[0], &mWiFiBSSID[1], &mWiFiBSSID[2], &mWiFiBSSID[3], &mWiFiBSSID[4], &mWiFiBSSID[5]) != 6)
+    if (sscanf(bssIdStr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &mWiFiBSSID[0], &mWiFiBSSID[1], &mWiFiBSSID[2], &mWiFiBSSID[3],
+               &mWiFiBSSID[4], &mWiFiBSSID[5]) != 6)
     {
         ChipLogError(DeviceLayer, "FAIL: parse bssid");
         return CHIP_ERROR_READ_FAILED;

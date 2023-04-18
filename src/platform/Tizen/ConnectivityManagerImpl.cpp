@@ -256,7 +256,7 @@ bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
 {
     uint8_t * bssId = nullptr;
-    CHIP_ERROR err = Internal::WiFiMgr().GetBssId(bssId);
+    CHIP_ERROR err  = Internal::WiFiMgr().GetBssId(bssId);
     ReturnErrorOnFailure(err);
 
     value = MutableByteSpan(bssId, 6);
