@@ -39,9 +39,9 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
 
     if (gBrowsedServicesCount == ++gResolvedServicesCount)
     {
+        // After last service is resolved, stop the event loop,
+        // so the test case can gracefully exit.
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-        chip::DeviceLayer::PlatformMgr().Shutdown();
-        exit(0);
     }
 }
 
