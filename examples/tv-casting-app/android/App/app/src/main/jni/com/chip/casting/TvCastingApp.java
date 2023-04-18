@@ -59,7 +59,9 @@ public class TvCastingApp {
   }
 
   public boolean initApp(Context applicationContext, AppParameters appParameters) {
-    if (applicationContext == null || appParameters == null) {
+    if (applicationContext == null
+        || appParameters == null
+        || appParameters.getConfigurationManager() == null) {
       return false;
     }
 
