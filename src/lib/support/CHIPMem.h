@@ -176,27 +176,12 @@ struct Deleter
 };
 
 template <typename T>
-struct MemoryFreer
-{
-    void operator()(T * p) { MemoryFree(p); }
-};
-
-template <typename T>
 using UniquePtr = std::unique_ptr<T, Deleter<T>>;
-
-template <typename T>
-using MemoryUniquePtr = std::unique_ptr<T, MemoryFreer<T>>;
 
 template <typename T, typename... Args>
 inline UniquePtr<T> MakeUnique(Args &&... args)
 {
     return UniquePtr<T>(New<T>(std::forward<Args>(args)...));
-}
-
-template <typename T>
-inline MemoryUniquePtr<T> MakeMemoryUnique(size_t num, size_t size)
-{
-    return MemoryUniquePtr<T>(static_cast<T *>(MemoryCalloc(num, size)));
 }
 
 template <typename T>

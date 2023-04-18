@@ -76,15 +76,12 @@ NSString * const MTRStructureValueType = @"Structure";
 NSString * const MTRArrayValueType = @"Array";
 
 class MTRDataValueDictionaryCallbackBridge;
-template <typename DecodableValueType> class BufferedReadClientCallback;
-class MTRDataValueDictionaryDecodableType;
 
 @interface MTRReadClientContainer : NSObject
 @property (nonatomic, readwrite) app::ReadClient * readClientPtr;
 @property (nonatomic, readwrite) app::AttributePathParams * pathParams;
 @property (nonatomic, readwrite) app::EventPathParams * eventPathParams;
 @property (nonatomic, readwrite) uint64_t deviceID;
-@property (nonatomic, readwrite) BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callbackPtr;
 - (void)onDone;
 @end
 
@@ -160,10 +157,6 @@ static void PurgeReadClientContainers(
                         std::is_trivially_destructible<EventPathParams>::value, "EventPathParams destructors won't get run");
                     Platform::MemoryFree(container.eventPathParams);
                     container.eventPathParams = nullptr;
-                }
-                if (container.callbackPtr != nullptr) {
-                    Platform::Delete(container.callbackPtr);
-                    container.callbackPtr = nullptr;
                 }
             }
             [listToDelete removeAllObjects];
@@ -247,10 +240,6 @@ static void CauseReadClientFailure(
         Platform::MemoryFree(_eventPathParams);
         _eventPathParams = nullptr;
     }
-    if (_callbackPtr) {
-        Platform::Delete(_callbackPtr);
-        _callbackPtr = nullptr;
-    }
     PurgeCompletedReadClientContainers(_deviceID);
 }
 
@@ -269,10 +258,6 @@ static void CauseReadClientFailure(
         static_assert(std::is_trivially_destructible<EventPathParams>::value, "EventPathParams destructors won't get run");
         Platform::MemoryFree(_eventPathParams);
         _eventPathParams = nullptr;
-    }
-    if (_callbackPtr) {
-        Platform::Delete(_callbackPtr);
-        _callbackPtr = nullptr;
     }
 }
 @end
@@ -763,7 +748,7 @@ public:
     static void OnSuccessFn(void * context, id value) { DispatchSuccess(context, value); }
 };
 
-template <typename DecodableValueType> class BufferedReadClientCallback : public app::ReadClient::Callback {
+template <typename DecodableValueType> class BufferedReadClientCallback final : public app::ReadClient::Callback {
 public:
     using OnSuccessAttributeCallbackType
         = std::function<void(const ConcreteAttributePath & aPath, const DecodableValueType & aData)>;
@@ -780,7 +765,11 @@ public:
         OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
         OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr,
         OnDeviceResubscriptionScheduledCallbackType aOnDeviceResubscriptionScheduled = nullptr)
-        : mOnAttributeSuccess(aOnAttributeSuccess)
+        : mAttributePathParamsList(aAttributePathParamsList)
+        , mAttributePathParamsSize(aAttributePathParamsSize)
+        , mEventPathParamsList(aEventPathParamsList)
+        , mEventPathParamsSize(aEventPathParamsSize)
+        , mOnAttributeSuccess(aOnAttributeSuccess)
         , mOnEventSuccess(aOnEventSuccess)
         , mOnError(aOnError)
         , mOnDone(aOnDone)
@@ -788,17 +777,6 @@ public:
         , mOnDeviceResubscriptionScheduled(aOnDeviceResubscriptionScheduled)
         , mBufferedReadAdapter(*this)
     {
-        if (aAttributePathParamsList != nullptr) {
-            mAttributePathParamsList = Platform::MakeMemoryUnique<app::AttributePathParams>(aAttributePathParamsSize, sizeof(AttributePathParams));
-            memcpy(mAttributePathParamsList.get(), aAttributePathParamsList, aAttributePathParamsSize * sizeof(AttributePathParams));
-            mAttributePathParamsSize = aAttributePathParamsSize;
-        }
-        
-        if (aEventPathParamsList != nullptr) {
-            mEventPathParamsList = Platform::MakeMemoryUnique<app::EventPathParams>(aEventPathParamsSize, sizeof(EventPathParams));
-            memcpy(mEventPathParamsList.get(), aEventPathParamsList, aEventPathParamsSize * sizeof(EventPathParams));
-            mEventPathParamsSize = aEventPathParamsSize;
-        }
     }
 
     ~BufferedReadClientCallback()
@@ -806,8 +784,6 @@ public:
         // Ensure we release the ReadClient before we tear down anything else,
         // so it can call our OnDeallocatePaths properly.
         mReadClient = nullptr;
-        mAttributePathParamsList = nullptr;
-        mEventPathParamsList = nullptr;
     }
 
     app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
@@ -833,9 +809,9 @@ private:
 
         VerifyOrExit(aStatus.IsSuccess(), err = aStatus.ToChipError());
         VerifyOrExit(
-            std::find_if(mAttributePathParamsList.get(), mAttributePathParamsList.get() + mAttributePathParamsSize,
+            std::find_if(mAttributePathParamsList, mAttributePathParamsList + mAttributePathParamsSize,
                 [aPath](app::AttributePathParams & pathParam) -> bool { return pathParam.IsAttributePathSupersetOf(aPath); })
-                != mAttributePathParamsList.get() + mAttributePathParamsSize,
+                != mAttributePathParamsList + mAttributePathParamsSize,
             err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -858,11 +834,11 @@ private:
 
         VerifyOrExit(mEventPathParamsList != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        VerifyOrExit(std::find_if(mEventPathParamsList.get(), mEventPathParamsList.get() + mEventPathParamsSize,
+        VerifyOrExit(std::find_if(mEventPathParamsList, mEventPathParamsList + mEventPathParamsSize,
                          [aEventHeader](app::EventPathParams & pathParam) -> bool {
                              return pathParam.IsEventPathSupersetOf(aEventHeader.mPath);
                          })
-                != mEventPathParamsList.get() + mEventPathParamsSize,
+                != mEventPathParamsList + mEventPathParamsSize,
             err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -911,8 +887,8 @@ private:
     OnDeviceResubscriptionScheduledCallbackType mOnDeviceResubscriptionScheduled;
     app::BufferedReadCallback mBufferedReadAdapter;
     Platform::UniquePtr<app::ReadClient> mReadClient;
-    Platform::MemoryUniquePtr<app::AttributePathParams> mAttributePathParamsList;
-    Platform::MemoryUniquePtr<app::EventPathParams> mEventPathParamsList;
+    app::AttributePathParams * mAttributePathParamsList;
+    app::EventPathParams * mEventPathParamsList;
     size_t mAttributePathParamsSize;
     size_t mEventPathParamsSize;
 };
@@ -1003,26 +979,32 @@ private:
                 }
             };
 
-        Platform::MemoryUniquePtr<AttributePathParams> attributePathParamsList = nullptr;
-        Platform::MemoryUniquePtr<EventPathParams> eventPathParamsList = nullptr;
+            AttributePathParams * attributePathParamsList = nullptr;
+            EventPathParams * eventPathParamsList = nullptr;
 
             if (attributes != nil) {
                 size_t count = 0;
                 attributePathParamsList
-                = Platform::MakeMemoryUnique<AttributePathParams>([attributes count], sizeof(AttributePathParams));
+                    = static_cast<AttributePathParams *>(Platform::MemoryCalloc([attributes count], sizeof(AttributePathParams)));
                 VerifyOrReturnError(attributePathParamsList != nullptr, CHIP_ERROR_NO_MEMORY);
                 for (MTRAttributeRequestPath * attribute in attributes) {
-                    [attribute convertToAttributePathParams:attributePathParamsList.get()[count++]];
+                    [attribute convertToAttributePathParams:attributePathParamsList[count++]];
                 }
             }
 
             if (events != nil) {
                 size_t count = 0;
                 eventPathParamsList
-                = Platform::MakeMemoryUnique<EventPathParams>([events count], sizeof(EventPathParams));
-                VerifyOrReturnError(eventPathParamsList != nullptr, CHIP_ERROR_NO_MEMORY);
+                    = static_cast<EventPathParams *>(Platform::MemoryCalloc([events count], sizeof(EventPathParams)));
+                if (eventPathParamsList == nullptr) {
+                    if (attributePathParamsList != nullptr) {
+                        Platform::MemoryFree(attributePathParamsList);
+                        attributePathParamsList = nullptr;
+                    }
+                    return CHIP_ERROR_NO_MEMORY;
+                }
                 for (MTREventRequestPath * event in events) {
-                    [event convertToEventPathParams:eventPathParamsList.get()[count++]];
+                    [event convertToEventPathParams:eventPathParamsList[count++]];
                 }
             }
 
@@ -1031,12 +1013,13 @@ private:
 
             chip::app::ReadPrepareParams readParams(session);
             [params toReadPrepareParams:readParams];
-            readParams.mpAttributePathParamsList = attributePathParamsList.get();
+            readParams.mpAttributePathParamsList = attributePathParamsList;
             readParams.mAttributePathParamsListSize = [attributePaths count];
-            readParams.mpEventPathParamsList = eventPathParamsList.get();
+            readParams.mpEventPathParamsList = eventPathParamsList;
             readParams.mEventPathParamsListSize = [eventPaths count];
 
-        auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
+            auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb, attributePathParamsList,
+                              eventPathParamsList](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
                 if (*interactionStatus != CHIP_NO_ERROR) {
                     // Failure
                     failureCb(bridge, *interactionStatus);
@@ -1044,11 +1027,17 @@ private:
                     // Success
                     successCb(bridge, resultArray);
                 }
+                if (attributePathParamsList != nullptr) {
+                    Platform::MemoryFree(attributePathParamsList);
+                }
+                if (eventPathParamsList != nullptr) {
+                    Platform::MemoryFree(eventPathParamsList);
+                }
                 chip::Platform::Delete(callback);
             };
 
             auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                attributePathParamsList.get(), readParams.mAttributePathParamsListSize, eventPathParamsList.get(),
+                attributePathParamsList, readParams.mAttributePathParamsListSize, eventPathParamsList,
                 readParams.mEventPathParamsListSize, onAttributeSuccessCb, onEventSuccessCb, onFailureCb, onDone, nullptr);
             VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -1448,7 +1437,6 @@ exit:
                    readParams.mEventPathParamsListSize = eventPathSize;
 
                    auto onDone = [container](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
-                       container.callbackPtr = nullptr;
                        [container onDone];
                        // Make sure we delete callback last, because doing that actually destroys our
                        // lambda, so we can't access captured values after that.
@@ -1489,7 +1477,6 @@ exit:
 
                    // Read clients will be purged when deregistered.
                    container.readClientPtr = readClient;
-                   container.callbackPtr = callback.get();
                    AddReadClientContainer(container.deviceID, container);
                    callback.release();
                }];
