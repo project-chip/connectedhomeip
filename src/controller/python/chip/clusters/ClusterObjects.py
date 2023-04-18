@@ -282,7 +282,9 @@ class ClusterAttributeDescriptor:
             # register this clusterattribute in the ALL_ATTRIBUTES dict for quick lookups
             ALL_ATTRIBUTES[cls.cluster_id][cls.attribute_id] = cls
         except NotImplementedError:
-            pass # we can safely ignore this
+            # handle case where the ClusterAttribute class is not (fully) subclassed
+            # and accessing the id property throws a NotImplementedError.
+            pass
         
     @classmethod
     def ToTLV(cls, tag: Union[int, None], value):
