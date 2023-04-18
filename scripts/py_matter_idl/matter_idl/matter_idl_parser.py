@@ -257,12 +257,12 @@ class MatterIdlTransformer(Transformer):
         return field
 
     @v_args(meta=True)
-    def server_cluster(self, meta, _):
+    def server_cluster(self, meta, unused_args):
         self._cluster_start_pos = meta and meta.start_pos
         return ClusterSide.SERVER
 
     @v_args(meta=True, inline=True)
-    def client_cluster(self, meta, *_):
+    def client_cluster(self, meta, *unused_args):
         self._cluster_start_pos = meta and meta.start_pos
         return ClusterSide.CLIENT
 
@@ -287,7 +287,7 @@ class MatterIdlTransformer(Transformer):
     def command(self, meta, *args):
         # The command takes 4 arguments if no input argument, 5 if input
         # argument is provided
-        args = list(args) # convert from tuple
+        args = list(args)  # convert from tuple
         if len(args) != 5:
             args.insert(2, None)
 

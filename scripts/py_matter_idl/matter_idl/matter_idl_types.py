@@ -1,6 +1,6 @@
 import enum
 from dataclasses import dataclass, field
-from typing import List, Optional, Union, Set
+from typing import List, Optional, Set, Union
 
 from lark.tree import Meta
 
