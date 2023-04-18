@@ -2,6 +2,7 @@
 
 import functools
 import logging
+from typing import Optional
 
 from lark import Lark
 from lark.lexer import Token
@@ -260,8 +261,8 @@ class MatterIdlTransformer(Transformer):
         self._cluster_start_pos = meta and meta.start_pos
         return ClusterSide.SERVER
 
-    @v_args(meta=True)
-    def client_cluster(self, meta, _):
+    @v_args(meta=True, inline=True)
+    def client_cluster(self, meta, *_):
         self._cluster_start_pos = meta and meta.start_pos
         return ClusterSide.CLIENT
 
@@ -280,8 +281,10 @@ class MatterIdlTransformer(Transformer):
 
         return init_args
 
-    @v_args(meta=True)
-    def command(self, meta, args):
+    # NOTE: awkward inline because the order of 'meta, children' vs 'children, meta' was flipped
+    #       between lark versions in https://github.com/lark-parser/lark/pull/993
+    @v_args(meta=True, inline=True)
+    def command(self, meta, *args):
         # The command takes 4 arguments if no input argument, 5 if input
         # argument is provided
         if len(args) != 5:
@@ -513,7 +516,7 @@ class ParserWithLines:
             }
         )
 
-    def parse(self, file: str, file_name: str = None):
+    def parse(self, file: str, file_name: Optional[str] = None):
         idl = self.transformer.transform(self.parser.parse(file))
         idl.parse_file_name = file_name
 
