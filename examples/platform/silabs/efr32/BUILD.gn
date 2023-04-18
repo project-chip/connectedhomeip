@@ -228,9 +228,7 @@ config("efr32-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  # Do not warn for LOAD segment with RWX permissions
-  # Uncomment this cflag when pigweed update is done and GCC 12.2 is used.
-  #ldflags = [ "-Wl,--no-warn-rwx-segment" ]
+  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
 config("silabs-wifi-config") {
