@@ -140,7 +140,7 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
     extra_args = {}
     for o in option:
         if ':' not in o:
-            logging.fatal("Please specify options as '<key>:<value>'. %r is not valid. "%o)
+            logging.fatal("Please specify options as '<key>:<value>'. %r is not valid. " % o)
             sys.exit(1)
         key, value = o.split(':')
         extra_args[key] = value
