@@ -979,14 +979,12 @@ private:
                 }
             };
 
-            AttributePathParams * attributePathParamsList = nullptr;
-            EventPathParams * eventPathParamsList = nullptr;
+            Platform::ScopedMemoryBuffer<AttributePathParams> attributePathParamsList;
+            Platform::ScopedMemoryBuffer<EventPathParams> eventPathParamsList;
 
             if (attributes != nil) {
                 size_t count = 0;
-                attributePathParamsList
-                    = static_cast<AttributePathParams *>(Platform::MemoryCalloc([attributes count], sizeof(AttributePathParams)));
-                VerifyOrReturnError(attributePathParamsList != nullptr, CHIP_ERROR_NO_MEMORY);
+                VerifyOrReturnError(attributePathParamsList.Calloc([attributes count]), CHIP_ERROR_NO_MEMORY);
                 for (MTRAttributeRequestPath * attribute in attributes) {
                     [attribute convertToAttributePathParams:attributePathParamsList[count++]];
                 }
@@ -994,15 +992,7 @@ private:
 
             if (events != nil) {
                 size_t count = 0;
-                eventPathParamsList
-                    = static_cast<EventPathParams *>(Platform::MemoryCalloc([events count], sizeof(EventPathParams)));
-                if (eventPathParamsList == nullptr) {
-                    if (attributePathParamsList != nullptr) {
-                        Platform::MemoryFree(attributePathParamsList);
-                        attributePathParamsList = nullptr;
-                    }
-                    return CHIP_ERROR_NO_MEMORY;
-                }
+                VerifyOrReturnError(eventPathParamsList.Calloc([events count]), CHIP_ERROR_NO_MEMORY);
                 for (MTREventRequestPath * event in events) {
                     [event convertToEventPathParams:eventPathParamsList[count++]];
                 }
@@ -1013,13 +1003,16 @@ private:
 
             chip::app::ReadPrepareParams readParams(session);
             [params toReadPrepareParams:readParams];
-            readParams.mpAttributePathParamsList = attributePathParamsList;
+            readParams.mpAttributePathParamsList = attributePathParamsList.Get();
             readParams.mAttributePathParamsListSize = [attributePaths count];
-            readParams.mpEventPathParamsList = eventPathParamsList;
+            readParams.mpEventPathParamsList = eventPathParamsList.Get();
             readParams.mEventPathParamsListSize = [eventPaths count];
 
-            auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb, attributePathParamsList,
-                              eventPathParamsList](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
+            AttributePathParams * attributePathParamsListToFree = attributePathParamsList.Get();
+            EventPathParams * eventPathParamsListToFree = eventPathParamsList.Get();
+
+            auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb, attributePathParamsListToFree,
+                           eventPathParamsListToFree](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
                 if (*interactionStatus != CHIP_NO_ERROR) {
                     // Failure
                     failureCb(bridge, *interactionStatus);
@@ -1027,17 +1020,17 @@ private:
                     // Success
                     successCb(bridge, resultArray);
                 }
-                if (attributePathParamsList != nullptr) {
-                    Platform::MemoryFree(attributePathParamsList);
+                if (attributePathParamsListToFree != nullptr) {
+                    Platform::MemoryFree(attributePathParamsListToFree);
                 }
-                if (eventPathParamsList != nullptr) {
-                    Platform::MemoryFree(eventPathParamsList);
+                if (eventPathParamsListToFree != nullptr) {
+                    Platform::MemoryFree(eventPathParamsListToFree);
                 }
                 chip::Platform::Delete(callback);
             };
 
             auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                attributePathParamsList, readParams.mAttributePathParamsListSize, eventPathParamsList,
+                attributePathParamsList.Get(), readParams.mAttributePathParamsListSize, eventPathParamsList.Get(),
                 readParams.mEventPathParamsListSize, onAttributeSuccessCb, onEventSuccessCb, onFailureCb, onDone, nullptr);
             VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -1058,6 +1051,8 @@ private:
             //
             callback->AdoptReadClient(std::move(readClient));
             callback.release();
+            attributePathParamsList.Release();
+            eventPathParamsList.Release();
             return err;
         });
     std::move(*bridge).DispatchAction(self);
