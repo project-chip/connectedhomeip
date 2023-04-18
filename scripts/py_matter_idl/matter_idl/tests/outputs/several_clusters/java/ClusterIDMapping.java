@@ -21,8 +21,10 @@ public class ClusterIDMapping {
         long getID();
         String getAttributeName(long id) throws NoSuchFieldError;
         String getEventName(long id) throws NoSuchFieldError;
+        String getCommandName(long id) throws NoSuchFieldError;
         long getAttributeID(String name) throws IllegalArgumentException;
         long getEventID(String name) throws IllegalArgumentException;
+        long getCommandID(String name) throws IllegalArgumentException;
     }
 
     public static BaseCluster getCluster(long clusterId) {
@@ -83,6 +85,26 @@ public class ClusterIDMapping {
             }
         }
 
+        public enum Command {;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
         @Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
@@ -94,6 +116,11 @@ public class ClusterIDMapping {
         }
 
         @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
         public long getAttributeID(String name) throws IllegalArgumentException {
             return Attribute.valueOf(name).getID();
         }
@@ -101,6 +128,11 @@ public class ClusterIDMapping {
         @Override
         public long getEventID(String name) throws IllegalArgumentException {
             return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
         }
     }
     public static class Second implements BaseCluster {
@@ -150,6 +182,26 @@ public class ClusterIDMapping {
             }
         }
 
+        public enum Command {;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
         @Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
@@ -161,6 +213,11 @@ public class ClusterIDMapping {
         }
 
         @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
         public long getAttributeID(String name) throws IllegalArgumentException {
             return Attribute.valueOf(name).getID();
         }
@@ -168,6 +225,11 @@ public class ClusterIDMapping {
         @Override
         public long getEventID(String name) throws IllegalArgumentException {
             return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
         }
     }
     public static class Third implements BaseCluster {
@@ -218,6 +280,26 @@ public class ClusterIDMapping {
             }
         }
 
+        public enum Command {;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
         @Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
@@ -229,6 +311,11 @@ public class ClusterIDMapping {
         }
 
         @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
         public long getAttributeID(String name) throws IllegalArgumentException {
             return Attribute.valueOf(name).getID();
         }
@@ -236,5 +323,10 @@ public class ClusterIDMapping {
         @Override
         public long getEventID(String name) throws IllegalArgumentException {
             return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
         }
     }}
