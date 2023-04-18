@@ -179,10 +179,10 @@ source_set("efr32-attestation-credentials") {
   public_configs = [ ":attestation-credentials-config" ]
 }
 
-source_set("efr32-factory-data-provider") {
+source_set("silabs-factory-data-provider") {
   sources = [
-    "EFR32DeviceDataProvider.cpp",
-    "EFR32DeviceDataProvider.h",
+    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
+    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.h",
   ]
 
   public_deps = [
@@ -356,7 +356,7 @@ source_set("efr32-common") {
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
-    public_deps += [ ":efr32-factory-data-provider" ]
+    public_deps += [ ":silabs-factory-data-provider" ]
   }
 
   if (chip_config_use_icd_subscription_callbacks) {
