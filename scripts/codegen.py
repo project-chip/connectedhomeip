@@ -128,7 +128,7 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
     if generator.startswith('custom:'):
         # check that the plugin path is provided
         custom_params = generator.split(':')
-        if len(custom_params) != 3
+        if len(custom_params) != 3:
             logging.fatal("Custom generator format not valid. Please use --generator custom:<path>:<module>")
             sys.exit(1)
         (generator, plugin_path, plugin_module) = custom_params
