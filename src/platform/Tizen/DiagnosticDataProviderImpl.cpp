@@ -487,16 +487,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-/*
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & bssId)
 {
     return ConnectivityMgrImpl().GetWiFiBssId(bssId);
-}
-*/
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & bssId)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
