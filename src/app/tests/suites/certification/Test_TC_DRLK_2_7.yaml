@@ -35,6 +35,7 @@ tests:
                 value: nodeId
 
     - label: "Create new user"
+      PICS: DRLK.S.F08
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -55,6 +56,7 @@ tests:
                 value: 0
 
     - label: "Read the user back and verify its fields"
+      PICS: DRLK.S.F08
       command: "GetUser"
       arguments:
           values:
@@ -183,6 +185,7 @@ tests:
                     hasValue: false
 
     - label: "Create a user with userIndex as 5"
+      PICS: DRLK.S.F08
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -321,6 +324,7 @@ tests:
                 value: 1
 
     - label: "Cleanup the created user with UserIndex 1"
+      PICS: DRLK.S.F08
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -329,6 +333,7 @@ tests:
                 value: 1
 
     - label: "Cleanup the created user with UserIndex 5"
+      PICS: DRLK.S.F08
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000
       arguments:

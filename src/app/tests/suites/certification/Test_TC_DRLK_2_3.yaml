@@ -33,6 +33,7 @@ tests:
                 value: nodeId
 
     - label: "Create new user"
+      PICS: DRLK.S.F08
       command: "SetUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -54,6 +55,7 @@ tests:
 
     - label: "Read the user back and verify its fields"
       command: "GetUser"
+      PICS: DRLK.S.F08
       arguments:
           values:
               - name: "UserIndex"
@@ -83,6 +85,7 @@ tests:
 
     - label: "Create new PIN credential and lock/unlock user"
       command: "SetCredential"
+      PICS: DRLK.S.F08
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
@@ -109,6 +112,7 @@ tests:
 
     - label: "Verify created PIN credential"
       command: "GetCredentialStatus"
+      PICS: DRLK.S.F08
       arguments:
           values:
               - name: "Credential"
@@ -159,7 +163,7 @@ tests:
       timedInteractionTimeoutMs: 1000
 
     - label: "TH sends the unlock Door command to the DUT with valid PINCode"
-      PICS: DRLK.S.C01.Rsp
+      PICS: DRLK.S.C01.Rsp && DRLK.S.F08
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -428,6 +432,7 @@ tests:
                 value: "y"
 
     - label: "Cleanup the created user"
+      PICS: DRLK.S.F08
       command: "ClearUser"
       timedInteractionTimeoutMs: 1000
       arguments:

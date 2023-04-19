@@ -35,6 +35,7 @@ tests:
                 value: nodeId
 
     - label: "Create new user with default parameters"
+      PICS: DRLK.S.F08
       command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -55,6 +56,7 @@ tests:
                 value: 0
 
     - label: "Read the user back and verify its fields"
+      PICS: DRLK.S.F08
       command: "GetUser"
       arguments:
           values:
@@ -410,6 +412,7 @@ tests:
           error: INVALID_COMMAND
 
     - label: "Cleanup the first created user"
+      PICS: DRLK.S.F08
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -418,6 +421,7 @@ tests:
                 value: 1
 
     - label: "Cleanup the second created user"
+      PICS: DRLK.S.F08
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000
       arguments:

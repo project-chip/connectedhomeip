@@ -34,6 +34,7 @@ tests:
                 value: nodeId
 
     - label: "Create new user"
+      PICS: DRLK.S.F08
       command: "SetUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -54,6 +55,7 @@ tests:
                 value: 0
 
     - label: "Read the user back and verify its fields"
+      PICS: DRLK.S.F08
       command: "GetUser"
       arguments:
           values:
@@ -83,6 +85,7 @@ tests:
                 value: null
 
     - label: "Create new PIN credential and lock/unlock user"
+      PICS: DRLK.S.F08
       command: "SetCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -109,6 +112,7 @@ tests:
                 value: 2
 
     - label: "Verify created PIN credential"
+      PICS: DRLK.S.F08
       command: "GetCredentialStatus"
       arguments:
           values:
@@ -171,6 +175,7 @@ tests:
           value: 1
 
     - label: "Cleanup the created user"
+      PICS: DRLK.S.F08
       command: "ClearUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -179,7 +184,7 @@ tests:
                 value: 1
 
     - label: "Clean the created credential"
-      PICS: DRLK.S.C26.Rsp
+      PICS: DRLK.S.C26.Rsp && DRLK.S.F08
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:

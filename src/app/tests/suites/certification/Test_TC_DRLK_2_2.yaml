@@ -32,6 +32,7 @@ tests:
                 value: nodeId
 
     - label: "Create new user"
+      PICS: DRLK.S.F08
       command: "SetUser"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -52,6 +53,7 @@ tests:
                 value: 0
 
     - label: "Read the user back and verify its fields"
+      PICS: DRLK.S.F08
       command: "GetUser"
       arguments:
           values:
@@ -81,6 +83,7 @@ tests:
                 value: null
 
     - label: "Create new PIN credential and lock/unlock user"
+      PICS: DRLK.S.F00 && DRLK.S.F08
       command: "SetCredential"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -107,6 +110,7 @@ tests:
                 value: 2
 
     - label: "Verify created PIN credential"
+      PICS: DRLK.S.F00 && DRLK.S.F08
       command: "GetCredentialStatus"
       arguments:
           values:
@@ -137,7 +141,7 @@ tests:
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: "!DRLK.S.A0033"
+      PICS: !DRLK.S.A0033
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -158,7 +162,7 @@ tests:
       timedInteractionTimeoutMs: 1000
 
     - label: "TH sends Lock Door Command to the DUT with valid PINCode"
-      PICS: DRLK.S.C00.Rsp
+      PICS: DRLK.S.C00.Rsp && DRLK.S.F00 && DRLK.S.F08
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -169,7 +173,7 @@ tests:
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT"
-      PICS: DRLK.S.A0033
+      PICS: DRLK.S.A0033 && DRLK.S.F00
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -178,7 +182,7 @@ tests:
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: "!DRLK.S.A0033"
+      PICS: !DRLK.S.A0033 && DRLK.S.F08
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -395,6 +399,7 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Clean the created user"
+      PICS: DRLK.S.F08
       command: "ClearUser"
       timedInteractionTimeoutMs: 1000
       arguments:
