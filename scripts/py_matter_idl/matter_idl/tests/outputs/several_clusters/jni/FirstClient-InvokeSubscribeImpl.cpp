@@ -1,6 +1,6 @@
 #include <jni/CHIPCallbackTypes.h>
+#include <jni/CHIPReadCallbacks.h>
 #include <controller/java/zap-generated/CHIPInvokeCallbacks.h>
-#include <controller/java/zap-generated/CHIPReadCallbacks.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <zap-generated/CHIPClientCallbacks.h>

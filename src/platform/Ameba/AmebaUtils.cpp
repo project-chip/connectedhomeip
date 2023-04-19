@@ -136,7 +136,7 @@ CHIP_ERROR AmebaUtils::WiFiDisconnect(void)
     return err;
 }
 
-CHIP_ERROR AmebaUtils::WiFiConnect(void)
+CHIP_ERROR AmebaUtils::WiFiConnectProvisionedNetwork(void)
 {
     CHIP_ERROR err             = CHIP_NO_ERROR;
     rtw_wifi_config_t * config = (rtw_wifi_config_t *) pvPortMalloc(sizeof(rtw_wifi_config_t));
@@ -144,9 +144,56 @@ CHIP_ERROR AmebaUtils::WiFiConnect(void)
     GetWiFiConfig(config);
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) config->ssid);
     int ameba_err = matter_wifi_connect((char *) config->ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) config->password,
-                                        strlen((const char *) config->ssid), strlen((const char *) config->password), 0, NULL);
+                                        strlen((const char *) config->ssid), strlen((const char *) config->password), 0, nullptr);
 
     vPortFree(config);
     err = (ameba_err == RTW_SUCCESS) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    return err;
+}
+
+CHIP_ERROR AmebaUtils::WiFiConnect(const char * ssid, const char * password)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) ssid);
+    int ameba_err = matter_wifi_connect((char *) ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) password, strlen(ssid),
+                                        strlen(password), 0, nullptr);
+    err           = (ameba_err == RTW_SUCCESS) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    return err;
+}
+
+CHIP_ERROR AmebaUtils::SetCurrentProvisionedNetwork()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    rtw_wifi_setting_t pSetting;
+    int ret = matter_get_sta_wifi_info(&pSetting);
+    if (ret < 0)
+    {
+        ChipLogProgress(DeviceLayer, "STA No Wi-Fi Info");
+        goto exit;
+    }
+    else
+    {
+        rtw_wifi_config_t config = { 0 };
+        GetWiFiConfig(&config);
+        if (!memcmp(config.ssid, pSetting.ssid, strlen((const char *) pSetting.ssid) + 1))
+        {
+            ChipLogProgress(DeviceLayer, "STA Wi-Fi Info exist, do nothing");
+            goto exit;
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "STA Wi-Fi Info ");
+
+            memcpy(config.ssid, pSetting.ssid, strlen((const char *) pSetting.ssid) + 1);
+            memcpy(config.password, pSetting.password, strlen((const char *) pSetting.password) + 1);
+            err = SetWiFiConfig(&config);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "SetWiFiConfig() failed");
+                goto exit;
+            }
+        }
+    }
+exit:
     return err;
 }

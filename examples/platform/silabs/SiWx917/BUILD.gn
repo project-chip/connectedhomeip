@@ -35,6 +35,9 @@ declare_args() {
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
 
+  # use commissionable data for SiWx917
+  siwx917_commissionable_data = false
+
   #default WiFi SSID
   chip_default_wifi_ssid = ""
 
@@ -126,7 +129,7 @@ config("attestation-credentials-config") {
 
   defines = [
     # Set to 1 to enable SI917 attestation credentials
-    "SI917_ATTESTATION_CREDENTIALS",
+    "SILABS_ATTESTATION_CREDENTIALS",
   ]
 }
 
@@ -144,10 +147,10 @@ source_set("siwx917-attestation-credentials") {
   public_configs = [ ":attestation-credentials-config" ]
 }
 
-source_set("siwx917-factory-data-provider") {
+source_set("silabs-factory-data-provider") {
   sources = [
-    "SiWx917DeviceDataProvider.cpp",
-    "SiWx917DeviceDataProvider.h",
+    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
+    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.h",
   ]
 
   public_deps = [
@@ -155,13 +158,15 @@ source_set("siwx917-factory-data-provider") {
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/setup_payload",
   ]
+
+  public_configs = [ ":siwx917-common-config" ]
 }
 
 config("siwx917-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
   if (!disable_lcd) {
-    include_dirs = [ "display" ]
+    include_dirs = [ "${silabs_common_plat_dir}/display" ]
 
     defines += [ "DISPLAY_ENABLED" ]
   }
@@ -171,11 +176,15 @@ config("siwx917-common-config") {
   }
 
   if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
+    defines += [ "SILABS_OTA_ENABLED" ]
   }
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
+  }
+
+  if (siwx917_commissionable_data) {
+    defines += [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
   }
 }
 
@@ -224,7 +233,6 @@ source_set("siwx917-common") {
     ".",
     "SiWx917/",
     "${wifi_sdk_dir}",
-    "${wifi_sdk_dir}/hal",
   ]
 
   sources = [
@@ -258,16 +266,16 @@ source_set("siwx917-common") {
 
   if (!disable_lcd) {
     sources += [
-      "display/demo-ui.c",
-      "display/lcd.cpp",
+      "${silabs_common_plat_dir}/display/demo-ui.c",
+      "${silabs_common_plat_dir}/display/lcd.cpp",
     ]
 
-    include_dirs += [ "display" ]
+    include_dirs += [ "${silabs_common_plat_dir}/display" ]
     public_deps += [ "${chip_root}/examples/common/QRCode" ]
   }
 
   if (enable_heap_monitoring) {
-    sources += [ "MemMonitoring.cpp" ]
+    sources += [ "${silabs_common_plat_dir}/MemMonitoring.cpp" ]
   }
 
   if (chip_enable_wifi) {
@@ -285,7 +293,7 @@ source_set("siwx917-common") {
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
-    public_deps += [ ":siwx917-factory-data-provider" ]
+    public_deps += [ ":silabs-factory-data-provider" ]
   }
 
   public_deps += [

@@ -842,7 +842,6 @@ static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
@@ -863,11 +862,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 
     G = curve_G;
 
-    return error;
-
-exit:
-    _log_mbedTLS_error(result);
-    Clear();
     return error;
 }
 
@@ -926,20 +920,18 @@ exit:
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_len, void * fe)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
 
     uECC_word_t tmp[2 * NUM_ECC_WORDS] = { 0 };
     uECC_vli_bytesToNative(tmp, in, NUM_ECC_BYTES);
 
     uECC_vli_mmod((uECC_word_t *) fe, tmp, curve_n);
 
-exit:
-    _log_mbedTLS_error(result);
     return error;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, uint8_t * out, size_t out_len)
 {
+    (void) out_len;
     uECC_vli_nativeToBytes(out, NUM_ECC_BYTES, (const unsigned int *) fe);
 
     return CHIP_NO_ERROR;
@@ -967,12 +959,9 @@ exit:
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEMul(void * fer, const void * fe1, const void * fe2)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
 
     uECC_vli_modMult((uECC_word_t *) fer, (const uECC_word_t *) fe1, (const uECC_word_t *) fe2, (const uECC_word_t *) curve_n);
 
-exit:
-    _log_mbedTLS_error(result);
     return error;
 }
 
@@ -1018,7 +1007,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
     uECC_word_t R1[2 * NUM_ECC_WORDS];
     uECC_word_t R2[2 * NUM_ECC_WORDS];
     uECC_word_t z[NUM_ECC_WORDS];
-    uint8_t ret = UECC_SUCCESS;
 
     if (EccPoint_mult_safer(R1, (const uECC_word_t *) P1, (const uECC_word_t *) fe1) != UECC_SUCCESS)
     {
@@ -1490,7 +1478,6 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
     CHIP_ERROR error = CHIP_NO_ERROR;
     mbedtls_x509_crt mbed_cert;
     mbedtls_uecc_keypair * keypair = nullptr;
-    size_t pubkey_size             = 0;
 
     mbedtls_x509_crt_init(&mbed_cert);
 

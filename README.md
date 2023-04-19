@@ -2,6 +2,7 @@
 
 [![Builds](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/build.yaml)
 
+**Examples:**
 [![Examples - EFR32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20EFR32/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-efr32.yaml)
 [![Examples - ESP32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20ESP32/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-esp32.yaml)
 [![Examples - i.MX Linux](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20i.MX%20Linux/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-imx.yaml)
@@ -14,13 +15,21 @@
 [![Build example - Infineon](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-infineon.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-infineon.yaml)
 [![Build example - BouffaloLab](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20BouffaloLab/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-bouffalolab.yaml)
 
+**Platforms:**
 [![Android](https://github.com/project-chip/connectedhomeip/workflows/Android/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/android.yaml)
 
+**Tests:**
 [![Unit / Integration Tests](https://github.com/project-chip/connectedhomeip/workflows/Unit%20/%20Integration%20Tests/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/unit_integration_test.yaml)
 [![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/cirque.yaml)
 [![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/qemu.yaml)
 
+**Tools:**
 [![ZAP Templates](https://github.com/project-chip/connectedhomeip/workflows/ZAP/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/zap_templates.yaml)
+
+**Documentation:**
+[![Documentation Build](https://github.com/project-chip/connectedhomeip/actions/workflows/docbuild.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/docbuild.yaml)
+
+-   [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html)
 
 # About
 
@@ -180,26 +189,26 @@ Instructions about how to build Matter can be found [here](./docs/README.md) .
 
 The Matter repository is structured as follows:
 
-| File/Folder        | Content                                                            |
-| ------------------ | ------------------------------------------------------------------ |
-| build              | Build system support content and built output directories          |
-| build_overrides    | Build system parameter customization for different platforms       |
-| config             | Project configurations                                             |
-| credentials        | Development and test credentials                                   |
-| docs               | Documentation, including guides                                    |
-| examples           | Example firmware applications that demonstrate use of Matter       |
-| integrations       | 3rd Party integrations                                             |
-| scripts            | Scripts needed to work with the Matter repository                  |
-| src                | Implementation of Matter                                           |
-| third_party        | 3rd party code used by Matter                                      |
-| zzz_generated      | zap generated template code - Revolving around cluster information |
-| BUILD.gn           | Build file for the gn build system                                 |
-| CODE_OF_CONDUCT.md | Code of conduct for Matter and contribution to it                  |
-| CONTRIBUTING.md    | Guidelines for contributing to Matter                              |
-| LICENSE            | Matter license file                                                |
-| REVIEWERS.md       | PR reviewers                                                       |
-| gn_build.sh        | Build script for specific projects such as Android, EFR32, etc.    |
-| README.md          | This File                                                          |
+| File/Folder        | Content                                                                                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| build              | Build system support content and built output directories                                                                                             |
+| build_overrides    | Build system parameter customization for different platforms                                                                                          |
+| config             | Project configurations                                                                                                                                |
+| credentials        | Development and test credentials                                                                                                                      |
+| docs               | Documentation, including guides. Visit the [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html) to read it. |
+| examples           | Example firmware applications that demonstrate use of Matter                                                                                          |
+| integrations       | 3rd Party integrations                                                                                                                                |
+| scripts            | Scripts needed to work with the Matter repository                                                                                                     |
+| src                | Implementation of Matter                                                                                                                              |
+| third_party        | 3rd party code used by Matter                                                                                                                         |
+| zzz_generated      | zap generated template code - Revolving around cluster information                                                                                    |
+| BUILD.gn           | Build file for the gn build system                                                                                                                    |
+| CODE_OF_CONDUCT.md | Code of conduct for Matter and contribution to it                                                                                                     |
+| CONTRIBUTING.md    | Guidelines for contributing to Matter                                                                                                                 |
+| LICENSE            | Matter license file                                                                                                                                   |
+| REVIEWERS.md       | PR reviewers                                                                                                                                          |
+| gn_build.sh        | Build script for specific projects such as Android, EFR32, etc.                                                                                       |
+| README.md          | This File                                                                                                                                             |
 
 # License
 

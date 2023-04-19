@@ -75,7 +75,7 @@ uint16_t KeyValueStoreManagerImpl::hashKvsKeyString(const char * key) const
     uint8_t hash256[Crypto::kSHA256_Hash_Length] = { 0 };
     Crypto::Hash_SHA256(reinterpret_cast<const uint8_t *>(key), strlen(key), hash256);
 
-    uint16_t hash16, i = 0;
+    uint16_t hash16 = 0, i = 0;
 
     while (!hash16 && (i < (Crypto::kSHA256_Hash_Length - 1)))
     {

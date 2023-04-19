@@ -25,23 +25,26 @@ extern "C" {
 #include "sl_mx25_flash_shutdown_usart_config.h"
 #include "sl_spidrv_exp_config.h"
 #include "sl_wfx_host_api.h"
+#include "spidrv.h"
 
-#define LCD_BIT_RATE 1100000
-#define EXP_HDR_BIT_RATE 16000000
-#define SPI_FLASH_BIT_RATE 16000000
-
-typedef enum PERIPHERAL_TYPE
-{
-    EXP_HDR = 0,
-    LCD,
-    EXT_SPIFLASH,
-} peripheraltype_t;
+#define SL_BIT_RATE_LCD 1100000
+#define SL_BIT_RATE_EXP_HDR 16000000
+#define SL_BIT_RATE_SPI_FLASH 16000000
+#define SL_BIT_RATE_UART_CONSOLE 16000000
 
 extern SemaphoreHandle_t spi_sem_sync_hdl;
-extern peripheraltype_t pr_type;
+
+#ifdef RS911X_WIFI
+extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
+#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
+#endif
+
+#ifdef WF200_WIFI
+extern SPIDRV_Handle_t sl_spidrv_exp_handle;
+#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
+#endif
 
 void spi_drv_reinit(uint32_t);
-void set_spi_baudrate(peripheraltype_t);
 
 void spiflash_cs_assert(void);
 void spiflash_cs_deassert(void);

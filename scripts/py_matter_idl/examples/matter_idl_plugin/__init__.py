@@ -14,7 +14,6 @@
 
 import os
 
-import jinja2
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import Cluster, ClusterSide, Command, Field, Idl
 
@@ -199,13 +198,11 @@ class CustomGenerator(CodeGenerator):
         Inintialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.
         """
-        super().__init__(storage, idl)
+        super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
-        # Override the template path to use local templates within this plugin directory
-        self.jinja_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(
-                searchpath=os.path.dirname(__file__)),
-            keep_trailing_newline=True)
+        if 'package' not in kargs:
+            raise Exception('Please provide a "--option package:<name>" argument')
+        self.package = kargs['package']
 
         # String helpers
         self.jinja_env.filters['toLowerSnakeCase'] = toLowerSnakeCase
@@ -241,9 +238,10 @@ class CustomGenerator(CodeGenerator):
 
             # Header containing a macro to initialize all cluster plugins
             self.internal_render_one_output(
-                template_path="./matter_cluster_proto.jinja",
+                template_path="matter_cluster_proto.jinja",
                 output_file_name=filename,
                 vars={
                     'cluster': cluster,
+                    'package': self.package,
                 }
             )

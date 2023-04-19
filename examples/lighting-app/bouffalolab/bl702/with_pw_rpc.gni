@@ -24,4 +24,9 @@ chip_enable_pw_rpc = true
 chip_build_pw_trace_lib = false
 
 cpp_standard = "gnu++17"
-#pw_trace_BACKEND = "$dir_pw_trace_tokenized"
+
+# pigweed updated to a1bd248 makes compile conversion errors;
+# it seems riscv gcc (version > 10) can fixes this issue.
+# let's disable strict warnings for RPC enabled for now.
+remove_default_configs = [ "$dir_pw_build:strict_warnings" ]
+treat_warnings_as_errors = false

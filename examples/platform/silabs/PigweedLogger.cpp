@@ -68,9 +68,8 @@ void init(void)
 
 int putString(const char * buffer, size_t size)
 {
-    assert(sWriteBufferPos < kWriteBufferSize);
-
     xSemaphoreTake(sLoggerLock, portMAX_DELAY);
+    assert(sWriteBufferPos < kWriteBufferSize);
 
     for (size_t i = 0; i < size; ++i)
     {

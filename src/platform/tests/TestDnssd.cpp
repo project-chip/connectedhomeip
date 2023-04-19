@@ -164,8 +164,8 @@ int TestDnssd()
             // This will stop the event loop above, and wait till it has actually stopped
             // (i.e exited RunEventLoop()).
             //
-            chip::Dnssd::ChipDnssdShutdown();
             chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+            chip::Dnssd::ChipDnssdShutdown();
             chip::DeviceLayer::PlatformMgr().Shutdown();
             shutdown = true;
 
@@ -181,8 +181,8 @@ int TestDnssd()
 
     if (!shutdown)
     {
-        chip::Dnssd::ChipDnssdShutdown();
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        chip::Dnssd::ChipDnssdShutdown();
         chip::DeviceLayer::PlatformMgr().Shutdown();
     }
     chip::Platform::MemoryShutdown();

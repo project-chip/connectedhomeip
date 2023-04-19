@@ -1,6 +1,9 @@
 {{#first}}
 
 {{/first}}
+  {{#if description}}
+  /** {{description}} */
+  {{/if}}
   {{~indent 1~}}
   {{#if isFabricScoped~}} fabric {{/if~}}
   {{#if mustUseTimedInvoke~}} timed {{/if~}}

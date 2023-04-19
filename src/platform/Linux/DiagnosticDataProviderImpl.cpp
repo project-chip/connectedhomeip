@@ -818,7 +818,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
     return ConnectivityMgrImpl().GetWiFiVersion(wiFiVersion);
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & value)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & value)
 {
     return ConnectivityMgrImpl().GetWiFiBssId(value);
 }

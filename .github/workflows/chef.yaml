@@ -30,7 +30,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.47
+            image: connectedhomeip/chip-build:0.7.0
             options: --user root
 
         steps:
@@ -43,7 +43,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform linux
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Bootstrap cache
               uses: actions/cache@v3
               timeout-minutes: 10
@@ -66,7 +66,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.6.47
+            image: connectedhomeip/chip-build-esp32:0.7.0
             options: --user root
 
         steps:
@@ -79,7 +79,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform esp32
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform esp32
             - name: Bootstrap cache
               uses: actions/cache@v3
               timeout-minutes: 10
@@ -102,7 +102,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.6.47
+            image: connectedhomeip/chip-build-nrf-platform:0.7.0
             options: --user root
 
         steps:
@@ -115,7 +115,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform nrfconnect
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform nrfconnect
             - name: Bootstrap cache
               uses: actions/cache@v3
               timeout-minutes: 10

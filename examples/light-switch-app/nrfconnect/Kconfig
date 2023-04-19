@@ -47,6 +47,9 @@ config NRF_WIFI_LOW_POWER
 
 endif # CHIP_WIFI
 
+config CHIP_ICD_SUBSCRIPTION_HANDLING
+	default y
+
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

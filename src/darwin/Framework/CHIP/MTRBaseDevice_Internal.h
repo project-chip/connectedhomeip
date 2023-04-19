@@ -18,11 +18,13 @@
 #import "MTRBaseDevice.h"
 #import <Foundation/Foundation.h>
 
+#include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
 #include <app/EventLoggingTypes.h>
+#include <app/EventPathParams.h>
 
 @class MTRDeviceController;
 
@@ -104,6 +106,14 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                    timestamp:(const chip::app::Timestamp &)timestamp
                        value:(id _Nullable)value
                        error:(NSError * _Nullable)error;
+@end
+
+@interface MTRAttributeRequestPath ()
+- (void)convertToAttributePathParams:(chip::app::AttributePathParams &)params;
+@end
+
+@interface MTREventRequestPath ()
+- (void)convertToEventPathParams:(chip::app::EventPathParams &)params;
 @end
 
 // Exported utility function
