@@ -152,20 +152,20 @@ config CHIP_LOG_SIZE_OPTIMIZATION
 
 config CHIP_BUTTON_MANAGER_IRQ_MODE
 	bool "Use GPIO in an IRQ mode instead of polling the GPIO"
-	default n
+	default PM
 	help
 	  Use GPIO in an IRQ mode to avoid button polling loop and extend the battery lifetime by waking up by GPIO event. 
 	  GPIO events are working only with GPIO IRQ. This option changes button matrix configuration. 
 	
 config CHIP_ENABLE_APPLICATION_STATUS_LED
 	bool "Enable application status LED"
-	default y
+	default !(PM)
 	help
 	  Enable application status LED.
 
 config CHIP_ENABLE_PM_DURING_BLE
 	bool "Enable PM during BLE operation"
-	default y
+	default PM
 	help
 	  Enable PM during BLE operation.
 
@@ -175,3 +175,7 @@ config CHIP_OPENTHREAD_TX_POWER
 	default 0
 	help
 	  OpenThread Transmission power in dBm.
+
+config SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
+	int
+	default 255 if SHELL_BACKEND_SERIAL

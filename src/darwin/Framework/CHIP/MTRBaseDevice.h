@@ -130,6 +130,38 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
     MTRTransportTypeTCP,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * A path indicating an attribute being requested (for read or subscribe).
+ *
+ * nil is used to represent wildcards.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRAttributeRequestPath : NSObject <NSCopying>
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint;
+@property (nonatomic, readonly, copy, nullable) NSNumber * cluster;
+@property (nonatomic, readonly, copy, nullable) NSNumber * attribute;
+
++ (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
+                                             clusterID:(NSNumber * _Nullable)clusterID
+                                           attributeID:(NSNumber * _Nullable)attributeID MTR_NEWLY_AVAILABLE;
+@end
+
+/**
+ * A path indicating an event being requested (for read or subscribe).
+ *
+ * nil is used to represent wildcards.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTREventRequestPath : NSObject <NSCopying>
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint;
+@property (nonatomic, readonly, copy, nullable) NSNumber * cluster;
+@property (nonatomic, readonly, copy, nullable) NSNumber * event;
+
++ (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
+                                         clusterID:(NSNumber * _Nullable)clusterID
+                                           eventID:(NSNumber * _Nullable)eventID MTR_NEWLY_AVAILABLE;
+@end
+
 @interface MTRBaseDevice : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -230,6 +262,26 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
+ * Reads multiple attribute or event paths from the device.
+ *
+ * Nil is treated as an empty array for attributePaths and eventPaths.
+ *
+ * Lists of attribute and event paths to read can be provided via attributePaths and eventPaths.
+ *
+ * The completion will be called with an error if the input parameters are invalid (e.g., both attributePaths and eventPaths are
+ * empty.) or the entire read interaction fails. Otherwise it will be called with values, which may be empty (e.g. if no paths
+ * matched the wildcard paths passed in) or may include per-path errors if particular paths failed.
+ *
+ * If the sum of the lengths of attributePaths and eventPaths exceeds 9, the read may fail due to the device not supporting that
+ * many read paths.
+ */
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+
+/**
  * Write to attribute in a designated attribute path
  *
  * @param value       A data-value NSDictionary object as described in
@@ -304,6 +356,27 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
                               reportHandler:(MTRDeviceResponseHandler)reportHandler
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Subscribes to multiple attribute or event paths.
+ *
+ * Nil is treated as an empty array for attributePaths and eventPaths.
+ *
+ * Lists of attribute and event paths to subscribe to can be provided via attributePaths and eventPaths.
+ *
+ * The reportHandler will be called with an error if the inputs are invalid (e.g., both attributePaths and eventPaths are
+ * empty), or if the subscription fails entirely.
+ *
+ * If the sum of the lengths of attributePaths and eventPaths exceeds 3, the subscribe may fail due to the device not supporting
+ * that many paths for a subscription.
+ */
+- (void)subscribeToAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                       eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                           params:(MTRSubscribeParams * _Nullable)params
+                            queue:(dispatch_queue_t)queue
+                    reportHandler:(MTRDeviceResponseHandler)reportHandler
+          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+          resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled MTR_NEWLY_AVAILABLE;
 
 /**
  * Deregister all local report handlers for a remote device

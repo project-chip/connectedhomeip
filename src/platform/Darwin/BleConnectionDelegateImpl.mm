@@ -42,6 +42,8 @@ using namespace chip::Ble;
 
 constexpr uint64_t kScanningWithDiscriminatorTimeoutInSeconds = 60;
 constexpr uint64_t kScanningWithoutDelegateTimeoutInSeconds = 120;
+constexpr uint64_t kCachePeripheralTimeoutInSeconds
+    = static_cast<uint64_t>(CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX / 1000.0 * 8.0 * 0.625);
 constexpr const char * kBleWorkQueueName = "org.csa-iot.matter.framework.ble.workqueue";
 
 typedef NS_ENUM(uint8_t, BleConnectionMode) {
@@ -60,7 +62,7 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
 @property (nonatomic, readonly, nullable) dispatch_source_t timer;
 @property (nonatomic, readonly) BleConnectionMode currentMode;
-@property (strong, nonatomic) NSMutableDictionary * cachedPeripherals;
+@property (strong, nonatomic) NSMutableDictionary<CBPeripheral *, NSDictionary *> * cachedPeripherals;
 @property (unsafe_unretained, nonatomic) bool found;
 @property (unsafe_unretained, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
 @property (unsafe_unretained, nonatomic) void * appState;
@@ -81,6 +83,9 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 - (BOOL)isScanningWithoutDelegate;
 - (BOOL)isScanning;
 - (BOOL)isConnecting;
+- (void)addPeripheralToCache:(CBPeripheral *)peripheral data:(NSData *)data;
+- (void)removePeripheralFromCache:(CBPeripheral *)peripheral;
+- (void)removePeripheralsFromCache;
 
 @end
 
@@ -379,18 +384,7 @@ namespace DeviceLayer {
     }
 
     if (![self isConnecting]) {
-        if ([_cachedPeripherals objectForKey:peripheral] == nil) {
-            ChipLogProgress(Ble, "Storing device %p with discriminator: %d", peripheral, discriminator);
-            if (_scannerDelegate) {
-                dispatch_async(_chipWorkQueue, ^{
-                    ChipBLEDeviceIdentificationInfo info;
-                    memcpy(&info, bytes, sizeof(info));
-                    _scannerDelegate->OnBleScanResult((__bridge void *) peripheral, info);
-                });
-            }
-        }
-
-        _cachedPeripherals[peripheral] = serviceData;
+        [self addPeripheralToCache:peripheral data:serviceData];
     }
 }
 
@@ -542,9 +536,9 @@ namespace DeviceLayer {
 - (void)stop
 {
     [self stopScanning];
-    _scannerDelegate = nil;
-    [_cachedPeripherals removeAllObjects];
+    [self removePeripheralsFromCache];
     _cachedPeripherals = nil;
+    _scannerDelegate = nil;
 
     if (!_centralManager || !_peripheral) {
         return;
@@ -597,17 +591,16 @@ namespace DeviceLayer {
 
 - (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate
 {
-    [_cachedPeripherals removeAllObjects];
     _scannerDelegate = delegate;
     _currentMode = (delegate == nullptr) ? kScanningWithoutDelegate : kScanning;
 
     if (_currentMode == kScanning) {
         for (CBPeripheral * cachedPeripheral in _cachedPeripherals) {
-            NSData * serviceData = _cachedPeripherals[cachedPeripheral];
+            NSData * serviceData = _cachedPeripherals[cachedPeripheral][@"data"];
             dispatch_async(_chipWorkQueue, ^{
                 ChipBLEDeviceIdentificationInfo info;
                 memcpy(&info, [serviceData bytes], sizeof(info));
-                _scannerDelegate->OnBleScanResult((__bridge void *) cachedPeripheral, info);
+                _scannerDelegate->OnBleScanAdd((__bridge void *) cachedPeripheral, info);
             });
         }
     }
@@ -623,7 +616,7 @@ namespace DeviceLayer {
 
     CBPeripheral * peripheral = nil;
     for (CBPeripheral * cachedPeripheral in _cachedPeripherals) {
-        NSData * serviceData = _cachedPeripherals[cachedPeripheral];
+        NSData * serviceData = _cachedPeripherals[cachedPeripheral][@"data"];
         ChipBLEDeviceIdentificationInfo info;
         memcpy(&info, [serviceData bytes], sizeof(info));
 
@@ -632,6 +625,8 @@ namespace DeviceLayer {
             break;
         }
     }
+
+    [self removePeripheralsFromCache];
 
     if (peripheral) {
         ChipLogProgress(Ble, "Connecting to cached device: %p", peripheral);
@@ -650,6 +645,62 @@ namespace DeviceLayer {
     ChipLogProgress(Ble, "Connecting to device: %p", peripheral);
     [self connect:peripheral];
     [self stopScanning];
+}
+
+- (void)addPeripheralToCache:(CBPeripheral *)peripheral data:(NSData *)data
+{
+    dispatch_source_t timeoutTimer;
+
+    if ([_cachedPeripherals objectForKey:peripheral]) {
+        timeoutTimer = _cachedPeripherals[peripheral][@"timer"];
+    } else {
+        auto delegate = _scannerDelegate;
+        if (delegate) {
+            dispatch_async(_chipWorkQueue, ^{
+                ChipBLEDeviceIdentificationInfo info;
+                auto bytes = (const uint8_t *) [data bytes];
+                memcpy(&info, bytes, sizeof(info));
+                delegate->OnBleScanAdd((__bridge void *) peripheral, info);
+            });
+        }
+
+        timeoutTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
+        dispatch_source_set_event_handler(timeoutTimer, ^{
+            [self removePeripheralFromCache:peripheral];
+        });
+        dispatch_resume(timeoutTimer);
+    }
+
+    auto timeout = static_cast<int64_t>(kCachePeripheralTimeoutInSeconds * NSEC_PER_SEC);
+    dispatch_source_set_timer(timeoutTimer, dispatch_walltime(nullptr, timeout), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+
+    _cachedPeripherals[peripheral] = @{
+        @"data" : data,
+        @"timer" : timeoutTimer,
+    };
+}
+
+- (void)removePeripheralFromCache:(CBPeripheral *)peripheral
+{
+    auto entry = [_cachedPeripherals objectForKey:peripheral];
+    if (entry) {
+        dispatch_source_cancel(entry[@"timer"]);
+        [_cachedPeripherals removeObjectForKey:peripheral];
+
+        auto delegate = _scannerDelegate;
+        if (delegate) {
+            dispatch_async(_chipWorkQueue, ^{
+                delegate->OnBleScanRemove((__bridge void *) peripheral);
+            });
+        }
+    }
+}
+
+- (void)removePeripheralsFromCache
+{
+    for (CBPeripheral * peripheral in _cachedPeripherals) {
+        [self removePeripheralFromCache:peripheral];
+    }
 }
 
 /**

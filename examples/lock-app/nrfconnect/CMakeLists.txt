@@ -71,3 +71,7 @@ endif()
 if(CONFIG_MCUMGR_SMP_BT)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
 endif()
+
+if(CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING)
+    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/ICDUtil.cpp)
+endif()
