@@ -110,6 +110,7 @@ k32w0_executable("contact_sensor_app") {
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
+    "${k32w0_platform_dir}/common:syscalls_stub",
   ]
 
   if (chip_openthread_ftd) {

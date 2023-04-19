@@ -455,7 +455,12 @@ template("k32w0_sdk") {
         "-Wno-parentheses-equality",
       ]
     } else {
-      cflags += [ "-fno-optimize-strlen" ]
+      cflags += [
+        "-fno-optimize-strlen",
+
+        # asdf
+        "-Wno-error=address",
+      ]
     }
 
     # Now add our "system-header" include dirs

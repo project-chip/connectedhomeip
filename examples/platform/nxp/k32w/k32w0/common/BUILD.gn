@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,18 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/mw320_sdk.gni")
-
-import("${mw320_sdk_build_root}/mw320_sdk.gni")
-
-config("chip_examples_project_config") {
-  include_dirs = [ "app/project_include" ]
-}
-
-source_set("config_mw320_chip_examples") {
-  #  sources = [ "app/project_include/CHIPProjectConfig.h" ]
-  public_configs = [ ":chip_examples_project_config" ]
-}
 
 source_set("syscalls_stub") {
   sources = [ "syscalls_stubs.cpp" ]

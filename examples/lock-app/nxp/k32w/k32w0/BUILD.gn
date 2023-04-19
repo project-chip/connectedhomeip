@@ -112,6 +112,7 @@ k32w0_executable("lock_app") {
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${chip_root}/third_party/simw-top-mini:se05x",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
+    "${k32w0_platform_dir}/common:syscalls_stub",
   ]
 
   if (chip_openthread_ftd) {
