@@ -1309,16 +1309,16 @@ CHIP_ERROR CASESession::SendSigma3a()
         {
             const FabricInfo * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
             VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND);
-            if (fabricInfo->HasOperationalKey())
+            auto * keystore = mFabricsTable->GetOperationalKeystore();
+            if (!fabricInfo->HasOperationalKey() && keystore != nullptr && keystore->SupportsSignWithOpKeypairInBackground())
             {
-                // NOTE: used to sign in foreground.
-                data.fabricTable = mFabricsTable;
+                // NOTE: used to sign in background.
+                data.keystore = keystore;
             }
             else
             {
-                // NOTE: used to sign in background.
-                data.keystore = mFabricsTable->GetOperationalKeystore();
-                VerifyOrExit(data.keystore != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND);
+                // NOTE: used to sign in foreground.
+                data.fabricTable = mFabricsTable;
             }
         }
 
