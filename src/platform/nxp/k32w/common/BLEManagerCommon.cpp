@@ -173,7 +173,8 @@ CHIP_ERROR BLEManagerCommon::_Init()
                                      blekw_connection_timeout_cb);
     VerifyOrExit(connectionTimeout != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(InitHostController(&blekw_generic_cb));
+    /* BLE platform code initialization */
+    SuccessOrExit(err = InitHostController(&blekw_generic_cb));
 
     sImplInstance = GetImplInstance();
 
@@ -182,7 +183,7 @@ CHIP_ERROR BLEManagerCommon::_Init()
 
     /* Wait until BLE Stack is ready */
     eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_INIT_COMPLETE, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
-    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_INIT_COMPLETE, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_INIT_COMPLETE, err = CHIP_ERROR_INCORRECT_STATE);
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     PWR_ChangeDeepSleepMode(cPWR_PowerDown_RamRet);
@@ -877,7 +878,7 @@ void BLEManagerCommon::DriveBLEState(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized
-    VerifyOrExit(BLEManagerCommon::mFlags.Has(BLEManagerCommon::Flags::kK32WBLEStackInitialized), /* */);
+    VerifyOrExit(BLEManagerCommon::mFlags.Has(BLEManagerCommon::Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     // Start advertising if needed...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))
@@ -1269,14 +1270,6 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
     }
 }
 
-/* Called by BLE when a connect is received */
-void BLEManagerCommon::BLE_SignalFromISRCallback(void)
-{
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
-    PWR_DisallowDeviceToSleep();
-#endif /* cPWR_UsePowerDownMode */
-}
-
 void BLEManagerCommon::blekw_connection_timeout_cb(TimerHandle_t timer)
 {
     (void) blekw_msg_add_u8(BLE_KW_MSG_FORCE_DISCONNECT, 0);
@@ -1360,16 +1353,13 @@ void BLEManagerCommon::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent
 CHIP_ERROR BLEManagerCommon::blekw_msg_add_att_written(blekw_msg_type_t type, uint8_t device_id, uint16_t handle, uint8_t * data,
                                                      uint16_t length)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     blekw_msg_t * msg = NULL;
     blekw_att_written_data_t * att_wr_data;
 
     /* Allocate a buffer with enough space to store the packet */
     msg = (blekw_msg_t *) malloc(sizeof(blekw_msg_t) + sizeof(blekw_att_written_data_t) + length);
-
-    if (!msg)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    VerifyOrExit(msg, err = CHIP_ERROR_NO_MEMORY);
 
     msg->type              = type;
     msg->length            = sizeof(blekw_att_written_data_t) + length;
@@ -1379,24 +1369,22 @@ CHIP_ERROR BLEManagerCommon::blekw_msg_add_att_written(blekw_msg_type_t type, ui
     att_wr_data->length    = length;
     FLib_MemCpy(att_wr_data->data, data, length);
 
-    xQueueSend(sBleEventQueue, &msg, 0);
+    VerifyOrExit(xQueueSend(sBleEventQueue, &msg, 0) == pdTRUE, err = CHIP_ERROR_NO_MEMORY);
     otTaskletsSignalPending(NULL);
 
-    return CHIP_NO_ERROR;
+exit:
+    return err;
 }
 
 CHIP_ERROR BLEManagerCommon::blekw_msg_add_att_read(blekw_msg_type_t type, uint8_t device_id, uint16_t handle)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     blekw_msg_t * msg = NULL;
     blekw_att_read_data_t * att_rd_data;
 
     /* Allocate a buffer with enough space to store the packet */
     msg = (blekw_msg_t *) malloc(sizeof(blekw_msg_t) + sizeof(blekw_att_read_data_t));
-
-    if (!msg)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    VerifyOrExit(msg, err = CHIP_ERROR_NO_MEMORY);
 
     msg->type              = type;
     msg->length            = sizeof(blekw_att_read_data_t);
@@ -1404,54 +1392,51 @@ CHIP_ERROR BLEManagerCommon::blekw_msg_add_att_read(blekw_msg_type_t type, uint8
     att_rd_data->device_id = device_id;
     att_rd_data->handle    = handle;
 
-    xQueueSend(sBleEventQueue, &msg, 0);
+    VerifyOrExit(xQueueSend(sBleEventQueue, &msg, 0) == pdTRUE, err = CHIP_ERROR_NO_MEMORY);
     otTaskletsSignalPending(NULL);
 
-    return CHIP_NO_ERROR;
+exit:
+    return err;
 }
 
 CHIP_ERROR BLEManagerCommon::blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     blekw_msg_t * msg = NULL;
 
     /* Allocate a buffer with enough space to store the packet */
     msg = (blekw_msg_t *) malloc(sizeof(blekw_msg_t));
-
-    if (!msg)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    VerifyOrExit(msg, err = CHIP_ERROR_NO_MEMORY);
 
     msg->type    = type;
     msg->length  = 0;
     msg->data.u8 = data;
 
-    xQueueSend(sBleEventQueue, &msg, 0);
+    VerifyOrExit(xQueueSend(sBleEventQueue, &msg, 0) == pdTRUE, err = CHIP_ERROR_NO_MEMORY);
     otTaskletsSignalPending(NULL);
 
-    return CHIP_NO_ERROR;
+exit:
+    return err;
 }
 
 CHIP_ERROR BLEManagerCommon::blekw_msg_add_u16(blekw_msg_type_t type, uint16_t data)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     blekw_msg_t * msg = NULL;
 
     /* Allocate a buffer with enough space to store the packet */
     msg = (blekw_msg_t *) malloc(sizeof(blekw_msg_t));
-
-    if (!msg)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    VerifyOrExit(msg, err = CHIP_ERROR_NO_MEMORY);
 
     msg->type     = type;
     msg->length   = 0;
     msg->data.u16 = data;
 
-    xQueueSend(sBleEventQueue, &msg, 0);
+    VerifyOrExit(xQueueSend(sBleEventQueue, &msg, 0) == pdTRUE, err = CHIP_ERROR_NO_MEMORY);
     otTaskletsSignalPending(NULL);
 
-    return CHIP_NO_ERROR;
+exit:
+    return err;
 }
 
 void BLEManagerCommon::BleAdvTimeoutHandler(TimerHandle_t xTimer)

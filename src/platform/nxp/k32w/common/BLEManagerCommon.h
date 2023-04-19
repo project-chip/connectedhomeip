@@ -50,7 +50,7 @@ typedef void (*ble_generic_cb_fp)(gapGenericEvent_t * pGenericEvent);
 using namespace chip::Ble;
 
 /**
- * Concrete implementation of the BLEManager singleton object for the K32W platforms.
+ * Base class for different platform implementations (K32W0 and K32W1 for now).
  */
 class BLEManagerCommon : public BLEManager, protected BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
@@ -226,8 +226,7 @@ protected:
     static void HandleWriteEvent(intptr_t arg);
     static void HandleDisconnectEvent(intptr_t arg);
     static void HandleAdvIntervalChange(intptr_t arg);
-        
-    static void BLE_SignalFromISRCallback(void);
+
     static void blekw_connection_timeout_cb(TimerHandle_t timer);
     static CHIP_ERROR blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data);
     static void blekw_new_data_received_notification(uint32_t mask);
