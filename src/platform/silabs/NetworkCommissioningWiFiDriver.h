@@ -138,6 +138,7 @@ private:
     WiFiNetwork mStagingNetwork = {};
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
+    NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 };
 
 } // namespace NetworkCommissioning

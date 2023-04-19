@@ -42,6 +42,7 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     size_t credentialsLen = 0;
     mpScanCallback        = nullptr;
     mpConnectCallback     = nullptr;
+    mpStatusChangeCallback = networkStatusChangeCallback;
 
 #ifdef SL_ONNETWORK_PAIRING
     memcpy(&mSavedNetwork.ssid[0], SL_WIFI_SSID, sizeof(SL_WIFI_SSID));
@@ -183,6 +184,9 @@ void SlWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
     {
         mpConnectCallback = callback;
         networkingStatus  = Status::kSuccess;
+        // TODO: Re-write implementation with proper driver based callback
+        if (mpStatusChangeCallback != nullptr)
+            mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(networkId), NullOptional);
     }
 
 exit:
@@ -191,6 +195,9 @@ exit:
         ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
+        // TODO: Re-write implementation with proper driver based callback
+        if (mpStatusChangeCallback != nullptr)
+            mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId), MakeOptional(err));
     }
 }
 
