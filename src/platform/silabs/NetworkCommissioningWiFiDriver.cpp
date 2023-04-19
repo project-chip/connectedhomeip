@@ -197,7 +197,7 @@ exit:
         callback->OnResult(networkingStatus, CharSpan(), 0);
         // TODO: Re-write implementation with proper driver based callback
         if (mpStatusChangeCallback != nullptr)
-            mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId), MakeOptional(err));
+            mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId), NullOptional);
     }
 }
 
