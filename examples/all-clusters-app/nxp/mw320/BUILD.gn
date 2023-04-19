@@ -63,7 +63,7 @@ mw320_executable("shell_mw320") {
     "${chip_root}/src/setup_payload",
   ]
 
-  deps = ["${examples_plat_dir}:syscalls_stub"]
+  deps = [ "${examples_plat_dir}:syscalls_stub" ]
 
   include_dirs = [
     "${chip_root}/src/platform/nxp/mw320",
@@ -88,7 +88,7 @@ mw320_executable("shell_mw320") {
 
   ldflags = [
     "-T" + rebase_path(ldscript, root_build_dir),
-    "-Wl,--no-warn-rwx-segment"
+    "-Wl,--no-warn-rwx-segment",
   ]
   defines = [
     "MW320_SHELL_STREAMER",

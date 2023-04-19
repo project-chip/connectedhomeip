@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-int _open(const char* pathname, int flags, int mode);
+int _open(const char * pathname, int flags, int mode);
 int _close(int file);
 int _fstat(int file, struct stat * st);
 int _isatty(int file);
@@ -42,7 +42,7 @@ int _lseek(int file, int ptr, int dir);
 int _read(int file, char * ptr, int len);
 int _write(int file, const char * ptr, int len);
 
-int __attribute__((weak)) _open(const char* pathname, int flags, int mode)
+int __attribute__((weak)) _open(const char * pathname, int flags, int mode)
 {
     (void) pathname;
     (void) flags;
