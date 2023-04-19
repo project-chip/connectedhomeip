@@ -51,8 +51,6 @@ static_library("Tizen") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
-    "MainLoop.cpp",
-    "MainLoop.h",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
     "PlatformManagerImpl.cpp",

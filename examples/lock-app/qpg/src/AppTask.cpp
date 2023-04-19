@@ -177,6 +177,10 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
+    sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
+    sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+    sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+    sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
     UpdateLEDs();
 
     return err;

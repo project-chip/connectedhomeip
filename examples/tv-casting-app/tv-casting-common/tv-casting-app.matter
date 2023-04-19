@@ -6,6 +6,11 @@ struct ApplicationStruct {
     char_string applicationID = 1;
 }
 
+struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
@@ -143,10 +148,10 @@ client cluster OnOff = 6 {
   }
 
   readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  readonly attribute optional boolean globalSceneControl = 16384;
+  attribute optional int16u onTime = 16385;
+  attribute optional int16u offWaitTime = 16386;
+  attribute access(write: manage) optional nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -203,19 +208,19 @@ client cluster LevelControl = 8 {
   }
 
   readonly attribute nullable int8u currentLevel = 0;
-  readonly attribute int16u remainingTime = 1;
-  readonly attribute int8u minLevel = 2;
-  readonly attribute int8u maxLevel = 3;
-  readonly attribute int16u currentFrequency = 4;
-  readonly attribute int16u minFrequency = 5;
-  readonly attribute int16u maxFrequency = 6;
+  readonly attribute optional int16u remainingTime = 1;
+  readonly attribute optional int8u minLevel = 2;
+  readonly attribute optional int8u maxLevel = 3;
+  readonly attribute optional int16u currentFrequency = 4;
+  readonly attribute optional int16u minFrequency = 5;
+  readonly attribute optional int16u maxFrequency = 6;
   attribute LevelControlOptions options = 15;
-  attribute int16u onOffTransitionTime = 16;
+  attribute optional int16u onOffTransitionTime = 16;
   attribute nullable int8u onLevel = 17;
-  attribute nullable int16u onTransitionTime = 18;
-  attribute nullable int16u offTransitionTime = 19;
-  attribute nullable int8u defaultMoveRate = 20;
-  attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
+  attribute optional nullable int16u onTransitionTime = 18;
+  attribute optional nullable int16u offTransitionTime = 19;
+  attribute optional nullable int8u defaultMoveRate = 20;
+  attribute access(write: manage) optional nullable int8u startUpCurrentLevel = 16384;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -397,18 +402,18 @@ server cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
+  struct Target {
+    nullable cluster_id cluster = 0;
+    nullable endpoint_no endpoint = 1;
+    nullable devtype_id deviceType = 2;
+  }
+
   fabric_scoped struct AccessControlEntryStruct {
     fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
-  }
-
-  struct Target {
-    nullable cluster_id cluster = 0;
-    nullable endpoint_no endpoint = 1;
-    nullable devtype_id deviceType = 2;
   }
 
   fabric_scoped struct AccessControlExtensionStruct {
@@ -681,15 +686,6 @@ server cluster NetworkCommissioning = 49 {
     boolean connected = 1;
   }
 
-  struct WiFiInterfaceScanResult {
-    WiFiSecurity security = 0;
-    octet_string<32> ssid = 1;
-    octet_string<6> bssid = 2;
-    int16u channel = 3;
-    WiFiBand wiFiBand = 4;
-    int8s rssi = 5;
-  }
-
   struct ThreadInterfaceScanResult {
     int16u panId = 0;
     int64u extendedPanId = 1;
@@ -699,6 +695,15 @@ server cluster NetworkCommissioning = 49 {
     octet_string<8> extendedAddress = 5;
     int8s rssi = 6;
     int8u lqi = 7;
+  }
+
+  struct WiFiInterfaceScanResult {
+    WiFiSecurity security = 0;
+    octet_string<32> ssid = 1;
+    octet_string<6> bssid = 2;
+    int16u channel = 3;
+    WiFiBand wiFiBand = 4;
+    int8s rssi = 5;
   }
 
   readonly attribute access(read: administer) int8u maxNetworks = 0;
@@ -1083,18 +1088,18 @@ server cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
-  fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_scoped struct NOCStruct {
+    fabric_sensitive octet_string noc = 1;
+    nullable fabric_sensitive octet_string icac = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1186,16 +1191,16 @@ server cluster GroupKeyManagement = 63 {
     kCacheAndSync = 1;
   }
 
-  fabric_scoped struct GroupKeyMapStruct {
-    group_id groupId = 1;
-    int16u groupKeySetID = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
   fabric_scoped struct GroupInfoMapStruct {
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
     optional char_string<16> groupName = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_scoped struct GroupKeyMapStruct {
+    group_id groupId = 1;
+    int16u groupKeySetID = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1262,7 +1267,7 @@ server cluster FixedLabel = 64 {
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 client cluster WakeOnLan = 1283 {
-  readonly attribute char_string<32> MACAddress = 0;
+  readonly attribute optional char_string<32> MACAddress = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1303,9 +1308,9 @@ client cluster Channel = 1284 {
     LineupInfoTypeEnum lineupInfoType = 3;
   }
 
-  readonly attribute ChannelInfoStruct channelList[] = 0;
-  readonly attribute nullable LineupInfoStruct lineup = 1;
-  readonly attribute nullable ChannelInfoStruct currentChannel = 2;
+  readonly attribute optional ChannelInfoStruct channelList[] = 0;
+  readonly attribute optional nullable LineupInfoStruct lineup = 1;
+  readonly attribute optional nullable ChannelInfoStruct currentChannel = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1353,7 +1358,7 @@ client cluster TargetNavigator = 1285 {
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
-  readonly attribute int8u currentTarget = 1;
+  readonly attribute optional int8u currentTarget = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1404,12 +1409,12 @@ client cluster MediaPlayback = 1286 {
   }
 
   readonly attribute PlaybackStateEnum currentState = 0;
-  readonly attribute nullable epoch_us startTime = 1;
-  readonly attribute nullable int64u duration = 2;
-  readonly attribute nullable PlaybackPositionStruct sampledPosition = 3;
-  readonly attribute single playbackSpeed = 4;
-  readonly attribute nullable int64u seekRangeEnd = 5;
-  readonly attribute nullable int64u seekRangeStart = 6;
+  readonly attribute optional nullable epoch_us startTime = 1;
+  readonly attribute optional nullable int64u duration = 2;
+  readonly attribute optional nullable PlaybackPositionStruct sampledPosition = 3;
+  readonly attribute optional single playbackSpeed = 4;
+  readonly attribute optional nullable int64u seekRangeEnd = 5;
+  readonly attribute optional nullable int64u seekRangeStart = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1725,8 +1730,8 @@ client cluster ContentLauncher = 1290 {
     optional StyleInformationStruct waterMark = 5;
   }
 
-  readonly attribute CHAR_STRING acceptHeader[] = 0;
-  attribute bitmap32 supportedStreamingProtocols = 1;
+  readonly attribute optional CHAR_STRING acceptHeader[] = 0;
+  attribute optional bitmap32 supportedStreamingProtocols = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1779,7 +1784,7 @@ client cluster AudioOutput = 1291 {
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
-  readonly attribute int8u currentOutput = 1;
+  readonly attribute optional int8u currentOutput = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1824,8 +1829,8 @@ client cluster ApplicationLauncher = 1292 {
     optional endpoint_no endpoint = 1;
   }
 
-  readonly attribute INT16U catalogList[] = 0;
-  attribute nullable ApplicationEPStruct currentApp = 1;
+  readonly attribute optional INT16U catalogList[] = 0;
+  attribute optional nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1873,10 +1878,10 @@ client cluster ApplicationBasic = 1293 {
     char_string applicationID = 1;
   }
 
-  readonly attribute char_string<32> vendorName = 0;
-  readonly attribute vendor_id vendorID = 1;
+  readonly attribute optional char_string<32> vendorName = 0;
+  readonly attribute optional vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
-  readonly attribute int16u productID = 3;
+  readonly attribute optional int16u productID = 3;
   readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;

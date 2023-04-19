@@ -59,6 +59,9 @@
 #endif
 
 #include <DeviceInfoProviderImpl.h>
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+#include <platform/bouffalolab/common/FactoryDataProvider.h>
+#endif
 
 #if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
 #include "uart.h"
@@ -80,6 +83,12 @@ chip::app::Clusters::NetworkCommissioning::Instance
 #endif
 
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+namespace {
+FactoryDataProvider sFactoryDataProvider;
+}
+#endif
 
 void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -112,6 +121,10 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
         {
             GetAppTask().PostEvent(AppTask::APP_EVENT_SYS_PROVISIONED);
             GetAppTask().mIsConnected = true;
+#ifdef OTA_ENABLED
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+#endif
         }
         break;
 #endif
@@ -146,11 +159,14 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
         {
             ChipLogProgress(NotSpecified, "Initializing route hook...");
             bl_route_hook_init();
+
+#ifdef OTA_ENABLED
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+#endif
         }
         break;
 #endif
-
-        break;
     default:
         break;
     }
@@ -196,10 +212,23 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ReturnLogErrorOnFailure(sWiFiNetworkCommissioningInstance.Init());
 #endif
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-
     // Initialize device attestation config
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+    if (CHIP_NO_ERROR == sFactoryDataProvider.Init())
+    {
+        SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+        SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+        SetCommissionableDataProvider(&sFactoryDataProvider);
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "sFactoryDataProvider.Init() failed");
+    }
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXT_DISCOVERY_TIMEOUT_SECS);
@@ -226,12 +255,6 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
-
-#ifdef OTA_ENABLED
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    OTAConfig::Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-#endif // OTA_ENABLED
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();

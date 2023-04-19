@@ -18,52 +18,15 @@
 
 #pragma once
 
-#include "AppEvent.h"
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-#include "LEDWidget.h"
-#endif
+#include "AppTaskCommon.h"
 
-#include <zephyr/drivers/gpio.h>
-
-#include <platform/CHIPDeviceLayer.h>
-
-#include <cstdint>
-
-struct k_timer;
-
-class AppTask
+class AppTask : public AppTaskCommon
 {
-public:
-    CHIP_ERROR StartApp();
-
-    void PostEvent(AppEvent * event);
-
 private:
     friend AppTask & GetAppTask(void);
+    friend class AppTaskCommon;
 
     CHIP_ERROR Init();
-
-    void DispatchEvent(AppEvent * event);
-
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
-    static void LEDStateUpdateHandler(LEDWidget * ledWidget);
-    static void UpdateStatusLED();
-#endif
-    static void FactoryResetButtonEventHandler(void);
-    static void StartBleAdvButtonEventHandler(void);
-
-    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
-    static void FactoryResetTimerTimeoutCallback(k_timer * timer);
-
-    static void FactoryResetTimerEventHandler(AppEvent * aEvent);
-    static void FactoryResetHandler(AppEvent * aEvent);
-    static void StartBleAdvHandler(AppEvent * aEvent);
-
-    static void InitButtons(void);
-
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static AppTask sAppTask;
 };

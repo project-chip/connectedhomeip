@@ -28,7 +28,7 @@ mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
 chip_crypto = "platform"
 
 # Transitional CommissionableDataProvider not used anymore
-# examples/platform/efr32/EFR32DeviceDataProvider is now used.
+# examples/platform/silabs/SilabsDeviceDataProvider is now used.
 chip_use_transitional_commissionable_data_provider = false
 
 # Use GSDK lwip instead of CHIP

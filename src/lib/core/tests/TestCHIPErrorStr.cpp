@@ -170,6 +170,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_INVALID_FILE_IDENTIFIER,
     CHIP_ERROR_BUSY,
     CHIP_ERROR_HANDLER_NOT_SET,
+    CHIP_ERROR_IN_PROGRESS,
 };
 // clang-format on
 

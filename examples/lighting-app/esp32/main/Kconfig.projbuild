@@ -60,6 +60,10 @@ menu "Demo"
             depends on IDF_TARGET_ESP32C6
     endchoice
 
+    config CHIP_PROJECT_CONFIG
+        string "CHIP Project Configuration file"
+        default "main/include/CHIPProjectConfig.h"
+
     choice LED_TYPE
         prompt "LED type"
         default LED_TYPE_RMT if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_S3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C6_DEVKITC

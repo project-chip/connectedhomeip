@@ -344,6 +344,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_IM_FABRIC_DELETED.AsInteger():
         desc = "The fabric is deleted, and the corresponding IM resources are released";
         break;
+    case CHIP_ERROR_IN_PROGRESS.AsInteger():
+        desc = "The operation is still in progress";
+        break;
     case CHIP_ERROR_ACCESS_DENIED.AsInteger():
         desc = "The CHIP message is not granted access";
         break;

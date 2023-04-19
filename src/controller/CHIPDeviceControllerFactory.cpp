@@ -340,6 +340,21 @@ CHIP_ERROR DeviceControllerFactory::ServiceEvents()
     return CHIP_NO_ERROR;
 }
 
+void DeviceControllerFactory::RetainSystemState()
+{
+    (void) mSystemState->Retain();
+}
+
+void DeviceControllerFactory::ReleaseSystemState()
+{
+    mSystemState->Release();
+
+    if (!mSystemState->IsInitialized() && mEnableServerInteractions)
+    {
+        app::DnssdServer::Instance().StopServer();
+    }
+}
+
 DeviceControllerFactory::~DeviceControllerFactory()
 {
     Shutdown();

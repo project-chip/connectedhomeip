@@ -216,7 +216,7 @@ static_library("support") {
   }
 
   if (chip_pw_tokenizer_logging) {
-    public_deps += [ "${dir_pw_tokenizer}:global_handler_with_payload" ]
+    public_deps += [ "${dir_pw_tokenizer}" ]
   }
 
   if (chip_config_memory_debug_dmalloc) {

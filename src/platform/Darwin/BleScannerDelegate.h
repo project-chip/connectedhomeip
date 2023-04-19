@@ -30,7 +30,10 @@ public:
     virtual ~BleScannerDelegate() {}
 
     // Called when a scan result is available.
-    virtual void OnBleScanResult(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
+    virtual void OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
+
+    // Called when a scan result is not available anymore.
+    virtual void OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) = 0;
 };
 
 } // namespace DeviceLayer
