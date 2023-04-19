@@ -476,10 +476,11 @@ def BuildTizenTarget():
         TargetPart('tests', app=TizenApp.TESTS),
     ])
 
-    target.AppendModifier(name="no-ble", enable_ble=False)
-    target.AppendModifier(name="no-wifi", enable_wifi=False)
-    target.AppendModifier(name="asan", use_asan=True)
-    target.AppendModifier(name="ubsan", use_ubsan=True)
+    target.AppendModifier("no-ble", enable_ble=False)
+    target.AppendModifier("no-thread", enable_thread=False)
+    target.AppendModifier("no-wifi", enable_wifi=False)
+    target.AppendModifier("asan", use_asan=True)
+    target.AppendModifier("ubsan", use_ubsan=True)
 
     return target
 
