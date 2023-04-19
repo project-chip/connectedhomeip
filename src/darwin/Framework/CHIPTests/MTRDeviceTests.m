@@ -1695,11 +1695,24 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test021_ReadMultipleWildcardPathsIncludeUnsupportedAttribute
 {
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"read Basic Information Cluster's attributes and include 1 unsupported attribute"];
-
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // Read the PartList of descriptor on endpoint 0 to find out how many endpoints there are.
+    XCTestExpectation * descriptorReadExpectation = [self expectationWithDescription:@"read PartsList from endpoint 0"];
+    __auto_type * descriptorCluster = [[MTRBaseClusterDescriptor alloc] initWithDevice:device endpointID:@(0) queue:queue];
+    __block size_t endpointCount = 0;
+    [descriptorCluster readAttributePartsListWithCompletion:^(NSArray<NSNumber *> * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        endpointCount = value.count + 1; // Include endpoint 0
+        [descriptorReadExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ descriptorReadExpectation ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"read Basic Information Cluster's attributes and include 1 unsupported attribute"];
 
     NSNumber * failAttributeID = @10000;
 
@@ -1727,11 +1740,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
                         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                         NSArray * resultArray = values;
-                        // Our test application has 3 endpoints.  We have a descriptor on each one,
-                        // so that's 4 results per endpoint, and we only have Basic Information on
-                        // endpoint 0, so that's 4 more results.  Note that there are no results for
-                        // failAttributeID, because we used a wildcard path and hence it got ignored.
-                        XCTAssertEqual([resultArray count], 3 * 4 + 4);
+                        // We have a descriptor on each endpoint, so that's 4 results per endpoint,
+                        // and we only have Basic Information on endpoint 0, so that's 4 more
+                        // results.  Note that there are no results for failAttributeID, because we
+                        // used a wildcard path and hence it got ignored.
+                        XCTAssertEqual(resultArray.count, endpointCount * 4 + 4);
 
                         for (NSDictionary * result in resultArray) {
                             MTRAttributePath * path = result[@"attributePath"];
@@ -1752,7 +1765,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                         [expectation fulfill];
                     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test022_ReadMultipleConcretePathsIncludeUnsupportedAttribute
@@ -1789,7 +1802,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
                         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                         NSArray * resultArray = values;
-                        XCTAssertEqual([resultArray count], 9);
+                        XCTAssertEqual(resultArray.count, attributePaths.count);
 
                         for (NSDictionary * result in resultArray) {
                             MTRAttributePath * path = result[@"attributePath"];
