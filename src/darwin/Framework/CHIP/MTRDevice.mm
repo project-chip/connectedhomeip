@@ -38,12 +38,6 @@
 #include <app/InteractionModelEngine.h>
 #include <platform/PlatformManager.h>
 
-NSString * const MTREventNumberKey = @"eventNumber";
-NSString * const MTREventPriorityKey = @"eventPriority";
-NSString * const MTREventTimeTypeKey = @"eventTimeType";
-NSString * const MTREventSystemUpTimeKey = @"eventSystemUpTime";
-NSString * const MTREventTimestampDateKey = @"eventTimestampDate";
-
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
 // Consider moving utility classes to their own file
@@ -87,41 +81,6 @@ NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
         return max;
     }
     return aNumber;
-}
-
-NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
-{
-    // Note: The event timestamp value as written in the spec is in microseconds, but the released 1.0 SDK implemented it in
-    // milliseconds. The following issue was filed to address the inconsistency:
-    //    https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6236
-    // For consistency with the released behavior, calculations here will be done in milliseconds.
-
-    // First convert the event timestamp value (in milliseconds) to NSTimeInterval - to minimize potential loss of precision
-    // of uint64 => NSTimeInterval (double), convert whole seconds and remainder separately and then combine
-    uint64_t eventTimestampValueSeconds = timeValue / chip::kMillisecondsPerSecond;
-    uint64_t eventTimestampValueRemainderMilliseconds = timeValue % chip::kMillisecondsPerSecond;
-    NSTimeInterval eventTimestampValueRemainder
-        = NSTimeInterval(eventTimestampValueRemainderMilliseconds) / chip::kMillisecondsPerSecond;
-    NSTimeInterval eventTimestampValue = eventTimestampValueSeconds + eventTimestampValueRemainder;
-
-    return eventTimestampValue;
-}
-
-BOOL MTRPriorityLevelIsValid(chip::app::PriorityLevel priorityLevel)
-{
-    return (priorityLevel >= chip::app::PriorityLevel::Debug) && (priorityLevel <= chip::app::PriorityLevel::Critical);
-}
-
-MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel priorityLevel)
-{
-    switch (priorityLevel) {
-    case chip::app::PriorityLevel::Debug:
-        return MTREventPriorityDebug;
-    case chip::app::PriorityLevel::Info:
-        return MTREventPriorityInfo;
-    default:
-        return MTREventPriorityCritical;
-    }
 }
 
 #pragma mark - SubscriptionCallback class declaration
@@ -1214,43 +1173,14 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
             MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
         }];
     } else {
-        id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
-        if (value) {
-            // Construct the right type, and key/value depending on the type
-            NSNumber * eventTimeType;
-            NSString * timestampKey;
-            id timestampValue;
-            if (aEventHeader.mTimestamp.mType == Timestamp::Type::kSystem) {
-                eventTimeType = @(MTREventTimeTypeSystemUpTime);
-                timestampKey = MTREventSystemUpTimeKey;
-                timestampValue = @(MTRTimeIntervalForEventTimestampValue(aEventHeader.mTimestamp.mValue));
-            } else if (aEventHeader.mTimestamp.mType == Timestamp::Type::kEpoch) {
-                eventTimeType = @(MTREventTimeTypeTimestampDate);
-                timestampKey = MTREventTimestampDateKey;
-                timestampValue =
-                    [NSDate dateWithTimeIntervalSince1970:MTRTimeIntervalForEventTimestampValue(aEventHeader.mTimestamp.mValue)];
-            } else {
-                MTR_LOG_INFO(
-                    "%@ Unsupported event timestamp type %u - ignoring", eventPath, (unsigned int) aEventHeader.mTimestamp.mType);
-                ReportError(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-                return;
-            }
-
-            if (!MTRPriorityLevelIsValid(aEventHeader.mPriorityLevel)) {
-                MTR_LOG_INFO("%@ Unsupported event priority %u - ignoring", eventPath, (unsigned int) aEventHeader.mPriorityLevel);
-                ReportError(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-                return;
-            }
-
-            [mEventReports addObject:@{
-                MTREventPathKey : eventPath,
-                MTRDataKey : value,
-                MTREventNumberKey : @(aEventHeader.mEventNumber),
-                MTREventPriorityKey : @(MTREventPriorityForValidPriorityLevel(aEventHeader.mPriorityLevel)),
-                MTREventTimeTypeKey : eventTimeType,
-                timestampKey : timestampValue
-            }];
+        id value;
+        if (apData == nullptr) {
+            value = nil;
+        } else {
+            value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
         }
+
+        [mEventReports addObject:[MTRBaseDevice eventReportForHeader:aEventHeader andData:value]];
     }
 }
 
