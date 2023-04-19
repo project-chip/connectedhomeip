@@ -10,16 +10,14 @@ This build guide cross-compiles for arm64 architecture to be run on Unify's refe
 > - _some-other-command_ should be executed inside the Docker container.
 >   - _`root@docker:/<dir>$ some-other-command`_
 
-## Set Up the Matter Build Environment
-
-Once you have all the necessary submodules, source the Matter environment with the following command. This loads a number of build tools and makes sure the correct toolchains and compilers are used for compiling the Unify Matter Bridge.
-
 ## Check Out Submodules
+
+> 🔴 Assuming you have cloned the matter repo in `~/matter` 
 
 Check out the necessary submodules with the following command.
 
 ```bash
-dev-machine:~$ ./scripts/checkout_submodules.py --platform linux
+dev-machine:~/matter$ ./scripts/checkout_submodules.py --platform linux
 ```
 
 ## Clone and Stage the Unify SDK Repository 
@@ -33,7 +31,7 @@ dev-machine:~/matter$ git clone --depth 1 https://github.com/SiliconLabs/UnifySD
 ## Build the Docker Container (arm64 compilation)
 
 ```bash
-dev-machine:~$ docker build -t unify-matter silabs_examples/unify-matter-bridge/docker/
+dev-machine:~/matter$ docker build -t unify-matter silabs_examples/unify-matter-bridge/docker/
 ```
 
 ## Run the docker container  (arm64 compilation)
@@ -80,6 +78,8 @@ root@docker:/uic$ export UCL_XML_PATH=$PWD/stage/share/uic/ucl
 ```
 
 ## Run activate in matter 
+
+Once you have all the necessary submodules, source the Matter environment with the following command. This loads a number of build tools and makes sure the correct toolchains and compilers are used for compiling the Unify Matter Bridge.
 
 Make sure you are in `matter/` directory
 
