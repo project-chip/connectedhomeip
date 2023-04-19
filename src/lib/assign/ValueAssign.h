@@ -22,7 +22,7 @@ namespace chip {
 namespace Value {
 
 template <class DEST, class SRC>
-SRC & Assign(DEST & dest, const SRC & src)
+DEST & Assign(DEST & dest, const SRC & src)
 {
     return dest = src;
 }
