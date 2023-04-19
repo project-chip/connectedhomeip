@@ -33,9 +33,11 @@ def ScanFoundCallback(closure, address: str, discriminator: int, vendor: int,
 def ScanDoneCallback(closure):
     closure.ScanCompleted()
 
+
 @ScanErrorCallback
 def ScanErrorCallback(closure, errorCode: int):
     closure.ScanErrorCallback(errorCode)
+
 
 def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, errorCallback, adapter=None):
     """Initiate a BLE discovery of devices with the given timeout.
@@ -75,7 +77,7 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, errorCallback, ada
                 def ScanCompleted(self, *args):
                     doneCallback(*args)
                     ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
-                    
+
                 def ScanErrorCallback(self, *args):
                     errorCallback(*args)
                     ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
@@ -123,6 +125,7 @@ class _DeviceInfoReceiver:
 
     def ScanError(self, errorCode):
         pass
+
 
 def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, None]:
     """Discover BLE devices over the specified period of time. 
