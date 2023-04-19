@@ -141,7 +141,7 @@ tests:
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: !DRLK.S.A0033
+      PICS: "!DRLK.S.A0033"
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -182,7 +182,7 @@ tests:
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: !DRLK.S.A0033 && DRLK.S.F08
+      PICS: "!DRLK.S.A0033 && DRLK.S.F08"
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
