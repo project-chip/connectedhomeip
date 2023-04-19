@@ -293,9 +293,6 @@ tests:
           In the case of chip tool as a client, here is an example command the client can write an attribute in the basic cluster in the TH to change the value that the client subscribed in the above command.
 
 
-           Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
-
           basicinformation subscribe node-label 30 200  1 0
 
           On TH (On the reference app) Verify if DUT is responding with the below status response for the above command
