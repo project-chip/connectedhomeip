@@ -10,22 +10,22 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.ClusterIDMapping
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.WriteAttributesCallback
 import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.NodeState
-import chip.tlv.AnonymousTag
-import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.BasicClientFragmentBinding
+import com.google.chip.chiptool.util.TlvParseUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Optional
+
+import chip.devicecontroller.ClusterIDMapping.*
 
 class BasicClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -51,22 +51,19 @@ class BasicClientFragment : Fragment() {
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
     binding.writeNodeLabelBtn.setOnClickListener { scope.launch {
-      val tlvWriter = TlvWriter()
-      tlvWriter.put(AnonymousTag, binding.nodeLabelEd.text.toString())
-      sendWriteAttribute(ClusterIDMapping.BasicInformation.Attribute.NodeLabel.id, tlvWriter.getEncoded())
+      // TODO : Need to be implement poj-to-tlv
+      sendWriteAttribute(BasicInformation.Attribute.NodeLabel, TlvParseUtil.encode(binding.nodeLabelEd.text.toString()))
       binding.nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
     }}
     binding.writeLocationBtn.setOnClickListener { scope.launch {
-      val tlvWriter = TlvWriter()
-      tlvWriter.put(AnonymousTag, binding.locationEd.text.toString())
-      sendWriteAttribute(ClusterIDMapping.BasicInformation.Attribute.Location.id, tlvWriter.getEncoded())
+      // TODO : Need to be implement poj-to-tlv
+      sendWriteAttribute(BasicInformation.Attribute.Location, TlvParseUtil.encode(binding.locationEd.text.toString()))
       binding.locationEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
     }}
     binding.writeLocalConfigDisabledSwitch.setOnCheckedChangeListener { _, isChecked ->
       scope.launch {
-        val tlvWriter = TlvWriter()
-        tlvWriter.put(AnonymousTag, isChecked)
-        sendWriteAttribute(ClusterIDMapping.BasicInformation.Attribute.LocalConfigDisabled.id, tlvWriter.getEncoded())
+        // TODO : Need to be implement poj-to-tlv
+        sendWriteAttribute(BasicInformation.Attribute.LocalConfigDisabled, TlvParseUtil.encode(isChecked))
       }
     }
     makeAttributeList()
@@ -122,9 +119,9 @@ class BasicClientFragment : Fragment() {
 
   private suspend fun readBasicClusters(itemIndex: Int) {
     val endpointId = addressUpdateFragment.endpointId
-    val clusterId = ClusterIDMapping.BasicInformation.ID
+    val clusterId = BasicInformation.ID
     val attributeName = ATTRIBUTES[itemIndex]
-    val attributeId = ClusterIDMapping.BasicInformation.Attribute.valueOf(attributeName).id
+    val attributeId = BasicInformation.Attribute.valueOf(attributeName).id
 
     val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
 
@@ -144,26 +141,26 @@ class BasicClientFragment : Fragment() {
   }
 
   private fun makeAttributeList() {
-    for (attribute in ClusterIDMapping.BasicInformation.Attribute.values()) {
+    for (attribute in BasicInformation.Attribute.values()) {
       ATTRIBUTES.add(attribute.name)
     }
   }
 
-  private suspend fun sendWriteAttribute(attributeId: Long, tlv: ByteArray) {
-    val clusterId = ClusterIDMapping.BasicInformation.ID
+  private suspend fun sendWriteAttribute(attribute: BasicInformation.Attribute, tlv: ByteArray) {
+    val clusterId = BasicInformation.ID
     val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
 
     ChipClient.getDeviceController(requireContext()).write(object: WriteAttributesCallback {
       override fun onError(attributePath: ChipAttributePath?, ex: java.lang.Exception?) {
-        showMessage("Write Location failure $ex")
-        Log.e(TAG, "Write Location failure", ex)
+        showMessage("Write ${attribute.name} failure $ex")
+        Log.e(TAG, "Write ${attribute.name} failure", ex)
       }
 
       override fun onResponse(attributePath: ChipAttributePath?) {
-        showMessage("Write Location success")
+        showMessage("Write ${attribute.name} success")
       }
 
-    }, devicePtr, listOf(AttributeWriteRequest.newInstance(addressUpdateFragment.endpointId.toLong(), clusterId, attributeId, tlv, Optional.empty())), 0, 0)
+    }, devicePtr, listOf(AttributeWriteRequest.newInstance(addressUpdateFragment.endpointId.toLong(), clusterId, attribute.id, tlv, Optional.empty())), 0, 0)
   }
 
   private fun showMessage(msg: String) {

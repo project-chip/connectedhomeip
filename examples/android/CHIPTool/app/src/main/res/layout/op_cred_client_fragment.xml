@@ -35,11 +35,23 @@
         android:layout_marginBottom="10dp"
         android:text="@string/op_cred_client_read_commissioned_fabric_btn_text" />
 
+    <Button
+        android:id="@+id/readFabricsBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/readCommissionedFabricBtn"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="@string/op_cred_client_read_fabrics_btn_text" />
+
     <TextView
         android:id="@+id/opCredClusterCommandStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/readCommissionedFabricBtn"
+        android:layout_below="@id/readFabricsBtn"
         android:minLines="4"
         android:padding="16dp"
         android:singleLine="false"
