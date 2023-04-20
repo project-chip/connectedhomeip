@@ -1324,11 +1324,9 @@ exit:
                completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
                    NSError * _Nullable error) {
                    if (error != nil) {
-                       if (reportHandler) {
-                           dispatch_async(queue, ^{
-                               reportHandler(nil, error);
-                           });
-                       }
+                       dispatch_async(queue, ^{
+                           reportHandler(nil, error);
+                       });
                        return;
                    }
 
@@ -1377,11 +1375,9 @@ exit:
                                    nil);
                            });
                        } else {
-                           if (reportHandler) {
-                               dispatch_async(queue, ^{
-                                   reportHandler(nil, [MTRError errorForCHIPErrorCode:error]);
-                               });
-                           }
+                           dispatch_async(queue, ^{
+                               reportHandler(nil, [MTRError errorForCHIPErrorCode:error]);
+                           });
                        }
                    };
 
@@ -1463,11 +1459,9 @@ exit:
                    }
 
                    if (err != CHIP_NO_ERROR) {
-                       if (reportHandler) {
-                           dispatch_async(queue, ^{
-                               reportHandler(nil, [MTRError errorForCHIPErrorCode:err]);
-                           });
-                       }
+                       dispatch_async(queue, ^{
+                           reportHandler(nil, [MTRError errorForCHIPErrorCode:err]);
+                       });
                        Platform::Delete(readClient);
                        if (container.pathParams != nullptr) {
                            Platform::MemoryFree(container.pathParams);
