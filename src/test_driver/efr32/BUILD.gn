@@ -100,7 +100,7 @@ silabs_executable("efr32_device_tests") {
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
-    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
+    deps += [ "${examples_plat_dir}:silabs-factory-data-provider" ]
   }
 
   deps += pw_build_LINK_DEPS

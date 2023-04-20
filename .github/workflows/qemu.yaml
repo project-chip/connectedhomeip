@@ -135,6 +135,6 @@ jobs:
               run: |
                 ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
-                        --target tizen-arm-tests-no-ble \
+                        --target tizen-arm-tests-no-ble-no-thread \
                         build
                     "

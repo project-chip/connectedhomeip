@@ -273,17 +273,6 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest(void)
     mAdvertisingRequest.advertisingData  = Span<bt_data>(advertisingData);
     mAdvertisingRequest.scanResponseData = nameSize ? Span<bt_data>(scanResponseData) : Span<bt_data>{};
 
-    mAdvertisingRequest.onStarted = [](int rc) {
-        if (rc == 0)
-        {
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising started");
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, "Failed to start CHIPoBLE advertising: %d", rc);
-        }
-    };
-
     return CHIP_NO_ERROR;
 }
 
@@ -339,7 +328,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 #endif
 
     // Request advertising
-    ReturnErrorOnFailure(BLEAdvertisingArbiter::InsertRequest(mAdvertisingRequest));
+    ReturnErrorOnFailure(System::MapErrorZephyr(bt_le_adv_stop()));
+    const bt_le_adv_param params = BT_LE_ADV_PARAM_INIT(mAdvertisingRequest.options, mAdvertisingRequest.minInterval,
+                                                        mAdvertisingRequest.maxInterval, nullptr);
+    ReturnErrorOnFailure(System::MapErrorZephyr(
+        bt_le_adv_start(&params, mAdvertisingRequest.advertisingData.data(), mAdvertisingRequest.advertisingData.size(),
+                        mAdvertisingRequest.scanResponseData.data(), mAdvertisingRequest.scanResponseData.size())));
+    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising started");
 
     // Transition to the Advertising state...
     if (!mFlags.Has(Flags::kAdvertising))
@@ -375,7 +370,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    BLEAdvertisingArbiter::CancelRequest(mAdvertisingRequest);
+    ReturnErrorOnFailure(System::MapErrorZephyr(bt_le_adv_stop()));
 
     // Transition to the not Advertising state...
     if (mFlags.Has(Flags::kAdvertising))

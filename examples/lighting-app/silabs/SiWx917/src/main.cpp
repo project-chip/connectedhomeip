@@ -52,7 +52,7 @@ static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 int main(void)
 {
     init_ccpPlatform();
-    if (SI917MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
+    if (SilabsMatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
     {
         appError(CHIP_ERROR_INTERNAL);
     }
