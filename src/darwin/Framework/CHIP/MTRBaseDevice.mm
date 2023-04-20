@@ -917,26 +917,21 @@ private:
                 completion:(MTRDeviceResponseHandler)completion
 {
     if ((attributePaths == nil || [attributePaths count] == 0) && (eventPaths == nil || [eventPaths count] == 0)) {
+        // No paths, just return an empty array.
         dispatch_async(queue, ^{
-            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+            completion(@[], nil);
         });
         return;
     }
 
-    NSMutableArray<MTRAttributeRequestPath *> * attributes = nil;
+    NSArray<MTRAttributeRequestPath *> * attributes = nil;
     if (attributePaths != nil) {
-        attributes = [[NSMutableArray alloc] init];
-        for (MTRAttributeRequestPath * attributePath in attributePaths) {
-            [attributes addObject:[attributePath copy]];
-        }
+        attributes = [[NSArray alloc] initWithArray:attributePaths copyItems:YES];
     }
 
-    NSMutableArray<MTREventRequestPath *> * events = nil;
+    NSArray<MTREventRequestPath *> * events = nil;
     if (eventPaths != nil) {
-        events = [[NSMutableArray alloc] init];
-        for (MTRAttributeRequestPath * eventPath in eventPaths) {
-            [events addObject:[eventPath copy]];
-        }
+        events = [[NSArray alloc] initWithArray:eventPaths copyItems:YES];
     }
     params = (params == nil) ? nil : [params copy];
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
@@ -1006,9 +1001,9 @@ private:
             chip::app::ReadPrepareParams readParams(session);
             [params toReadPrepareParams:readParams];
             readParams.mpAttributePathParamsList = attributePathParamsList.Get();
-            readParams.mAttributePathParamsListSize = [attributePaths count];
+            readParams.mAttributePathParamsListSize = [attributes count];
             readParams.mpEventPathParamsList = eventPathParamsList.Get();
-            readParams.mEventPathParamsListSize = [eventPaths count];
+            readParams.mEventPathParamsListSize = [events count];
 
             AttributePathParams * attributePathParamsListToFree = attributePathParamsList.Get();
             EventPathParams * eventPathParamsListToFree = eventPathParamsList.Get();
@@ -1288,8 +1283,10 @@ exit:
           resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled
 {
     if ((attributePaths == nil || [attributePaths count] == 0) && (eventPaths == nil || [eventPaths count] == 0)) {
+        // Per spec a server would respond InvalidAction to this, so just go
+        // ahead and do that.
         dispatch_async(queue, ^{
-            reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+            reportHandler(nil, [MTRError errorForIMStatus:StatusIB(Status::InvalidAction)]);
         });
         return;
     }
@@ -1303,20 +1300,14 @@ exit:
     }
 
     // Copy params before going async.
-    NSMutableArray<MTRAttributeRequestPath *> * attributes = nil;
+    NSArray<MTRAttributeRequestPath *> * attributes = nil;
     if (attributePaths != nil) {
-        attributes = [[NSMutableArray alloc] init];
-        for (MTRAttributeRequestPath * attributePath in attributePaths) {
-            [attributes addObject:[attributePath copy]];
-        }
+        attributes = [[NSArray alloc] initWithArray:attributePaths copyItems:YES];
     }
 
-    NSMutableArray<MTREventRequestPath *> * events = nil;
+    NSArray<MTREventRequestPath *> * events = nil;
     if (eventPaths != nil) {
-        events = [[NSMutableArray alloc] init];
-        for (MTRAttributeRequestPath * eventPath in eventPaths) {
-            [events addObject:[eventPath copy]];
-        }
+        events = [[NSArray alloc] initWithArray:eventPaths copyItems:YES];
     }
 
     params = (params == nil) ? nil : [params copy];
