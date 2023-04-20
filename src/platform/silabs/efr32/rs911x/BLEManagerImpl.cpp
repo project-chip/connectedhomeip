@@ -661,12 +661,12 @@ exit:
     return CHIP_NO_ERROR; // err;
 }
 
-// TODO:: Implementation need to be done.
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t status = 0;
-    if (mFlags.Has(Flags::kAdvertising))
+    // TODO: change this condition
+    if (1)
     {
         mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);

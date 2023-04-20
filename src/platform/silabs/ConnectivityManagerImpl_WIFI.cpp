@@ -380,7 +380,9 @@ void ConnectivityManagerImpl::OnStationConnected()
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
     (void) PlatformMgr().PostEvent(&event);
+    // Setting the rs911x in the power save mode
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
+    chip::DeviceLayer::Internal::BLEManagerImpl().StopAdvertising();
     wfx_power_save();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
     UpdateInternetConnectivityState();
