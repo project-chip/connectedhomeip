@@ -74,7 +74,7 @@ EmberAfStatus Instance::GetOnMode(DataModel::Nullable<uint8_t> & value) const
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpointId, clusterId, ModeSelect::Attributes::StartUpMode::Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpointId, clusterId, ModeSelect::Attributes::OnMode::Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -82,7 +82,7 @@ EmberAfStatus Instance::GetOnMode(DataModel::Nullable<uint8_t> & value) const
     }
     else
     {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
+        value.SetNonNull(Traits::StorageToWorking(temp));
     }
     return status;
 }
@@ -122,7 +122,7 @@ EmberAfStatus Instance::GetStartUpMode(DataModel::Nullable<uint8_t> & value) con
     }
     else
     {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
+        value.SetNonNull(Traits::StorageToWorking(temp));
     }
     return status;
 }
@@ -167,7 +167,7 @@ CHIP_ERROR Instance::Init()
         // attribute are listed below.
 
         DataModel::Nullable<uint8_t> startUpMode;
-        EmberAfStatus status = GetOnMode(startUpMode);
+        EmberAfStatus status = GetStartUpMode(startUpMode);
         if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpMode.IsNull())
         {
             // todo use the feature map to determine if the mode select instance depends on the on/off cluster.
@@ -351,7 +351,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
 
         if (msDelegate->IsSupportedMode(newMode) != Status::Success)
         {
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
         }
 
         switch (attributePath.mAttributeId)
@@ -369,7 +369,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
         return CHIP_NO_ERROR;
     }
 
-    return CHIP_ERROR_INVALID_ARGUMENT;
+    return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
 }
 
 } // namespace ModeSelect
