@@ -1324,11 +1324,9 @@ exit:
                completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
                    NSError * _Nullable error) {
                    if (error != nil) {
-                       if (reportHandler) {
-                           dispatch_async(queue, ^{
-                               reportHandler(nil, error);
-                           });
-                       }
+                       dispatch_async(queue, ^{
+                           reportHandler(nil, error);
+                       });
                        return;
                    }
 
@@ -1356,29 +1354,34 @@ exit:
                        });
                    };
 
-                   auto establishedOrFailed = chip::Platform::MakeShared<BOOL>(NO);
-                   auto onFailureCb = [establishedOrFailed, queue, subscriptionEstablished, reportHandler](
-                                          const app::ConcreteAttributePath * attributePath,
+                   auto onFailureCb = [queue, reportHandler](const app::ConcreteAttributePath * attributePath,
                                           const app::ConcreteEventPath * eventPath, CHIP_ERROR error) {
-                       // TODO, Requires additional logic if attributePath or eventPath is not null
-                       if (!(*establishedOrFailed)) {
-                           *establishedOrFailed = YES;
-                           if (subscriptionEstablished) {
-                               dispatch_async(queue, subscriptionEstablished);
-                           }
-                       }
-                       if (reportHandler) {
+                       if (attributePath != nullptr) {
+                           ConcreteAttributePath pathCopy(*attributePath);
+                           dispatch_async(queue, ^{
+                               reportHandler(@[ @ {
+                                   MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
+                                   MTRErrorKey : [MTRError errorForCHIPErrorCode:error]
+                               } ],
+                                   nil);
+                           });
+                       } else if (eventPath != nullptr) {
+                           ConcreteEventPath pathCopy(*eventPath);
+                           dispatch_async(queue, ^{
+                               reportHandler(@[ @ {
+                                   MTRAttributePathKey : [[MTREventPath alloc] initWithPath:pathCopy],
+                                   MTRErrorKey : [MTRError errorForCHIPErrorCode:error]
+                               } ],
+                                   nil);
+                           });
+                       } else {
                            dispatch_async(queue, ^{
                                reportHandler(nil, [MTRError errorForCHIPErrorCode:error]);
                            });
                        }
                    };
 
-                   auto onEstablishedCb = [establishedOrFailed, queue, subscriptionEstablished]() {
-                       if (*establishedOrFailed) {
-                           return;
-                       }
-                       *establishedOrFailed = YES;
+                   auto onEstablishedCb = [queue, subscriptionEstablished]() {
                        if (subscriptionEstablished) {
                            dispatch_async(queue, subscriptionEstablished);
                        }
@@ -1456,11 +1459,9 @@ exit:
                    }
 
                    if (err != CHIP_NO_ERROR) {
-                       if (reportHandler) {
-                           dispatch_async(queue, ^{
-                               reportHandler(nil, [MTRError errorForCHIPErrorCode:err]);
-                           });
-                       }
+                       dispatch_async(queue, ^{
+                           reportHandler(nil, [MTRError errorForCHIPErrorCode:err]);
+                       });
                        Platform::Delete(readClient);
                        if (container.pathParams != nullptr) {
                            Platform::MemoryFree(container.pathParams);
