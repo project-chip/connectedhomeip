@@ -59,6 +59,8 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 
+    mShouldRunEventLoop.store(true, std::memory_order_relaxed);
+
     int ret = pthread_cond_init(&mEventQueueStoppedCond, nullptr);
     VerifyOrReturnError(ret == 0, CHIP_ERROR_POSIX(ret));
 
