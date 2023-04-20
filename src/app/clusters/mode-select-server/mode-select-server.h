@@ -18,19 +18,16 @@
 
 #pragma once
 
-#include <app/util/af.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/clusters/mode-select-server/mode-select-delegate.h>
-
+#include <app/util/af.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ModeSelect {
 
-
-class Instance : public CommandHandlerInterface,
-                 public AttributeAccessInterface
+class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 
 public:
@@ -38,21 +35,28 @@ public:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
-    // CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-    // CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    // CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    // override; CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void *
+    // context) override;
 
-    // // AttributeAccessInterface
-    // CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    // CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    // AttributeAccessInterface
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
-    EmberAfStatus SetCurrentMode(uint8_t);
+    EmberAfStatus GetCurrentMode(uint8_t *) const;
+    EmberAfStatus SetCurrentMode(uint8_t) const;
+    EmberAfStatus GetStartUpMode(DataModel::Nullable<uint8_t> &) const;
+    EmberAfStatus SetStartUpMode(uint8_t value) const;
+    EmberAfStatus SetStartUpModeNull() const;
+    EmberAfStatus GetOnMode(DataModel::Nullable<uint8_t> &) const;
+    EmberAfStatus SetOnMode(uint8_t value) const;
+    EmberAfStatus SetOnModeNull() const;
 
 private:
     EndpointId endpointId{};
     ClusterId clusterId{};
     Delegate * msDelegate;
 
-    void GenericHandleChangeToMode(uint8_t newMode);
     void ModeSelectHandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
 
 public:
@@ -60,19 +64,15 @@ public:
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId)
     {
+        // todo check that the cluster ID given is a valid mode select cluster ID.
         endpointId = aEndpointId;
-        clusterId = aClusterId;
+        clusterId  = aClusterId;
         msDelegate = aDelegate;
-
     }
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
-
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
-
 
 } // namespace ModeSelect
 } // namespace Clusters
