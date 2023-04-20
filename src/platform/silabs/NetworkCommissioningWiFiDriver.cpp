@@ -136,12 +136,17 @@ Status SlWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCh
 
 CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
+    ByteSpan networkId = ByteSpan((const unsigned char *) ssid, ssidLen);
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Disconecting for current wifi");
         int32_t status = wfx_sta_discon();
         if (status != 0)
         {
+            // TODO: Re-write implementation with proper driver based callback
+            if (mpStatusChangeCallback != nullptr)
+                mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId),
+                                                                 MakeOptional(status));
             return CHIP_ERROR_INTERNAL;
         }
     }
@@ -157,6 +162,9 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     wfx_set_wifi_provision(&wifiConfig);
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
+    // TODO: Re-write implementation with proper driver based callback
+    if (mpStatusChangeCallback != nullptr)
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(networkId), NullOptional);
     return CHIP_NO_ERROR;
 }
 
@@ -184,9 +192,6 @@ void SlWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
     {
         mpConnectCallback = callback;
         networkingStatus  = Status::kSuccess;
-        // TODO: Re-write implementation with proper driver based callback
-        if (mpStatusChangeCallback != nullptr)
-            mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(networkId), NullOptional);
     }
 
 exit:
@@ -195,9 +200,6 @@ exit:
         ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
-        // TODO: Re-write implementation with proper driver based callback
-        if (mpStatusChangeCallback != nullptr)
-            mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId), NullOptional);
     }
 }
 
