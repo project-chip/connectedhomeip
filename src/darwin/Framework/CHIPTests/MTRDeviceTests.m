@@ -1659,9 +1659,27 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                 XCTAssertEqualObjects(path.endpoint, @0);
                                 XCTAssertEqualObjects(path.cluster, @40);
                                 XCTAssertEqualObjects(path.event, @0);
-                                XCTAssertNotNil(result[@"data"]);
                                 XCTAssertNil(result[@"error"]);
+
+                                XCTAssertNotNil(result[@"data"]);
                                 XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+
+                                XCTAssertNotNil(result[@"eventNumber"]);
+                                XCTAssertTrue([result[@"eventNumber"] isKindOfClass:[NSNumber class]]);
+
+                                XCTAssertNotNil(result[@"eventPriority"]);
+                                XCTAssertTrue([result[@"eventPriority"] isKindOfClass:[NSNumber class]]);
+                                XCTAssertEqualObjects(result[@"eventPriority"], @(MTREventPriorityCritical));
+
+                                XCTAssertNotNil(result[@"eventTimeType"]);
+                                XCTAssertTrue([result[@"eventTimeType"] isKindOfClass:[NSNumber class]]);
+
+                                XCTAssertTrue(result[@"eventSystemUpTime"] != nil || result[@"eventTimestampDate"] != nil);
+                                if (result[@"eventSystemUpTime"] != nil) {
+                                    XCTAssertTrue([result[@"eventSystemUpTime"] isKindOfClass:[NSNumber class]]);
+                                } else {
+                                    XCTAssertTrue([result[@"eventTimestampDate"] isKindOfClass:[NSDate class]]);
+                                }
                             } else if ([result objectForKey:@"attributePath"]) {
                                 ++attributeResultCount;
                                 MTRAttributePath * path = result[@"attributePath"];
@@ -2077,6 +2095,78 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         resubscriptionScheduled:nil];
 
     [self waitForExpectations:@[ errorExpectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test025_SubscribeMultipleEvents
+{
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // Subscribe
+    XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe multiple events"];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+
+    NSArray<MTREventRequestPath *> * eventPaths = @[
+        // Startup event.
+        [MTREventRequestPath requestPathWithEndpointID:@0 clusterID:@40 eventID:@0],
+        // Shutdown event.
+        [MTREventRequestPath requestPathWithEndpointID:@0 clusterID:@40 eventID:@1],
+    ];
+
+    XCTestExpectation * startupEventExpectation = [self expectationWithDescription:@"report startup event"];
+    __auto_type reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+
+        for (NSDictionary * result in values) {
+            XCTAssertNotNil(result[@"eventPath"]);
+
+            MTREventPath * path = result[@"eventPath"];
+            // We only expect to see a Startup event here.
+            XCTAssertEqualObjects(path.endpoint, @0);
+            XCTAssertEqualObjects(path.cluster, @40);
+            XCTAssertEqualObjects(path.event, @0);
+
+            XCTAssertNil(result[@"error"]);
+
+            XCTAssertNotNil(result[@"data"]);
+            XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+
+            XCTAssertNotNil(result[@"eventNumber"]);
+            XCTAssertTrue([result[@"eventNumber"] isKindOfClass:[NSNumber class]]);
+
+            XCTAssertNotNil(result[@"eventPriority"]);
+            XCTAssertTrue([result[@"eventPriority"] isKindOfClass:[NSNumber class]]);
+            XCTAssertEqualObjects(result[@"eventPriority"], @(MTREventPriorityCritical));
+
+            XCTAssertNotNil(result[@"eventTimeType"]);
+            XCTAssertTrue([result[@"eventTimeType"] isKindOfClass:[NSNumber class]]);
+
+            XCTAssertTrue(result[@"eventSystemUpTime"] != nil || result[@"eventTimestampDate"] != nil);
+            if (result[@"eventSystemUpTime"] != nil) {
+                XCTAssertTrue([result[@"eventSystemUpTime"] isKindOfClass:[NSNumber class]]);
+            } else {
+                XCTAssertTrue([result[@"eventTimestampDate"] isKindOfClass:[NSDate class]]);
+            }
+
+            [startupEventExpectation fulfill];
+        }
+    };
+
+    [device subscribeToAttributePaths:nil
+                           eventPaths:eventPaths
+                               params:params
+                                queue:queue
+                        reportHandler:reportHandler
+              subscriptionEstablished:^{
+                  NSLog(@"subscribe complete");
+                  [expectation fulfill];
+              }
+              resubscriptionScheduled:nil];
+
+    // Wait till establishment
+    [self waitForExpectations:@[ startupEventExpectation, expectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test900_SubscribeAllAttributes
