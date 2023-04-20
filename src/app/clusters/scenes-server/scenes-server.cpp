@@ -334,51 +334,51 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
 }
 
 // CommandHanlerInterface
-void ScenesServer::InvokeCommand(HandlerContext & ctx)
+void ScenesServer::InvokeCommand(HandlerContext & ctxt)
 {
-    mPath = ctx.mRequestPath;
+    mPath = ctxt.mRequestPath;
 
     switch (mPath.mCommandId)
     {
     case Commands::AddScene::Id:
         HandleCommand<Commands::AddScene::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleAddScene(ctx, req); });
+            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleAddScene(ctx, req); });
         return;
     case Commands::ViewScene::Id:
         HandleCommand<Commands::ViewScene::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleViewScene(ctx, req); });
+            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleViewScene(ctx, req); });
         return;
     case Commands::RemoveScene::Id:
         HandleCommand<Commands::RemoveScene::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleRemoveScene(ctx, req); });
+            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleRemoveScene(ctx, req); });
         return;
     case Commands::RemoveAllScenes::Id:
         HandleCommand<Commands::RemoveAllScenes::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleRemoveAllScenes(ctx, req); });
+            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleRemoveAllScenes(ctx, req); });
         return;
     case Commands::StoreScene::Id:
         HandleCommand<Commands::StoreScene::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleStoreScene(ctx, req); });
+            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleStoreScene(ctx, req); });
         return;
     case Commands::RecallScene::Id:
         HandleCommand<Commands::RecallScene::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleRecallScene(ctx, req); });
+            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleRecallScene(ctx, req); });
         return;
     case Commands::GetSceneMembership::Id:
         HandleCommand<Commands::GetSceneMembership::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleGetSceneMembership(ctx, req); });
+            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleGetSceneMembership(ctx, req); });
         return;
     case Commands::EnhancedAddScene::Id:
         HandleCommand<Commands::EnhancedAddScene::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleEnhancedAddScene(ctx, req); });
+            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleEnhancedAddScene(ctx, req); });
         return;
     case Commands::EnhancedViewScene::Id:
         HandleCommand<Commands::EnhancedViewScene::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleEnhancedViewScene(ctx, req); });
+            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleEnhancedViewScene(ctx, req); });
         return;
     case Commands::CopyScene::Id:
         HandleCommand<Commands::CopyScene::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandleCopyScene(ctx, req); });
+            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleCopyScene(ctx, req); });
         return;
     }
 }
