@@ -145,8 +145,14 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
         {
             // TODO: Re-write implementation with proper driver based callback
             if (mpStatusChangeCallback != nullptr)
+            {
                 mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId),
                                                                  MakeOptional(status));
+            }
+            else
+            {
+                ChipLogError(NetworkProvisioning, "mpStatusChangeCallback is nil");
+            }
             return CHIP_ERROR_INTERNAL;
         }
     }
@@ -164,7 +170,13 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
     // TODO: Re-write implementation with proper driver based callback
     if (mpStatusChangeCallback != nullptr)
+    {
         mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(networkId), NullOptional);
+    }
+    else
+    {
+        ChipLogError(NetworkProvisioning, "mpStatusChangeCallback is nil");
+    }
     return CHIP_NO_ERROR;
 }
 
