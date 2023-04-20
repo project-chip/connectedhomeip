@@ -42,6 +42,22 @@ FetchContent_Declare(
     GIT_PROGRESS   ON
 )
 
+# Apply a patch to TF-M to support GCC 12
+FetchContent_Declare(
+    trusted-firmware-m
+    GIT_REPOSITORY  https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git
+    GIT_TAG         d0c0a67f1b412e89d09b0987091c12998c4e4660
+    GIT_SHALLOW     OFF
+    GIT_PROGRESS    ON
+    # Note: This prevents FetchContent_MakeAvailable() from calling
+    # add_subdirectory() on the fetched repository. TF-M needs a
+    # standalone build because it relies on functions defined in its
+    # own toolchain files and contains paths that reference the
+    # top-level project instead of its own project.
+    SOURCE_SUBDIR   NONE
+    PATCH_COMMAND   git reset --hard --quiet && git clean --force -dx --quiet && git apply ${CMAKE_CURRENT_LIST_DIR}/tf-m.patch
+)
+
 # Open IoT SDK configuration
 set(IOTSDK_FETCH_LIST
     mcu-driver-reference-platforms-for-arm
