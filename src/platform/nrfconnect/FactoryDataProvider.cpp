@@ -81,7 +81,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
         return error;
     }
 
-    if (!ParseFactoryData(factoryData, factoryDataSize, &mFactoryData))
+    if (!ParseFactoryData(factoryData, static_cast<uint16_t>(factoryDataSize), &mFactoryData))
     {
         ChipLogError(DeviceLayer, "Failed to parse factory data");
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
