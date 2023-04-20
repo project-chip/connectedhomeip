@@ -141,7 +141,8 @@ jobs:
                     "./scripts/build/build_examples.py \
                       --target cyw30739-cyw930739m2evb_01-light \
                       --target cyw30739-cyw930739m2evb_01-lock \
-                      --target cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging \
+                      --target cyw30739-cyw930739m2evb_01-ota-requestor \
+                      --target cyw30739-cyw930739m2evb_01-switch \
                       build \
                       --copy-artifacts-to out/artifacts \
                     "
@@ -163,8 +164,15 @@ jobs:
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cyw30739 cyw930739m2evb_01 ota-requestor-no-progress-logging \
-                    out/artifacts/cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging/chip-cyw30739-ota-requestor-example.elf \
+                    cyw30739 cyw930739m2evb_01 ota-requestor \
+                    out/artifacts/cyw30739-cyw930739m2evb_01-ota-requestor/chip-cyw30739-ota-requestor-example.elf \
+                    /tmp/bloat_reports/
+            - name: Get switch size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cyw30739 cyw930739m2evb_01 switch \
+                    out/artifacts/cyw30739-cyw930739m2evb_01-switch/chip-cyw30739-light-switch-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v3
