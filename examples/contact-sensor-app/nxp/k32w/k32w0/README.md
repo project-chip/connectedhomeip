@@ -177,14 +177,14 @@ In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
 -   Download
-    [K32W061DK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W061DK6.zip).
+    [K32W061DK6 SDK 2.6.11](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_11_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
 
     -   without Secure Element
 
     ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_10_K32W061DK6/
+    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_11_K32W061DK6/
     user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
     user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w0
@@ -204,7 +204,7 @@ Secure Element. These can be changed if building without Secure Element
 
     Exactly the same steps as above but set argument build_for_k32w041am=1 in
     the gn command and use
-    [K32W041AMDK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W041AMDK6.zip).
+    [K32W041AMDK6 SDK 2.6.11](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_11_K32W041AMDK6.zip).
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
@@ -450,14 +450,14 @@ This is the list of all supported partitions:
     00000110 -----------> 0x10010000 Start Address
     3002----------------> 0x0230 Number of 512-bytes pages
     00 -----------------> 0x00 Bootable flag
-    fc -----------------> 0xFC Image type (0x00 = SSBL)
+    fc -----------------> 0xFC Image type (0xFC = OTA partition)
 
 00000510100000fd: NVM partition
 
     00000510 -----------> 0x10050000 Start Address
     1000 ---------------> 0x0010 Number of 512-bytes pages
     00 -----------------> 0x00 Bootable flag
-    fd -----------------> 0xFC Image type (0xFC = NVM)
+    fd -----------------> 0xFD Image type (0xFD = NVM partition)
 ```
 
 First, image directory 0 (SSBL partition) must be written:
