@@ -200,7 +200,7 @@ MTR_NEWLY_AVAILABLE
  * eventReportHandler will be called any time an event is reported (with a
  * non-nil "value")
  *
- * The array passed to eventReportHandler will contain CHIPEventReport
+ * The array passed to eventReportHandler will contain MTREventReport
  * instances.  Errors for specific paths, not the whole subscription, will be
  * reported via those objects.
  *
@@ -347,6 +347,17 @@ MTR_NEWLY_AVAILABLE
  *
  * A non-nil attributeID along with a nil clusterID will only succeed if the
  * attribute ID is for a global attribute that applies to all clusters.
+ *
+ * The reportHandler will be called with an error if the subscription fails
+ * entirely.
+ *
+ * The reportHandler will be called with arrays of response-value dictionaries
+ * (which may be data or errors) as path-specific data is received.
+ *
+ * subscriptionEstablished will be called when the subscription is first
+ * successfully established (after the initial set of data reports has been
+ * delivered to reportHandler).  If params allow automatic resubscription, it
+ * will be called any time resubscription succeeds.
  */
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
                                   clusterID:(NSNumber * _Nullable)clusterID
@@ -366,6 +377,17 @@ MTR_NEWLY_AVAILABLE
  *
  * The reportHandler will be called with an error if the inputs are invalid (e.g., both attributePaths and eventPaths are
  * empty), or if the subscription fails entirely.
+ *
+ * The reportHandler will be called with arrays of response-value dictionaries
+ * (which may be data or errors) as path-specific data is received.
+ *
+ * subscriptionEstablished will be called when the subscription is first
+ * successfully established (after the initial set of data reports has been
+ * delivered to reportHandler).  If params allow automatic resubscription, it
+ * will be called any time resubscription succeeds.
+ *
+ * resubscriptionScheduled will be called if subscription drop is detected and
+ * params allow automatic resubscription.
  *
  * If the sum of the lengths of attributePaths and eventPaths exceeds 3, the subscribe may fail due to the device not supporting
  * that many paths for a subscription.
@@ -465,6 +487,17 @@ MTR_NEWLY_AVAILABLE
  *
  * If all of endpointID, clusterID, eventID are nil, all events on the
  * device will be subscribed to.
+ *
+ * The reportHandler will be called with an error if the subscription fails
+ * entirely.
+ *
+ * The reportHandler will be called with arrays of response-value dictionaries
+ * (which may be data or errors) as path-specific data is received.
+ *
+ * subscriptionEstablished will be called when the subscription is first
+ * successfully established (after the initial set of data reports has been
+ * delivered to reportHandler).  If params allow automatic resubscription, it
+ * will be called any time resubscription succeeds.
  */
 - (void)subscribeToEventsWithEndpointID:(NSNumber * _Nullable)endpointID
                               clusterID:(NSNumber * _Nullable)clusterID
