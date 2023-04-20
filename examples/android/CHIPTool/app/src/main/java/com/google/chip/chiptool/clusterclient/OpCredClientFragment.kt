@@ -47,7 +47,6 @@ class OpCredClientFragment : Fragment() {
 
     binding.readSupportedFabricBtn.setOnClickListener { scope.launch { readClusterAttribute(OperationalCredentials.Attribute.SupportedFabrics) } }
     binding.readCommissionedFabricBtn.setOnClickListener { scope.launch { readClusterAttribute(OperationalCredentials.Attribute.CommissionedFabrics) } }
-    binding.readFabricsBtn.setOnClickListener { scope.launch { readClusterAttribute(OperationalCredentials.Attribute.Fabrics) } }
 
     return binding.root
   }

@@ -106,7 +106,6 @@
     <string name="op_cred_client_btn_text">Operational Credentials cluster</string>
     <string name="op_cred_client_read_supported_fabric_btn_text">Read Supported Fabric count</string>
     <string name="op_cred_client_read_commissioned_fabric_btn_text">Read Commissioned Fabric count</string>
-    <string name="op_cred_client_read_fabrics_btn_text">Read Commissioned Fabrics</string>
 
     <string name="basic_cluster_btn_text">Basic cluster</string>
     <string name="basic_cluster_write_btn_text">Write</string>
