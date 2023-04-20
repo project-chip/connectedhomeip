@@ -364,6 +364,10 @@ public:
                                       readParams.mAttributePathParamsListSize = 1;
                                       readParams.mpEventPathParamsList = eventPath.get();
                                       readParams.mEventPathParamsListSize = 1;
+                                      if (params.minEventNumber) {
+                                          readParams.mEventNumber.SetValue(
+                                              static_cast<chip::EventNumber>(params.minEventNumber.unsignedLongLongValue));
+                                      }
 
                                       std::unique_ptr<ClusterStateCache> clusterStateCache;
                                       ReadClient::Callback * callbackForReadClient = nullptr;
@@ -1007,6 +1011,9 @@ private:
             readParams.mAttributePathParamsListSize = [attributePaths count];
             readParams.mpEventPathParamsList = eventPathParamsList.Get();
             readParams.mEventPathParamsListSize = [eventPaths count];
+            if ([eventPaths count] && params.minEventNumber) {
+                readParams.mEventNumber.SetValue(static_cast<chip::EventNumber>(params.minEventNumber.unsignedLongLongValue));
+            }
 
             AttributePathParams * attributePathParamsListToFree = attributePathParamsList.Get();
             EventPathParams * eventPathParamsListToFree = eventPathParamsList.Get();
@@ -1437,6 +1444,10 @@ exit:
                    readParams.mAttributePathParamsListSize = attributePathSize;
                    readParams.mpEventPathParamsList = container.eventPathParams;
                    readParams.mEventPathParamsListSize = eventPathSize;
+                   if (eventPathSize && params.minEventNumber) {
+                       readParams.mEventNumber.SetValue(
+                           static_cast<chip::EventNumber>(params.minEventNumber.unsignedLongLongValue));
+                   }
 
                    auto onDone = [container](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
                        [container onDone];
