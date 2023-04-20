@@ -427,10 +427,14 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
                 if (!ConnectivityMgr().IsThreadProvisioned())
                 {
                     // Enable BLE advertisements and pairing window
-                    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
-                    {
-                        ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
-                    }
+                    SystemLayer().ScheduleLambda([] {
+                        CHIP_ERROR err;
+                        if ((err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow()) ==
+                            CHIP_NO_ERROR)
+                        {
+                            ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+                        }
+                    });
                 }
                 else
                 {
@@ -466,24 +470,28 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
 void AppTask::CancelTimer()
 {
-    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
-    mFunctionTimerActive = false;
+    SystemLayer().ScheduleLambda([this] {
+        chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
+        this->mFunctionTimerActive = false;
+    });
 }
 
 void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
-    CHIP_ERROR err;
+    SystemLayer().ScheduleLambda([aTimeoutInMs, this] {
+        CHIP_ERROR err;
+        chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
+        err =
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutInMs), TimerEventHandler, this);
+        SuccessOrExit(err);
 
-    chip::DeviceLayer::SystemLayer().CancelTimer(TimerEventHandler, this);
-    err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutInMs), TimerEventHandler, this);
-    SuccessOrExit(err);
-
-    mFunctionTimerActive = true;
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
-    }
+        this->mFunctionTimerActive = true;
+    exit:
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "StartTimer failed %s: ", chip::ErrorStr(err));
+        }
+    });
 }
 
 void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
@@ -577,14 +585,16 @@ void AppTask::UpdateClusterState(void)
     using namespace chip::app::Clusters;
     auto newValue = BoltLockMgr().IsUnlocked() ? DoorLock::DlLockState::kUnlocked : DoorLock::DlLockState::kLocked;
 
-    ChipLogProgress(NotSpecified, "UpdateClusterState");
+    SystemLayer().ScheduleLambda([newValue] {
+        ChipLogProgress(NotSpecified, "UpdateClusterState");
 
-    EmberAfStatus status = DoorLock::Attributes::LockState::Set(QPG_LOCK_ENDPOINT_ID, newValue);
+        EmberAfStatus status = DoorLock::Attributes::LockState::Set(QPG_LOCK_ENDPOINT_ID, newValue);
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
-    }
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
+        }
+    });
 }
 
 void AppTask::UpdateLEDs(void)
