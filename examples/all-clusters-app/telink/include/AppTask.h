@@ -18,71 +18,17 @@
 
 #pragma once
 
-#include "AppEvent.h"
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-#include "LEDWidget.h"
-#endif
-#include "PWMDevice.h"
+#include "AppTaskCommon.h"
 
-#include <zephyr/drivers/gpio.h>
-
-#include <platform/CHIPDeviceLayer.h>
-
-#if CONFIG_CHIP_FACTORY_DATA
-#include <platform/telink/FactoryDataProvider.h>
-#endif
-
-#include <cstdint>
-
-struct k_timer;
-struct Identify;
-
-class AppTask
+class AppTask : public AppTaskCommon
 {
-public:
-    CHIP_ERROR StartApp(void);
-
-    void PostEvent(AppEvent * event);
-    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
-
 private:
     friend AppTask & GetAppTask(void);
+    friend class AppTaskCommon;
 
-    CHIP_ERROR Init(void);
-
-    static void ActionIdentifyStateUpdateHandler(k_timer * timer);
-
-    void DispatchEvent(AppEvent * event);
-
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
-    static void LEDStateUpdateHandler(LEDWidget * ledWidget);
-    static void UpdateStatusLED();
-#endif
-    static void FactoryResetButtonEventHandler(void);
-    static void StartThreadButtonEventHandler(void);
-    static void StartBleAdvButtonEventHandler(void);
-
-    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
-    static void FactoryResetTimerTimeoutCallback(k_timer * timer);
-
-    static void FactoryResetTimerEventHandler(AppEvent * aEvent);
-    static void FactoryResetHandler(AppEvent * aEvent);
-    static void StartThreadHandler(AppEvent * aEvent);
-    static void StartBleAdvHandler(AppEvent * aEvent);
-    static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
-
-    static void InitButtons(void);
-
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    CHIP_ERROR Init();
 
     static AppTask sAppTask;
-    PWMDevice mPwmIdentifyLed;
-
-#if CONFIG_CHIP_FACTORY_DATA
-    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
-#endif
 };
 
 inline AppTask & GetAppTask(void)

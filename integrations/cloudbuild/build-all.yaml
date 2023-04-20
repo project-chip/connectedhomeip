@@ -39,7 +39,7 @@ steps:
               --target cc13x2x7_26x2x7-lock-ftd
               --target cc13x2x7_26x2x7-lock-mtd
               --target cc13x2x7_26x2x7-shell
-              --target cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging
+              --target cyw30739-cyw930739m2evb_01-ota-requestor
               --target efr32-brd4161a-light-rpc
               --target efr32-brd4161a-lock
               --target efr32-brd4161a-switch

@@ -18,7 +18,6 @@
 
 #include "SensorManager.h"
 #include "AppConfig.h"
-#include "AppEvent.h"
 #include "AppTask.h"
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);

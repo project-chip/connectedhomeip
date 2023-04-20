@@ -147,14 +147,10 @@ source_set("siwx917-attestation-credentials") {
   public_configs = [ ":attestation-credentials-config" ]
 }
 
-source_set("siwx917-factory-data-provider") {
-  if (siwx917_commissionable_data) {
-    defines = [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
-  }
-
+source_set("silabs-factory-data-provider") {
   sources = [
-    "SiWx917DeviceDataProvider.cpp",
-    "SiWx917DeviceDataProvider.h",
+    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
+    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.h",
   ]
 
   public_deps = [
@@ -162,6 +158,8 @@ source_set("siwx917-factory-data-provider") {
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/setup_payload",
   ]
+
+  public_configs = [ ":siwx917-common-config" ]
 }
 
 config("siwx917-common-config") {
@@ -178,11 +176,15 @@ config("siwx917-common-config") {
   }
 
   if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
+    defines += [ "SILABS_OTA_ENABLED" ]
   }
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
+  }
+
+  if (siwx917_commissionable_data) {
+    defines += [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
   }
 }
 
@@ -291,7 +293,7 @@ source_set("siwx917-common") {
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
-    public_deps += [ ":siwx917-factory-data-provider" ]
+    public_deps += [ ":silabs-factory-data-provider" ]
   }
 
   public_deps += [

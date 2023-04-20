@@ -72,7 +72,7 @@ void DeviceScanner::OnNodeDiscovered(const DiscoveredNodeData & nodeData)
 }
 
 #if CHIP_TOOL_DEVICE_SCANNER_USE_BLE
-void DeviceScanner::OnBleScanResult(BLE_CONNECTION_OBJECT connObj, const ChipBLEDeviceIdentificationInfo & info)
+void DeviceScanner::OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const ChipBLEDeviceIdentificationInfo & info)
 {
     auto discriminator = info.GetDeviceDiscriminator();
     auto vendorId      = static_cast<VendorId>(info.GetVendorId());
@@ -85,6 +85,8 @@ void DeviceScanner::OnBleScanResult(BLE_CONNECTION_OBJECT connObj, const ChipBLE
     DeviceScannerResult result = { params, vendorId, productId, discriminator };
     mDiscoveredResults.push_back(result);
 }
+
+void DeviceScanner::OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) {}
 #endif // CHIP_TOOL_DEVICE_SCANNER_USE_BLE
 
 CHIP_ERROR DeviceScanner::Get(uint16_t index, RendezvousParameters & params)

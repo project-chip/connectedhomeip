@@ -179,6 +179,17 @@ jobs:
                     linux debug bridge-app \
                     out/linux-x64-bridge/chip-bridge-app \
                     /tmp/bloat_reports/
+            - name: Build example Dynamic Bridge
+              timeout-minutes: 10
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-dynamic-bridge-ipv6only \
+                        build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug dynamic-bridge-app-ipv6only \
+                    out/linux-x64-dynamic-bridge-ipv6only/dynamic-chip-bridge-app \
+                    /tmp/bloat_reports/
             - name: Build example OTA Provider
               timeout-minutes: 10
               run: |

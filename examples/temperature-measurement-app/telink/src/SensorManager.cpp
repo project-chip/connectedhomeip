@@ -18,7 +18,6 @@
 
 #include "SensorManager.h"
 #include "AppConfig.h"
-#include "AppEvent.h"
 #include "AppTask.h"
 
 #define TEMPERATURE_SIMULATION_IS_USED
