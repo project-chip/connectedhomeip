@@ -22,6 +22,7 @@
  *
  */
 
+#include <atomic>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -55,14 +56,29 @@ static void TestPlatformMgr_InitShutdown(nlTestSuite * inSuite, void * inContext
 
 static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inContext)
 {
+    std::atomic<int> counterRun{ 0 };
+
     CHIP_ERROR err = PlatformMgr().InitChipStack();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = PlatformMgr().StartEventLoopTask();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    // Start/stop the event loop task a few times.
+    for (size_t i = 0; i < 3; i++)
+    {
+        err = PlatformMgr().StartEventLoopTask();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = PlatformMgr().StopEventLoopTask();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        // Verify that the event loop will not exit until we tell it to by
+        // scheduling few lambdas (for the test to pass, the event loop will
+        // have to process more than one event).
+        DeviceLayer::SystemLayer().ScheduleLambda([&counterRun]() { counterRun++; });
+        chip::test_utils::SleepMillis(10);
+        DeviceLayer::SystemLayer().ScheduleLambda([&counterRun]() { counterRun++; });
+
+        err = PlatformMgr().StopEventLoopTask();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+
+    NL_TEST_ASSERT(inSuite, counterRun == (3 * 2));
 
     PlatformMgr().Shutdown();
 }
