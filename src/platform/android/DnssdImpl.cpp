@@ -232,7 +232,7 @@ CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], 
     {
         outProtocol = DnssdServiceProtocol::kDnssdProtocolUdp;
     }
-    else 
+    else
     {
         ChipLogError(Discovery,"protocol type don't include neithor TCP nor UDP!");
         return CHIP_ERROR_INVALID_ARGUMENT;
