@@ -3711,6 +3711,7 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
+| * ChangeToModeWithStatus                                            |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Description                                                       | 0x0000 |
@@ -3757,6 +3758,37 @@ public:
 
 private:
     chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type mRequest;
+};
+
+/*
+ * Command ChangeToModeWithStatus
+ */
+class ModeSelectChangeToModeWithStatus : public ClusterCommand
+{
+public:
+    ModeSelectChangeToModeWithStatus(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode-with-status", credsIssuerConfig)
+    {
+        AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000001) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000001, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000001) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000050, 0x00000001, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ModeSelect::Commands::ChangeToModeWithStatus::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -11846,8 +11878,9 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),     //
-        make_unique<ModeSelectChangeToMode>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),               //
+        make_unique<ModeSelectChangeToMode>(credsIssuerConfig),           //
+        make_unique<ModeSelectChangeToModeWithStatus>(credsIssuerConfig), //
         //
         // Attributes
         //

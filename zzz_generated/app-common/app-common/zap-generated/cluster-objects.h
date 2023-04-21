@@ -13172,6 +13172,16 @@ struct Type;
 struct DecodableType;
 } // namespace ChangeToMode
 
+namespace ChangeToModeWithStatus {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -13207,6 +13217,73 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeToMode
+namespace ChangeToModeWithStatus {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeWithStatus
+namespace ChangeToModeResponse {
+enum class Fields : uint8_t
+{
+    kStatus     = 0,
+    kStatusText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -13221,7 +13298,7 @@ struct TypeInfo
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 32; }
+    static constexpr size_t MaxLength() { return 64; }
 };
 } // namespace Description
 namespace StandardNamespace {

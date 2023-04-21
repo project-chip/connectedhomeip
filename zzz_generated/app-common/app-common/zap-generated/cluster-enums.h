@@ -1359,6 +1359,39 @@ namespace BooleanState {} // namespace BooleanState
 
 namespace ModeSelect {
 
+// Enum for ChangeToModeResponseStatus
+enum class ChangeToModeResponseStatus : uint8_t
+{
+    kSuccess         = 0x00,
+    kUnsupportedMode = 0x01,
+    kGenericFailure  = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for CommonSemanticTags
+enum class CommonSemanticTags : uint16_t
+{
+    kAuto      = 0x00,
+    kQuick     = 0x01,
+    kQuiet     = 0x02,
+    kLowNoise  = 0x03,
+    kLowEnergy = 0x04,
+    kVacation  = 0x05,
+    kMin       = 0x06,
+    kMax       = 0x07,
+    kNight     = 0x08,
+    kDay       = 0x09,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 10,
+};
+
 // Bitmap for ModeSelectFeature
 enum class ModeSelectFeature : uint32_t
 {

@@ -17,9 +17,30 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
+  <enum name="ChangeToModeResponseStatus" type="ENUM8">
+    <cluster code="0x0050"/>
+    <item name="Success" value="0x0"/>
+    <item name="UnsupportedMode" value="0x1"/>
+    <item name="GenericFailure" value="0x2"/>
+  </enum>
+
+  <enum name="CommonSemanticTags" type="ENUM16">
+    <cluster code="0x0050"/>
+    <item name="Auto" value="0x0"/>
+    <item name="Quick" value="0x1"/>
+    <item name="Quiet" value="0x2"/>
+    <item name="LowNoise" value="0x3"/>
+    <item name="LowEnergy" value="0x4"/>
+    <item name="Vacation" value="0x5"/>
+    <item name="Min" value="0x6"/>
+    <item name="Max" value="0x7"/>
+    <item name="Night" value="0x8"/>
+    <item name="Day" value="0x9"/>
+  </enum>
+
   <struct name="SemanticTagStruct">
     <cluster code="0x0050"/>
-    <item name="MfgCode" type="vendor_id"/>
+    <item name="MfgCode" type="vendor_id" optional="false"/>
     <item name="Value" type="ENUM16" optional="false"/>
   </struct>
 
@@ -39,19 +60,37 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
     <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false" isNullable="false" length="32">Description</attribute>
+    <attribute side="server" code="0x0000" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false" isNullable="false" length="64">Description</attribute>
     <attribute side="server" code="0x0001" define="STANDARD_NAMESPACE" type="ENUM16"                                        writable="false" optional="false"  isNullable="true">StandardNamespace</attribute>
     <attribute side="server" code="0x0002" define="SUPPORTED_MODES" type="ARRAY" entryType="ModeOptionStruct"               writable="false" optional="false" isNullable="false">SupportedModes</attribute>
     <attribute side="server" code="0x0003" define="CURRENT_MODE"    type="INT8U"                                            writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
     <attribute side="server" code="0x0004" define="START_UP_MODE"   type="INT8U"                                            writable="true" optional="true"  isNullable="true">StartUpMode</attribute>
     <attribute side="server" code="0x0005" define="ON_MODE"         type="INT8U"                                            writable="true"  optional="true" isNullable="true">OnMode</attribute>
 
-    <!-- Test Commands -->
+    <!-- Commands -->
     <command source="client" code="0x00" name="ChangeToMode" optional="false">
       <description>
-        On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response.
+        If the NewMode field doesn't match the Mode field in an entry of the SupportedModes list the server SHALL respond with an INVALID_COMMAND status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list but the device is unable to transition as requested, the server SHALL respond with a FAILURE status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response.
       </description>
-      <arg name="NewMode" type="INT8U" />
+      <arg name="NewMode" type="INT8U" optional="false"/>
+    </command>
+
+    <command source="client" code="0x01" name="ChangeToModeWithStatus" optional="true">
+      <description>
+        This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
+      </description>
+      <arg name="NewMode" type="INT8U" optional="false"/>
+    </command>
+
+    <command source="server" code="0x02" name="ChangeToModeResponse" optional="true">
+      <description>
+        This command is sent by the device on receipt of the ChangeToModeWithStatus command.
+      </description>
+      <arg name="Status" type="ENUM8" optional="false"/>
+      <arg name="StatusText" type="CHAR_STRING" optional="true"/>
     </command>
 
   </cluster>

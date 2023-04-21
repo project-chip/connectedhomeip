@@ -14113,6 +14113,34 @@ class ModeSelect(Cluster):
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
 
+    class Enums:
+        class ChangeToModeResponseStatus(MatterIntEnum):
+            kSuccess = 0x00
+            kUnsupportedMode = 0x01
+            kGenericFailure = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 3,
+
+        class CommonSemanticTags(MatterIntEnum):
+            kAuto = 0x00
+            kQuick = 0x01
+            kQuiet = 0x02
+            kLowNoise = 0x03
+            kLowEnergy = 0x04
+            kVacation = 0x05
+            kMin = 0x06
+            kMax = 0x07
+            kNight = 0x08
+            kDay = 0x09
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 10,
+
     class Bitmaps:
         class ModeSelectFeature(IntFlag):
             kDeponoff = 0x1
@@ -14162,6 +14190,40 @@ class ModeSelect(Cluster):
                     ])
 
             newMode: 'uint' = 0
+
+        @dataclass
+        class ChangeToModeWithStatus(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0050
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="newMode", Tag=0, Type=uint),
+                    ])
+
+            newMode: 'uint' = 0
+
+        @dataclass
+        class ChangeToModeResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0050
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="statusText", Tag=1, Type=typing.Optional[str]),
+                    ])
+
+            status: 'uint' = 0
+            statusText: 'typing.Optional[str]' = None
 
     class Attributes:
         @dataclass

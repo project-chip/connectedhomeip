@@ -366,6 +366,13 @@ typedef void (*GroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallb
     void *, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum);
 typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum> &);
+typedef void (*ModeSelectClusterChangeToModeResponseStatusAttributeCallback)(
+    void *, chip::app::Clusters::ModeSelect::ChangeToModeResponseStatus);
+typedef void (*NullableModeSelectClusterChangeToModeResponseStatusAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::ChangeToModeResponseStatus> &);
+typedef void (*ModeSelectClusterCommonSemanticTagsAttributeCallback)(void *, chip::app::Clusters::ModeSelect::CommonSemanticTags);
+typedef void (*NullableModeSelectClusterCommonSemanticTagsAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::CommonSemanticTags> &);
 typedef void (*DoorLockClusterAlarmCodeEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::AlarmCodeEnum);
 typedef void (*NullableDoorLockClusterAlarmCodeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::AlarmCodeEnum> &);
@@ -16028,6 +16035,142 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
+    : public MTRCallbackBridge<ModeSelectClusterChangeToModeResponseStatusAttributeCallback>
+{
+public:
+    MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<ModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ModeSelect::ChangeToModeResponseStatus value);
+};
+
+class MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge
+    : public MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
+{
+public:
+    MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableModeSelectClusterChangeToModeResponseStatusAttributeCallback>
+{
+public:
+    MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::ChangeToModeResponseStatus> & value);
+};
+
+class MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge
+    : public MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
+{
+public:
+    MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRModeSelectClusterCommonSemanticTagsAttributeCallbackBridge
+    : public MTRCallbackBridge<ModeSelectClusterCommonSemanticTagsAttributeCallback>
+{
+public:
+    MTRModeSelectClusterCommonSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ModeSelectClusterCommonSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRModeSelectClusterCommonSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<ModeSelectClusterCommonSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ModeSelect::CommonSemanticTags value);
+};
+
+class MTRModeSelectClusterCommonSemanticTagsAttributeCallbackSubscriptionBridge
+    : public MTRModeSelectClusterCommonSemanticTagsAttributeCallbackBridge
+{
+public:
+    MTRModeSelectClusterCommonSemanticTagsAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRModeSelectClusterCommonSemanticTagsAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRModeSelectClusterCommonSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRModeSelectClusterCommonSemanticTagsAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableModeSelectClusterCommonSemanticTagsAttributeCallback>
+{
+public:
+    MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableModeSelectClusterCommonSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<NullableModeSelectClusterCommonSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::CommonSemanticTags> & value);
+};
+
+class MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackSubscriptionBridge
+    : public MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackBridge
+{
+public:
+    MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

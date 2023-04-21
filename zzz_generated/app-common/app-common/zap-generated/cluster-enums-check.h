@@ -1164,6 +1164,40 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::ChangeToModeResponseStatus val)
+{
+    using EnumType = ModeSelect::ChangeToModeResponseStatus;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kUnsupportedMode:
+    case EnumType::kGenericFailure:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::CommonSemanticTags val)
+{
+    using EnumType = ModeSelect::CommonSemanticTags;
+    switch (val)
+    {
+    case EnumType::kAuto:
+    case EnumType::kQuick:
+    case EnumType::kQuiet:
+    case EnumType::kLowNoise:
+    case EnumType::kLowEnergy:
+    case EnumType::kVacation:
+    case EnumType::kMin:
+    case EnumType::kMax:
+    case EnumType::kNight:
+    case EnumType::kDay:
+        return val;
+    default:
+        return static_cast<EnumType>(10);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;

@@ -7244,11 +7244,23 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command ChangeToMode
  *
- * On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL
- * set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response.
+ * If the NewMode field doesn't match the Mode field in an entry of the SupportedModes list the server SHALL respond with an
+ INVALID_COMMAND status response. If the NewMode field matches the Mode field in an entry of the SupportedModes list but the device
+ is unable to transition as requested, the server SHALL respond with a FAILURE status response. If the NewMode field matches the
+ Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the
+ CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response.
  */
 - (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params
                     completion:(MTRStatusCompletion)completion API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+/**
+ * Command ChangeToModeWithStatus
+ *
+ * This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a
+ response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on
+ NewMode field, see ChangeToMode command. On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
+ */
+- (void)changeToModeWithStatusWithParams:(MTRModeSelectClusterChangeToModeWithStatusParams *)params
+                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeDescriptionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -20034,6 +20046,25 @@ typedef NS_ENUM(uint8_t, MTRGroupKeyManagementGroupKeySecurityPolicy) {
     MTRGroupKeyManagementGroupKeySecurityPolicyTrustFirst API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRGroupKeyManagementGroupKeySecurityPolicyCacheAndSync API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_ENUM(uint8_t, MTRModeSelectChangeToModeResponseStatus) {
+    MTRModeSelectChangeToModeResponseStatusSuccess MTR_NEWLY_AVAILABLE = 0x00,
+    MTRModeSelectChangeToModeResponseStatusUnsupportedMode MTR_NEWLY_AVAILABLE = 0x01,
+    MTRModeSelectChangeToModeResponseStatusGenericFailure MTR_NEWLY_AVAILABLE = 0x02,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint16_t, MTRModeSelectCommonSemanticTags) {
+    MTRModeSelectCommonSemanticTagsAuto MTR_NEWLY_AVAILABLE = 0x00,
+    MTRModeSelectCommonSemanticTagsQuick MTR_NEWLY_AVAILABLE = 0x01,
+    MTRModeSelectCommonSemanticTagsQuiet MTR_NEWLY_AVAILABLE = 0x02,
+    MTRModeSelectCommonSemanticTagsLowNoise MTR_NEWLY_AVAILABLE = 0x03,
+    MTRModeSelectCommonSemanticTagsLowEnergy MTR_NEWLY_AVAILABLE = 0x04,
+    MTRModeSelectCommonSemanticTagsVacation MTR_NEWLY_AVAILABLE = 0x05,
+    MTRModeSelectCommonSemanticTagsMin MTR_NEWLY_AVAILABLE = 0x06,
+    MTRModeSelectCommonSemanticTagsMax MTR_NEWLY_AVAILABLE = 0x07,
+    MTRModeSelectCommonSemanticTagsNight MTR_NEWLY_AVAILABLE = 0x08,
+    MTRModeSelectCommonSemanticTagsDay MTR_NEWLY_AVAILABLE = 0x09,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRModeSelectFeature) {
     MTRModeSelectFeatureDEPONOFF API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,

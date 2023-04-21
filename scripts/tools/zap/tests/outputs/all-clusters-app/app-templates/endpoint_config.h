@@ -875,7 +875,7 @@
             { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Mode Select (server) */                                                                       \
-            { ZAP_LONG_DEFAULTS_INDEX(20), 0x00000000, 33, ZAP_TYPE(CHAR_STRING), 0 },                /* Description */            \
+            { ZAP_LONG_DEFAULTS_INDEX(20), 0x00000000, 65, ZAP_TYPE(CHAR_STRING), 0 },                /* Description */            \
             { ZAP_SIMPLE_DEFAULT(0), 0x00000001, 2, ZAP_TYPE(ENUM16), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* StandardNamespace */      \
             { ZAP_SIMPLE_DEFAULT(255), 0xFFF10001, 1, ZAP_TYPE(INT8U), 0 },                           /* ManufacturerExtension */  \
             { ZAP_EMPTY_DEFAULT(), 0x00000002, 0, ZAP_TYPE(ARRAY), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* SupportedModes */    \
@@ -1543,10 +1543,6 @@
     const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
         (EmberAfGenericClusterFunction) MatterLevelControlClusterServerShutdownCallback,                                           \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayModeSelectServer[] = {                                                        \
-        (EmberAfGenericClusterFunction) emberAfModeSelectClusterServerInitCallback,                                                \
-        (EmberAfGenericClusterFunction) MatterModeSelectClusterServerPreAttributeChangedCallback,                                  \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {                                                          \
         (EmberAfGenericClusterFunction) MatterDoorLockClusterServerAttributeChangedCallback,                                       \
@@ -2491,9 +2487,9 @@
       .clusterId = 0x00000050, \
       .attributes = ZAP_ATTRIBUTE_INDEX(315), \
       .attributeCount = 9, \
-      .clusterSize = 45, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
-      .functions = chipFuncArrayModeSelectServer, \
+      .clusterSize = 77, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 125 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
@@ -2950,7 +2946,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 28, 361 }, { ZAP_CLUSTER_INDEX(28), 44, 3459 }, { ZAP_CLUSTER_INDEX(72), 5, 105 },                 \
+        { ZAP_CLUSTER_INDEX(0), 28, 361 }, { ZAP_CLUSTER_INDEX(28), 44, 3491 }, { ZAP_CLUSTER_INDEX(72), 5, 105 },                 \
             { ZAP_CLUSTER_INDEX(77), 1, 0 },                                                                                       \
     }
 
@@ -2963,7 +2959,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (37)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3925)
+#define ATTRIBUTE_MAX_SIZE (3957)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)

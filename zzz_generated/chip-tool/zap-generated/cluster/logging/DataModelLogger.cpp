@@ -3989,6 +3989,15 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusText", indent + 1, value.statusText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -10744,6 +10753,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("KeySetReadAllIndicesResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case ModeSelect::Id: {
+        switch (path.mCommandId)
+        {
+        case ModeSelect::Commands::ChangeToModeResponse::Id: {
+            ModeSelect::Commands::ChangeToModeResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }
         }
         break;
