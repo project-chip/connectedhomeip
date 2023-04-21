@@ -41,6 +41,20 @@ NS_ASSUME_NONNULL_BEGIN
  *                MTRDataKey: Data-value NSDictionary object.
  *                              Included when there is data and when there is no error.
  *                              The data-value is described below.
+ *                MTREventNumberKey : NSNumber-wrapped uint64_t value. Monotonically increasing, and consecutive event reports
+ *                                    should have consecutive numbers unless device reboots, or if events are lost.
+ *                                    Only present when both MTREventPathKey and MTRDataKey are present.
+ *                MTREventPriorityKey : NSNumber-wrapped MTREventPriority value.
+ *                                      Only present when both MTREventPathKey and MTRDataKey are present.
+ *                MTREventTimeTypeKey : NSNumber-wrapped MTREventTimeType value.
+ *                                      Only present when both MTREventPathKey and MTRDataKey are present.
+ *                MTREventSystemUpTimeKey : NSNumber-wrapped NSTimeInterval value.
+ *                                          Only present when MTREventTimeTypeKey is MTREventTimeTypeSystemUpTime.
+ *                MTREventTimestampDateKey : NSDate object.
+ *                                           Only present when MTREventTimeTypeKey is MTREventTimeTypeTimestampDate.
+ *
+ *                Only one of MTREventTimestampDateKey and MTREventSystemUpTimeKey will be present, depending on the value for
+ *                MTREventTimeTypeKey.
  *
  *                A data-value is an NSDictionary object with the following key values:
  *
@@ -117,6 +131,11 @@ extern NSString * const MTRDoubleValueType;
 extern NSString * const MTRNullValueType;
 extern NSString * const MTRStructureValueType;
 extern NSString * const MTRArrayValueType;
+extern NSString * const MTREventNumberKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventPriorityKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventTimeTypeKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventSystemUpTimeKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventTimestampDateKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 @class MTRClusterStateCacheContainer;
 @class MTRAttributeCacheContainer;

@@ -23,6 +23,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
+#include <app/EventHeader.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventPathParams.h>
 
@@ -75,6 +76,13 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
  */
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
+/**
+ * Create a report, suitable in including in the sort of data structure that
+ * gets passed to MTRDeviceResponseHandler, from a given event header and
+ * already-decoded event data.  The data is allowed to be nil in error cases
+ * (e.g. when TLV decoding failed).
+ */
++ (NSDictionary *)eventReportForHeader:(const chip::app::EventHeader &)header andData:(id _Nullable)data;
 @end
 
 @interface MTRClusterPath ()

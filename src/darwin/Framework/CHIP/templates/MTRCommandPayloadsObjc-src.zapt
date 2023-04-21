@@ -7,7 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_clusters}}
 {{#zcl_commands}}
 {{#*inline "completeImpl"}}
-{{#unless (wasRemoved cluster command=command)}}
+{{#if (isSupported cluster command=command isForCommandPayload=true)}}
 @implementation MTR{{cluster}}Cluster{{command}}Params
 - (instancetype)init
 {
@@ -59,14 +59,14 @@ NS_ASSUME_NONNULL_BEGIN
 {{/zcl_command_arguments}}
 
 @end
-{{/unless}}
+{{/if}}
 {{/inline}}
 {{#*inline "oldNameImpl"}}
 
 @implementation MTR{{cluster}}Cluster{{command}}Params
 @end
 {{/inline}}
-{{#if (not (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true)))}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 {{> completeImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                  command=(asUpperCamelCase name preserveAcronyms=true)
                  includeRenamedProperties=false}}
