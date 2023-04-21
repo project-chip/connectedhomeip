@@ -30,8 +30,8 @@
 #include <cstddef>
 #include <jni.h>
 #include <memory>
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace chip {
 namespace Dnssd {
@@ -187,8 +187,8 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
     VerifyOrReturnError(sBrowserObject != nullptr && sBrowseMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sMdnsCallbackObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    std::string serviceType =  GetFullTypeWithSubTypes(type, protocol);
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    std::string serviceType = GetFullTypeWithSubTypes(type, protocol);
+    JNIEnv * env            = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jniServiceType(env, serviceType.c_str());
 
     env->CallVoidMethod(sBrowserObject, sBrowseMethod, jniServiceType.jniValue(), reinterpret_cast<jlong>(callback),
@@ -224,17 +224,17 @@ CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], 
     outServiceName[lengthWithoutProtocol] = '\0'; // Set a null terminator
 
     outProtocol = DnssdServiceProtocol::kDnssdProtocolUnknown;
-    if (strstr(dotPos,"._tcp") != 0)
+    if (strstr(dotPos, "._tcp") != 0)
     {
         outProtocol = DnssdServiceProtocol::kDnssdProtocolTcp;
     }
-    else if (strstr(dotPos,"._udp") != 0)
+    else if (strstr(dotPos, "._udp") != 0)
     {
         outProtocol = DnssdServiceProtocol::kDnssdProtocolUdp;
     }
     else
     {
-        ChipLogError(Discovery,"protocol type don't include neithor TCP nor UDP!");
+        ChipLogError(Discovery, "protocol type don't include neithor TCP nor UDP!");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -250,7 +250,7 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface,
     VerifyOrReturnError(sMdnsCallbackObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     std::string serviceType = GetFullType(service);
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env            = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jniInstanceName(env, service->mName);
     UtfString jniServiceType(env, serviceType.c_str());
 
