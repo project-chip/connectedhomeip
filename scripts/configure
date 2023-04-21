@@ -25,7 +25,7 @@
 # environment (via scripts/activate.sh). The pigweed git sub-module must still
 # be present though.
 #
-# Host tool dependencies: python3, gn, ninja
+# External tool dependencies: bash, python3, gn, ninja
 #
 # The zap-cli code generator and a small number of Python modules are
 # downloaded if necessary (see scripts/setup/requirements.build.txt) and
@@ -51,6 +51,12 @@ function usage() {
 function main() { # ...
     set -o pipefail
     CHIP_ROOT=$(cd "$(dirname "$0")/.." && pwd)
+    BUILD_ENV_DEPS=(
+        "${CHIP_ROOT}/scripts/setup/requirements.build.txt"
+        "${CHIP_ROOT}/scripts/setup/constraints.txt"
+        "${CHIP_ROOT}/scripts/setup/zap.version"
+    )
+
     if [[ "$PWD" == "$CHIP_ROOT" ]]; then
         BUILD_DIR="out/configured"
         BUILD_ROOT="${CHIP_ROOT}/${BUILD_DIR}"
@@ -97,9 +103,24 @@ function main() { # ...
         return
     fi
 
+    create_empty_pw_env
     gn_generate "$@"
     create_ninja_wrapper
     info "You can now run ./ninja"
+}
+
+function create_empty_pw_env() {
+    # The Pigweed environment ("//build_overrides/pigweed_environment.gni") is
+    # imported unconditionally in various build files, so ensure it exists.
+    local gni="build_overrides/pigweed_environment.gni"
+    if [[ -d "${CHIP_ROOT}/$(dirname "$gni")" ]]; then
+        if safe_to_clobber "$gni"; then
+            info "Creating empty $gni in source tree"
+            echo "# ${CONFIGURE_MARKER}" >"${CHIP_ROOT}/${gni}"
+        else
+            info "Warning: Leaving existing $gni in place, this might affect the build configuration."
+        fi
+    fi
 }
 
 function gn_generate() { # [project options]
@@ -109,105 +130,18 @@ function gn_generate() { # [project options]
         cd "${CHIP_ROOT}/${PROJECT}" # --root= doesn't work for gn args!
 
         # Run gn gen with an empty args.gn first so we can list all arguments
-        info "Configuring gn build arguments"
+        info "Configuring gn build arguments (see $BUILD_DIR/args.configured for full list)"
         echo "# ${CONFIGURE_MARKER}" >"${BUILD_ROOT}/args.gn"
         gn -q gen "$BUILD_ROOT"
-        gn args "$BUILD_ROOT" --list --json | process_args "$@" >>"${BUILD_ROOT}/args.gn"
+
+        # Use the argument list to drive the mapping of our command line options to GN args
+        python_util process_project_args <(gn args "$BUILD_ROOT" --list --json) "$@" >>"${BUILD_ROOT}/args.gn"
+        gn args "$BUILD_ROOT" --list >"${BUILD_ROOT}/args.configured"
 
         # Now gn gen with the arguments we have configured.
         info "Running gn gen to generate ninja files"
         gn -q gen "$BUILD_ROOT"
     )
-}
-
-function process_args() { # [project options]
-    "$PYTHON" - "$@" 3<&0 <<'END'
-import collections, json, os, re, sys
-
-def info(message):
-    print(message, file=sys.stderr)
-def fail(message):
-    info("Error: " + message)
-    sys.exit(1)
-
-# Parse `gn args --list --json` output from FD 3, derive type from default value
-argtype = str.maketrans('"tf0123456789', 'sbbiiiiiiiiii') # first char of value -> type
-gn_args = { arg['name']: arg['default']['value'][0].translate(argtype) for arg in json.load(os.fdopen(3)) }
-def gn_arg(name, prefixes=(), type=None):
-    arg = name.translate(str.maketrans('-', '_'))
-    candidates = [p + arg for p in (('',) + prefixes) if (p + arg) in gn_args]
-    preferred = [c for c in candidates if gn_args[c] == type] if type else []
-    if not (match := next(iter(preferred + candidates), None)):
-        info("Warning: Project has no option '%s'" % arg)
-    return match
-
-args = collections.OrderedDict()
-def add_arg(arg, value):
-    # format strings and bools as JSON, otherwise pass through as is
-    args[arg] = (json.dumps(value) if gn_args.get(arg, 's') in 'sb' else value)
-
-def add_default(arg, value):
-    if arg in gn_args:
-        add_arg(arg, value)
-
-def add_env_arg(arg, envvar, default=None, list=False):
-    value = os.environ.get(envvar, default)
-    if not value:
-        return
-    if not (type := gn_args.get(arg, None)):
-        info("Warning: Not propagating %s, project does not have '%s' option" % (envvar, arg))
-        return
-    args[arg] = json.dumps(value if type != '[' else value.split() if list else [value])
-
-# Defaults
-add_default('chip_build_tests', False)
-add_default('custom_toolchain', 'custom')
-
-# Configure toolchain binaries and flags from environment
-add_env_arg('target_cc', 'CC', 'cc')
-add_env_arg('target_cxx', 'CXX', 'cxx')
-add_env_arg('target_ar', 'AR', 'ar')
-add_env_arg('target_cflags', 'CPPFLAGS', list=True)
-add_env_arg('target_cflags_c', 'CFLAGS', list=True)
-add_env_arg('target_cflags_cc', 'CXXFLAGS', list=True)
-add_env_arg('target_cflags_objc', 'OBJCFLAGS', list=True)
-add_env_arg('target_ldflags', 'LDFLAGS', list=True)
-
-# Parse GNU configure style options
-for arg in sys.argv[1:]:
-    if not (m := re.fullmatch(r'--([a-z][a-z0-9-]*)(?:=(.*))?', arg)):
-        fail("Invalid argument: '%s'" % arg)
-    name, value = m.group(1, 2)
-    if name in ('build', 'host', 'target'):
-        if value == None:
-            fail("Project option '%s' requires an argument" % arg)
-        triplet = value.split('-')
-        if len(triplet) not in (2, 3, 4):
-            fail("Project option '%s' argument must be a cpu-vendor-os[-abi] triplet" % arg)
-        prefix = 'host_' if name == 'build' else 'target_' # "host" has different meanings in GNU and GN!
-        add_arg(prefix + 'cpu', triplet[0])
-        add_arg(prefix + 'os', triplet[1 if len(triplet) == 2 else 2])
-    elif name.startswith('enable-'):
-        if not (arg := gn_arg(name[len('enable-'):], ('is_', 'use_', 'chip_', 'chip_use_', 'chip_config_'), 'b')):
-            continue
-        if gn_args[arg] != 'b':
-            fail("Project option '%s' is not a boolean" % arg)
-        if value != 'no' and value != None:
-            fail("Invalid argument for --%s, must be absent or 'no'" % name)
-        add_arg(arg, value == None)
-    else:
-        if not (arg := gn_arg(name, ('chip_', 'chip_config_'))):
-            continue
-        if gn_args[arg] == 'b':
-            fail("Project option '%s' is a boolean, use --enable-..." % arg)
-        if value == None:
-            fail("Project option '%s' requires an argument" % arg)
-        add_arg(arg, value)
-
-for arg, value in args.items():
-    info(" - %s = %s" % (arg, value))
-    print("%s = %s" % (arg, value))
-END
 }
 
 function create_ninja_wrapper() {
@@ -241,15 +175,16 @@ function configure_python_env() {
     info "ok"
 
     progress "Installing Python build dependencies"
-    "${BUILD_ENV_DIR}/bin/pip" install --disable-pip-version-check --require-virtualenv --quiet \
+    "${BUILD_ENV_DIR}/bin/pip" install --require-virtualenv --quiet --upgrade pip wheel
+    "${BUILD_ENV_DIR}/bin/pip" install --require-virtualenv --quiet \
         -r "${CHIP_ROOT}/scripts/setup/requirements.build.txt" \
         -c "${CHIP_ROOT}/scripts/setup/constraints.txt"
     info "ok"
 }
 
 function generate_build_env_cksum() {
-    # Conservatively assume that any change to these files invalidates a cached build environment
-    CURRENT_ENV_CKSUM="$(cat "$0" "${CHIP_ROOT}/scripts/setup/requirements.build.txt" "${CHIP_ROOT}/scripts/setup/zap.version" | cksum)"
+    # Conservatively assume that any change to this script or BUILD_ENV_DEPS invalidates the environment
+    CURRENT_ENV_CKSUM="$(cat "$0" "${BUILD_ENV_DEPS[@]}" | cksum)"
     [[ -n "$CURRENT_ENV_CKSUM" ]] || fail "Failed to generate build environment checksum"
 }
 
@@ -270,14 +205,13 @@ function download_zap() {
     local url="https://github.com/project-chip/zap/releases/download/${version}/zap-${platform}.zip"
 
     progress "Installing zap-cli from $url"
-    "$PYTHON" - "$url" "${BUILD_ENV_DIR}/bin" <<'END'
-import sys, urllib.request, zipfile
-file, *_ = urllib.request.urlretrieve(sys.argv[1])
-with zipfile.ZipFile(file) as zip:
-    zip.extract(next(i for i in zip.infolist() if i.filename == 'zap-cli'), sys.argv[2])
-END
+    python_util download_and_extract_zip "$url" "${BUILD_ENV_DIR}/bin" zap-cli
     chmod a+x "${BUILD_ENV_DIR}/bin/zap-cli" # ZipFile.extract() does not handle permissions
     info "ok"
+}
+
+function python_util() { # function ...
+    "$PYTHON" "${CHIP_ROOT}/scripts/configure.utils.py" "$@"
 }
 
 function check_python() {
@@ -314,11 +248,15 @@ function have_binary() { # binary
 }
 
 function ensure_no_clobber() { # file
+    safe_to_clobber "$1" || fail "Won't overwrite file not generated by configure: $1"
+}
+
+function safe_to_clobber() { # file
     CONFIGURE_MARKER="Auto-generated by configure, do not edit"
     [[ -s "$1" ]] || return 0
     read -r -n 512 -d '' <"$1" || true
     [[ "${REPLY/$CONFIGURE_MARKER/}" != "$REPLY" ]] && return 0
-    fail "Won't overwrite file not generated by configure: $1"
+    return 1
 }
 
 function info() { # message
