@@ -54,7 +54,7 @@ bool SilabsPlatform::GetLedState(uint8_t led)
 {
     if (led >= SL_SIMPLE_LED_COUNT)
     {
-        return 0;
+        return false;
     }
 
     return sl_led_get_state(SL_SIMPLE_LED_INSTANCE(led));

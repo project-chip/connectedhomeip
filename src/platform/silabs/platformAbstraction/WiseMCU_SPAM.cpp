@@ -37,27 +37,28 @@ CHIP_ERROR SilabsPlatform::Init(void)
 #ifdef ENABLE_WSTK_LEDS
 void SilabsPlatform::InitLed(void)
 {
-    // TODO ?
+    // TODO
     SilabsPlatformAbstractionBase::InitLed();
 }
 
 CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led) override
 {
-    // TODO add range check ?
+    // TODO add range check
     RSI_Board_LED_Set(led, state);
     return CHIP_NO_ERROR;
 }
 
 bool SilabsPlatform::GetLedState(uint8_t led)
 {
-    // TODO ?
+    // TODO
     return SilabsPlatformAbstractionBase::GetLedState(led);
 }
 
 CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led) override
 {
-    // TODO add range check ?
-    RSI_Board_LED_Toggle(led) return CHIP_NO_ERROR;
+    // TODO add range check
+    RSI_Board_LED_Toggle(led);
+    return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
 

@@ -24,9 +24,7 @@
 #include "EventHandlerLibShell.h"
 #endif // ENABLE_CHIP_SHELL
 
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
@@ -53,9 +51,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef ENABLE_WSTK_LEDS
 #define LOCK_STATE_LED 1
-#endif // ENABLE_WSTK_LEDS
 
 using chip::app::Clusters::DoorLock::DlLockState;
 using chip::app::Clusters::DoorLock::OperationErrorEnum;
@@ -67,9 +63,7 @@ using namespace ::chip::DeviceLayer::Internal;
 using namespace SI917DoorLock::LockInitParams;
 
 namespace {
-#ifdef ENABLE_WSTK_LEDS
 LEDWidget sLockLED;
-#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 } // namespace
@@ -238,11 +232,8 @@ CHIP_ERROR AppTask::Init()
 
     LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-#ifdef ENABLE_WSTK_LEDS
-    // Initialize LEDs
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(state.Value() == DlLockState::kUnlocked);
-#endif // ENABLE_WSTK_LEDS
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
@@ -371,9 +362,7 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
     {
         bool locked = (aAction == LockManager::LOCK_ACTION);
         SILABS_LOG("%s Action has been initiated", (locked) ? "Lock" : "Unlock");
-#ifdef ENABLE_WSTK_LEDS
         sLockLED.Set(!locked);
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
         sAppTask.GetLCD().WriteDemoUI(locked);
