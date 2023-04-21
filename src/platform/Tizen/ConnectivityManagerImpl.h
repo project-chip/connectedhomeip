@@ -87,7 +87,13 @@ public:
     void StartWiFiManagement();
     void StopWiFiManagement();
     bool IsWiFiManagementStarted();
+    CHIP_ERROR GetWiFiBssId(MutableByteSpan & value);
+    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
+    CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
+    const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
 #endif
+
+    const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
@@ -127,6 +133,8 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
+    char mEthIfName[IFNAMSIZ];
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
@@ -134,6 +142,7 @@ private:
     System::Clock::Timestamp mLastAPDemandTime;
     System::Clock::Timeout mWiFiStationReconnectInterval;
     System::Clock::Timeout mWiFiAPIdleTimeout;
+    static char sWiFiIfName[IFNAMSIZ];
 #endif
 };
 

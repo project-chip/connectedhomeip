@@ -615,10 +615,11 @@ def main() -> int:
                     f"\"{truncated_sw_ver_string}\" due to 64 bytes limitation")
                 sw_ver_string = truncated_sw_ver_string
 
-        flush_print("Building...")
-
+        flush_print(f"Software Version String: \"{sw_ver_string}\"")
         flush_print(
             f"Product ID 0x{options.pid:02X} / Vendor ID 0x{options.vid:02X}")
+        flush_print("Building...")
+
         shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
         if (options.build_target == "esp32") or (options.build_target == "nrfconnect") or (options.build_target == "ameba"):

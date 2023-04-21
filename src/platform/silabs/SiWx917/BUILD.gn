@@ -67,7 +67,7 @@ static_library("SiWx917") {
   if (chip_enable_ota_requestor) {
     sources += [
       #"OTAImageProcessorImpl.cpp",
-      #"OTAImageProcessorImpl.h",
+      #"${silabs_platform_dir}/OTAImageProcessorImpl.h",
     ]
   }
 

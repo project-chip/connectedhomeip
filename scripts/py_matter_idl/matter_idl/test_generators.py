@@ -128,7 +128,7 @@ class GeneratorTest:
             sys.path.append(os.path.abspath(
                 os.path.join(os.path.dirname(__file__), '../examples')))
             from matter_idl_plugin import CustomGenerator
-            return CustomGenerator(storage, idl)
+            return CustomGenerator(storage, idl, package='com.matter.example.proto')
         else:
             raise Exception("Unknown generator for testing: %s",
                             self.generator_name.lower())

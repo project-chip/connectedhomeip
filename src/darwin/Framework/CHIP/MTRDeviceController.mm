@@ -548,7 +548,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
-        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error], nil);
+        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:error], nil);
 
         return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
     };
