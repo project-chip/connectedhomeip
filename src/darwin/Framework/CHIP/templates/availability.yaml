@@ -53,6 +53,17 @@
 #              NOTE: support for "removed" may not be complete in the templates.
 #              Please examine codegen carefully when using "removed" to make
 #              sure all the things that should have been removed have been.
+#
+# * "provisional": Can contain clusters, commands, attributes, etc as described
+#                  above for "introduced" and "deprecated".  Items can be
+#                  defined as provisional to prevent code generation for them.
+#                  If they are then listed as introduced in a release that is
+#                  later than the one where they were marked provisional,
+#                  they will start being code-generated.
+#                  NOTE: support for "provisional" may not be complete in the
+#                  templates. Please examine codegen carefully when using
+#                  "provisional" to make sure all the things that should have
+#                  been omitted have been.
 
 - release: "Initial release"
   versions:
@@ -4577,6 +4588,14 @@
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
+  provisional:
+      clusters:
+          - PulseWidthModulation
+          - TimeSynchronization
+          - ProxyConfiguration
+          - ProxyDiscovery
+          - ProxyValid
+          - FaultInjection
 
 - release: "First dot-release"
   versions:
@@ -6142,9 +6161,6 @@
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
   removed:
-      clusters:
-          # Not ready to be public API yet.
-          - ClientMonitoring
       commands:
           BasicInformation:
               - MfgSpecificPing
@@ -6198,6 +6214,10 @@
                   - Dual
               CredentialRuleEnum:
                   - Double
+  provisional:
+      clusters:
+          # Not ready to be public API yet.
+          - ClientMonitoring
   renames:
       clusters:
           UnitTesting: TestCluster
@@ -6546,9 +6566,10 @@
       watchos: "9.5"
       tvos: "16.5"
   introduced:
-      attributes:
-          TimeSynchronization:
-              - DSTOffset
+      ids:
+          attributes:
+              TimeSynchronization:
+                  - DSTOffset
       command fields:
           DiagnosticLogs:
               RetrieveLogsRequest:
@@ -6813,12 +6834,10 @@
           PumpConfigurationAndControl:
               PumpFeature:
                   - Local
-  removed:
+  provisional:
       global attributes:
-          # EventList is provisional for now.
           - EventList
       attributes:
-          # EventList is provisional for now.
           Scenes:
               - EventList
           OnOff:
@@ -6961,6 +6980,7 @@
               - EventList
           FaultInjection:
               - EventList
+  removed:
       enum values:
           DoorLock:
               DlLockDataType:

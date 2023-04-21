@@ -7,10 +7,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 
 
-{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 /**
  * Cluster {{name}}
  *
@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandDecl"}}
-{{#unless (wasRemoved cluster command=command)}}
+{{#if (isSupported cluster command=command)}}
 /**
  * Command {{name}}
  *
@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#unless hasArguments}}
 - (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="First major API revamp"}};
 {{/unless}}
-{{/unless}}
+{{/if}}
 {{/inline}}
 {{> commandDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/zcl_commands}}
 
 {{#zcl_attributes_server removeKeys='isOptional'}}
-{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
@@ -63,41 +63,41 @@ NS_ASSUME_NONNULL_BEGIN
 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 + (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 {{/if}}
-{{/unless}}
+{{/if}}
 {{/zcl_attributes_server}}
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
 @end
-{{/unless}}
+{{/if}}
 
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
-{{#unless (wasRemoved (compatClusterNameRemapping name))}}
+{{#if (isSupported (compatClusterNameRemapping name))}}
 {{availability (compatClusterNameRemapping name) deprecationMessage=(concat "Please use MTRBaseCluster" (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRBaseCluster{{compatClusterNameRemapping name}} : MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 @end
 
+{{/if}}
 {{/unless}}
-{{/unless}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
 {{#*inline "enumDef"}}
 typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName clusterName enumName}}) {
    {{#zcl_enum_items}}
-   {{#unless (wasRemoved ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true))}}
+   {{#if (isSupported ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true))}}
    {{objCEnumName ../clusterName ../enumName}}{{asUpperCamelCase label preserveAcronyms=true}} {{availability ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (asUpperCamelCase label preserveAcronyms=true))}} = {{asHex value 2}},
-   {{/unless}}
+   {{/if}}
    {{#*inline "oldNameItemDecl"}}
    {{#if oldItemName}}
-   {{#unless (wasRemoved ../clusterName enum=../enumName enumValue=oldItemName)}}
+   {{#if (isSupported ../clusterName enum=../enumName enumValue=oldItemName)}}
    {{objCEnumName ../clusterName ../enumName}}{{objCEnumItemLabel oldItemName}} {{availability ../clusterName enum=../enumName enumValue=oldItemName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (asUpperCamelCase label preserveAcronyms=true))}} = {{asHex value 2}},
-   {{/unless}}
+   {{/if}}
    {{/if}}
    {{/inline}}
    {{> oldNameItemDecl oldItemName=(oldName ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true))}}
@@ -105,20 +105,20 @@ typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName clusterName enumNam
    {{!We had extra "Not Supported" values for DoorLockUserStatus/DoorLockUserType that we have to wedge in here manually for now.}}
    {{#if (and (isStrEqual clusterName "DoorLock")
               (or (isStrEqual enumName "UserTypeEnum") (isStrEqual enumName "UserStatusEnum"))
-              (not (wasRemoved clusterName enum=enumName enumValue="NotSupported")))}}
+              (isSupported clusterName enum=enumName enumValue="NotSupported"))}}
    {{objCEnumName clusterName enumName}}{{objCEnumItemLabel "NotSupported"}} {{availability clusterName enum=enumName enumValue="NotSupported" deprecationMessage="This value is not part of the specification and will be removed"}} = 0xFF,
    {{/if}}
 }
 {{/inline}}
-{{#unless (wasRemoved (asUpperCamelCase ../name preserveAcronyms=true) enum=(asUpperCamelCase label preserveAcronyms=true))}}
+{{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) enum=(asUpperCamelCase label preserveAcronyms=true))}}
 {{> enumDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) enumName=(asUpperCamelCase label preserveAcronyms=true)}} {{availability (asUpperCamelCase ../name preserveAcronyms=true) enum=(asUpperCamelCase label preserveAcronyms=true) deprecationMessage="This enum is unused and will be removed"}};
-{{/unless}}
+{{/if}}
 {{! Takes the name of the enum to use as enumName. }}
 {{#*inline "oldNameDecl"}}
-{{#unless (wasRemoved (compatClusterNameRemapping ../name) enum=enumName)}}
+{{#if (isSupported (compatClusterNameRemapping ../name) enum=enumName)}}
 
 {{> enumDef name=name clusterName=(compatClusterNameRemapping ../name) enumName=enumName}} {{availability (compatClusterNameRemapping ../name) enum=enumName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../name preserveAcronyms=true) label))}};
-{{/unless}}
+{{/if}}
 {{/inline}}
 {{! Takes the old name of the enum, if any, as oldEnumName. }}
 {{#*inline "oldNameCheck"}}
@@ -138,29 +138,29 @@ typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName clusterName enumNam
 {{#*inline "bitmapDef"}}
 typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitmapName}}) {
    {{#zcl_bitmap_items}}
-   {{#unless (wasRemoved ../clusterName bitmap=../bitmapName bitmapValue=(asUpperCamelCase label preserveAcronyms=true))}}
+   {{#if (isSupported ../clusterName bitmap=../bitmapName bitmapValue=(asUpperCamelCase label preserveAcronyms=true))}}
    {{objCEnumName ../clusterName ../bitmapName}}{{asUpperCamelCase label preserveAcronyms=true}} {{availability ../clusterName bitmap=../bitmapName bitmapValue=(asUpperCamelCase label preserveAcronyms=true) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (asUpperCamelCase label preserveAcronyms=true))}} = {{asHex mask}},
-   {{/unless}}
+   {{/if}}
    {{#*inline "oldNameItemDecl"}}
    {{#if oldItemName}}
-   {{#unless (wasRemoved ../clusterName bitmap=../bitmapName bitmapValue=oldItemName)}}
+   {{#if (isSupported ../clusterName bitmap=../bitmapName bitmapValue=oldItemName)}}
    {{objCEnumName ../clusterName ../bitmapName}}{{objCEnumItemLabel oldItemName}} {{availability ../clusterName bitmap=../bitmapName bitmapValue=oldItemName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (asUpperCamelCase label preserveAcronyms=true))}} = {{asHex mask}},
-   {{/unless}}
+   {{/if}}
    {{/if}}
    {{/inline}}
    {{> oldNameItemDecl oldItemName=(oldName ../clusterName bitmap=../bitmapName bitmapValue=(asUpperCamelCase label preserveAcronyms=true))}}
    {{/zcl_bitmap_items}}
 }
 {{/inline}}
-{{#unless (wasRemoved (asUpperCamelCase ../name preserveAcronyms=true) bitmap=(asUpperCamelCase label preserveAcronyms=true))}}
+{{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) bitmap=(asUpperCamelCase label preserveAcronyms=true))}}
 {{> bitmapDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) bitmapName=(asUpperCamelCase label preserveAcronyms=true)}} {{availability (asUpperCamelCase ../name preserveAcronyms=true) bitmap=(asUpperCamelCase label preserveAcronyms=true)}};
-{{/unless}}
+{{/if}}
 {{! Takes the name of the bitmap to use as bitmapName. }}
 {{#*inline "oldNameDecl"}}
-{{#unless (wasRemoved (compatClusterNameRemapping ../name) bitmap=bitmapName)}}
+{{#if (isSupported (compatClusterNameRemapping ../name) bitmap=bitmapName)}}
 
 {{> bitmapDef name=name clusterName=(compatClusterNameRemapping ../name) bitmapName=bitmapName}} {{availability (compatClusterNameRemapping ../name) bitmap=bitmapName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../name preserveAcronyms=true) label))}};
-{{/unless}}
+{{/if}}
 {{/inline}}
 {{! Takes the old name of the bitmap, if any, as oldBitmapName. }}
 {{#*inline "oldNameCheck"}}
@@ -179,9 +179,9 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
 {{/zcl_bitmaps}}
 {{/zcl_clusters}}
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 {{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
-           (not (wasRemoved (compatClusterNameRemapping name))))}}
+           (isSupported (compatClusterNameRemapping name)))}}
 @interface MTRBaseCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
@@ -193,7 +193,7 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandDecl"}}
 {{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)
-           (not (wasRemoved cluster command=command)))}}
+           (isSupported cluster command=command))}}
 - (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField }}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
     {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithParams:completion:")}};
 {{#unless hasArguments}}
@@ -209,7 +209,7 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
 
 {{#zcl_attributes_server removeKeys='isOptional'}}
 {{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
-           (not (wasRemoved (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
+           (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name)))}}
 {{#*inline "attribute"}}Attribute{{compatAttributeNameRemapping parent.name name}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
@@ -234,6 +234,6 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 @end
 
 {{/if}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 
 NS_ASSUME_NONNULL_END

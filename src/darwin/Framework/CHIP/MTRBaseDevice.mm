@@ -74,6 +74,11 @@ NSString * const MTRDoubleValueType = @"Double";
 NSString * const MTRNullValueType = @"Null";
 NSString * const MTRStructureValueType = @"Structure";
 NSString * const MTRArrayValueType = @"Array";
+NSString * const MTREventNumberKey = @"eventNumber";
+NSString * const MTREventPriorityKey = @"eventPriority";
+NSString * const MTREventTimeTypeKey = @"eventTimeType";
+NSString * const MTREventSystemUpTimeKey = @"eventSystemUpTime";
+NSString * const MTREventTimestampDateKey = @"eventTimestampDate";
 
 class MTRDataValueDictionaryCallbackBridge;
 
@@ -752,7 +757,7 @@ template <typename DecodableValueType> class BufferedReadClientCallback final : 
 public:
     using OnSuccessAttributeCallbackType
         = std::function<void(const ConcreteAttributePath & aPath, const DecodableValueType & aData)>;
-    using OnSuccessEventCallbackType = std::function<void(const ConcreteEventPath & aPath, const DecodableValueType & aData)>;
+    using OnSuccessEventCallbackType = std::function<void(const EventHeader & aEventHeader, const DecodableValueType & aData)>;
     using OnErrorCallbackType = std::function<void(
         const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath, CHIP_ERROR aError)>;
     using OnDoneCallbackType = std::function<void(BufferedReadClientCallback * callback)>;
@@ -844,7 +849,7 @@ private:
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
 
-        mOnEventSuccess(aEventHeader.mPath, value);
+        mOnEventSuccess(aEventHeader, value);
 
     exit:
         if (err != CHIP_NO_ERROR) {
@@ -944,31 +949,28 @@ private:
 
             auto resultArray = [[NSMutableArray alloc] init];
             auto onAttributeSuccessCb
-                = [resultArray](const ConcreteAttributePath & attributePath, const MTRDataValueDictionaryDecodableType & aData) {
+                = [resultArray](const ConcreteAttributePath & aAttributePath, const MTRDataValueDictionaryDecodableType & aData) {
                       [resultArray addObject:@ {
-                          MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attributePath],
+                          MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:aAttributePath],
                           MTRDataKey : aData.GetDecodedObject()
                       }];
                   };
 
             auto onEventSuccessCb
-                = [resultArray](const ConcreteEventPath & eventPath, const MTRDataValueDictionaryDecodableType & aData) {
-                      [resultArray addObject:@ {
-                          MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
-                          MTRDataKey : aData.GetDecodedObject()
-                      }];
+                = [resultArray](const EventHeader & aEventHeader, const MTRDataValueDictionaryDecodableType & aData) {
+                      [resultArray addObject:[MTRBaseDevice eventReportForHeader:aEventHeader andData:aData.GetDecodedObject()]];
                   };
 
-            auto onFailureCb = [resultArray, interactionStatus](const app::ConcreteAttributePath * attributePath,
-                                   const app::ConcreteEventPath * eventPath, CHIP_ERROR aError) {
-                if (attributePath != nullptr) {
+            auto onFailureCb = [resultArray, interactionStatus](const app::ConcreteAttributePath * aAttributePath,
+                                   const app::ConcreteEventPath * aEventPath, CHIP_ERROR aError) {
+                if (aAttributePath != nullptr) {
                     [resultArray addObject:@ {
-                        MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:*attributePath],
+                        MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:*aAttributePath],
                         MTRErrorKey : [MTRError errorForCHIPErrorCode:aError]
                     }];
-                } else if (eventPath != nullptr) {
+                } else if (aEventPath != nullptr) {
                     [resultArray addObject:@ {
-                        MTREventPathKey : [[MTREventPath alloc] initWithPath:*eventPath],
+                        MTREventPathKey : [[MTREventPath alloc] initWithPath:*aEventPath],
                         MTRErrorKey : [MTRError errorForCHIPErrorCode:aError]
                     }];
                 } else {
@@ -1343,14 +1345,11 @@ exit:
                        });
                    };
 
-                   auto onEventReportCb = [queue, reportHandler](const ConcreteEventPath & eventPath,
-                                              const MTRDataValueDictionaryDecodableType & data) {
-                       id valueObject = data.GetDecodedObject();
-                       ConcreteEventPath pathCopy(eventPath);
+                   auto onEventReportCb = [queue, reportHandler](
+                                              const EventHeader & eventHeader, const MTRDataValueDictionaryDecodableType & data) {
+                       NSDictionary * report = [MTRBaseDevice eventReportForHeader:eventHeader andData:data.GetDecodedObject()];
                        dispatch_async(queue, ^{
-                           reportHandler(
-                               @[ @ { MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy], MTRDataKey : valueObject } ],
-                               nil);
+                           reportHandler(@[ report ], nil);
                        });
                    };
 
@@ -1538,6 +1537,43 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     auto * self = static_cast<OpenCommissioningWindowHelper *>(context);
     self->mResultCallback(status, payload);
     delete self;
+}
+
+#pragma mark - Utility for time conversion
+NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
+{
+    // Note: The event timestamp value as written in the spec is in microseconds, but the released 1.0 SDK implemented it in
+    // milliseconds. The following issue was filed to address the inconsistency:
+    //    https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6236
+    // For consistency with the released behavior, calculations here will be done in milliseconds.
+
+    // First convert the event timestamp value (in milliseconds) to NSTimeInterval - to minimize potential loss of precision
+    // of uint64 => NSTimeInterval (double), convert whole seconds and remainder separately and then combine
+    uint64_t eventTimestampValueSeconds = timeValue / chip::kMillisecondsPerSecond;
+    uint64_t eventTimestampValueRemainderMilliseconds = timeValue % chip::kMillisecondsPerSecond;
+    NSTimeInterval eventTimestampValueRemainder
+        = NSTimeInterval(eventTimestampValueRemainderMilliseconds) / chip::kMillisecondsPerSecond;
+    NSTimeInterval eventTimestampValue = eventTimestampValueSeconds + eventTimestampValueRemainder;
+
+    return eventTimestampValue;
+}
+
+#pragma mark - Utility for event priority conversion
+BOOL MTRPriorityLevelIsValid(chip::app::PriorityLevel priorityLevel)
+{
+    return (priorityLevel >= chip::app::PriorityLevel::Debug) && (priorityLevel <= chip::app::PriorityLevel::Critical);
+}
+
+MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel priorityLevel)
+{
+    switch (priorityLevel) {
+    case chip::app::PriorityLevel::Debug:
+        return MTREventPriorityDebug;
+    case chip::app::PriorityLevel::Info:
+        return MTREventPriorityInfo;
+    default:
+        return MTREventPriorityCritical;
+    }
 }
 
 } // anonymous namespace
@@ -1737,6 +1773,46 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                       reportHandler:reportHandler
             subscriptionEstablished:subscriptionEstablished
             resubscriptionScheduled:nil];
+}
+
++ (NSDictionary *)eventReportForHeader:(const chip::app::EventHeader &)header andData:(id _Nullable)data
+{
+    MTREventPath * eventPath = [[MTREventPath alloc] initWithPath:header.mPath];
+    if (data == nil) {
+        MTR_LOG_ERROR("%@ could not decode event data", eventPath);
+        return @{ MTREventPathKey : eventPath, MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT] };
+    }
+
+    // Construct the right type, and key/value depending on the type
+    NSNumber * eventTimeType;
+    NSString * timestampKey;
+    id timestampValue;
+    if (header.mTimestamp.mType == Timestamp::Type::kSystem) {
+        eventTimeType = @(MTREventTimeTypeSystemUpTime);
+        timestampKey = MTREventSystemUpTimeKey;
+        timestampValue = @(MTRTimeIntervalForEventTimestampValue(header.mTimestamp.mValue));
+    } else if (header.mTimestamp.mType == Timestamp::Type::kEpoch) {
+        eventTimeType = @(MTREventTimeTypeTimestampDate);
+        timestampKey = MTREventTimestampDateKey;
+        timestampValue = [NSDate dateWithTimeIntervalSince1970:MTRTimeIntervalForEventTimestampValue(header.mTimestamp.mValue)];
+    } else {
+        MTR_LOG_ERROR("%@ Unsupported event timestamp type %u - ignoring", eventPath, (unsigned int) header.mTimestamp.mType);
+        return @{ MTREventPathKey : eventPath, MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE] };
+    }
+
+    if (!MTRPriorityLevelIsValid(header.mPriorityLevel)) {
+        MTR_LOG_ERROR("%@ Unsupported event priority %u - ignoring", eventPath, (unsigned int) header.mPriorityLevel);
+        return @{ MTREventPathKey : eventPath, MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE] };
+    }
+
+    return @{
+        MTREventPathKey : eventPath,
+        MTRDataKey : data,
+        MTREventNumberKey : @(header.mEventNumber),
+        MTREventPriorityKey : @(MTREventPriorityForValidPriorityLevel(header.mPriorityLevel)),
+        MTREventTimeTypeKey : eventTimeType,
+        timestampKey : timestampValue
+    };
 }
 @end
 
