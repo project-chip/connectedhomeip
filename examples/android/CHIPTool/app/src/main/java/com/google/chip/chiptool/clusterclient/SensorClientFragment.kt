@@ -168,7 +168,7 @@ class SensorClientFragment : Fragment() {
       val clusterId = CLUSTERS[clusterName]!!["clusterId"] as Long
       val attributeId = CLUSTERS[clusterName]!!["attributeId"] as Long
       val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
-      val callback = makeReadCallback(clusterName, false)
+      val callback = makeReadCallback(clusterName, true)
 
       deviceController.subscribeToAttributePath({ Log.d(TAG, "onSubscriptionEstablished") }, callback, device, listOf(ChipAttributePath.newInstance(endpointId.toLong(), clusterId, attributeId)), MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S, 0)
       subscribedDevicePtr = device
