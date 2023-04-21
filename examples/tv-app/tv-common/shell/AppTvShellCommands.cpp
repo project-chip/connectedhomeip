@@ -19,10 +19,9 @@
  * @file Contains shell commands for a ContentApp relating to Content App platform of the Video Player.
  */
 
-#include "AppPlatformShellCommands.h"
-#include "AppImpl.h"
-#include "ControllerShellCommands.h"
-#include <AppMain.h>
+#include "AppTvShellCommands.h"
+#include "AppTv.h"
+
 #include <access/AccessControl.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
@@ -36,20 +35,24 @@
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-
-using namespace ::chip::Controller;
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
 using namespace chip::Access;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-using namespace chip::app::Clusters;
 
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#include <controller/CHIPDeviceController.h>
+#include <controller/CommissionerDiscoveryController.h>
+using namespace ::chip::Controller;
+extern DeviceCommissioner * GetDeviceCommissioner();
+extern CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+using namespace chip::app::Clusters;
 
 namespace chip {
 namespace Shell {
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 static CHIP_ERROR pairApp(bool printHeader, size_t index)
 {
     streamer_t * sout = streamer_get();
@@ -181,23 +184,28 @@ exit:
     ChipLogError(DeviceLayer, "DumpAccessControlEntry: dump failed %" CHIP_ERROR_FORMAT, err.Format());
     return err;
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
-    streamer_printf(sout, "  help                 Usage: app <subcommand>\r\n");
-    streamer_printf(sout, "  add <vid> [<pid>]    Add app with given vendor ID [1, 2, 9050]. Usage: app add 9050\r\n");
-    streamer_printf(sout, "  remove <endpoint>    Remove app at given endpoint [6, 7, etc]. Usage: app remove 6\r\n");
+    streamer_printf(sout, "  help                           Usage: app <subcommand>\r\n");
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    streamer_printf(sout, "  add <vid> [<pid>]              Add app with given vendor ID [1, 2, 9050]. Usage: app add 9050\r\n");
+    streamer_printf(sout, "  remove <endpoint>              Remove app at given endpoint [6, 7, etc]. Usage: app remove 6\r\n");
+    streamer_printf(
+        sout, "  setpin <endpoint> <pincode>    Set pincode for app with given endpoint ID. Usage: app setpin 6 34567890\r\n");
     streamer_printf(sout,
-                    "  setpin <endpoint> <pincode>  Set pincode for app with given endpoint ID. Usage: app setpin 6 34567890\r\n");
+                    "  add-admin-vendor <vid>         Add vendor ID to list which will receive admin privileges. Usage: app "
+                    "add-admin-vendor 65521\r\n");
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    streamer_printf(sout, "  print-app-access     Print all ACLs for app platform fabric. Usage: app print-app-access\r\n");
+    streamer_printf(sout, "  remove-app-access    Remove all ACLs for app platform fabric. Usage: app remove-app-access\r\n");
     streamer_printf(sout,
                     "  commission <udc-entry>     Commission given udc-entry using given pincode from corresponding app. Usage: "
                     "app commission 0\r\n");
-    streamer_printf(sout,
-                    "  add-admin-vendor <vid> Add vendor ID to list which will receive admin privileges. Usage: app "
-                    "add-admin-vendor 65521\r\n");
-    streamer_printf(sout, "  print-app-access     Print all ACLs for app platform fabric. Usage: app print-app-access\r\n");
-    streamer_printf(sout, "  remove-app-access    Remove all ACLs for app platform fabric. Usage: app remove-app-access\r\n");
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -211,6 +219,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     {
         return PrintAllCommands();
     }
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     else if (strcmp(argv[0], "add-admin-vendor") == 0)
     {
         if (argc < 2)
@@ -295,16 +304,8 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
 
         return CHIP_NO_ERROR;
     }
-    else if (strcmp(argv[0], "commission") == 0)
-    {
-        if (argc < 2)
-        {
-            return PrintAllCommands();
-        }
-        char * eptr;
-        size_t index = (size_t) strtol(argv[1], &eptr, 10);
-        return error = pairApp(true, index);
-    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     else if (strcmp(argv[0], "print-app-access") == 0)
     {
         Access::AccessControl::EntryIterator iterator;
@@ -322,6 +323,17 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         Access::GetAccessControl().DeleteAllEntriesForFabric(GetDeviceCommissioner()->GetFabricIndex());
         return CHIP_NO_ERROR;
     }
+    else if (strcmp(argv[0], "commission") == 0)
+    {
+        if (argc < 2)
+        {
+            return PrintAllCommands();
+        }
+        char * eptr;
+        size_t index = (size_t) strtol(argv[1], &eptr, 10);
+        return error = pairApp(true, index);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     else
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -329,7 +341,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     return error;
 }
 
-void RegisterAppPlatformCommands()
+void RegisterAppTvCommands()
 {
 
     static const shell_command_t sDeviceComand = { &AppPlatformHandler, "app", "App commands. Usage: app [command_name]" };
@@ -341,5 +353,3 @@ void RegisterAppPlatformCommands()
 
 } // namespace Shell
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

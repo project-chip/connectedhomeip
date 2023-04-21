@@ -97,10 +97,10 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
                                                  const DecodableList<ParameterType> & parameterList, bool autoplay,
                                                  const CharSpan & data)
 {
-    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent");
     string dataString(data.data(), data.size());
 
-    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl TEST CASE autoplay=%d data=%s ", (autoplay ? 1 : 0),
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent TEST CASE autoplay=%d data=%s ", (autoplay ? 1 : 0),
                     dataString.c_str());
 
     bool foundMatch = false;
