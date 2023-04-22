@@ -21,13 +21,15 @@
 
 #include "AppConfig.h"
 #include "init_efrPlatform.h"
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_simple_button_instances.h"
+#endif
 #include "sl_system_kernel.h"
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <matter_config.h>
-#ifdef EFR32_ATTESTATION_CREDENTIALS
+#ifdef SILABS_ATTESTATION_CREDENTIALS
 #include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
 #else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -43,28 +45,29 @@ using namespace ::chip::Credentials;
 
 volatile int apperror_cnt;
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
 // ================================================================================
 // Main Code
 // ================================================================================
 int main(void)
 {
     init_efrPlatform();
-    if (EFR32MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
+    if (SilabsMatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
+
     gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
-#ifdef EFR32_ATTESTATION_CREDENTIALS
-    SetDeviceAttestationCredentialsProvider(EFR32::GetEFR32DacProvider());
+#ifdef SILABS_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(Silabs::GetSilabsDacProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
-
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    SILABS_LOG("Starting App Task");
 
+    SILABS_LOG("Starting App Task");
     if (AppTask::GetAppTask().StartAppTask() != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 
@@ -77,8 +80,9 @@ int main(void)
     appError(CHIP_ERROR_INTERNAL);
 }
 
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void sl_button_on_change(const sl_button_t * handle)
 {
-
     AppTask::GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
 }
+#endif
