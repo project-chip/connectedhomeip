@@ -22,12 +22,13 @@
  *
  */
 
-#include <atomic>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <atomic>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -67,12 +68,27 @@ static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inC
         err = PlatformMgr().StartEventLoopTask();
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+        std::atomic<int> counterSync{ 2 };
+
         // Verify that the event loop will not exit until we tell it to by
         // scheduling few lambdas (for the test to pass, the event loop will
         // have to process more than one event).
-        DeviceLayer::SystemLayer().ScheduleLambda([&counterRun]() { counterRun++; });
+        DeviceLayer::SystemLayer().ScheduleLambda([&]() {
+            counterRun++;
+            counterSync--;
+        });
         chip::test_utils::SleepMillis(10);
-        DeviceLayer::SystemLayer().ScheduleLambda([&counterRun]() { counterRun++; });
+        DeviceLayer::SystemLayer().ScheduleLambda([&]() {
+            counterRun++;
+            counterSync--;
+        });
+
+        // Wait for the event loop to process the scheduled events.
+        // Note, that we can not use any synchronization primitives like
+        // condition variables or barriers, because the test has to compile
+        // on all platforms. Instead we use a busy loop with a timeout.
+        for (size_t t = 0; counterSync != 0 && t < 1000; t++)
+            chip::test_utils::SleepMillis(1);
 
         err = PlatformMgr().StopEventLoopTask();
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
