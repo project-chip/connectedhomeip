@@ -489,5 +489,5 @@ if (chip_device_platform != "none") {
 }
 
 source_set("syscalls_stub") {
-  sources = ["SyscallStubs.cpp"]
+  sources = [ "SyscallStubs.cpp" ]
 }
