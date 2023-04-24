@@ -77,7 +77,15 @@ static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inC
             counterRun++;
             counterSync--;
         });
+
+        // Sleep for a short time to allow the event loop to process the
+        // scheduled event and go to idle state. Without this sleep, the
+        // event loop may process both scheduled lambdas during single
+        // iteration of the event loop which would defeat the purpose of
+        // this test on POSIX platforms where the event loop is implemented
+        // using a "do { ... } while (shouldRun)" construct.
         chip::test_utils::SleepMillis(10);
+
         DeviceLayer::SystemLayer().ScheduleLambda([&]() {
             counterRun++;
             counterSync--;
