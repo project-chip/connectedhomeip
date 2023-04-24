@@ -61,6 +61,7 @@ target_include_directories(app PRIVATE
                            ${ALL_CLUSTERS_COMMON_DIR}/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
+                           ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include)
 
 add_definitions(
@@ -69,11 +70,12 @@ add_definitions(
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/main.cpp
                src/ZclDoorLockCallbacks.cpp 
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
+               ${TELINK_COMMON}/common/src/mainCommon.cpp
+               ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp

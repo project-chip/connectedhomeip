@@ -219,13 +219,9 @@ DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
     return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    static uint8_t macAddress[kMaxHardwareAddrSize];
-
-    memcpy(macAddress, wifiMgmr.wifi_mgmr_stat_info.bssid, kMaxHardwareAddrSize);
-
-    return CHIP_NO_ERROR;
+    return CopySpanToMutableSpan(ByteSpan(wifiMgmr.wifi_mgmr_stat_info.bssid), BssId);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)

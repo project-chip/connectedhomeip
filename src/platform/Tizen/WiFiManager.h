@@ -53,6 +53,8 @@ public:
     CHIP_ERROR SetDeviceState(wifi_manager_device_state_e deviceState);
     CHIP_ERROR GetModuleState(wifi_manager_module_state_e * moduleState);
     CHIP_ERROR GetConnectionState(wifi_manager_connection_state_e * connectionState);
+    CHIP_ERROR GetBssId(uint8_t * bssId);
+    CHIP_ERROR GetSecurityType(wifi_manager_security_type_e * securityType);
 
 private:
     static void _DeviceStateChangedCb(wifi_manager_device_state_e deviceState, void * userData);
@@ -69,11 +71,11 @@ private:
     static void _ConnectedCb(wifi_manager_error_e wifiErr, void * userData);
     static bool _ConfigListCb(const wifi_manager_config_h config, void * userData);
 
-    static gboolean _WiFiInitialize(gpointer userData);
-    static gboolean _WiFiActivate(GMainLoop * mainLoop, gpointer userData);
-    static gboolean _WiFiDeactivate(GMainLoop * mainLoop, gpointer userData);
-    static gboolean _WiFiScan(GMainLoop * mainLoop, gpointer userData);
-    static gboolean _WiFiConnect(GMainLoop * mainLoop, gpointer userData);
+    static CHIP_ERROR _WiFiInitialize(gpointer userData);
+    static CHIP_ERROR _WiFiActivate(gpointer userData);
+    static CHIP_ERROR _WiFiDeactivate(gpointer userData);
+    static CHIP_ERROR _WiFiScan(gpointer userData);
+    static CHIP_ERROR _WiFiConnect(wifi_manager_ap_h ap);
 
     void _WiFiDeinitialize();
     void _WiFiSetStates();
@@ -82,6 +84,7 @@ private:
     void _WiFiSetDeviceState(wifi_manager_device_state_e deviceState);
     void _WiFiSetModuleState(wifi_manager_module_state_e moduleState);
     void _WiFiSetConnectionState(wifi_manager_connection_state_e connectionState);
+    wifi_manager_ap_h _WiFiGetConnectedAP();
     wifi_manager_ap_h _WiFiGetFoundAP();
 
     friend WiFiManager & WiFiMgr();
@@ -93,6 +96,7 @@ private:
     wifi_manager_module_state_e mModuleState;
     wifi_manager_connection_state_e mConnectionState;
 
+    uint8_t mWiFiBSSID[kWiFiBSSIDLength];
     char mWiFiSSID[kMaxWiFiSSIDLength + 1];
     char mWiFiKey[kMaxWiFiKeyLength + 1];
 

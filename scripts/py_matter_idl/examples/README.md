@@ -13,9 +13,13 @@ scripts/py_matter_idl/examples/matter_idl_plugin:
    "matter_idl_plugin" subdirectory.
 4. Execute the `codegen.py` script passing the path to the parent directory of
    "matter_idl_plugin" via
-   `--generator custom:<plugin_path>:<plugin_module_name>` argument.
+   `--generator custom:<plugin_path>:<plugin_module_name>` argument and package
+   name like `--option package:com.example.matter.proto`
 
 ```
 # From top-of-tree in this example
-./scripts/codegen.py --generator custom:./scripts/py_matter_idl/examples:matter_idl_plugin ./src/controller/data_model/controller-clusters.matter
+./scripts/codegen.py \
+  --generator custom:./scripts/py_matter_idl/examples:matter_idl_plugin \
+  --option package:com.example.matter.proto \
+  ./src/controller/data_model/controller-clusters.matter
 ```

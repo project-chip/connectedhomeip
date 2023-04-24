@@ -202,12 +202,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 @end
 
-extern NSString * const MTREventNumberKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventPriorityKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventTimeTypeKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventSystemUpTimeKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventTimestampDateKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-
 @protocol MTRDeviceDelegate <NSObject>
 @required
 /**

@@ -94,6 +94,9 @@ public:
     /// (Re-)starts the Dnssd server, using the provided commissioning mode.
     void StartServer(Dnssd::CommissioningMode mode);
 
+    //// Stop the Dnssd server.
+    void StopServer();
+
     CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
     /// Generates the (random) instance name that a CHIP device is to use for pre-commissioning DNS-SD

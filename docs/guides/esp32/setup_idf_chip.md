@@ -13,27 +13,27 @@ step.
 
 ### Install Prerequisites
 
--   [Linux](https://docs.espressif.com/projects/esp-idf/en/v4.4.3/esp32/get-started/linux-setup.html)
--   [macOS](https://docs.espressif.com/projects/esp-idf/en/v4.4.3/esp32/get-started/macos-setup.html)
+-   [Linux](https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/get-started/linux-setup.html)
+-   [macOS](https://docs.espressif.com/projects/esp-idf/en/v4.4.4/esp32/get-started/macos-setup.html)
 
-### Get IDF v4.4.3
+### Get IDF v4.4.4
 
 -   Clone ESP-IDF
-    [v4.4.3 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.3)
+    [v4.4.4 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.4)
 
     ```
-    $ git clone -b v4.4.3 --recursive https://github.com/espressif/esp-idf.git
+    $ git clone -b v4.4.4 --recursive https://github.com/espressif/esp-idf.git
     $ cd esp-idf
     $ ./install.sh
     ```
 
--   To update an existing esp-idf toolchain to v4.4.3:
+-   To update an existing esp-idf toolchain to v4.4.4:
 
     ```
     $ cd path/to/esp-idf
     $ git fetch origin
-    $ git checkout v4.4.3
-    $ git reset --hard origin/v4.4.3
+    $ git checkout v4.4.4
+    $ git reset --hard origin/v4.4.4
     $ git submodule update --recursive --init
     $ git clean -fdx
     $ ./install.sh

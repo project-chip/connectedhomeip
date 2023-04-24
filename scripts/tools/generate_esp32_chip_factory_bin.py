@@ -226,6 +226,32 @@ def get_fixed_label_dict(fixed_labels):
 
     return fl_dict
 
+# get_supported_modes_dict() converts the list of strings to per endpoint dictionaries.
+# example input  : ['0/label1/1/"1\0x8000, 2\0x8000",  1/label2/1/"1\0x8000, 2\0x8000"']
+# example outout : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}]}
+
+
+def get_supported_modes_dict(supported_modes):
+    output_dict = {}
+
+    for mode_str in supported_modes:
+        mode_label_strs = mode_str.split('/')
+        mode = mode_label_strs[0]
+        label = mode_label_strs[1]
+        ep = mode_label_strs[2]
+
+        semantic_tag_strs = mode_label_strs[3].split(', ')
+        semantic_tags = [{"value": int(v.split('\\')[0]), "mfgCode": int(v.split('\\')[1], 16)} for v in semantic_tag_strs]
+
+        mode_dict = {"Label": label, "Mode": int(mode), "Semantic_Tag": semantic_tags}
+
+        if ep in output_dict:
+            output_dict[ep].append(mode_dict)
+        else:
+            output_dict[ep] = [mode_dict]
+
+    return output_dict
+
 
 def check_str_range(s, min_len, max_len, name):
     if s and ((len(s) < min_len) or (len(s) > max_len)):
@@ -358,6 +384,60 @@ def populate_factory_data(args, spake2p_params):
                 FACTORY_DATA.update({'fl-k/{:x}/{:x}'.format(int(key), i): _label_key})
                 FACTORY_DATA.update({'fl-v/{:x}/{:x}'.format(int(key), i): _label_value})
 
+    # SupportedModes are stored as multiple entries
+    #  - sm-sz/<ep>                 : number of supported modes for the endpoint
+    #  - sm-label/<ep>/<index>      : supported modes label key for the endpoint and index
+    #  - sm-mode/<ep>/<index>       : supported modes mode key for the endpoint and index
+    #  - sm-st-sz/<ep>/<index>      : supported modes SemanticTag key for the endpoint and index
+    #  - st-v/<ep>/<index>/<ind>    : semantic tag value key for the endpoint and index and ind
+    #  - st-mfg/<ep>/<index>/<ind>  : semantic tag mfg code key for the endpoint and index and ind
+    if (args.supported_modes is not None):
+        dictionary = get_supported_modes_dict(args.supported_modes)
+        for ep in dictionary.keys():
+            _sz = {
+                'type': 'data',
+                'encoding': 'u32',
+                'value': len(dictionary[ep])
+            }
+            FACTORY_DATA.update({'sm-sz/{:x}'.format(int(ep)): _sz})
+            for i in range(len(dictionary[ep])):
+                item = dictionary[ep][i]
+                _label = {
+                    'type': 'data',
+                    'encoding': 'string',
+                    'value': item["Label"]
+                }
+                _mode = {
+                    'type': 'data',
+                    'encoding': 'u32',
+                    'value': item["Mode"]
+                }
+                _st_sz = {
+                    'type': 'data',
+                    'encoding': 'u32',
+                    'value': len(item["Semantic_Tag"])
+                }
+                FACTORY_DATA.update({'sm-label/{:x}/{:x}'.format(int(ep), i): _label})
+                FACTORY_DATA.update({'sm-mode/{:x}/{:x}'.format(int(ep), i): _mode})
+                FACTORY_DATA.update({'sm-st-sz/{:x}/{:x}'.format(int(ep), i): _st_sz})
+
+                for j in range(len(item["Semantic_Tag"])):
+                    entry = item["Semantic_Tag"][j]
+
+                    _value = {
+                        'type': 'data',
+                        'encoding': 'u32',
+                        'value': entry["value"]
+                    }
+                    _mfg_code = {
+                        'type': 'data',
+                        'encoding': 'u32',
+                        'value': entry["mfgCode"]
+                    }
+
+                    FACTORY_DATA.update({'st-v/{:x}/{:x}/{:x}'.format(int(ep), i, j): _value})
+                    FACTORY_DATA.update({'st-mfg/{:x}/{:x}/{:x}'.format(int(ep), i, j): _mfg_code})
+
 
 def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
     with open(key_file, 'rb') as f:
@@ -467,6 +547,8 @@ def main():
     parser.add_argument('--locales', nargs='+', help='List of supported locales, Language Tag as defined by BCP47, eg. en-US en-GB')
     parser.add_argument('--fixed-labels', nargs='+',
                         help='List of fixed labels, eg: "0/orientation/up" "1/orientation/down" "2/orientation/down"')
+    parser.add_argument('--supported-modes', type=str, nargs='+', required=False,
+                        help='List of supported modes, eg: mode1/label1/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode2/label2/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode3/label3/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"')
 
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')

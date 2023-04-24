@@ -18,7 +18,6 @@
 
 #include "TemperatureManager.h"
 #include "AppConfig.h"
-#include "AppEvent.h"
 #include "AppTask.h"
 #include <zephyr/logging/log.h>
 

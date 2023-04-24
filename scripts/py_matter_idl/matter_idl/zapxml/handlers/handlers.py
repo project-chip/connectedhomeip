@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+from typing import Any
 
 from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
                                          Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality,
@@ -339,6 +340,20 @@ class BitmapHandler(BaseHandler):
         self.context.AddIdlPostProcessor(self)
 
 
+class DescriptionHandler(BaseHandler):
+    """Handles .../description text elements
+
+       Attaches a "description" attribute to a given structure
+    """
+
+    def __init__(self, context: Context, target: Any):
+        super().__init__(context)
+        self.target = target
+
+    def HandleContent(self, content):
+        self.target.description = content
+
+
 class CommandHandler(BaseHandler):
     """Handles /configurator/cluster/command elements."""
 
@@ -421,6 +436,8 @@ class CommandHandler(BaseHandler):
             self._struct.fields.append(self.GetArgumentField(attrs))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
+            if self._command:
+                return DescriptionHandler(self.context, self._command)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
@@ -496,7 +513,9 @@ class ClusterHandler(BaseHandler):
             return ClusterGlobalAttributeHandler(self.context, self._cluster, ParseInt(attrs['code']))
         elif name.lower() == 'command':
             return CommandHandler(self.context, self._cluster, attrs)
-        elif name.lower() in ['define', 'description', 'domain', 'tag', 'client', 'server']:
+        elif name.lower() == 'description':
+            return DescriptionHandler(self.context, self._cluster)
+        elif name.lower() in ['define', 'domain', 'tag', 'client', 'server']:
             # NOTE: we COULD use client and server to create separate definitions
             #       of each, but the usefulness of this is unclear as the definitions are
             #       likely identical and matter has no concept of differences between the two
