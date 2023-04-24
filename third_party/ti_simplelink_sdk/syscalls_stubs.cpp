@@ -21,7 +21,6 @@
     (newlib/libc_nano)
 */
 
-#include <reent.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
