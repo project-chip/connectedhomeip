@@ -23,9 +23,11 @@
 extern "C" {
 #include "btl_interface.h"
 #include "em_bus.h" // For CORE_CRITICAL_SECTION
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-#include "sl_wfx_host_api.h"
+#if (defined(EFR32MG24) && defined(SL_WIFI))
 #include "spi_multiplex.h"
+#ifdef WF200_WIFI
+#include "sl_wfx_host_api.h"
+#endif
 #endif
 }
 
@@ -134,6 +136,9 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "HandlePrepareDownload");
 
     CORE_CRITICAL_SECTION(bootloader_init();)
+#ifdef RS911X_WIFI
+    pr_type = EXT_SPIFLASH;
+#endif
     mSlotId                                 = 0; // Single slot until we support multiple images
     writeBufOffset                          = 0;
     mWriteOffset                            = 0;
@@ -166,11 +171,11 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
             writeBuffer[writeBufOffset] = 0;
             writeBufOffset++;
         }
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI))
         pre_bootloader_spi_transfer();
 #endif
         CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI))
         post_bootloader_spi_transfer();
 #endif
         if (err)
@@ -194,7 +199,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI))
     pre_bootloader_spi_transfer();
 #endif
     CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
@@ -219,7 +224,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     // This reboots the device
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI))
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif
 }
@@ -272,11 +277,11 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         if (writeBufOffset == kAlignmentBytes)
         {
             writeBufOffset = 0;
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI))
             pre_bootloader_spi_transfer();
 #endif
             CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI))
             post_bootloader_spi_transfer();
 #endif
             if (err)

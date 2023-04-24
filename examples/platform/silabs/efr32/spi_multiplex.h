@@ -23,13 +23,25 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "sl_mx25_flash_shutdown_usart_config.h"
+#ifdef WF200_WIFI
 #include "sl_spidrv_exp_config.h"
+#endif
+#ifdef RS911X_WIFI
+#include "sl_spidrv_eusart_exp_config.h"
+#endif
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
 #include "sl_wfx_host_api.h"
+#endif
+#include "em_eusart.h"
 #include "spidrv.h"
 
 #define SL_BIT_RATE_LCD 1100000
+#ifdef WF200_WIFI
 #define SL_BIT_RATE_EXP_HDR 16000000
-#define SL_BIT_RATE_SPI_FLASH 10000000
+#else
+#define SL_BIT_RATE_EXP_HDR SL_SPIDRV_EUSART_EXP_BITRATE
+#endif
+#define SL_BIT_RATE_SPI_FLASH 16000000
 #define SL_BIT_RATE_UART_CONSOLE 16000000
 
 extern SemaphoreHandle_t spi_sem_sync_hdl;
@@ -37,6 +49,21 @@ extern SemaphoreHandle_t spi_sem_sync_hdl;
 #ifdef RS911X_WIFI
 extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
 #define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
+
+typedef enum PERIPHERAL_TYPE
+{
+    EXP_HDR = 0,
+    LCD,
+    EXT_SPIFLASH,
+} peripheraltype_t;
+
+extern peripheraltype_t pr_type;
+
+sl_status_t sl_wfx_host_spi_cs_deassert(void);
+sl_status_t sl_wfx_host_spi_cs_assert(void);
+
+void spi_switch(peripheraltype_t);
+
 #endif
 
 #ifdef WF200_WIFI

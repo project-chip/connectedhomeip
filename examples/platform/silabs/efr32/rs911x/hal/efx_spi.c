@@ -68,14 +68,21 @@ extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 #define SPI_HANDLE sl_spidrv_exp_handle
 #elif defined(EFR32MG24)
 #include "sl_spidrv_eusart_exp_config.h"
+#include "spi_multiplex.h"
+StaticSemaphore_t spi_sem_peripharal;
+SemaphoreHandle_t spi_sem_sync_hdl;
+peripheraltype_t pr_type = EXP_HDR;
 extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
 #define SPI_HANDLE sl_spidrv_eusart_exp_handle
 #else
 #error "Unknown platform"
 #endif
 
+static unsigned int tx_dma_channel;
+static unsigned int rx_dma_channel;
+
 extern void rsi_gpio_irq_cb(uint8_t irqnum);
-//#define RS911X_USE_LDMA
+// #define RS911X_USE_LDMA
 
 /********************************************************
  * @fn   sl_wfx_host_gpio_init(void)
@@ -89,6 +96,11 @@ void sl_wfx_host_gpio_init(void)
 {
     // Enable GPIO clock.
     CMU_ClockEnable(cmuClock_GPIO, true);
+
+#if defined(EFR32MG24)
+    // Set CS pin to high/inactive
+    GPIO_PinModeSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN, gpioModePushPull, PINOUT_SET);
+#endif
 
     GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, PINOUT_SET);
     GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModePushPull, PINOUT_CLEAR);
@@ -141,12 +153,45 @@ void rsi_hal_board_init(void)
     spiTransferLock = xSemaphoreCreateBinaryStatic(&xEfxSpiIntfSemaBuffer);
     xSemaphoreGive(spiTransferLock);
 
+#if defined(EFR32MG24)
+    spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripharal);
+    xSemaphoreGive(spi_sem_sync_hdl);
+#endif
+
     /* GPIO INIT of MG12 & MG24 : Reset, Wakeup, Interrupt */
     sl_wfx_host_gpio_init();
 
     /* Reset of Wifi chip */
     sl_wfx_host_reset_chip();
 }
+
+#if defined(EFR32MG24)
+/****************************************************************************
+ * @fn  sl_status_t sl_wfx_host_spi_cs_assert()
+ * @brief
+ *     Assert chip select.
+ * @param[in] None
+ * @return returns SL_STATUS_OK
+ *****************************************************************************/
+sl_status_t sl_wfx_host_spi_cs_assert()
+{
+    GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+    return SL_STATUS_OK;
+}
+
+/****************************************************************************
+ * @fn  sl_status_t sl_wfx_host_spi_cs_deassert()
+ * @brief
+ *     De-Assert chip select.
+ * @param[in] None
+ * @return returns SL_STATUS_OK
+ *****************************************************************************/
+sl_status_t sl_wfx_host_spi_cs_deassert()
+{
+    GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+    return SL_STATUS_OK;
+}
+#endif
 
 /*****************************************************************************
  *@brief
@@ -169,6 +214,16 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
+#if defined(EFR32MG24)
+void rsi_update_spi(void)
+{
+    spi_switch(EXP_HDR);
+    // GPIO_PinModeSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN, gpioModePushPull, PINOUT_SET);
+    /* MG24 + rs9116 combination uses EUSART driver */
+    tx_dma_channel = sl_spidrv_eusart_exp_handle->txDMACh;
+    rx_dma_channel = sl_spidrv_eusart_exp_handle->rxDMACh;
+}
+#endif
 /*********************************************************************
  * @fn   int16_t rsi_spi_transfer(uint8_t *tx_buf, uint8_t *rx_buf, uint16_t xlen, uint8_t mode)
  * @brief
@@ -182,6 +237,19 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
  **************************************************************************/
 int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint8_t mode)
 {
+#if defined(EFR32MG24)
+    /* In case of MG24, take multiplex synchronization semaphore  to ensure SPI is
+     * available and then set CS of Exp Hdr SPI to low/enable */
+    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
+    {
+        return SL_STATUS_TIMEOUT;
+    }
+    if (pr_type != EXP_HDR)
+    {
+        rsi_update_spi();
+    }
+    GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+#endif
     if (xlen <= MIN_XLEN || (tx_buf == NULL && rx_buf == NULL)) // at least one buffer needs to be provided
     {
         return RSI_ERROR_INVALID_PARAM;
@@ -237,5 +305,10 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     }
 
     xSemaphoreGive(spiTransferLock);
+#if defined(EFR32MG24)
+    /* In case of MG24, set CS of Exp Hdr SPI to high and release multiplex synchronization semaphore*/
+    GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+    xSemaphoreGive(spi_sem_sync_hdl);
+#endif
     return rsiError;
 }

@@ -12,6 +12,7 @@ rs911x_src_plat = [
   "${examples_plat_dir}/rs911x/hal/rsi_hal_mcu_timer.c",
   "${examples_plat_dir}/rs911x/hal/efx_spi.c",
   "${wifi_sdk_dir}/wfx_notify.cpp",
+  "${examples_plat_dir}/spi_multiplex.c",
 ]
 
 #

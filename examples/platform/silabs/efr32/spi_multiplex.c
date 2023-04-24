@@ -26,8 +26,25 @@
 #include "em_ldma.h"
 #include "em_usart.h"
 #if SL_WIFI
+#include "btl_interface.h"
+#include "sl_memlcd.h"
 #include "spi_multiplex.h"
 #endif /* SL_WIFI */
+
+#define CONCAT(A, B) (A##B)
+#define SPI_CLOCK(N) CONCAT(cmuClock_USART, N)
+#ifdef WF200_WIFI
+#define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EXP_FRAME_LENGTH
+#else
+#define SL_SPIDRV_FRAME_LENGTH 8 // default value
+#endif
+
+const uint32_t spiBitRates[] = { [EXP_HDR] = SL_BIT_RATE_EXP_HDR, [LCD] = SL_BIT_RATE_LCD, [EXT_SPIFLASH] = SL_BIT_RATE_SPI_FLASH };
+
+extern void efr32Log(const char *, ...);
+
+extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
+extern SPIDRV_Init_t sl_spidrv_eusart_init_exp;
 
 /****************************************************************************
  * @fn  void spi_drv_reinit()
@@ -47,10 +64,14 @@ void spi_drv_reinit(uint32_t baudrate)
     USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
     usartInit.msbf                   = true;
     usartInit.clockMode              = usartClockMode0;
-    usartInit.baudrate               = baudrate;
-    uint32_t databits                = SL_SPIDRV_EXP_FRAME_LENGTH - 4U + _USART_FRAME_DATABITS_FOUR;
-    usartInit.databits               = (USART_Databits_TypeDef) databits;
-    usartInit.autoCsEnable           = true;
+#ifdef WF200_WIFI
+    usartInit.baudrate = baudrate;
+#elif RS911X_WIFI
+    usartInit.baudrate = spiBitRates[pr_type];
+#endif
+    uint32_t databits      = SL_SPIDRV_FRAME_LENGTH - 4U + _USART_FRAME_DATABITS_FOUR;
+    usartInit.databits     = (USART_Databits_TypeDef) databits;
+    usartInit.autoCsEnable = true;
 
     USART_InitSync(USART0, &usartInit);
 }
@@ -95,7 +116,11 @@ void pre_bootloader_spi_transfer(void)
     /*
      * Assert CS pin for EXT SPI Flash
      */
+#ifdef WF200_WIFI
     spi_drv_reinit(SL_BIT_RATE_SPI_FLASH);
+#else
+    spi_switch(EXT_SPIFLASH);
+#endif
     spiflash_cs_assert();
 }
 
@@ -128,7 +153,11 @@ void pre_lcd_spi_transfer(void)
     {
         return;
     }
+#ifdef WF200_WIFI
     spi_drv_reinit(SL_BIT_RATE_LCD);
+#else
+    spi_switch(LCD);
+#endif
     /*LCD CS is handled as part of LCD gsdk*/
 }
 
@@ -143,6 +172,78 @@ void post_lcd_spi_transfer(void)
 {
     xSemaphoreGive(spi_sem_sync_hdl);
 }
+
+#ifdef RS911X_WIFI
+/****************************************************************************
+ * @fn  void spi_switch(pr_type)
+ * @brief
+ *     Handles switching between pheripherals spi
+ * @param[in] prType - enum indicating type of pheripheral to switch the SPI to
+ * @return returns void
+ *****************************************************************************/
+void spi_switch(peripheraltype_t prType)
+{
+    efr32Log("switching spi from %u to %u", pr_type, prType);
+    if (pr_type != EXP_HDR && prType == EXP_HDR)
+    {
+        if (pr_type == LCD)
+        {
+            /* deinit USART of LCD*/
+            USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
+            CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
+            // USART_Reset(SL_MEMLCD_SPI_PERIPHERAL);
+            GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = 0;
+        }
+        else if (pr_type == EXT_SPIFLASH)
+        {
+            bootloader_deinit();
+            GPIO->USARTROUTE[0].ROUTEEN = 0;
+        }
+        pr_type = EXP_HDR;
+        /* init EUSART of RS911x*/
+        SPIDRV_Init(sl_spidrv_eusart_exp_handle, &sl_spidrv_eusart_init_exp);
+    }
+    else if (pr_type != LCD && prType == LCD)
+    {
+        if (pr_type == EXT_SPIFLASH)
+        {
+            spi_drv_reinit(SL_BIT_RATE_LCD);
+            pr_type = prType;
+            efr32Log("spi switched to %u", pr_type);
+            return;
+        }
+        if (pr_type == EXP_HDR)
+        {
+            efr32Log("deinited eusart of exp hdr");
+            SPIDRV_DeInit(sl_spidrv_eusart_exp_handle);
+            GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = 0;
+        }
+        pr_type = LCD;
+        efr32Log("inited usart for lcd");
+        sl_memlcd_refresh(sl_memlcd_get());
+    }
+    else if (pr_type != EXT_SPIFLASH && prType == EXT_SPIFLASH)
+    {
+        if (pr_type == LCD)
+        {
+            spi_drv_reinit(SL_BIT_RATE_SPI_FLASH);
+            pr_type = prType;
+            efr32Log("spi switched to %u", pr_type);
+            return;
+        }
+        else if (pr_type == EXP_HDR)
+        {
+            SPIDRV_DeInit(sl_spidrv_eusart_exp_handle);
+            GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = 0;
+        }
+        pr_type = EXT_SPIFLASH;
+        /* init EUSART of RS911x*/
+        bootloader_init();
+    }
+    efr32Log("spi switched to %u", pr_type);
+}
+#endif
+
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
 /****************************************************************************
  * @fn  void pre_uart_transfer()
