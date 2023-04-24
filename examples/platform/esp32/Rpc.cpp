@@ -206,7 +206,7 @@ public:
         password[password_size] = '\0';
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         CHIP_ERROR error = chip::DeviceLayer::NetworkCommissioning::ESPWiFiDriver::GetInstance().ConnectWiFiNetwork(
-                ssid, strlen(ssid), password, strlen(password));
+            ssid, strlen(ssid), password, strlen(password));
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         if (error != CHIP_NO_ERROR)
         {
