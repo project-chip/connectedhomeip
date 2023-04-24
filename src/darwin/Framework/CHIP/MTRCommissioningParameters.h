@@ -20,6 +20,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, MTRNetworkSetupMode) {
+    MTRNetworkSetupModeAutomatic,
+    MTRNetworkSetupModeSkipped,
+    MTRNetworkSetupModeForced,
+} MTR_NEWLY_AVAILABLE;
+
 @protocol MTRDeviceAttestationDelegate;
 
 /**
@@ -79,6 +85,23 @@ NS_ASSUME_NONNULL_BEGIN
  * deviceAttestationDelegate.
  */
 @property (nonatomic, copy, nullable) NSNumber * failSafeTimeout API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Whether to perform network setup on the device.
+ *
+ * If set to MTRNetworkSetupModeAutomatic (the default), the commissioning process will attempt to
+ * auto-detect whether network setup is needed (e.g. based on whether the PASE session to the
+ * accessory is over the operational network).  Credentials for the desired operational network
+ * should be provided to enable this to happen.
+ *
+ * If set to MTRNetworkSetupModeSkipped, any needed network configuration should have been done on
+ * the device already prior to starting the rest of the commissioning process.  In that case, the
+ * various network identifiers and credentials above can all be nil.
+ *
+ * If set to MTRNetworkSetupModeForced, the commissioning process will attempt to do network setup
+ * using the provided network credentials.
+ */
+@property (nonatomic, assign) MTRNetworkSetupMode networkSetupMode MTR_NEWLY_AVAILABLE;
 
 @end
 

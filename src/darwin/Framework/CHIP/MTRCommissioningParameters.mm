@@ -21,6 +21,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRCommissioningParameters : NSObject
 
+- (instancetype)init
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _csrNonce = nil;
+    _attestationNonce = nil;
+    _wifiSSID = nil;
+    _wifiCredentials = nil;
+    _threadOperationalDataset = nil;
+    _deviceAttestationDelegate = nil;
+    _failSafeTimeout = nil;
+    _networkSetupMode = MTRNetworkSetupModeAutomatic;
+    return self;
+}
+
 @end
 
 @implementation MTRCommissioningParameters (Deprecated)

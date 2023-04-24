@@ -491,6 +491,18 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                 self, commissioningParams.deviceAttestationDelegate, timeoutSecs, shouldWaitAfterDeviceAttestation);
             params.SetDeviceAttestationDelegate(self->_deviceAttestationDelegateBridge);
         }
+        switch (commissioningParams.networkSetupMode) {
+        case MTRNetworkSetupModeSkipped:
+            params.SetDoNetworkSetup(false);
+            break;
+        case MTRNetworkSetupModeForced:
+            params.SetDoNetworkSetup(true);
+            break;
+        default:
+            // MTRNetworkSetupModeAutomatic and any unknown value, just do the
+            // auto-detect behavior.
+            break;
+        }
 
         chip::NodeId deviceId = [nodeID unsignedLongLongValue];
         self->_operationalCredentialsDelegate->SetDeviceID(deviceId);

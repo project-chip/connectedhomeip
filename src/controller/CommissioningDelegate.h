@@ -427,6 +427,21 @@ public:
         return *this;
     }
 
+    // Whether network setup should be performed.  If not set, the need for
+    // network setup will be auto-detected based on whether we established a
+    // PASE session on-network or not.
+    Optional<bool> GetDoNetworkSetup() const { return mDoNetworkSetup; }
+    CommissioningParameters & SetDoNetworkSetup(bool doNetworkSetup)
+    {
+        mDoNetworkSetup = MakeOptional(doNetworkSetup);
+        return *this;
+    }
+    CommissioningParameters & ResetDoNetworkSetup()
+    {
+        mDoNetworkSetup.ClearValue();
+        return *this;
+    }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -479,6 +494,7 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
+    Optional<bool> mDoNetworkSetup;
     bool mCheckForMatchingFabric = false;
 };
 
