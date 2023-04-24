@@ -35,6 +35,10 @@ class AvhLightingAppInstance(AvhInstance):
     def configure_system(self):
         self.log_in_to_console()
 
+        # install network manager
+        self.console_exec_command("sudo apt-get update", timeout=300)
+        self.console_exec_command("sudo apt -y install network-manager", timeout=300)
+
         # remove the Wi-Fi configuration and disable network manager on the Wi-Fi interface
         self.console_exec_command("sudo nmcli connection delete Arm")
         self.console_exec_command("sudo nmcli dev set wlan0 managed no")
