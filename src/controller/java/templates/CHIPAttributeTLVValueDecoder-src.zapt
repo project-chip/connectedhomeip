@@ -51,7 +51,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     {
                         return nullptr;
                     }
-                    {{>decode_value target="value" source="cppValue" cluster=(asUpperCamelCase parent.name) depth=0 earlyReturn="nullptr"}}
+                    {{>decode_value target="value" source="cppValue" cluster=parent.name depth=0 earlyReturn="nullptr"}}
                     return value;
                 }
                 {{/zcl_attributes_server}}
