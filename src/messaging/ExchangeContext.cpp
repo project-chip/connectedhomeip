@@ -218,7 +218,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
 #endif
 
-        if (err != CHIP_NO_ERROR && IsResponseExpected())
+        if (err != CHIP_NO_ERROR && sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
         {
             CancelResponseTimer();
             SetResponseExpected(false);
@@ -267,8 +267,11 @@ void ExchangeContext::DoClose(bool clearRetransTable)
         mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
     }
 
-    // Cancel the response timer.
-    CancelResponseTimer();
+    if (IsResponseExpected())
+    {
+        // Cancel the response timer.
+        CancelResponseTimer();
+    }
 }
 
 /**
@@ -590,12 +593,15 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Since we got the response, cancel the response timer.
-    CancelResponseTimer();
+    if (IsResponseExpected())
+    {
+        // Since we got the response, cancel the response timer.
+        CancelResponseTimer();
 
-    // If the context was expecting a response to a previously sent message, this message
-    // is implicitly that response.
-    SetResponseExpected(false);
+        // If the context was expecting a response to a previously sent message, this message
+        // is implicitly that response.
+        SetResponseExpected(false);
+    }
 
     // Don't send messages on to our delegate if our dispatch does not allow
     // those messages.
