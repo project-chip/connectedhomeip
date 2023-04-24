@@ -42,12 +42,22 @@ int _lseek(int file, int ptr, int dir);
 int _read(int file, char * ptr, int len);
 int _write(int file, const char * ptr, int len);
 
+/**************************************************************************
+ * @brief
+ *  Open a file.
+ *
+ * @param[in] file
+ *  File you want to open.
+ *
+ * @return
+ *  Returns -1 since there is not logic here to open file.
+ **************************************************************************/
 int __attribute__((weak)) _open(const char * pathname, int flags, int mode)
 {
     (void) pathname;
     (void) flags;
     (void) mode;
-    return 0;
+    return -1;
 }
 
 /**************************************************************************
