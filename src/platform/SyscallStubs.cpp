@@ -83,7 +83,7 @@ int __attribute__((weak)) _close(int file)
 void __attribute__((weak)) _exit(int status)
 {
     (void) status;
-    while (1)
+    while (true)
     {
     } /* Hang here forever... */
 }
