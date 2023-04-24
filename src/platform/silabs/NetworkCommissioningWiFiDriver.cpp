@@ -136,23 +136,13 @@ Status SlWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCh
 
 CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
-    ByteSpan networkId = ByteSpan((const unsigned char *) ssid, ssidLen);
+    int32_t status = SL_STATUS_OK;
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Disconecting for current wifi");
-        int32_t status = wfx_sta_discon();
-        if (status != 0)
+        status = wfx_sta_discon();
+        if (status != SL_STATUS_OK)
         {
-            // TODO: Re-write implementation with proper driver based callback
-            if (mpStatusChangeCallback != nullptr)
-            {
-                mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId),
-                                                                 MakeOptional(status));
-            }
-            else
-            {
-                ChipLogError(NetworkProvisioning, "mpStatusChangeCallback is nil");
-            }
             return CHIP_ERROR_INTERNAL;
         }
     }
@@ -168,16 +158,27 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     wfx_set_wifi_provision(&wifiConfig);
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
-    // TODO: Re-write implementation with proper driver based callback
-    if (mpStatusChangeCallback != nullptr)
-    {
-        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(networkId), NullOptional);
-    }
-    else
+    return CHIP_NO_ERROR;
+}
+
+// TODO: Re-write implementation with proper driver based callback
+void SlWiFiDriver::UpdateNetworkingStatus()
+{
+    if (mpStatusChangeCallback == nullptr)
     {
         ChipLogError(NetworkProvisioning, "mpStatusChangeCallback is nil");
+        return;
     }
-    return CHIP_NO_ERROR;
+
+    ByteSpan networkId = ByteSpan((const unsigned char *) mStagingNetwork.ssid, mStagingNetwork.ssidLen);
+    if (!wfx_is_sta_connected())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId),
+                                                         MakeOptional((int32_t) SL_STATUS_FAIL));
+        return;
+    }
+    mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(networkId),
+                                                     MakeOptional((int32_t) SL_STATUS_OK));
 }
 
 void SlWiFiDriver::OnConnectWiFiNetwork()

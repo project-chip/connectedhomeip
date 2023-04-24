@@ -123,6 +123,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             {
             case IP_EVENT_STA_GOT_IP:
                 ChipLogProgress(DeviceLayer, "IP_EVENT_STA_GOT_IP");
+                NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
                 UpdateInternetConnectivityState();
                 break;
             case IP_EVENT_STA_LOST_IP:
@@ -131,6 +132,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
                 break;
             case IP_EVENT_GOT_IP6:
                 ChipLogProgress(DeviceLayer, "IP_EVENT_GOT_IP6");
+                NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
                 UpdateInternetConnectivityState();
                 break;
             default:
@@ -386,7 +388,7 @@ void ConnectivityManagerImpl::OnStationConnected()
 
 void ConnectivityManagerImpl::OnStationDisconnected()
 {
-    // TODO Invoke WARM to perform actions that occur when the WiFi station interface goes down.
+    // TODO: Invoke WARM to perform actions that occur when the WiFi station interface goes down.
 
     // Alert other components of the new state.
     ChipDeviceEvent event;

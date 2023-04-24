@@ -123,6 +123,7 @@ public:
     chip::BitFlags<WiFiSecurity> ConvertSecuritytype(wfx_sec_t security);
 
     void OnConnectWiFiNetwork();
+    void UpdateNetworkingStatus();
     static SlWiFiDriver & GetInstance()
     {
         static SlWiFiDriver instance;
