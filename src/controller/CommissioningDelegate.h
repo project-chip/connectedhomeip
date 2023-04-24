@@ -103,6 +103,19 @@ public:
     static constexpr size_t kMaxCredentialsLen   = 64;
     static constexpr size_t kMaxCountryCodeLen   = 2;
 
+    enum class NetworkSetupMode : uint8_t
+    {
+        // Automatically decide, based on whether we established a PASE session
+        // on-network or not, whether network setup needs to be done.
+        kAutomatic,
+        // Skip network setup.  Can be used when the commissioner determines
+        // that the commissionee is already on the right network.
+        kSkip,
+        // Perform network setup, even if PASE was on-network.  Can be used
+        // when trying to commission onto a different network.
+        kForce,
+    };
+
     // Value to use when setting the commissioning failsafe timer on the node being commissioned.
     // If the failsafe timer value is passed in as part of the commissioning parameters, that value will be used. If not supplied,
     // the AutoCommissioner will set this to the recommended value read from the node. If that is not set, it will fall back to the
@@ -427,18 +440,12 @@ public:
         return *this;
     }
 
-    // Whether network setup should be performed.  If not set, the need for
-    // network setup will be auto-detected based on whether we established a
-    // PASE session on-network or not.
-    Optional<bool> GetDoNetworkSetup() const { return mDoNetworkSetup; }
-    CommissioningParameters & SetDoNetworkSetup(bool doNetworkSetup)
+    // The network setup mode; see documentation for NetworkSetupMode.
+    // Defaults to NetworkSetupMode::kAutomatic.
+    NetworkSetupMode GetNetworkSetupMode() const { return mNetworkSetupMode; }
+    CommissioningParameters & SetNetworkSetupMode(NetworkSetupMode networkSetupMode)
     {
-        mDoNetworkSetup = MakeOptional(doNetworkSetup);
-        return *this;
-    }
-    CommissioningParameters & ResetDoNetworkSetup()
-    {
-        mDoNetworkSetup.ClearValue();
+        mNetworkSetupMode = networkSetupMode;
         return *this;
     }
 
@@ -494,8 +501,8 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
-    Optional<bool> mDoNetworkSetup;
-    bool mCheckForMatchingFabric = false;
+    NetworkSetupMode mNetworkSetupMode = NetworkSetupMode::kAutomatic;
+    bool mCheckForMatchingFabric       = false;
 };
 
 struct RequestedCertificate

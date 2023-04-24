@@ -418,9 +418,24 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     mStopCommissioning       = false;
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
-    mNeedsNetworkSetup       = mParams.GetDoNetworkSetup().ValueOr(
-        mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
-        Transport::Type::kBle);
+
+    switch (mParams.GetNetworkSetupMode())
+    {
+    case CommissioningParameters::NetworkSetupMode::kAutomatic:
+        FALLTHROUGH;
+    // Treat unknown modes as "automatic".
+    default:
+        mNeedsNetworkSetup =
+            mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
+            Transport::Type::kBle;
+        break;
+    case CommissioningParameters::NetworkSetupMode::kSkip:
+        mNeedsNetworkSetup = false;
+        break;
+    case CommissioningParameters::NetworkSetupMode::kForce:
+        mNeedsNetworkSetup = true;
+        break;
+    }
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage),

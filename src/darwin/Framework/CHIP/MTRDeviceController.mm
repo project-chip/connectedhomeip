@@ -493,10 +493,10 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         }
         switch (commissioningParams.networkSetupMode) {
         case MTRNetworkSetupModeSkipped:
-            params.SetDoNetworkSetup(false);
+            params.SetNetworkSetupMode(chip::Controller::CommissioningParameters::NetworkSetupMode::kSkip);
             break;
         case MTRNetworkSetupModeForced:
-            params.SetDoNetworkSetup(true);
+            params.SetNetworkSetupMode(chip::Controller::CommissioningParameters::NetworkSetupMode::kForce);
             break;
         default:
             // MTRNetworkSetupModeAutomatic and any unknown value, just do the
