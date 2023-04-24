@@ -504,8 +504,10 @@ template("efr32_sdk") {
       "-Wno-shadow",
 
       # see https://github.com/project-chip/connectedhomeip/issues/26058
-      # Uncomment this cflag when pigweed update is done and GCC 12.2 is used.
-      # "-Wno-error=array-parameter",
+      "-Wno-error=array-parameter",
+
+      # see https://github.com/project-chip/connectedhomeip/issues/26170
+      "-Wno-error=array-bounds",
     ]
 
     if (silabs_family == "efr32mg24" || silabs_family == "mgm24") {
