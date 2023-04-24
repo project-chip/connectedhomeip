@@ -34,18 +34,19 @@ namespace Internal {
 
 namespace {
 
-struct GDBusCancellableObjectManager
+// Helper context for creating GDBusObjectManager with
+// chip::DeviceLayer::GLibMatterContextInvokeSync()
+struct GDBusCreateObjectManagerContext
 {
-    GCancellable * cancellable  = nullptr;
     GDBusObjectManager * object = nullptr;
+    // Cancellable passed to g_dbus_object_manager_client_new_for_bus_sync()
+    // which later can be used to cancel the scan operation.
+    GCancellable * cancellable = nullptr;
 
-    GDBusCancellableObjectManager() : cancellable(g_cancellable_new()) {}
-    ~GDBusCancellableObjectManager()
+    GDBusCreateObjectManagerContext() : cancellable(g_cancellable_new()) {}
+    ~GDBusCreateObjectManagerContext()
     {
-        if (cancellable != nullptr)
-        {
-            g_object_unref(cancellable);
-        }
+        g_object_unref(cancellable);
         if (object != nullptr)
         {
             g_object_unref(object);
@@ -53,18 +54,18 @@ struct GDBusCancellableObjectManager
     }
 };
 
-CHIP_ERROR MainLoopCreateObjectManager(GDBusCancellableObjectManager * cancellableObjectManager)
+CHIP_ERROR MainLoopCreateObjectManager(GDBusCreateObjectManagerContext * context)
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
     // all D-Bus signals will be delivered to the GLib global default main context.
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
     std::unique_ptr<GError, GErrorDeleter> err;
-    cancellableObjectManager->object = g_dbus_object_manager_client_new_for_bus_sync(
+    context->object = g_dbus_object_manager_client_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
         bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-        nullptr /* destroy notify */, cancellableObjectManager->cancellable, &MakeUniquePointerReceiver(err).Get());
-    VerifyOrReturnError(cancellableObjectManager->object != nullptr, CHIP_ERROR_INTERNAL,
+        nullptr /* destroy notify */, context->cancellable, &MakeUniquePointerReceiver(err).Get());
+    VerifyOrReturnError(context->object != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(Ble, "Failed to get DBUS object manager for device scanning: %s", err->message));
 
     return CHIP_NO_ERROR;
@@ -118,14 +119,13 @@ ChipDeviceScanner::~ChipDeviceScanner()
 
 std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate)
 {
-    GDBusCancellableObjectManager manager;
+    GDBusCreateObjectManagerContext context;
     CHIP_ERROR err;
 
-    VerifyOrExit(manager.cancellable != nullptr, );
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopCreateObjectManager, &manager);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopCreateObjectManager, &context);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Ble, "Failed to create BLE object manager"));
 
-    return std::make_unique<ChipDeviceScanner>(manager.object, adapter, manager.cancellable, delegate);
+    return std::make_unique<ChipDeviceScanner>(context.object, adapter, context.cancellable, delegate);
 
 exit:
     return std::unique_ptr<ChipDeviceScanner>();
