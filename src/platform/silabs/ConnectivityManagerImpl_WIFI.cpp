@@ -123,7 +123,6 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             {
             case IP_EVENT_STA_GOT_IP:
                 ChipLogProgress(DeviceLayer, "IP_EVENT_STA_GOT_IP");
-                NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
                 UpdateInternetConnectivityState();
                 break;
             case IP_EVENT_STA_LOST_IP:
@@ -132,7 +131,6 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
                 break;
             case IP_EVENT_GOT_IP6:
                 ChipLogProgress(DeviceLayer, "IP_EVENT_GOT_IP6");
-                NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
                 UpdateInternetConnectivityState();
                 break;
             default:
@@ -411,6 +409,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
+        NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
     }
 }
 
