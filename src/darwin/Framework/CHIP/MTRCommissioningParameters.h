@@ -80,6 +80,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSNumber * failSafeTimeout API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * Only perform the PASE steps of commissioning.
+ * Commissioning will be completed by another admin on the network.
+ */
+@property (nonatomic, copy, nullable) NSNumber * skipCommissioningComplete;
+
 @end
 
 @interface MTRCommissioningParameters (Deprecated)
