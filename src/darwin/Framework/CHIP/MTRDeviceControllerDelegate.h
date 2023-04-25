@@ -76,9 +76,10 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 /**
  * Notify the delegate when commissioning is completed.
- * For getting commissioning controllee's nodeID
  *
- * NodeID is nil if commissioning is failed.
+ * Exactly one of error and nodeID will be nil.
+ *
+ * If nodeID is not nil, then it represents the node id the node was assigned, as encoded in its operational certificate.
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
