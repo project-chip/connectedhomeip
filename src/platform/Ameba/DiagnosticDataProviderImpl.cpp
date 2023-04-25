@@ -186,56 +186,49 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     NetworkInterface * head = NULL;
     struct ifaddrs * ifaddr = nullptr;
 
-    if (xnetif == NULL)
+    // xnetif is never null, no need to check. If we do check with -Werror=address, we get compiler error.
+    for (struct netif * ifa = xnetif; ifa != NULL; ifa = ifa->next)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        for (struct netif * ifa = xnetif; ifa != NULL; ifa = ifa->next)
+        NetworkInterface * ifp = new NetworkInterface();
+
+        Platform::CopyString(ifp->Name, ifa->name);
+
+        ifp->name          = CharSpan::fromCharString(ifp->Name);
+        ifp->isOperational = true;
+        if ((ifa->flags) & NETIF_FLAG_ETHERNET)
+            ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
+        else
+            ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+        ifp->offPremiseServicesReachableIPv4.SetNull();
+        ifp->offPremiseServicesReachableIPv6.SetNull();
+
+        memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
+
+        if (0)
         {
-            NetworkInterface * ifp = new NetworkInterface();
-
-            Platform::CopyString(ifp->Name, ifa->name);
-
-            ifp->name          = CharSpan::fromCharString(ifp->Name);
-            ifp->isOperational = true;
-            if ((ifa->flags) & NETIF_FLAG_ETHERNET)
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
-            else
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
-            ifp->offPremiseServicesReachableIPv4.SetNull();
-            ifp->offPremiseServicesReachableIPv6.SetNull();
-
-            memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
-
-            if (0)
-            {
-                ChipLogError(DeviceLayer, "Failed to get network hardware address");
-            }
-            else
-            {
-                // Set 48-bit IEEE MAC Address
-                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
-            }
-
-            if (ifa->ip_addr.u_addr.ip4.addr != 0)
-            {
-                memcpy(ifp->Ipv4AddressesBuffer[0], &(ifa->ip_addr.u_addr.ip4.addr), kMaxIPv4AddrSize);
-                ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
-                ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
-            }
-
-            if (ifa->ip6_addr->u_addr.ip6.addr != 0)
-            {
-                memcpy(ifp->Ipv6AddressesBuffer[0], &(ifa->ip6_addr->u_addr.ip6.addr), kMaxIPv6AddrSize);
-                ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
-                ifp->IPv6Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, 1);
-            }
-
-            ifp->Next = head;
-            head      = ifp;
+            ChipLogError(DeviceLayer, "Failed to get network hardware address");
         }
+        else
+        {
+            // Set 48-bit IEEE MAC Address
+            ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+        }
+
+        if (ifa->ip_addr.u_addr.ip4.addr != 0)
+        {
+            memcpy(ifp->Ipv4AddressesBuffer[0], &(ifa->ip_addr.u_addr.ip4.addr), kMaxIPv4AddrSize);
+            ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
+            ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
+        }
+
+        // ifa->ip6_addr->u_addr.ip6.addr is never null, no need to check. If we do check with -Werror=address, we get compiler
+        // error.
+        memcpy(ifp->Ipv6AddressesBuffer[0], &(ifa->ip6_addr->u_addr.ip6.addr), kMaxIPv6AddrSize);
+        ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
+        ifp->IPv6Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, 1);
+
+        ifp->Next = head;
+        head      = ifp;
     }
 
     *netifpp = head;
@@ -253,19 +246,19 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-    static uint8_t ameba_bssid[6];
+    constexpr size_t bssIdSize = 6;
+    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    if (wifi_get_ap_bssid(ameba_bssid) == 0)
+    if (wifi_get_ap_bssid(BssId.data()) != 0)
     {
-        err = CHIP_NO_ERROR;
-        ChipLogProgress(DeviceLayer, "%02x,%02x,%02x,%02x,%02x,%02x\n", ameba_bssid[0], ameba_bssid[1], ameba_bssid[2],
-                        ameba_bssid[3], ameba_bssid[4], ameba_bssid[5]);
+        return CHIP_ERROR_READ_FAILED;
     }
 
-    BssId = ameba_bssid;
+    BssId.reduce_size(bssIdSize);
+    ChipLogProgress(DeviceLayer, "%02x,%02x,%02x,%02x,%02x,%02x\n", BssId.data()[0], BssId.data()[1], BssId.data()[2],
+                    BssId.data()[3], BssId.data()[4], BssId.data()[5]);
 
     return CHIP_NO_ERROR;
 }

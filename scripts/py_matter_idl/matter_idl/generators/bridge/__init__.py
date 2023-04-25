@@ -88,7 +88,7 @@ def get_field_type(definition: Field, cluster: Cluster, idl: Idl):
         cType = 'std::vector<{}>'.format(cType)
     if definition.is_nullable:
         cType = '::chip::app::DataModel::Nullable<{}>'.format(cType)
-    if definition.is_nullable:
+    if definition.is_optional:
         cType = '::chip::Optional<{}>'.format(cType)
     return cType
 

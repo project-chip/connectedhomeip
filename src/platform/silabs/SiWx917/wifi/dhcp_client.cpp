@@ -30,7 +30,7 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 
-#define MAX_DHCP_TRIES 4
+#define MAX_DHCP_TRIES (4)
 #define NETIF_IPV4_ADDRESS(X, Y) (((X) >> (8 * Y)) & 0xFF)
 
 /* Station IP address */

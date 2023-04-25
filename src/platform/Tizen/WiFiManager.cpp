@@ -31,8 +31,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 
-#include "MainLoop.h"
-
 namespace {
 static constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
 {
@@ -179,8 +177,6 @@ void WiFiManager::_IPConflictCb(char * mac, wifi_manager_ip_conflict_state_e ipC
 
 void WiFiManager::_ActivateCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    auto loop = reinterpret_cast<GMainLoop *>(userData);
-
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
         ChipLogProgress(DeviceLayer, "WiFi is activated");
@@ -189,14 +185,10 @@ void WiFiManager::_ActivateCb(wifi_manager_error_e wifiErr, void * userData)
     {
         ChipLogError(DeviceLayer, "FAIL: activate WiFi [%s]", get_error_message(wifiErr));
     }
-
-    g_main_loop_quit(loop);
 }
 
 void WiFiManager::_DeactivateCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    auto loop = reinterpret_cast<GMainLoop *>(userData);
-
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
     {
         ChipLogProgress(DeviceLayer, "WiFi is deactivated");
@@ -205,13 +197,10 @@ void WiFiManager::_DeactivateCb(wifi_manager_error_e wifiErr, void * userData)
     {
         ChipLogError(DeviceLayer, "FAIL: deactivate WiFi [%s]", get_error_message(wifiErr));
     }
-
-    g_main_loop_quit(loop);
 }
 
 void WiFiManager::_ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    auto loop                 = reinterpret_cast<GMainLoop *>(userData);
     wifi_manager_ap_h foundAp = nullptr;
 
     if (wifiErr == WIFI_MANAGER_ERROR_NONE)
@@ -221,15 +210,13 @@ void WiFiManager::_ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
         foundAp = sInstance._WiFiGetFoundAP();
         if (foundAp != nullptr)
         {
-            MainLoop::Instance().AsyncRequest(_WiFiConnect, static_cast<gpointer>(foundAp));
+            PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiConnect, foundAp);
         }
     }
     else
     {
         ChipLogError(DeviceLayer, "FAIL: scan WiFi [%s]", get_error_message(wifiErr));
     }
-
-    g_main_loop_quit(loop);
 }
 
 bool WiFiManager::_FoundAPCb(wifi_manager_ap_h ap, void * userData)
@@ -271,8 +258,6 @@ exit:
 
 void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
 {
-    auto loop = reinterpret_cast<GMainLoop *>(userData);
-
     if (wifiErr == WIFI_MANAGER_ERROR_NONE || wifiErr == WIFI_MANAGER_ERROR_ALREADY_EXISTS)
     {
         ChipLogProgress(DeviceLayer, "WiFi is connected");
@@ -295,8 +280,6 @@ void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
             chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
     }
-
-    g_main_loop_quit(loop);
 }
 
 bool WiFiManager::_ConfigListCb(const wifi_manager_config_h config, void * userData)
@@ -322,24 +305,20 @@ bool WiFiManager::_ConfigListCb(const wifi_manager_config_h config, void * userD
     return true;
 }
 
-gboolean WiFiManager::_WiFiInitialize(gpointer userData)
+CHIP_ERROR WiFiManager::_WiFiInitialize(gpointer userData)
 {
-    int wifiErr = WIFI_MANAGER_ERROR_NONE;
+    int wifiErr;
 
-    wifiErr = wifi_manager_initialize(&(sInstance.mWiFiManagerHandle));
-    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
-    {
-        ChipLogProgress(DeviceLayer, "WiFi is initialized");
-        sInstance._WiFiSetStates();
-        sInstance._WiFiSetCallbacks();
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "FAIL: initialize WiFi [%s]", get_error_message(wifiErr));
-        return false;
-    }
+    wifiErr = wifi_manager_initialize(&sInstance.mWiFiManagerHandle);
+    VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "FAIL: initialize WiFi [%s]", get_error_message(wifiErr)));
 
-    return true;
+    ChipLogProgress(DeviceLayer, "WiFi is initialized");
+
+    sInstance._WiFiSetStates();
+    sInstance._WiFiSetCallbacks();
+
+    return CHIP_NO_ERROR;
 }
 
 void WiFiManager::_WiFiDeinitialize()
@@ -359,79 +338,57 @@ void WiFiManager::_WiFiDeinitialize()
     }
 }
 
-gboolean WiFiManager::_WiFiActivate(GMainLoop * mainLoop, gpointer userData)
+CHIP_ERROR WiFiManager::_WiFiActivate(gpointer userData)
 {
-    int wifiErr = WIFI_MANAGER_ERROR_NONE;
+    int wifiErr;
 
-    wifiErr = wifi_manager_activate(sInstance.mWiFiManagerHandle, _ActivateCb, mainLoop);
-    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
-    {
-        ChipLogProgress(DeviceLayer, "WiFi activation is requested");
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "FAIL: request WiFi activation [%s]", get_error_message(wifiErr));
-        return false;
-    }
+    wifiErr = wifi_manager_activate(sInstance.mWiFiManagerHandle, _ActivateCb, nullptr);
+    VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "FAIL: request WiFi activation [%s]", get_error_message(wifiErr)));
 
-    return true;
+    ChipLogProgress(DeviceLayer, "WiFi activation is requested");
+    return CHIP_NO_ERROR;
 }
 
-gboolean WiFiManager::_WiFiDeactivate(GMainLoop * mainLoop, gpointer userData)
+CHIP_ERROR WiFiManager::_WiFiDeactivate(gpointer userData)
 {
-    int wifiErr = WIFI_MANAGER_ERROR_NONE;
+    int wifiErr;
 
-    wifiErr = wifi_manager_deactivate(sInstance.mWiFiManagerHandle, _DeactivateCb, mainLoop);
-    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
-    {
-        ChipLogProgress(DeviceLayer, "WiFi deactivation is requested");
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "FAIL: request WiFi deactivation [%s]", get_error_message(wifiErr));
-        return false;
-    }
+    wifiErr = wifi_manager_deactivate(sInstance.mWiFiManagerHandle, _DeactivateCb, nullptr);
+    VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "FAIL: request WiFi deactivation [%s]", get_error_message(wifiErr)));
 
-    return true;
+    ChipLogProgress(DeviceLayer, "WiFi deactivation is requested");
+    return CHIP_NO_ERROR;
 }
 
-gboolean WiFiManager::_WiFiScan(GMainLoop * mainLoop, gpointer userData)
+CHIP_ERROR WiFiManager::_WiFiScan(gpointer userData)
 {
-    int wifiErr = WIFI_MANAGER_ERROR_NONE;
+    int wifiErr;
 
-    wifiErr = wifi_manager_scan(sInstance.mWiFiManagerHandle, _ScanFinishedCb, mainLoop);
-    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
-    {
-        ChipLogProgress(DeviceLayer, "WiFi scan is requested");
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "FAIL: request WiFi scan [%s]", get_error_message(wifiErr));
-        return false;
-    }
+    wifiErr = wifi_manager_scan(sInstance.mWiFiManagerHandle, _ScanFinishedCb, nullptr);
+    VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "FAIL: request WiFi scan [%s]", get_error_message(wifiErr)));
 
-    return true;
+    ChipLogProgress(DeviceLayer, "WiFi scan is requested");
+    return CHIP_NO_ERROR;
 }
 
-gboolean WiFiManager::_WiFiConnect(GMainLoop * mainLoop, gpointer userData)
+CHIP_ERROR WiFiManager::_WiFiConnect(wifi_manager_ap_h ap)
 {
-    int wifiErr          = WIFI_MANAGER_ERROR_NONE;
-    wifi_manager_ap_h ap = static_cast<wifi_manager_ap_h>(userData);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    int wifiErr;
 
-    wifiErr = wifi_manager_connect(sInstance.mWiFiManagerHandle, ap, _ConnectedCb, mainLoop);
-    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
-    {
-        ChipLogProgress(DeviceLayer, "WiFi connect is requested");
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "FAIL: request WiFi connect [%s]", get_error_message(wifiErr));
-        wifi_manager_ap_destroy(ap);
-        return false;
-    }
+    wifiErr = wifi_manager_connect(sInstance.mWiFiManagerHandle, ap, _ConnectedCb, nullptr);
+    VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "FAIL: request WiFi connect [%s]", get_error_message(wifiErr));
+                 err = CHIP_ERROR_INTERNAL);
 
+    ChipLogProgress(DeviceLayer, "WiFi connect is requested");
+
+exit:
     wifi_manager_ap_destroy(ap);
-    return true;
+    return err;
 }
 
 void WiFiManager::_WiFiSetStates()
@@ -571,6 +528,33 @@ void WiFiManager::_WiFiSetConnectionState(wifi_manager_connection_state_e connec
     ChipLogProgress(DeviceLayer, "Set WiFi connection state [%s]", __WiFiConnectionStateToStr(mConnectionState));
 }
 
+wifi_manager_ap_h WiFiManager::_WiFiGetConnectedAP()
+{
+    int wifiErr                   = WIFI_MANAGER_ERROR_NONE;
+    wifi_manager_ap_h connectedAp = nullptr;
+
+    wifiErr = wifi_manager_get_connected_ap(mWiFiManagerHandle, &connectedAp);
+    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
+    {
+        char * ssidStr = nullptr;
+        if (connectedAp != nullptr)
+        {
+            wifiErr = wifi_manager_ap_get_essid(connectedAp, &ssidStr);
+            if (wifiErr != WIFI_MANAGER_ERROR_NONE)
+            {
+                ChipLogError(DeviceLayer, "FAIL: get ssid of connected AP [%s]", get_error_message(wifiErr));
+            }
+        }
+        ChipLogProgress(DeviceLayer, "Get connected AP [%s]", ssidStr);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "FAIL: get connected AP [%s]", get_error_message(wifiErr));
+    }
+
+    return connectedAp;
+}
+
 wifi_manager_ap_h WiFiManager::_WiFiGetFoundAP()
 {
     int wifiErr               = WIFI_MANAGER_ERROR_NONE;
@@ -595,13 +579,12 @@ void WiFiManager::Init()
     sInstance.mModuleState     = WIFI_MANAGER_MODULE_STATE_DETACHED;
     sInstance.mConnectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
 
-    MainLoop::Instance().Init(_WiFiInitialize);
+    PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiInitialize, static_cast<void *>(nullptr));
 }
 
 void WiFiManager::Deinit()
 {
     sInstance._WiFiDeinitialize();
-    MainLoop::Instance().Deinit();
 }
 
 CHIP_ERROR WiFiManager::IsActivated(bool * isWiFiActivated)
@@ -616,16 +599,12 @@ CHIP_ERROR WiFiManager::Activate()
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     bool isWiFiActivated = false;
-    bool dbusAsyncErr    = false;
 
     VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == false, ChipLogProgress(DeviceLayer, "WiFi is already activated"));
 
-    dbusAsyncErr = MainLoop::Instance().AsyncRequest(_WiFiActivate);
-    VerifyOrExit(dbusAsyncErr == true, {
-        ChipLogError(DeviceLayer, "FAIL: Async request: Activate WiFi");
-        err = CHIP_ERROR_INTERNAL;
-    });
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiActivate, static_cast<void *>(nullptr));
+    SuccessOrExit(err);
 
 exit:
     return err;
@@ -635,16 +614,12 @@ CHIP_ERROR WiFiManager::Deactivate()
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     bool isWiFiActivated = false;
-    bool dbusAsyncErr    = false;
 
     VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == true, ChipLogProgress(DeviceLayer, "WiFi is already deactivated"));
 
-    dbusAsyncErr = MainLoop::Instance().AsyncRequest(_WiFiDeactivate);
-    VerifyOrExit(dbusAsyncErr == true, {
-        ChipLogError(DeviceLayer, "FAIL: Async request: Deactivate WiFi");
-        err = CHIP_ERROR_INTERNAL;
-    });
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiDeactivate, static_cast<void *>(nullptr));
+    SuccessOrExit(err);
 
 exit:
     return err;
@@ -655,7 +630,6 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     bool isWiFiActivated      = false;
-    bool dbusAsyncErr         = false;
     wifi_manager_ap_h foundAp = nullptr;
 
     g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
@@ -672,19 +646,13 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
     foundAp = sInstance._WiFiGetFoundAP();
     if (foundAp != nullptr)
     {
-        dbusAsyncErr = MainLoop::Instance().AsyncRequest(_WiFiConnect, foundAp);
-        VerifyOrExit(dbusAsyncErr == true, {
-            ChipLogError(DeviceLayer, "FAIL: Async request: Connect WiFi");
-            err = CHIP_ERROR_INTERNAL;
-        });
+        err = PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiConnect, foundAp);
+        SuccessOrExit(err);
     }
     else
     {
-        dbusAsyncErr = MainLoop::Instance().AsyncRequest(_WiFiScan);
-        VerifyOrExit(dbusAsyncErr == true, {
-            ChipLogError(DeviceLayer, "FAIL: Async request: Scan WiFi");
-            err = CHIP_ERROR_INTERNAL;
-        });
+        err = PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiScan, static_cast<void *>(nullptr));
+        SuccessOrExit(err);
     }
 
 exit:
@@ -855,6 +823,58 @@ CHIP_ERROR WiFiManager::GetConnectionState(wifi_manager_connection_state_e * con
     }
 
     return err;
+}
+
+CHIP_ERROR WiFiManager::GetBssId(uint8_t * bssId)
+{
+    VerifyOrReturnError(bssId != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    char * bssIdStr = nullptr;
+    std::unique_ptr<char, decltype(&::free)> _{ bssIdStr, &::free };
+
+    wifi_manager_ap_h connectedAp = _WiFiGetConnectedAP();
+    if (connectedAp == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    int wifiErr = wifi_manager_ap_get_bssid(connectedAp, &bssIdStr);
+    if (wifiErr != WIFI_MANAGER_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "FAIL: get bssid [%s]", get_error_message(wifiErr));
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    if (sscanf(bssIdStr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &mWiFiBSSID[0], &mWiFiBSSID[1], &mWiFiBSSID[2], &mWiFiBSSID[3],
+               &mWiFiBSSID[4], &mWiFiBSSID[5]) != 6)
+    {
+        ChipLogError(DeviceLayer, "FAIL: parse bssid");
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    bssId = mWiFiBSSID;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WiFiManager::GetSecurityType(wifi_manager_security_type_e * securityType)
+{
+    wifi_manager_ap_h connectedAp = _WiFiGetConnectedAP();
+    if (connectedAp == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    wifi_manager_security_type_e secType;
+    int wifiErr = wifi_manager_ap_get_security_type(connectedAp, &secType);
+    if (wifiErr != WIFI_MANAGER_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "FAIL: get security type [%s]", get_error_message(wifiErr));
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    *securityType = secType;
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

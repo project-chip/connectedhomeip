@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include "OTAImageProcessorImpl.h"
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <platform/silabs/OTAImageProcessorImpl.h>
 
 extern "C" {
 #include "btl_interface.h"

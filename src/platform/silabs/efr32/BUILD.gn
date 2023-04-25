@@ -57,6 +57,9 @@ static_library("efr32") {
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
     "${silabs_platform_dir}/SystemPlatformConfig.h",
+    "${silabs_platform_dir}/platformAbstraction/GSDK_SPAM.cpp",
+    "${silabs_platform_dir}/platformAbstraction/SilabsPlatform.h",
+    "${silabs_platform_dir}/platformAbstraction/SilabsPlatformBase.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "ConfigurationManagerImpl.cpp",
@@ -76,8 +79,8 @@ static_library("efr32") {
 
   if (chip_enable_ota_requestor) {
     sources += [
+      "${silabs_platform_dir}/OTAImageProcessorImpl.h",
       "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
     ]
   }
 

@@ -61,6 +61,7 @@ executable("dynamic-chip-bridge-app") {
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/assign",
   ]
 
   include_dirs = [
@@ -116,7 +117,7 @@ executable("dynamic-chip-bridge-app") {
 
   output_dir = root_out_dir
 
-  configs += ["${chip_root}/src:includes"]
+  configs += [ "${chip_root}/src:includes" ]
 }
 
 group("linux") {

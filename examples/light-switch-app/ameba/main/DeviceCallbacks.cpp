@@ -32,6 +32,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/dnssd/Advertiser.h>
+#include <platform/Ameba/AmebaUtils.h>
 #include <route_hook/ameba_route_hook.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -103,6 +104,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
     case DeviceEventType::kCommissioningComplete:
         ChipLogProgress(DeviceLayer, "Commissioning Complete");
+        chip::DeviceLayer::Internal::AmebaUtils::SetCurrentProvisionedNetwork();
         break;
     }
 }
@@ -142,8 +144,9 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         chip::app::DnssdServer::Instance().StartServer();
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         // Init OTA requestor only when we have gotten IPv6 address
-        if (OTAInitializer::Instance().CheckInit())
+        if (!OTAInitializer::Instance().CheckInit())
         {
+            ChipLogProgress(DeviceLayer, "Initializing OTA");
             chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
                                                         InitOTARequestorHandler, nullptr);
         }

@@ -164,7 +164,7 @@ private:
         kAdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
     };
 
-    static gboolean _BleInitialize(void * userData);
+    static CHIP_ERROR _BleInitialize(void * userData);
     void DriveBLEState();
     static void DriveBLEState(intptr_t arg);
 
@@ -207,8 +207,7 @@ private:
     void NotifyBLEWriteReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
 
     // ==== Connection.
-    void ConnectHandler(const char * address);
-    static gboolean ConnectChipThing(gpointer userData);
+    static CHIP_ERROR ConnectChipThing(const char * userData);
     void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyHandleNewConnection(BLE_CONNECTION_OBJECT conId);
@@ -235,7 +234,6 @@ private:
 
     BLEScanConfig mBLEScanConfig;
     std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
-    GMainContext * mMainContext  = nullptr;
     bt_gatt_client_h mGattClient = nullptr;
 };
 

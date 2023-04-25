@@ -465,11 +465,11 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    // Just treat this as a timeout error.  Don't bother delivering the partial
+    // We have been canceled.  Don't bother delivering the partial
     // results we have queued up in the BrowseContext, if any.  In practice
     // there shouldn't be anything there long-term anyway.
     //
-    // Make sure to time out all the resolves first, before we time out the
+    // Make sure to cancel all the resolves first, before we cancel the
     // browse (just to avoid dangling pointers in the resolves, even though we
     // only use them for equality compares).
     std::vector<GenericContext *> resolves;
@@ -481,10 +481,10 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 
     for (auto & resolve : resolves)
     {
-        resolve->Finalize(kDNSServiceErr_Timeout);
+        resolve->Finalize(CHIP_ERROR_CANCELLED);
     }
 
-    ctx->Finalize(kDNSServiceErr_Timeout);
+    ctx->Finalize(CHIP_ERROR_CANCELLED);
     return CHIP_NO_ERROR;
 }
 
@@ -511,11 +511,11 @@ void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
     if (*existingCtx->consumerCounter == 0)
     {
         // No more consumers; clear out all of these resolves so they don't
-        // stick around.  Dispatch timeout failure on all of them to make sure
-        // whatever kicked them off cleans up resources as needed.
+        // stick around.  Dispatch a "cancelled" failure on all of them to make
+        // sure whatever kicked them off cleans up resources as needed.
         do
         {
-            existingCtx->Finalize(kDNSServiceErr_Timeout);
+            existingCtx->Finalize(CHIP_ERROR_CANCELLED);
             existingCtx = MdnsContexts::GetInstance().GetExistingResolveForInstanceName(instanceName);
         } while (existingCtx != nullptr);
     }

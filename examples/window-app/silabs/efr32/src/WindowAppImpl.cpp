@@ -27,7 +27,7 @@
 #ifdef QR_CODE_ENABLED
 #include <qrcodegen.h>
 #else
-#include "EFR32DeviceDataProvider.h"
+#include "SilabsDeviceDataProvider.h"
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #endif // QR_CODE_ENABLED
@@ -223,7 +223,7 @@ CHIP_ERROR WindowAppImpl::Init()
     char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan QRCode(qrCodeBuffer);
 
-    if (EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
+    if (Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
     {
         PrintQrCodeURL(QRCode);
     }

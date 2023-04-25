@@ -60,6 +60,7 @@ from .native import PyChipError
 __all__ = ["ChipDeviceController"]
 
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, PyChipError)
+_DeviceUnpairingCompleteFunct = CFUNCTYPE(None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
     None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
@@ -248,6 +249,15 @@ class ChipDeviceControllerBase():
             self._ChipStack.callbackRes = err
             self._ChipStack.completeEvent.set()
 
+        def HandleUnpairDeviceComplete(nodeid: int, err: PyChipError):
+            if err.is_success:
+                print("Succesfully unpaired device with nodeid {}".format(nodeid))
+            else:
+                print("Failed to unpair device: {}".format(err))
+
+            self._ChipStack.callbackRes = err
+            self._ChipStack.completeEvent.set()
+
         def HandlePASEEstablishmentComplete(err: PyChipError):
             if not err.is_success:
                 print("Failed to establish secure session to device: {}".format(err))
@@ -284,9 +294,10 @@ class ChipDeviceControllerBase():
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
             self.devCtrl, self.cbHandleOpenWindowCompleteFunct)
 
+        self.cbHandleDeviceUnpairCompleteFunct = _DeviceUnpairingCompleteFunct(HandleUnpairDeviceComplete)
+
         self.state = DCState.IDLE
         self._isActive = True
-
         # Validate FabricID/NodeID followed from NOC Chain
         self._fabricId = self.GetFabricIdInternal()
         self._nodeId = self.GetNodeIdInternal()
@@ -385,6 +396,14 @@ class ChipDeviceControllerBase():
             # Error 50 is a timeout
             return False
         return self._ChipStack.commissioningEventRes.is_success
+
+    def UnpairDevice(self, nodeid: int):
+        self.CheckIsActive()
+
+        return self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
+                self.devCtrl, nodeid, self.cbHandleDeviceUnpairCompleteFunct)
+        ).raise_on_error()
 
     def CloseBLEConnection(self):
         self.CheckIsActive()
@@ -1273,6 +1292,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_ConnectWithCode.argtypes = [
                 c_void_p, c_char_p, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectWithCode.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_UnpairDevice.argtypes = [
+                c_void_p, c_uint64, _DeviceUnpairingCompleteFunct]
+            self._dmLib.pychip_DeviceController_UnpairDevice.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_CloseSession.argtypes = [
                 c_void_p, c_uint64]

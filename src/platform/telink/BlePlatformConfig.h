@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/bluetooth.h>
 
 // ==================== Platform Adaptations ====================
 

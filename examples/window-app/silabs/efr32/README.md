@@ -122,7 +122,7 @@ Silicon Labs platform.
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/window-app/silabs/efr32/ ./out/window-app_SED BRD4161A --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/window-app/silabs/efr32/ ./out/window-app_SED BRD4161A --sed
 
     or use gn as previously mentioned but adding the following arguments:
 
@@ -279,19 +279,19 @@ combination with JLinkRTTClient as follows:
     established, look for the RTT log
 
     ```
-        [DL] Device Role: CHILD
-        [DL] Partition Id:0x6A7491B7
-        [DL] \_OnPlatformEvent default: event->Type = 32778
-        [DL] OpenThread State Changed (Flags: 0x00000001)
-        [DL] Thread Unicast Addresses:
-        [DL]    2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred
-        [DL]    FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc
-        [DL]    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred
-        [DL]    FE80::D8F2:592E:C109:CF00/64 valid preferred
-        [DL] LwIP Thread interface addresses updated
-        [DL] FE80::D8F2:592E:C109:CF00 IPv6 link-local address, preferred)
-        [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred)
-        [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
+        [DL] Device Role: CHILD
+        [DL] Partition Id:0x6A7491B7
+        [DL] \_OnPlatformEvent default: event->Type = 32778
+        [DL] OpenThread State Changed (Flags: 0x00000001)
+        [DL] Thread Unicast Addresses:
+        [DL]    2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred
+        [DL]    FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc
+        [DL]    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred
+        [DL]    FE80::D8F2:592E:C109:CF00/64 valid preferred
+        [DL] LwIP Thread interface addresses updated
+        [DL] FE80::D8F2:592E:C109:CF00 IPv6 link-local address, preferred)
+        [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred)
+        [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
     ```
 
     (you can verify that the device is on the thread network with the command
