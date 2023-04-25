@@ -673,7 +673,7 @@
 }
 
 // MARK: MTRDeviceControllerDelegate
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error nodeID:(NSNumber *)nodeID
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error nodeID:(NSNumber * _Nullable)nodeID
 {
     if (error != nil) {
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
@@ -685,7 +685,7 @@
 }
 
 // MARK: MTRDeviceControllerDelegate
-- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRReadCommissioningInfo *)info
+- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info
 {
     NSLog(@"readCommissioningInfo, vendorID:%@, productID:%@", info.vendorID, info.productID);
 }
