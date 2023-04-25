@@ -166,7 +166,10 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
     SILABS_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
 
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     sWiFiNetworkCommissioningInstance.Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
 #endif
 
     // Create FreeRTOS sw timer for Function Selection.

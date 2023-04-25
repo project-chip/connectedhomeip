@@ -41,7 +41,7 @@ void SilabsPlatform::InitLed(void)
     SilabsPlatformAbstractionBase::InitLed();
 }
 
-CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led) override
+CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
 {
     // TODO add range check
     RSI_Board_LED_Set(led, state);
@@ -54,7 +54,7 @@ bool SilabsPlatform::GetLedState(uint8_t led)
     return SilabsPlatformAbstractionBase::GetLedState(led);
 }
 
-CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led) override
+CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
 {
     // TODO add range check
     RSI_Board_LED_Toggle(led);
