@@ -21,9 +21,7 @@
  *
  */
 
-#include <condition_variable>
-#include <mutex>
-#include <thread>
+#include <atomic>
 
 #include <nlunit-test.h>
 
@@ -42,6 +40,8 @@ namespace {
 struct DnssdContext
 {
     nlTestSuite * mTestSuite;
+
+    std::atomic<bool> mTimeoutExpired{ false };
 
     unsigned int mBrowsedServicesCount  = 0;
     unsigned int mResolvedServicesCount = 0;
@@ -102,6 +102,14 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
     }
 }
 
+static void Timeout(chip::System::Layer * systemLayer, void * context)
+{
+    auto * ctx = static_cast<DnssdContext *>(context);
+    ChipLogError(DeviceLayer, "mDNS test timeout, is avahi daemon running?");
+    ctx->mTimeoutExpired = true;
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+}
+
 static void DnssdErrorCallback(void * context, CHIP_ERROR error)
 {
     auto * ctx = static_cast<DnssdContext *>(context);
@@ -150,10 +158,15 @@ void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite,
                    chip::Dnssd::ChipDnssdInit(TestDnssdPubSub_DnssdInitCallback, DnssdErrorCallback, &context) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(5), Timeout, &context) ==
+                       CHIP_NO_ERROR);
 
     ChipLogProgress(DeviceLayer, "Start EventLoop");
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     ChipLogProgress(DeviceLayer, "End EventLoop");
+
+    NL_TEST_ASSERT(inSuite, !context.mTimeoutExpired);
 
     chip::Dnssd::ChipDnssdShutdown();
 }
