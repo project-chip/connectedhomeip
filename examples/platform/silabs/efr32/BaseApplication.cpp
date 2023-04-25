@@ -73,7 +73,7 @@
 #define EXAMPLE_VENDOR_ID 0xcafe
 
 #if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
-#define SYSTEM_STATE_LED &sl_led_led0
+#define SYSTEM_STATE_LED 0
 #endif // ENABLE_WSTK_LEDS
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #define APP_FUNCTION_BUTTON &sl_button_btn0

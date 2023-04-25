@@ -25,9 +25,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
@@ -68,9 +66,7 @@
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
-#ifdef ENABLE_WSTK_LEDS
 #define APP_STATE_LED 0
-#endif // ENABLE_WSTK_LEDS
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -87,9 +83,7 @@ TimerHandle_t sLightTimer;
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-#ifdef ENABLE_WSTK_LEDS
 LEDWidget sStatusLED;
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef SL_WIFI
 app::Clusters::NetworkCommissioning::Instance
@@ -204,9 +198,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
     SILABS_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     SILABS_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
-#ifdef ENABLE_WSTK_LEDS
     sStatusLED.Init(APP_STATE_LED);
-#endif // ENABLE_WSTK_LEDS
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -302,7 +294,6 @@ void BaseApplication::LightEventHandler()
     // the LEDs at an even rate of 100ms.
     //
     // Otherwise, blink the LED ON for a very short time.
-#ifdef ENABLE_WSTK_LEDS
     if (mFunction != kFunction_FactoryReset)
     {
         if ((gIdentifyptr != nullptr) && (gIdentifyptr->mActive))
@@ -348,7 +339,6 @@ void BaseApplication::LightEventHandler()
     }
 
     sStatusLED.Animate();
-#endif // ENABLE_WSTK_LEDS
 }
 
 void BaseApplication::ButtonHandler(AppEvent * aEvent)
@@ -382,13 +372,10 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             break;
         }
 
-#ifdef ENABLE_WSTK_LEDS
         // Turn off status LED before starting blink to make sure blink is
         // co-ordinated.
         sStatusLED.Set(false);
         sStatusLED.Blink(500);
-#endif // ENABLE_WSTK_LEDS
-
         SILABS_LOG("Factory reset triggering in %d sec release button to cancel", count--);
 
         // Delay of 1sec before checking the button status again
@@ -397,9 +384,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
 
     if (count > 0)
     {
-#ifdef ENABLE_WSTK_LEDS
         sStatusLED.Set(false);
-#endif
         SILABS_LOG("Factory Reset has been Canceled"); // button held past Timeout wait till button is released
     }
 
@@ -467,9 +452,7 @@ void BaseApplication::StartStatusLEDTimer()
 
 void BaseApplication::StopStatusLEDTimer()
 {
-#ifdef ENABLE_WSTK_LEDS
     sStatusLED.Set(false);
-#endif // ENABLE_WSTK_LEDS
 
     if (xTimerStop(sLightTimer, pdMS_TO_TICKS(100)) != pdPASS)
     {
