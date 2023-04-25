@@ -82,7 +82,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Only perform the PASE steps of commissioning.
- * Commissioning will be completed by another admin on the network.
+ * If set to YES, commissioning will be completed by another admin on the network.
+ *
+ * Defaults to NO.
  */
 @property (nonatomic, assign) BOOL skipCommissioningComplete MTR_NEWLY_AVAILABLE;
 
