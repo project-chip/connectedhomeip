@@ -201,6 +201,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_verifyImage() error %ld", err);
+        // Call the OTARequestor API to reset the state
+        GetRequestorInstance()->CancelImageUpdate();
 
         return;
     }
@@ -209,6 +211,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err);
+        // Call the OTARequestor API to reset the state
+        GetRequestorInstance()->CancelImageUpdate();
 
         return;
     }

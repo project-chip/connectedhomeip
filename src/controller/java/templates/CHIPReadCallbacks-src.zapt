@@ -139,7 +139,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    {{>decode_value source="list" target="arrayListObj" cluster=(asUpperCamelCase parent.name) depth=0}}
+    {{>decode_value source="list" target="arrayListObj" cluster=parent.name depth=0}}
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -165,7 +165,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#if isArray}}{{else if isStruct}}{{else if isOptional}}Ljava/util/Optional;{{else if (isOctetString type)}}[B{{else if (isCharString type)}}Ljava/lang/String;{{else}}{{asJniSignatureBasic type true}}{{/if}})V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-        {{>decode_value source="value" target="javaValue" cluster=(asUpperCamelCase parent.name) depth=0}}
+        {{>decode_value source="value" target="javaValue" cluster=parent.name depth=0}}
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
     }
