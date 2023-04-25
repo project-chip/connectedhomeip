@@ -166,7 +166,13 @@ void SlWiFiDriver::UpdateNetworkingStatus()
 {
     if (mpStatusChangeCallback == nullptr)
     {
-        ChipLogError(NetworkProvisioning, "mpStatusChangeCallback is nil");
+        ChipLogError(NetworkProvisioning, "networkStatusChangeCallback is nil");
+        return;
+    }
+
+    if (mStagingNetwork.ssidLen == 0)
+    {
+        ChipLogError(NetworkProvisioning, "ssidLen is 0");
         return;
     }
 
