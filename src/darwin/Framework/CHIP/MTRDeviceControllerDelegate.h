@@ -32,7 +32,7 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
  * A representation of a (vendor, product) pair that identifies a specific product.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRReadCommissioningInfo : NSObject
+@interface MTRProductIdentity : NSObject
 
 /**
  * Controllee's VendorID Attribute of Basic Information cluster
