@@ -37,15 +37,25 @@ using chip::Dnssd::DnssdService;
 using chip::Dnssd::DnssdServiceProtocol;
 using chip::Dnssd::TextEntry;
 
-static unsigned int gBrowsedServicesCount  = 0;
-static unsigned int gResolvedServicesCount = 0;
-static bool gEndOfInput                    = false;
+namespace {
+
+struct DnssdContext
+{
+    nlTestSuite * mTestSuite;
+
+    unsigned int mBrowsedServicesCount  = 0;
+    unsigned int mResolvedServicesCount = 0;
+    bool mEndOfInput                    = false;
+};
+
+} // namespace
 
 static void HandleResolve(void * context, DnssdService * result, const chip::Span<chip::Inet::IPAddress> & addresses,
                           CHIP_ERROR error)
 {
+    auto * ctx   = static_cast<DnssdContext *>(context);
+    auto * suite = ctx->mTestSuite;
     char addrBuf[100];
-    nlTestSuite * suite = static_cast<nlTestSuite *>(context);
 
     NL_TEST_ASSERT(suite, result != nullptr);
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
@@ -53,14 +63,14 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     if (!addresses.empty())
     {
         addresses.data()[0].ToString(addrBuf, sizeof(addrBuf));
-        printf("Service[%u] at [%s]:%u\n", gResolvedServicesCount, addrBuf, result->mPort);
+        printf("Service[%u] at [%s]:%u\n", ctx->mResolvedServicesCount, addrBuf, result->mPort);
     }
 
     NL_TEST_ASSERT(suite, result->mTextEntrySize == 1);
     NL_TEST_ASSERT(suite, strcmp(result->mTextEntries[0].mKey, "key") == 0);
     NL_TEST_ASSERT(suite, strcmp(reinterpret_cast<const char *>(result->mTextEntries[0].mData), "val") == 0);
 
-    if (gBrowsedServicesCount == ++gResolvedServicesCount)
+    if (ctx->mBrowsedServicesCount == ++ctx->mResolvedServicesCount)
     {
         // After last service is resolved, stop the event loop,
         // so the test case can gracefully exit.
@@ -70,14 +80,15 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
 
 static void HandleBrowse(void * context, DnssdService * services, size_t servicesSize, bool finalBrowse, CHIP_ERROR error)
 {
-    nlTestSuite * suite = static_cast<nlTestSuite *>(context);
+    auto * ctx   = static_cast<DnssdContext *>(context);
+    auto * suite = ctx->mTestSuite;
 
     // Make sure that we will not be called again after end-of-input is set
-    NL_TEST_ASSERT(suite, gEndOfInput == false);
+    NL_TEST_ASSERT(suite, ctx->mEndOfInput == false);
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
 
-    gBrowsedServicesCount += servicesSize;
-    gEndOfInput = finalBrowse;
+    ctx->mBrowsedServicesCount += servicesSize;
+    ctx->mEndOfInput = finalBrowse;
 
     if (servicesSize > 0)
     {
@@ -86,7 +97,7 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
         {
             printf("Service[%u] name %s\n", i, services[i].mName);
             printf("Service[%u] type %s\n", i, services[i].mType);
-            NL_TEST_ASSERT(suite, ChipDnssdResolve(&services[i], services[i].mInterface, HandleResolve, suite) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(suite, ChipDnssdResolve(&services[i], services[i].mInterface, HandleResolve, context) == CHIP_NO_ERROR);
         }
     }
 }
@@ -95,11 +106,13 @@ static void HandlePublish(void * context, const char * type, const char * instan
 
 static void InitCallback(void * context, CHIP_ERROR error)
 {
+    auto * ctx   = static_cast<DnssdContext *>(context);
+    auto * suite = ctx->mTestSuite;
+
     DnssdService service;
     TextEntry entry;
-    char key[]          = "key";
-    char val[]          = "val";
-    nlTestSuite * suite = static_cast<nlTestSuite *>(context);
+    char key[] = "key";
+    char val[] = "val";
 
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
 
@@ -119,9 +132,10 @@ static void InitCallback(void * context, CHIP_ERROR error)
     service.mSubTypeSize   = 0;
 
     NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service, HandlePublish) == CHIP_NO_ERROR);
+
     intptr_t browseIdentifier;
     ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
-                    chip::Inet::InterfaceId::Null(), HandleBrowse, suite, &browseIdentifier);
+                    chip::Inet::InterfaceId::Null(), HandleBrowse, context, &browseIdentifier);
 }
 
 static void ErrorCallback(void * context, CHIP_ERROR error)
@@ -131,9 +145,12 @@ static void ErrorCallback(void * context, CHIP_ERROR error)
 
 void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)
 {
+    DnssdContext context;
+    context.mTestSuite = inSuite;
+
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformMgr().InitChipStack();
-    NL_TEST_ASSERT(inSuite, chip::Dnssd::ChipDnssdInit(InitCallback, ErrorCallback, inSuite) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, chip::Dnssd::ChipDnssdInit(InitCallback, ErrorCallback, &context) == CHIP_NO_ERROR);
 
     ChipLogProgress(DeviceLayer, "Start EventLoop");
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
