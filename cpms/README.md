@@ -93,11 +93,12 @@ The provisioning script and the GFW communicate through J-Link RTT using the PyL
 | Arguments                 | Conformance          | Type               | Description                                                                             |
 | ------------------------- | -------------------- | ------------------ | --------------------------------------------------------------------------------------- |
 | -c,  --config             | optional             | string             | Path to a JSON configuration file            |
-| -t,  --test               | optional             | boolean            | Auto-generate test certificates            |
+| -g,  --generate           | optional             | flag               | Auto-generate test certificates            |
+| -m,  --cpms               | optional             | flag               | CPMS mode: When true, only generate the JSON configuration, and exit.                    |
+| -r,  --csr                | optional             | flag               | CSR mode: When true, instructs the GFW to generate the private key, and issue a CSR.                    |
 | -j,  --jtag               | optional             | dec/hex            | JTAG serial number. Required if there are multiple devices connected.            |
-| -g,  --gen_fw             | optional             | dec/hex            | Path to the Generator Firmware image.                                                   |
-| -x,  --prod_fw            | optional             | dec/hex            | Path to the Production Firmware image.                                                   |
-| -m,  --cpms               | optional             | boolean            | CPMS mode: When true, only generate the JSON configuration, and exit.                    |
+| -gf, --gen_fw             | optional             | dec/hex            | Path to the Generator Firmware image.                                                   |
+| -pf, --prod_fw            | optional             | dec/hex            | Path to the Production Firmware image.                                                   |
 | -v,  --vendor_id          | optional             | dec/hex            | Vendor ID. e.g: 65521 or 0xFFF1 (Max 2 bytes).                              |
 | -V,  --vendor_name        | optional             | string             | Vendor name (Max 32 char).                                                  |
 | -p,  --product_id         | optional             | dec/hex            | Product ID. e.g: 32773 or 0x8005 (Max 2 bytes).                             |
@@ -140,7 +141,6 @@ override arguments read from a configuration file.
 For instance, with the configuration `cpms.json`:
 ```
 {
-    "test": false,
     "prod_fw": "/git/matter/out/lighting-app/BRD4164A/chip-efr32-lighting-example.s37",
     "vendor_id": 4169,
     "product_id": 32773,
@@ -160,47 +160,28 @@ For instance, with the configuration `cpms.json`:
 ```
 You may run:
 ```
-python3 ./cpms/provision.py -c cpms.json -d 2748 -p 0x8006 -si 10000
+python3 ./provision.py -c cpms.json -d 2748 -p 0x8006 -si 10000
 ```
 Which will set the connected device with discriminator 2748 (instead of 3841), product ID 32774 (instead of 32773),
 and use 10000 SPAKE2+ iterations (instead of 15000).
 
 To ease development and testing, the `provision.py` script provides defaults for most of the parameters. The only
 arguments that are truly mandatory are `vendor_id`, and `product_id`. Test certificates may be auto-generated using
-the -t flag, provided the `chip-cert` can be found, either in the default location, or through the `--cert-tool` argument.
+the -g flag, provided the `chip-cert` can be found, either in the default location, or through the `--cert-tool` argument.
 For instance, you may run:
 ```
-python3 ./cpms/provision.py -v 0x1049 -p 0x8005 -t
+python3 ./provision.py -v 0x1049 -p 0x8005 -g
 ```
 Which will generate the test certificates using `out/debug/chip-cert`, and set the device with the following parameters:
 ```
 {
-    "test": true,
-    "jtag": null,
-    "gen_fw": null,
-    "prod_fw": null,
+    "generate": true,
     "vendor_id": 65522,
-    "vendor_name": null,
     "product_id": 32773,
-    "product_name": null,
-    "product_label": null,
-    "product_url": null,
-    "part_number": null,
-    "hw_version": null,
-    "hw_version_str": null,
-    "manufacturing_date": null,
-    "unique_id": null,
-    "commissioning_flow": 0,
-    "rendezvous_flags": 2,
     "discriminator": 3840,
     "attestation": {
         "cert_tool": "./out/debug/chip-cert",
         "key_id": 2,
-        "dac_cert": null,
-        "dac_key": null,
-        "pai_cert": null,
-        "certification": null,
-        "common_name": null
     },
     "spake2p": {
         "verifier": null,
@@ -215,20 +196,20 @@ For each run, `provision.py` will generate the file `cpms/temp/cpms.json`, conta
 A default configuration with developer settings can be found at `cpms/defaults.json`:
 
 ```
-python ./cpms/provision.py -c cpms/defaults.json
+python ./provision.py -c cpms/defaults.json
 ```
 
 ## Attestation Files
 
-The `--test` options instructs the `provider.py` script to generate test attestation files with the given Vendor ID, and Product ID.
+The `--generate` option instructs the `provider.py` script to generate test attestation files with the given Vendor ID, and Product ID.
 These files are generated using [the chip-cert tool](https://github.com/project-chip/connectedhomeip/tree/master/src/tools/chip-cert),
 and stored in the `cpms/temp` folder. You can also generate the certificates manually, for instance:
 ```
-./out/debug/chip-cert gen-cd -f 1 -V 0xfff1 -p 0x8005 -d 0x0016 -c ZIG20142ZB330003-24 -l 0 -i 0 -n 257 -t 0 -o 0xfff1 -r 0x8005 -C ./credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem -K ./credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem -O ./cpms/temp/cd.der
+./out/debug/chip-cert gen-cd -f 1 -V 0xfff1 -p 0x8005 -d 0x0016 -c ZIG20142ZB330003-24 -l 0 -i 0 -n 257 -t 0 -o 0xfff1 -r 0x8005 -C ./credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem -K ./credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem -O ./temp/cd.der
 
-./out/debug/chip-cert gen-att-cert -t a -l 3660 -c "Matter PAA" -V 0xfff1 -o ./cpms/temp/paa_cert.pem -O ./cpms/temp/paa_key.pem
+./out/debug/chip-cert gen-att-cert -t a -l 3660 -c "Matter PAA" -V 0xfff1 -o ./temp/paa_cert.pem -O ./temp/paa_key.pem
 
-./out/debug/chip-cert gen-att-cert -t i -l 3660 -c "Matter PAI" -V 0xfff1 -P 0x8005 -C ./cpms/temp/paa_cert.pem -K ./cpms/temp/paa_key.pem -o ./cpms/temp/pai_cert.pem -O ./cpms/temp/pai_key.pem
+./out/debug/chip-cert gen-att-cert -t i -l 3660 -c "Matter PAI" -V 0xfff1 -P 0x8005 -C ./temp/paa_cert.pem -K ./temp/paa_key.pem -o ./temp/pai_cert.pem -O ./temp/pai_key.pem
 ```
 
 NOTE: The commissioning fails if the commissioner do not recognize the root certificate (PAA).
@@ -237,7 +218,7 @@ you can use the `--paa-trust-store-path` to enabled the PAA certificates for tes
 
 To generate an external DAC and private-key, you can use:
 ```
-./out/debug/chip-cert gen-att-cert -t d -l 3660 -c "Matter DAC" -V 0xfff1 -P 0x8005 -C ./cpms/temp/pai_cert.pem -K ./cpms/temp/pai_key.pem -o ./cpms/temp/dac_cert.pem -O ./cpms/temp/dac_key.pem
+./out/debug/chip-cert gen-att-cert -t d -l 3660 -c "Matter DAC" -V 0xfff1 -P 0x8005 -C ./temp/pai_cert.pem -K ./temp/pai_key.pem -o ./temp/dac_cert.pem -O ./temp/dac_key.pem
 ```
 
 ## Example
@@ -249,18 +230,18 @@ From the root of the Silicon Labs Matter repo, build the application using the `
 
 Set up the device with key generation:
 ```
-python3 ./cpms/provision.py -v 0x1049 -p 0x8005 \
-    -k 2 -cn "Silabs Device" -pc ./cpms/temp/pai_cert.pem -cd ./cpms/temp/cd.der \
+python3 ./provision.py -v 0x1049 -p 0x8005 \
+    -k 2 -cn "Silabs Device" -ic ./temp/pai_cert.pem -cd ./temp/cd.der \
     -sg /git/matter/core/out/debug/spake2p -sc 62034001 -ss 95834coRGvFhCB69IdmJyr5qYIzFgSirw6Ja7g5ySYA -si 15000 \
-    -d 0xf01 -j 440266330 -x /git/matter/core/out/lighting-app/BRD4164A/chip-efr32-lighting-example.s37
+    -d 0xf01 -j 440266330 -pf /git/matter/core/out/lighting-app/BRD4164A/chip-efr32-lighting-example.s37
 ```
 
 Or, set up the device with imported key:
 ```
-python3 ./cpms/provision.py -v 0x1049 -p 0x8005 \
-    -k 2 -cn "Silabs Device" -dc ./cpms/temp/dac_cert.pem  -dk ./cpms/temp/dac_key.pem  -pc ./cpms/temp/pai_cert.pem -cd ./cpms/temp/cd.der \
+python3 ./provision.py -v 0x1049 -p 0x8005 \
+    -k 2 -cn "Silabs Device" -dc ./temp/dac_cert.pem  -dk ./temp/dac_key.pem  -ic ./temp/pai_cert.pem -cd ./temp/cd.der \
     -sg /git/matter/core/out/debug/spake2p -sc 62034001 -ss 95834coRGvFhCB69IdmJyr5qYIzFgSirw6Ja7g5ySYA -si 15000 \
-    -d 0xf01 -j 440266330 -x /git/matter/core/out/lighting-app/BRD4164A/chip-efr32-lighting-example.s37
+    -d 0xf01 -j 440266330 -pf /git/matter/core/out/lighting-app/BRD4164A/chip-efr32-lighting-example.s37
 ```
 
 ## Validation
@@ -318,10 +299,10 @@ has 476 octets:
 0817e1d0: 2F A0 FF AF F5 5C A1 59 98 08 C7 BC 5F 00 00 00
 
 This should match the contents of the DER-formatted DAC certificate, which is
-stored by the setup script as ./cpms/temp/dac.der :
+stored by the setup script as ./temp/dac.der :
 
 ```shell
-$ xxd ./cpms/temp/dac.der
+$ xxd ./temp/dac.der
 ```
 00000000: 3082 01d8 3082 017f a003 0201 0202 0407  0...0...........
 00000010: 5bcd 1530 0a06 082a 8648 ce3d 0403 0230  [..0...*.H.=...0
@@ -339,10 +320,10 @@ has 460 octets:
 0817e3c0: 62 FD 9F E9 D8 00 FA CD 0F 32 7C C9 00 00 00 00
 
 This should match the contents of the DER-formatted PAI certificate, which is
-stored by the setup script as ./cpms/temp/pai_cert.der :
+stored by the setup script as ./temp/pai_cert.der :
 
 ```shell
-$ xxd ./cpms/temp/pai_cert.der
+$ xxd ./temp/pai_cert.der
 ```
 00000000: 3082 01c8 3082 016e a003 0201 0202 0879  0...0..n.......y
 00000010: 6e32 5afa 5bd1 f830 0a06 082a 8648 ce3d  n2Z.[..0...*.H.=
@@ -404,7 +385,7 @@ code of these images is found under cpms/support. The support package is generat
 SLC CLI. For instance, for the EFR32MG12P332F1024GL125 part:
 
 ```
-slc generate -p ./cpms/generator/generator.slcp -d ./cpms/support/efr32mg12p332f1024gl125 --with EFR32MG12P332F1024GL125 --sdk ./third_party/silabs/gecko_sdk
+slc generate -p ./generator/generator.slcp -d ./support/efr32mg12p332f1024gl125 --with EFR32MG12P332F1024GL125 --sdk ./third_party/silabs/gecko_sdk
 ```
 Note: Remark that this command is executed from the root of the Matter repo.
 
@@ -467,7 +448,7 @@ following changes:
 The script `support.py` may be used to ease the generation, and building of
 support files. The use is as follows:
 ```
-python ./cpms/support.py <gen|patch|make|all> <part_numbers>
+python ./support.py <gen|patch|make|all> <part_numbers>
 ```
 Where part_number is a comma-separated list of part numbers (without spaces).
 The first argument indicates the action to execute:
@@ -478,5 +459,5 @@ The first argument indicates the action to execute:
 
 For instance:
 ```
-python ./cpms/support.py build EFR32MG12P332F1024GL125,EFR32MG12P432F1024GL125,EFR32MG12P433F1024GL125,EFR32MG12P433F1024GM68,EFR32MG24A010F1536GM48,EFR32MG24B010F1536IM40,EFR32MG24B210F1536IM48,EFR32MG24B220F1536IM48,EFR32MG24B310F1536IM48,MGM12P32F1024GA
+python ./support.py build EFR32MG12P332F1024GL125,EFR32MG12P432F1024GL125,EFR32MG12P433F1024GL125,EFR32MG12P433F1024GM68,EFR32MG24A010F1536GM48,EFR32MG24B010F1536IM40,EFR32MG24B210F1536IM48,EFR32MG24B220F1536IM48,EFR32MG24B310F1536IM48,MGM12P32F1024GA
 ```

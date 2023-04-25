@@ -32,6 +32,7 @@
 static uint8_t _buffer[BUFFER_SIZE] = { 0 };
 
 static VoidCommand _void_command;
+static InitCommand _init_command;
 static CsrCommand _csr_command;
 static ImportCommand _import_command;
 static SetupCommand _setup_command;
@@ -41,6 +42,8 @@ Command & select_command(uint8_t id)
 {
     switch(id)
     {
+    case kCommand_Init:
+        return _init_command; 
     case kCommand_CSR:
         return _csr_command; 
     case kCommand_Import:
@@ -87,12 +90,6 @@ void reject_command(uint8_t id, int err)
 void app_init(void)
 {
     MSC_Init();
-
-    // Initialize NVM3
-    nvm3_open(nvm3_defaultHandle, nvm3_defaultInit);
-
-    // Initialize PSA Crypto
-    psa_crypto_init();
 }
 
 /*******************************************************************************

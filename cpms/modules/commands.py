@@ -3,12 +3,12 @@ from .encoding import *
 
 class Command(object):
     NONE = 0
-    DEBUG = 1
+    INIT = 1
     CSR = 2
     IMPORT = 3
     SETUP = 4
     SPAKE2p = 10
-    STRINGS = [ 'None', 'DEBUG', 'CSR', 'IMPORT', 'SETUP' ]
+    STRINGS = [ 'None', 'INIT', 'CSR', 'IMPORT', 'SETUP' ]
 
     def __init__(self, cid):
         self.id = cid
@@ -50,21 +50,24 @@ class Command(object):
             fail("Unexpected response {} to command {}".format(rid, self.id))
         if err:
             fail("Command {} failed with error {}".format(self.name, hex(err)))
-        # assert(0 == err)
         return self.decode(enc, err)
 
-class DebugCommand(Command):
+class InitCommand(Command):
 
-    def __init__(self, dac):
-        super().__init__(Command.DEBUG)
-        self.dac = dac
+    def __init__(self, info):
+        super().__init__(Command.INIT)
+        self.flash_addr = info.flash_addr
+        self.flash_size = info.flash_size
 
     def encode(self, enc):
-        enc.addArray(self.dac)
+        enc.addUint32(self.flash_addr)
+        enc.addUint32(self.flash_size)
 
-    def decode(self, enc):
-        serial = enc.getArray()
-        print("DEBUG, serial:{}\n".format(serial.hex()))
+    def decode(self, enc, err):
+        addr = enc.getUint32()
+        page = enc.getUint32()
+        print("Init:\n  ∙ addr:{:08x}, page:{}".format(addr, page))
+
 
 class CsrCommand(Command):
 
@@ -85,7 +88,6 @@ class CsrCommand(Command):
         kid = enc.getUint32()
         csr = enc.getString()
         print("CSR, key:{}, len:{}\n{}".format(kid, len(csr), csr))
-        assert(0 == err)
         return (kid, csr)
 
 
@@ -118,12 +120,9 @@ class ImportCommand(Command):
 
     def decode(self, enc, err):
         kid = enc.getUint32()
-        addr = enc.getUint32()
         off = enc.getUint32()
         size = enc.getUint32()
-
-        print("Import({}):\n  ∙ key:{}, addr:{}, off:{}, size:{}".format(self.name, kid, hex(addr), hex(off), size))
-        assert(0 == err)
+        print("Import({}):\n  ∙ key:{}, off:{}, size:{}".format(self.name, kid, hex(off), size))
         return (kid, off, size)
 
 

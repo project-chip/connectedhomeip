@@ -91,7 +91,7 @@ int Credentials::importKey(const uint8_t * asn1, size_t size)
     int err = 0;
 
     err = mbedtls_asn1_traverse_sequence_of(&p, asn1 + size, 0, 0, 0, 0, asn1_callback, this);
-    ASSERT(err, return err, "ASN1 decode errror");
+    ASSERT(err, return err, "ASN1 decode error");
 
     return 0;
 }
@@ -116,7 +116,7 @@ int Credentials::ImportRawKey(const uint8_t * key, size_t size)
 
     err = psa_import_key(&attr, key, size, &_key_id);
     psa_reset_key_attributes(&attr);
-    ASSERT(err, return err, "ASN1 decode errror");
+    ASSERT(err, return err, "ASN1 decode error");
 
     return 0;
 }

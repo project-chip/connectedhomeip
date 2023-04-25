@@ -14,11 +14,12 @@ filter:
     value: ["Beginner"]
 source:
   - path: app.cpp
+  - path: commands.cpp
   - path: config.cpp
   - path: credentials.cpp
-  - path: commands.cpp
   - path: encoding.cpp
   - path: main.cpp
+  - path: nvm3.c
 include:
   - path: .
     file_list:
@@ -35,10 +36,8 @@ include:
     - path: platform/silabs/SilabsConfig.h
 component:
   - id: sl_system
-  - id: device_init
   - id: cpp_support
   - id: iostream_rtt
-  - id: nvm3_default
   - id: psa_its
   - id: psa_driver
   - id: psa_crypto
@@ -48,6 +47,3 @@ component:
   - id: mbedtls_pkcs5
   - id: mbedtls_ecc
   - id: mbedtls_x509
-define:
-  - name: "CUSTOM_TOKEN_HEADER"
-    value: "custom-tokens.h"

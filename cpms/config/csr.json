@@ -1,0 +1,16 @@
+{
+    "csr": true,
+    "vendor_id": 65521,
+    "product_id": 32773,
+    "discriminator": 3840,
+    "attestation": {
+        "certification": "./temp/cd.der",
+        "common_name": "Matter Device"
+    },
+    "spake2p": {
+        "verifier": "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw==",
+        "passcode": 20202021,
+        "salt": "U1BBS0UyUCBLZXkgU2FsdA==",
+        "iterations": 1000
+    }
+}

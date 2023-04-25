@@ -6,7 +6,7 @@
 enum CommandIds
 {
     kCommand_None = 0,
-    kCommand_Debug = 1,
+    kCommand_Init = 1,
     kCommand_CSR = 2,
     kCommand_Import = 3,
     kCommand_Setup = 4,
@@ -41,7 +41,7 @@ public:
     void encode(Encoder & out) const override;
 };
 
-class DebugCommand : public Command
+class InitCommand : public Command
 {
 public:
     int decode(Encoder & in) override;
@@ -49,7 +49,8 @@ public:
     void encode(Encoder & out) const override;
 
 private:
-    uint32_t _key_id = 0;
+    uint32_t _flash_addr = 0;
+    uint32_t _flash_size = 0;
 };
 
 
@@ -94,7 +95,6 @@ private:
     uint32_t _key_id = 0;
     uint8_t _flash = 0;
     uint8_t _data[kFileSizeMax] = { 0 };
-    uint32_t _address = 0;
     uint32_t _offset = 0;
     size_t _size = 0;
 };

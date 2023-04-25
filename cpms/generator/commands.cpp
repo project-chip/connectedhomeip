@@ -46,27 +46,37 @@ void VoidCommand::encode(Encoder & out) const
 }
 
 //------------------------------------------------------------------------------
-// Debug
+// Init
 //------------------------------------------------------------------------------
 
-int DebugCommand::decode(Encoder & in)
-{
-    int err = 0;
+static uint8_t _credentials_page[FLASH_PAGE_SIZE] = { 0 };
+uint32_t _creds_base_addr = 0;
 
-    err = in.getUint32(_key_id);
+extern "C" void setNvm3End(uint32_t addr);
+
+int InitCommand::decode(Encoder & in)
+{
+    int err = in.getUint32(_flash_addr);
+    ASSERT(!err, return err, "Decode error");
+
+    err = in.getUint32(_flash_size);
     ASSERT(!err, return err, "Decode error");
 
     return 0;
 }
 
-int DebugCommand::execute()
+int InitCommand::execute()
 {
+    _creds_base_addr = _flash_addr + _flash_size - FLASH_PAGE_SIZE;
+    setNvm3End(_creds_base_addr);
+    psa_crypto_init();
     return 0;
 }
 
-void DebugCommand::encode(Encoder & out) const
+void InitCommand::encode(Encoder & out) const
 {
-    out.addUint32(_key_id);
+    out.addUint32(_creds_base_addr);
+    out.addUint32((uint32_t)FLASH_PAGE_SIZE);
 }
 
 //------------------------------------------------------------------------------
@@ -116,12 +126,6 @@ void CsrCommand::encode(Encoder & out) const
 // Import
 //------------------------------------------------------------------------------
 
-extern uint8_t linker_nvm_end[];
-uint32_t * _credentials_page_address = (uint32_t *)linker_nvm_end;
-
-static uint8_t _credentials_page[FLASH_PAGE_SIZE] = { 0 };
-size_t _credentials_page_size = FLASH_PAGE_SIZE;
-
 static constexpr size_t kCreds_DAC_Offset_Default        = 0x000;
 static constexpr size_t kCreds_PAI_Offset_Default        = 0x200;
 static constexpr size_t kCreds_CD_Offset_Default         = 0x400;
@@ -168,10 +172,8 @@ int ImportCommand::execute()
 void ImportCommand::encode(Encoder & out) const
 {
     out.addUint32(_key_id);
-    out.addUint32(_address);
     out.addUint32(_offset);
     out.addUint32((uint32_t)_size);
-    // out.addArray(_data, _size);
 }
 
 int ImportCommand::writeKey(const uint8_t *data, size_t size)
@@ -212,8 +214,6 @@ int ImportCommand::writeCD(const uint8_t *data, size_t size)
 
 int ImportCommand::writeFile(Key offset_key, Key size_key, uint32_t offset, const uint8_t *data, size_t size)
 {
-    uint32_t *base_addr = _credentials_page_address;
-
     // Write file 
     memcpy(&_credentials_page[offset], data, size);
 
@@ -227,17 +227,16 @@ int ImportCommand::writeFile(Key offset_key, Key size_key, uint32_t offset, cons
 
     if(_flash)
     {
-        MSC_ErasePage(_credentials_page_address);
+        MSC_ErasePage((uint32_t *)_creds_base_addr);
 
         // Read page address
-        err = Config::Write(SilabsConfig::kConfigKey_Creds_Base_Addr, (uint32_t)base_addr);
+        err = Config::Write(SilabsConfig::kConfigKey_Creds_Base_Addr, _creds_base_addr);
         ASSERT(!err, return err, "write read error");
 
         // Write to flash
-        MSC_WriteWord(base_addr, _credentials_page, _credentials_page_size);
+        MSC_WriteWord((uint32_t *)_creds_base_addr, _credentials_page, FLASH_PAGE_SIZE);
     }
 
-    _address = (uint32_t)base_addr;
     _offset = offset;
     _size = size;
     return err;

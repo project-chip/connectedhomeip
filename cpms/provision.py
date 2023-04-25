@@ -1,11 +1,10 @@
+#! /usr/bin/python3
 from modules.serial_comm import *
 from modules.commander import *
 from modules.commands import *
 from modules.util import *
 from modules.signing_server import *
-from modules.chip import *
 from datetime import datetime
-from datetime import date
 from ecdsa.curves import NIST256p
 import subprocess
 import argparse
@@ -47,15 +46,32 @@ class AttestationArguments:
 
     def validate(self, args):
 
-        if args.test:
-            # Generate test certificates
+        # CD
+        if not args.generate:
+            if args.certification is None:
+                fail("Missing Certification Declaration path (--certification)")
+            else:
+                if not os.path.exists(args.certification):
+                    fail("Invalid Certification Declaration path: '{}'".format(args.certification))
+
+        if args.csr:
+            # Use CSR
+            if args.common_name is None:
+                fail("Missing DAC Common Name (--common_name)")
+                
+        elif args.generate:
+            # Generate test certificates (PAA, PAI, DAC, CD)
 
             # PAA
             if (args.paa_cert is not None) and (not os.path.exists(args.paa_cert)):
                 fail("Invalid PAA certificate path: '{}'".format(args.paa_cert))
+            if (args.paa_key is not None) and (not os.path.exists(args.paa_key)):
+                fail("Invalid PAA key path: '{}'".format(args.paa_key))
             # PAI
             if (args.pai_cert is not None) and (not os.path.exists(args.pai_cert)):
-                fail("Invalid PAA certificate path: '{}'".format(args.pai_cert))
+                fail("Invalid PAI certificate path: '{}'".format(args.pai_cert))
+            if (args.pai_key is not None) and (not os.path.exists(args.pai_key)):
+                fail("Invalid PAI key path: '{}'".format(args.pai_key))
             # DAC
             if (args.dac_cert is not None) and (not os.path.exists(args.dac_cert)):
                 fail("Invalid DAC certificate path: '{}'".format(args.dac_cert))
@@ -67,52 +83,29 @@ class AttestationArguments:
                 fail("Invalid chip-cert tool path: '{}'".format(args.cert_tool))
 
         else:
-            # Use actual certificates
-            
+            # Use existing certificates (PAI, DAC, DAC-key)
+
             if args.att_certs:
                 # Single file
                 if not os.path.exists(args.att_certs):
                     fail("Invalid certificates path: '{}'".format(args.att_certs))
-
             else:
-                # Multiple files
+                # Separate files
+                if args.pai_cert is None:
+                    fail("Missing PAI certificate path (--pai_cert)")
+                elif not os.path.exists(args.pai_cert):
+                    fail("Invalid PAI certificate path: '{}'".format(args.pai_cert))
 
-                # # PAI
-                # if args.pai_cert is None:
-                #     # PAI missing
-                #     fail("Missing PAI cert path (--pai_cert)")
-                # else:
-                #     # PAI provided
-                #     if not os.path.exists(args.pai_cert):
-                #         fail("Invalid PAI cert path: '{}'".format(args.pai_cert))
-
-                # DAC
                 if args.dac_cert is None:
-                    # Generate DAC
-                    if args.common_name is None:
-                        fail("Missing DAC Common Name (--common_name)")
-                else:
-                    # DAC provided
-                    if not os.path.exists(args.dac_cert):
-                        fail("Invalid DAC certificate path: '{}'".format(args.dac_cert))
-                    if args.dac_key is None:
-                        fail("Missing DAC key path (--dac_key)")
-                    
-                    # DAC key required
-                    if args.dac_key is None:
-                        fail("Missing DAC key path")
-                    if not os.path.exists(args.dac_key):
-                        fail("Invalid DAC path: '{}'".format(args.dac_key))
+                    fail("Missing DAC certificate path (--dac_cert)")
+                elif not os.path.exists(args.dac_cert):
+                    fail("Invalid DAC certificate path: '{}'".format(args.dac_cert))
 
-            # CD
-            if args.certification is None:
-                # CD missing
-                fail("Missing Certification Declaration path (--certification)")
-            else:
-                # CD provided
-                if not os.path.exists(args.certification):
-                    fail("Invalid Certification Declaration path: '{}'".format(args.certification))
-
+                if args.dac_key is None:
+                    fail("Missing DAC key path (--dac_key)")
+                elif not os.path.exists(args.dac_key):
+                    fail("Invalid DAC key path: '{}'".format(args.dac_key))
+                
         self.cert_tool = args.cert_tool
         self.key_id = args.key_id
         self.pkcs12 = args.att_certs
@@ -146,17 +139,17 @@ class Spake2pArguments:
 
     def validate(self, args):
         # Passcode
-        self.passcode = args.spake2p_passcode or (args.test and Spake2pArguments.kPasscodeDefault)
+        self.passcode = args.spake2p_passcode or Spake2pArguments.kPasscodeDefault
         if not self.passcode:
             fail("SPAKE2+ passcode required (--spake2p_passcode)")
         if(self.passcode in Spake2pArguments.INVALID_PASSCODES):
             fail("The provided passcode is invalid")
         # Salt
-        self.salt = args.spake2p_salt or (args.test and Spake2pArguments.kSaltDefault)
+        self.salt = args.spake2p_salt or Spake2pArguments.kSaltDefault
         if not self.salt:
             fail("SPAKE2+ salt required (--spake2p_salt)")
         # Iterations
-        self.iterations = args.spake2p_iterations or (args.test and Spake2pArguments.kIterationsDefault)
+        self.iterations = args.spake2p_iterations or Spake2pArguments.kIterationsDefault
         if not self.iterations:
             fail("SPAKE2+ iteration count required (--spake2p_iterations)")
         if (self.iterations < Spake2pArguments.kIterationsMin) or (self.iterations > Spake2pArguments.kIterationsMax):
@@ -182,11 +175,12 @@ class Arguments:
     kDefaultRendezvousFlags = 2
 
     def __init__(self):
-        self.test = False
+        self.generate = None
+        self.cpms = None
+        self.csr = None
         self.jtag = None
         self.gen_fw = None
         self.prod_fw = None
-        self.cpms = None
         self.vendor_id = None
         self.vendor_name = None
         self.product_id = None
@@ -202,12 +196,16 @@ class Arguments:
 
     def parse(self):
         parser = argparse.ArgumentParser(description='CPMS Provisioner')
+
+        # NOTE: Don't put defaults here, they precedence over the JSON configuration, making it inefective
+
         parser.add_argument('-c', '--config', type=str, help='[string] Path to configuration file.')
-        parser.add_argument('-t', '--test', type=parseBool, help='[boolean] Generate test data.')
+        parser.add_argument('-g', '--generate', action='store_true', help='[boolean] Generate certificates.', default=None)
+        parser.add_argument('-m', '--cpms', action='store_true', help='[string] Generate JSON file only', default=None)
+        parser.add_argument('-r', '--csr', action='store_true', help='[boolean] Generate Certificate Signing Request', default=None)
         parser.add_argument('-j', '--jtag', type=str, help='[string] JTAG serial number.')
-        parser.add_argument('-g', '--gen_fw', type=str, help='[string] Path to the Generator Firmware image')
-        parser.add_argument('-x', '--prod_fw', type=str, help='[string] Path to the Production Firmware image')
-        parser.add_argument('-m', '--cpms', type=parseBool, help='[string] Generate JSON file only')
+        parser.add_argument('-gf', '--gen_fw', type=str, help='[string] Path to the Generator Firmware image')
+        parser.add_argument('-pf', '--prod_fw', type=str, help='[string] Path to the Production Firmware image')
 
         parser.add_argument('-v',  '--vendor_id', type=parseInt, help='[int] vendor ID')
         parser.add_argument('-V',  '--vendor_name', type=str, help='[string] vendor name')
@@ -225,12 +223,13 @@ class Arguments:
         parser.add_argument('-d',  '--discriminator', type=parseInt, help='[int] BLE pairing discriminator.')
 
         parser.add_argument('-ct', '--cert_tool', type=str, help='[boolean] Path to the `chip-cert` tool.')
-        parser.add_argument('-ki', '--key_id', type=parseInt, help='[int] Key ID', default=AttestationArguments.kDefaultKeyId)
+        parser.add_argument('-ki', '--key_id', type=parseInt, help='[int] Key ID')
         parser.add_argument('-kp', '--key_pass', type=str, help='[string] PKCS#12 attestation certificates key_pass')
         parser.add_argument('-xc', '--att_certs', type=str, help='[string] PKCS#12 attestation certificates path')
         parser.add_argument('-ac', '--paa_cert', type=str, help='[string] PAA certificate path')
         parser.add_argument('-ak', '--paa_key', type=str, help='[string] PAA key path')
         parser.add_argument('-ic', '--pai_cert', type=str, help='[string] PAI certificate path')
+        parser.add_argument('-ik', '--pai_key', type=str, help='[string] PAI key path')
         parser.add_argument('-dc', '--dac_cert', type=str, help='[string] PAI certificate path')
         parser.add_argument('-dk', '--dac_key', type=str, help='[string] PAI key path')
         parser.add_argument('-cd', '--certification', type=str, help='[string] Certification Declaration')
@@ -249,11 +248,21 @@ class Arguments:
 
 
     def validate(self, args):
-        self.test = args.test
+        self.generate = args.generate
+        if self.generate is None:
+            self.generate = False
+
+        self.cpms = args.cpms
+        if self.cpms is None:
+            self.cpms = False
+
+        self.csr = args.csr
+        if self.csr is None:
+            self.csr = False
+
         self.jtag = args.jtag
         self.gen_fw = args.gen_fw
         self.prod_fw = args.prod_fw
-        self.cpms = args.cpms
 
         if args.vendor_id is None:
             fail("Missing Vendor ID (--vendor_id)")
@@ -331,11 +340,12 @@ class Arguments:
     def exports(self, filename):
 
         d = {
-            'test': self.test,
+            'generate': self.generate,
+            'cpms': self.cpms,
+            'csr': self.csr,
             'jtag': self.jtag,
             'gen_fw': self.gen_fw,
             'prod_fw': self.prod_fw,
-            'cpms': self.cpms,
             'vendor_id': self.vendor_id,
             'vendor_name': self.vendor_name,
             'product_id': self.product_id,
@@ -357,9 +367,10 @@ class Arguments:
                 'key_pass': self.attest.key_pass,
                 'paa_cert': self.attest.paa_cert,
                 'paa_key': self.attest.paa_key,
+                'pai_cert': self.attest.pai_cert,
+                'pai_key': self.attest.pai_key,
                 'dac_cert': self.attest.dac_cert,
                 'dac_key': self.attest.dac_key,
-                'pai_cert': self.attest.pai_cert,
                 'certification': self.attest.cd,
                 'common_name': self.attest.cn,
             },
@@ -381,16 +392,17 @@ class Arguments:
         d = {}
         with open(filename, 'r') as f:
             d = json.loads(f.read())
-            print("\n{}\n".format(d))
 
+        print("\n{}\n".format(json.dumps(d, indent=True)))
         attest = ('attestation' in d and d['attestation']) or {}
         spake = ('spake2p' in d and d['spake2p']) or {}
         conf = Config()
-        conf.test = self.config(d, 'test', args.test)
+        conf.generate = self.config(d, 'generate', args.generate)
+        conf.cpms = self.config(d, 'cpms', args.cpms)
+        conf.csr = self.config(d, 'csr', args.csr)
         conf.jtag = self.config(d, 'jtag', args.jtag)
         conf.gen_fw = self.config(d, 'gen_fw', args.gen_fw)
         conf.prod_fw = self.config(d, 'prod_fw', args.prod_fw)
-        conf.cpms = self.config(d, 'cpms', args.cpms)
         conf.vendor_id = self.config(d, 'vendor_id', args.vendor_id)
         conf.vendor_name = self.config(d, 'vendor_name', args.vendor_name)
         conf.product_id = self.config(d, 'product_id', args.product_id)
@@ -411,11 +423,11 @@ class Arguments:
         conf.att_certs = self.config(attest, 'pkcs12', args.att_certs)
         conf.key_pass = self.config(attest, 'key_pass', args.key_pass)
         conf.paa_cert = self.config(attest, 'paa_cert', args.paa_cert)
-        conf.paa_cert = self.config(attest, 'paa_cert', args.paa_cert)
         conf.paa_key = self.config(attest, 'paa_key', args.paa_key)
+        conf.pai_cert = self.config(attest, 'pai_cert', args.pai_cert)
+        conf.pai_key = self.config(attest, 'pai_key', args.pai_key)
         conf.dac_cert = self.config(attest, 'dac_cert', args.dac_cert)
         conf.dac_key = self.config(attest, 'dac_key', args.dac_key)
-        conf.pai_cert = self.config(attest, 'pai_cert', args.pai_cert)
         conf.certification = self.config(attest, 'certification', args.certification)
         conf.common_name = self.config(attest, 'common_name', args.common_name)
         # SPAKE2+
@@ -455,10 +467,10 @@ class Paths:
         self.dac_key_pem = "{}/dac_key.pem".format(self.temp)
         self.dac_key_der = "{}/dac_key.der".format(self.temp)
         self.cert_tool = os.path.normpath("{}/chip-cert".format(self.debug))
-        self.config = "{}/cpms.json".format(self.temp)
+        self.config = "{}/config/latest.json".format(self.cpms)
         self.cd = "{}/cd.der".format(self.temp)
         self.csr_pem = self.temp + '/csr.pem'
-        self.gen_fw = "{}/images/{}.s37".format(self.cpms, info.part.lower())
+        self.gen_fw = "{}/images/{}.s37".format(self.cpms, info.family)
         self.template = "{}/silabs_creds.tmpl".format(self.cpms)
         self.header = "{}/silabs_creds.h".format(self.temp)
         execute(["mkdir", "-p", self.temp ])
@@ -509,8 +521,6 @@ def generateCerts(args, paths):
     security_level = 0
     security_info = 0
     lifetime = 3660
-    signing_cert = './credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem'
-    signing_key = './credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem'
 
     generate_cd = not os.path.exists(paths.cd)
     generate_paa = not os.path.exists(paths.paa_cert_pem)
@@ -523,6 +533,8 @@ def generateCerts(args, paths):
 
     if generate_cd:
         # Generate CD
+        signing_cert = "{}/credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem".format(paths.root)
+        signing_key = "{}/credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem".format(paths.root)
         execute([ cert_tool, 'gen-cd', '-f', '1', '-V', vid, '-p', pid, '-d', '0x0016', '-c', 'ZIG20142ZB330003-24', '-l', security_level, '-i', security_info, '-n', version, '-t', '0', '-o', vid, '-r' , pid, '-C', signing_cert, '-K', signing_key, '-O', paths.cd ])
     if generate_paa:
         # Generate PAA
@@ -611,11 +623,12 @@ def generateAttestation(serial, args, paths):
 
 def importAttestation(serial, args, paths):
     print("\n◆ Credentials: Import\n")
-    if args.attest.pkcs12:
+    if args.attest.pkcs12 is not None:
         # Extract key from PKCS#12
         password_arg = "pass:{}".format(args.attest.key_pass)
         ps = subprocess.Popen(('openssl', 'pkcs12', '-nodes', '-nocerts', '-in', args.attest.pkcs12, '-passin', password_arg), stdout=subprocess.PIPE)
         subprocess.check_output(('openssl', 'ec', '-outform', 'der', '-out', paths.dac_key_der), stdin=ps.stdout)
+        
         # Extract certificates from PKCS#12
         out = execute([ 'openssl', 'pkcs12', '-nodes', '-nokeys', '-in', args.attest.pkcs12, '-passin', password_arg ], True, True)
         # Parse certificates
@@ -632,7 +645,7 @@ def importAttestation(serial, args, paths):
     (key_id, key_offset, key_size) = step.execute(serial)
     return key_id
 
-def writeAttestation(serial, paths, key_id):
+def writeAttestation(serial, paths, info, key_id):
     print("\n◆ Credentials: Write \n")
     step = ImportCommand(ImportCommand.DAC, key_id, paths.dac_cert_der)
     (key_id, dac_offset, dac_size) = step.execute(serial)
@@ -660,58 +673,64 @@ def writeAttestation(serial, paths, key_id):
 # Main
 #-------------------------------------------------------------------------------
 
-# Process arguments
-args = Arguments()
-args.parse()
+def main(argv):
+    # Process arguments
+    args = Arguments()
+    args.parse()
 
-# Gather device info
-cmmd = Commander(args.jtag)
-info = cmmd.info()
-chip = SilabsChip(info.part)
-paths = Paths(info, args)
-print("\n◆ Device Info:\n{}\n{}".format(info, chip))
+    # Gather device info
+    cmmd = Commander(args.jtag)
+    info = cmmd.info()
+    paths = Paths(info, args)
+    print("\n◆ Device Info:\n{}".format(info))
 
-print("\n◆ Prepare")
-# Collect/Generate certificates
-if (args.spake2p.verifier is None):
-    generateSPAKE2pVerifier(args, paths)
-# Generate/Import Attestation Credentials
-collectCerts(args, paths)
-if args.test:
-    generateCerts(args, paths)
-# Export configuration to JSON
-args.exports(paths.config)
-if args.cpms:
-    exit()
+    print("\n◆ Prepare")
+    # Collect/Generate certificates
+    if (args.spake2p.verifier is None):
+        generateSPAKE2pVerifier(args, paths)
+    # Generate/Import Attestation Credentials
+    collectCerts(args, paths)
+    if args.generate:
+        generateCerts(args, paths)
+    # Export configuration to JSON
+    args.exports(paths.config)
+    if args.cpms:
+        exit()
 
-print("\n◆ Loading Generator Firmware")
-serial = SerialComm(chip.part, args.jtag)
-# Option 1: Load into RAM
-# with open(paths.gen_fw, 'rb') as f:
-#     generator_image = f.read()
-# serial.open()
-# serial.reset(True)
-# ram_addr = chip.ram_addr
-# stack_addr = ram_addr + chip.stacksize
-# serial.flash(ram_addr, stack_addr, generator_image)  
-# serial.close()
-# Option 2: Load into FLASH
-cmmd.flash(args.gen_fw or paths.gen_fw)
+    print("\n◆ Loading Generator Firmware")
+    serial = SerialComm(info.part, args.jtag)
+    # Option 1: Load into RAM
+    # with open(paths.gen_fw, 'rb') as f:
+    #     generator_image = f.read()
+    # serial.open()
+    # serial.reset(True)
+    # ram_addr = chip.ram_addr
+    # stack_addr = ram_addr + chip.stacksize
+    # serial.flash(ram_addr, stack_addr, generator_image)  
+    # serial.close()
+    # Option 2: Load into FLASH
+    cmmd.flash(args.gen_fw or paths.gen_fw)
 
-# Write Attestation Credentials
-if args.test or args.attest.pkcs12 or args.attest.dac_cert:
-    key_id = importAttestation(serial, args, paths)
-    writeAttestation(serial, paths, key_id)
-else:
-    key_id = generateAttestation(serial, args, paths)
-    writeAttestation(serial, paths, key_id)
+    # Initialize device
+    step = InitCommand(info)
+    step.execute(serial)
 
-# Write Factory Data
-print("\n◆ Write Factory Data\n")
-step = SetupCommand(args)
-step.execute(serial)
+    # Write Attestation Credentials
+    if args.csr:
+        key_id = generateAttestation(serial, args, paths)
+        writeAttestation(serial, paths, info, key_id)
+    else:
+        key_id = importAttestation(serial, args, paths)
+        writeAttestation(serial, paths, info, key_id)
 
-# Flash Production Firmware
-if args.prod_fw:
-    print("\n◆ Write app\n")
-    cmmd.flash(args.prod_fw)
+    # Write Factory Data
+    print("\n◆ Write Factory Data\n")
+    step = SetupCommand(args)
+    step.execute(serial)
+
+    # Flash Production Firmware
+    if args.prod_fw:
+        print("\n◆ Write app\n")
+        cmmd.flash(args.prod_fw)
+
+main(sys.argv[1:])
