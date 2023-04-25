@@ -37,7 +37,7 @@ MTR_NEWLY_AVAILABLE
 /**
  * Controllee's VendorID Attribute of Basic Information cluster
  */
-@property (nonatomic, copy, readonly, nonnull) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, readonly) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
 
 /**
  * Controllee's ProductID Attribute of Basic Information cluster
