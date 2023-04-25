@@ -280,6 +280,7 @@ source_set("efr32-common") {
   include_dirs = [ "." ]
 
   sources = [
+    "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/heap_4_silabs.c",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "efr32_utils.cpp",
@@ -289,10 +290,6 @@ source_set("efr32-common") {
 
   if (use_base_app) {
     sources += [ "BaseApplication.cpp" ]
-  }
-
-  if (use_wstk_leds) {
-    sources += [ "LEDWidget.cpp" ]
   }
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
