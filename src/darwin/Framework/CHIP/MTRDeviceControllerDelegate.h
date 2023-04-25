@@ -77,10 +77,12 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 /**
  * Notify the delegate when commissioning is completed.
  * For getting commissioning controllee's nodeID
+ *
+ * NodeID is nil if commissioning is failed.
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
-                   nodeID:(NSNumber * _Nonnull)nodeID MTR_NEWLY_AVAILABLE;
+                   nodeID:(NSNumber * _Nullable)nodeID MTR_NEWLY_AVAILABLE;
 /**
  * Notify the delegate when commissioning infomation has been read from the Basic
  * Information cluster of the commissionee.

@@ -125,7 +125,10 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                NSNumber * nodeID = [NSNumber numberWithUnsignedLongLong:nodeId];
+                NSNumber * nodeID = nil;
+                if (error == CHIP_NO_ERROR) {
+                   nodeID = [NSNumber numberWithUnsignedLongLong:nodeId];
+                }
                 [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];
             });
             return;
