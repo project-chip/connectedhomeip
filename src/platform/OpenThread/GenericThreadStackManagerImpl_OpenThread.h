@@ -138,7 +138,6 @@ protected:
     static void DispatchResolve(intptr_t context);
     static void DispatchResolveNoMemory(intptr_t context);
     static void DispatchAddressResolve(intptr_t context);
-    static void DispatchBrowseInvokedAddressResolve(intptr_t context);
     static void DispatchBrowseEmpty(intptr_t context);
     static void DispatchBrowse(intptr_t context);
     static void DispatchBrowseNoMemory(intptr_t context);
@@ -266,18 +265,12 @@ private:
     static void OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);
     static void OnDnsResolveResult(otError aError, const otDnsServiceResponse * aResponse, void * aContext);
     static void OnDnsAddressResolveResult(otError aError, const otDnsAddressResponse * aResponse, void * aContext);
-    static void OnDnsBrowseInvokedResolveResult(otError aError, const otDnsServiceResponse * aResponse, void * aContext);
-    static void OnDnsBrowseInvokedAddressResolveResult(otError aError, const otDnsAddressResponse * aResponse, void * aContext);
 
-    static void ResolveAddress(intptr_t context, otDnsAddressCallback callback);
-    static void ResolveResult(otError aError, const otDnsServiceResponse * aResponse, void * aContext,
-                              AsyncWorkFunct dispatchMdnsCallback, AsyncWorkFunct dispatchAddressResolve);
-    static void AddressResolveResult(otError aError, const otDnsAddressResponse * aResponse, void * aContext,
-                                     AsyncWorkFunct dispatchAddressResolve);
+    static CHIP_ERROR ResolveAddress(intptr_t context, otDnsAddressCallback callback);
 
     static CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const char * serviceType,
-                                                  chip::Dnssd::DnssdService & mdnsService,
-                                                  DnsServiceTxtEntries & serviceTxtEntries);
+                                                  chip::Dnssd::DnssdService & mdnsService, DnsServiceTxtEntries & serviceTxtEntries,
+                                                  otError error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
