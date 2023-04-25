@@ -127,7 +127,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 NSNumber * nodeID = nil;
                 if (error == CHIP_NO_ERROR) {
-                   nodeID = [NSNumber numberWithUnsignedLongLong:nodeId];
+                    nodeID = [NSNumber numberWithUnsignedLongLong:nodeId];
                 }
                 [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];
             });
