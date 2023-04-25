@@ -106,9 +106,7 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
     if (strongDelegate && mQueue && strongController) {
         if ([strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
             dispatch_async(mQueue, ^{
-                auto * info =
-                    [[MTRProductIdentity alloc] initWithVendorID:@(vendorId)
-                                                             productID:@(productId)];
+                auto * info = [[MTRProductIdentity alloc] initWithVendorID:@(vendorId) productID:@(productId)];
                 [strongDelegate controller:strongController readCommissioningInfo:info];
             });
         }
