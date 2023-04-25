@@ -83,7 +83,7 @@ using namespace chip;
     _intermediateCertificate = [intermediateCertificate copy];
     _rootCertificate = [rootCertificate copy];
     _ipk = [ipk copy];
-
+    _nocSigner = operationalKeypair;
     return self;
 }
 
