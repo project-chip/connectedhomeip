@@ -48,7 +48,9 @@ using chip::Protocols::InteractionModel::Status;
 static OnOffEffect * firstEffect = nullptr;
 OnOffServer OnOffServer::instance;
 
-static EmberEventControl gEventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT];
+static constexpr size_t kOnOffMaxEnpointCount =
+    EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static EmberEventControl gEventControls[kOnOffMaxEnpointCount];
 
 /**********************************************************
  * Function definition
