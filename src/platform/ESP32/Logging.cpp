@@ -26,20 +26,35 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     snprintf(tag, sizeof(tag), "chip[%s]", module);
     tag[sizeof(tag) - 1] = 0;
 
-    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
-
     switch (category)
     {
     case kLogCategory_Error:
-        ESP_LOGE(tag, "%s", formattedMsg);
+        if (esp_log_default_level >= ESP_LOG_ERROR)
+        {
+            printf(LOG_COLOR_E "E");                        // set color
+            printf(" (%u) %s: ", esp_log_timestamp(), tag); // add timestamp
+            esp_log_writev(ESP_LOG_ERROR, tag, msg, v);
+            printf(LOG_RESET_COLOR "\n");
+        }
         break;
     case kLogCategory_Progress:
     default:
-        ESP_LOGI(tag, "%s", formattedMsg);
+        if (esp_log_default_level >= ESP_LOG_INFO)
+        {
+            printf(LOG_COLOR_I "I");                        // set color
+            printf(" (%u) %s: ", esp_log_timestamp(), tag); // add timestamp
+            esp_log_writev(ESP_LOG_INFO, tag, msg, v);
+            printf(LOG_RESET_COLOR "\n");
+        }
         break;
     case kLogCategory_Detail:
-        ESP_LOGD(tag, "%s", formattedMsg);
+        if (esp_log_default_level >= ESP_LOG_DEBUG)
+        {
+            printf(LOG_COLOR_D "D");                        // set color
+            printf(" (%u) %s: ", esp_log_timestamp(), tag); // add timestamp
+            esp_log_writev(ESP_LOG_DEBUG, tag, msg, v);
+            printf(LOG_RESET_COLOR "\n");
+        }
         break;
     }
 }
