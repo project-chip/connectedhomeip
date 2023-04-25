@@ -18,6 +18,12 @@
 #include "init_efrPlatform.h"
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#ifdef ENABLE_WSTK_LEDS
+extern "C" {
+#include "sl_simple_led_instances.h"
+}
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
@@ -31,9 +37,6 @@ CHIP_ERROR SilabsPlatform::Init(void)
 }
 
 #ifdef ENABLE_WSTK_LEDS
-
-#include "sl_simple_led_instances.h"
-
 void SilabsPlatform::InitLed(void)
 {
     sl_simple_led_init_instances();
