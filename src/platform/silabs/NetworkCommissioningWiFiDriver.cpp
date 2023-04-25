@@ -38,10 +38,10 @@ SlScanResponseIterator<NetworkCommissioning::WiFiScanResponse> mScanResponseIter
 CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
-    size_t ssidLen        = 0;
-    size_t credentialsLen = 0;
-    mpScanCallback        = nullptr;
-    mpConnectCallback     = nullptr;
+    size_t ssidLen         = 0;
+    size_t credentialsLen  = 0;
+    mpScanCallback         = nullptr;
+    mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
 
 #ifdef SL_ONNETWORK_PAIRING
