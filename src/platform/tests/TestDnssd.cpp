@@ -102,19 +102,26 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
     }
 }
 
-static void HandlePublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error) {}
-
-static void InitCallback(void * context, CHIP_ERROR error)
+static void DnssdErrorCallback(void * context, CHIP_ERROR error)
 {
-    auto * ctx   = static_cast<DnssdContext *>(context);
+    auto * ctx = static_cast<DnssdContext *>(context);
+    NL_TEST_ASSERT(ctx->mTestSuite, error == CHIP_NO_ERROR);
+}
+
+static void HandlePublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error)
+{
+    auto * ctx = static_cast<DnssdContext *>(context);
+    NL_TEST_ASSERT(ctx->mTestSuite, error == CHIP_NO_ERROR);
+}
+
+static void TestDnssdPubSub_DnssdInitCallback(void * context, CHIP_ERROR error)
+{
+    auto * ctx = static_cast<DnssdContext *>(context);
+    NL_TEST_ASSERT(ctx->mTestSuite, error == CHIP_NO_ERROR);
     auto * suite = ctx->mTestSuite;
 
-    DnssdService service;
-    TextEntry entry;
-    char key[] = "key";
-    char val[] = "val";
-
-    NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
+    DnssdService service{};
+    TextEntry entry{ "key", reinterpret_cast<const uint8_t *>("val"), 3 };
 
     service.mInterface = chip::Inet::InterfaceId::Null();
     service.mPort      = 80;
@@ -123,24 +130,17 @@ static void InitCallback(void * context, CHIP_ERROR error)
     strcpy(service.mType, "_mock");
     service.mAddressType   = chip::Inet::IPAddressType::kAny;
     service.mProtocol      = DnssdServiceProtocol::kDnssdProtocolTcp;
-    entry.mKey             = key;
-    entry.mData            = reinterpret_cast<const uint8_t *>(val);
-    entry.mDataSize        = strlen(reinterpret_cast<const char *>(entry.mData));
     service.mTextEntries   = &entry;
     service.mTextEntrySize = 1;
     service.mSubTypes      = nullptr;
     service.mSubTypeSize   = 0;
 
-    NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service, HandlePublish) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service, HandlePublish, context) == CHIP_NO_ERROR);
 
     intptr_t browseIdentifier;
-    ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
-                    chip::Inet::InterfaceId::Null(), HandleBrowse, context, &browseIdentifier);
-}
-
-static void ErrorCallback(void * context, CHIP_ERROR error)
-{
-    VerifyOrDieWithMsg(error == CHIP_NO_ERROR, DeviceLayer, "Mdns error: %" CHIP_ERROR_FORMAT "\n", error.Format());
+    NL_TEST_ASSERT(suite,
+                   ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
+                                   chip::Inet::InterfaceId::Null(), HandleBrowse, context, &browseIdentifier) == CHIP_NO_ERROR);
 }
 
 void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)
@@ -148,86 +148,39 @@ void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)
     DnssdContext context;
     context.mTestSuite = inSuite;
 
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    NL_TEST_ASSERT(inSuite, chip::Dnssd::ChipDnssdInit(InitCallback, ErrorCallback, &context) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   chip::Dnssd::ChipDnssdInit(TestDnssdPubSub_DnssdInitCallback, DnssdErrorCallback, &context) == CHIP_NO_ERROR);
 
     ChipLogProgress(DeviceLayer, "Start EventLoop");
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     ChipLogProgress(DeviceLayer, "End EventLoop");
+
+    chip::Dnssd::ChipDnssdShutdown();
 }
 
 static const nlTest sTests[] = { NL_TEST_DEF("Test Dnssd::PubSub", TestDnssdPubSub), NL_TEST_SENTINEL() };
 
+int TestDnssd_Setup(void * inContext)
+{
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(chip::DeviceLayer::PlatformMgr().InitChipStack() == CHIP_NO_ERROR, FAILURE);
+    return SUCCESS;
+}
+
+int TestDnssd_Teardown(void * inContext)
+{
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 int TestDnssd()
 {
-    std::mutex mtx;
+    nlTestSuite theSuite = { "CHIP DeviceLayer mDNS tests", &sTests[0], TestDnssd_Setup, TestDnssd_Teardown };
 
-    std::condition_variable readyCondition;
-    bool ready = false;
-
-    std::condition_variable doneCondition;
-    bool done     = false;
-    bool shutdown = false;
-
-    int retVal = EXIT_FAILURE;
-
-    std::thread t([&]() {
-        {
-            std::lock_guard<std::mutex> lock(mtx);
-            ready = true;
-            readyCondition.notify_one();
-        }
-
-        nlTestSuite theSuite = { "CHIP DeviceLayer mdns tests", &sTests[0], nullptr, nullptr };
-
-        nlTestRunner(&theSuite, nullptr);
-        retVal = nlTestRunnerStats(&theSuite);
-
-        {
-            std::lock_guard<std::mutex> lock(mtx);
-            done = true;
-            doneCondition.notify_all();
-        }
-    });
-
-    {
-        std::unique_lock<std::mutex> lock(mtx);
-        readyCondition.wait(lock, [&] { return ready; });
-
-        doneCondition.wait_for(lock, std::chrono::seconds(5));
-        if (!done)
-        {
-            fprintf(stderr, "mDNS test timeout, is avahi daemon running?\n");
-
-            //
-            // This will stop the event loop above, and wait till it has actually stopped
-            // (i.e exited RunEventLoop()).
-            //
-            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-            chip::Dnssd::ChipDnssdShutdown();
-            chip::DeviceLayer::PlatformMgr().Shutdown();
-            shutdown = true;
-
-            doneCondition.wait_for(lock, std::chrono::seconds(1));
-            if (!done)
-            {
-                fprintf(stderr, "Orderly shutdown of the platform main loop failed as well.\n");
-            }
-            retVal = EXIT_FAILURE;
-        }
-    }
-    t.join();
-
-    if (!shutdown)
-    {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-        chip::Dnssd::ChipDnssdShutdown();
-        chip::DeviceLayer::PlatformMgr().Shutdown();
-    }
-    chip::Platform::MemoryShutdown();
-
-    return retVal;
+    // Run test suit against one context.
+    nlTestRunner(&theSuite, nullptr);
+    return nlTestRunnerStats(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestDnssd);
