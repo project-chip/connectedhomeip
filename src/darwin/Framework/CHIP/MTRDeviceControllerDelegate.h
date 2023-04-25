@@ -37,14 +37,14 @@ MTR_NEWLY_AVAILABLE
 /**
  * Controllee's VendorID Attribute of Basic Information cluster
  */
-@property (nonatomic, copy, readonly, nonnull) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, readonly) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
 
 /**
  * Controllee's ProductID Attribute of Basic Information cluster
  */
 @property (nonatomic, copy, readonly) NSNumber * productID MTR_NEWLY_AVAILABLE;
 
-- (instancetype)initWithVendorID:(NSNumber * _Nonnull)vendorID productID:(NSNumber * _Nonnull)productID;
+- (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID;
 @end
 
 @class MTRDeviceController;
