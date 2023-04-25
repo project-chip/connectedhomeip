@@ -44,7 +44,7 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, readonly) NSNumber * productID MTR_NEWLY_AVAILABLE;
 
-- (instancetype)initWithVendorID:(NSNumber * _Nonnull)vendorID productID:(NSNumber * _Nonnull)productID;
+- (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID;
 @end
 
 @class MTRDeviceController;
