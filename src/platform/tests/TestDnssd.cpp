@@ -43,6 +43,8 @@ struct DnssdContext
 
     std::atomic<bool> mTimeoutExpired{ false };
 
+    intptr_t mBrowseIdentifier = 0;
+
     unsigned int mBrowsedServicesCount  = 0;
     unsigned int mResolvedServicesCount = 0;
     bool mEndOfInput                    = false;
@@ -85,7 +87,9 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
 
     // Make sure that we will not be called again after end-of-input is set
     NL_TEST_ASSERT(suite, ctx->mEndOfInput == false);
-    NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
+    // Cancelled error is expected when the browse is stopped with
+    // ChipDnssdStopBrowse(), so we will not assert on it.
+    NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR || error == CHIP_ERROR_CANCELLED);
 
     ctx->mBrowsedServicesCount += servicesSize;
     ctx->mEndOfInput = finalBrowse;
@@ -145,10 +149,10 @@ static void TestDnssdPubSub_DnssdInitCallback(void * context, CHIP_ERROR error)
 
     NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service, HandlePublish, context) == CHIP_NO_ERROR);
 
-    intptr_t browseIdentifier;
     NL_TEST_ASSERT(suite,
                    ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
-                                   chip::Inet::InterfaceId::Null(), HandleBrowse, context, &browseIdentifier) == CHIP_NO_ERROR);
+                                   chip::Inet::InterfaceId::Null(), HandleBrowse, context,
+                                   &ctx->mBrowseIdentifier) == CHIP_NO_ERROR);
 }
 
 void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)
@@ -167,6 +171,9 @@ void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)
     ChipLogProgress(DeviceLayer, "End EventLoop");
 
     NL_TEST_ASSERT(inSuite, !context.mTimeoutExpired);
+
+    // Stop browsing so we can safely shutdown DNS-SD
+    chip::Dnssd::ChipDnssdStopBrowse(context.mBrowseIdentifier);
 
     chip::Dnssd::ChipDnssdShutdown();
 }
