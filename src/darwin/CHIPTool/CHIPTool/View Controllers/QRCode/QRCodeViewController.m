@@ -673,7 +673,9 @@
 }
 
 // MARK: MTRDeviceControllerDelegate
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error nodeID:(NSNumber * _Nullable)nodeID
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
 {
     if (error != nil) {
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
