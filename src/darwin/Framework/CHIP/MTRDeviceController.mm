@@ -464,7 +464,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
         }
         if (commissioningParams.skipCommissioningComplete) {
-            params.SetSkipCommissioningComplete(commissioningParams.skipCommissioningComplete.boolValue);
+            params.SetSkipCommissioningComplete(commissioningParams.skipCommissioningComplete);
         }
         if (commissioningParams.wifiSSID) {
             chip::ByteSpan ssid = AsByteSpan(commissioningParams.wifiSSID);
