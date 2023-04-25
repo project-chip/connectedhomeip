@@ -247,7 +247,7 @@ int TestPlatformMgr()
 {
     nlTestSuite theSuite = { "PlatformMgr tests", &sTests[0], TestPlatformMgr_Setup, TestPlatformMgr_Teardown };
 
-    // Run test suit againt one context.
+    // Run test suit against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

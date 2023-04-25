@@ -125,7 +125,7 @@ int TestPlatformTime()
 {
     nlTestSuite theSuite = { "PlatformTime tests", &sTests[0], nullptr, nullptr };
 
-    // Run test suit againt one context.
+    // Run test suit against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
