@@ -42,4 +42,4 @@ jobs:
             - name: Configure and build All Clusters App
               timeout-minutes: 10
               run: |
-                  CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux && ./ninja
+                  CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux && ./ninja-build

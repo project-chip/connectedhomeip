@@ -17,7 +17,7 @@
 # Usage: configure [OPTIONS] [--project=... [PROJECT OPTIONS]]
 #
 # Configures a stand-alone build for a CHIP application in the current
-# directory and creates a `ninja` wrapper script to build it. Should
+# directory and creates a `ninja-build` wrapper script to build it. Should
 # generally be run from an empty build directory (i.e. out-of-tree).
 #
 # This is intended to be used in the context of an external build system and
@@ -106,7 +106,7 @@ function main() { # ...
     create_empty_pw_env
     gn_generate "$@"
     create_ninja_wrapper
-    info "You can now run ./ninja"
+    info "You can now run ./ninja-build"
 }
 
 function create_empty_pw_env() {
@@ -135,7 +135,7 @@ function gn_generate() { # [project options]
         gn -q gen "$BUILD_ROOT"
 
         # Use the argument list to drive the mapping of our command line options to GN args
-        python_util process_project_args <(gn args "$BUILD_ROOT" --list --json) "$@" >>"${BUILD_ROOT}/args.gn"
+        call_impl process_project_args <(gn args "$BUILD_ROOT" --list --json) "$@" >>"${BUILD_ROOT}/args.gn"
         gn args "$BUILD_ROOT" --list >"${BUILD_ROOT}/args.configured"
 
         # Now gn gen with the arguments we have configured.
@@ -146,15 +146,16 @@ function gn_generate() { # [project options]
 
 function create_ninja_wrapper() {
     # Note: "." != $BUILD_DIR for in-tree builds
-    ensure_no_clobber "ninja"
-    cat >"ninja" <<END
+    local wrapper="ninja-build"
+    ensure_no_clobber "$wrapper"
+    cat >"$wrapper" <<END
 #!/bin/bash -e
 # ${CONFIGURE_MARKER}
 cd "\$(dirname "\$0")"
 source "${BUILD_ENV_DIR}/bin/activate"
 exec "${NINJA}" -C "${BUILD_DIR}" "\$@"
 END
-    chmod a+x "ninja"
+    chmod a+x "$wrapper"
 }
 
 function activate_build_env() {
@@ -205,13 +206,13 @@ function download_zap() {
     local url="https://github.com/project-chip/zap/releases/download/${version}/zap-${platform}.zip"
 
     progress "Installing zap-cli from $url"
-    python_util download_and_extract_zip "$url" "${BUILD_ENV_DIR}/bin" zap-cli
+    call_impl download_and_extract_zip "$url" "${BUILD_ENV_DIR}/bin" zap-cli
     chmod a+x "${BUILD_ENV_DIR}/bin/zap-cli" # ZipFile.extract() does not handle permissions
     info "ok"
 }
 
-function python_util() { # function ...
-    "$PYTHON" "${CHIP_ROOT}/scripts/configure.utils.py" "$@"
+function call_impl() { # func ...
+    "$PYTHON" "${CHIP_ROOT}/scripts/configure.impl.py" "$@"
 }
 
 function check_python() {

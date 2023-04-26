@@ -135,9 +135,9 @@ class ProjectArgProcessor:
         else:
             self.process_generic_parameter(name, value)
 
-    def process_parameters(self, argv):
+    def process_parameters(self, args):
         """Process GNU-style configure command line parameters"""
-        for arg in argv:
+        for arg in args:
             if not (m := re.fullmatch(r'--([a-z][a-z0-9-]*)(?:=(.*))?', arg)):
                 fail("Invalid argument: '%s'" % arg)
             self.process_parameter(m.group(1), m.group(2))
@@ -152,6 +152,7 @@ def fail(message):
     sys.exit(1)
 
 
-if __name__ == '__main__' and len(sys.argv) >= 2:
-    [_, func, *args] = sys.argv
-    globals()[func](*args)
+# `configure` invokes the top-level functions in this file by
+# passing the function name and arguments on the command line.
+[_, func, *args] = sys.argv
+globals()[func](*args)
