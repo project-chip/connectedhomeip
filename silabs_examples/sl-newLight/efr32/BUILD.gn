@@ -49,7 +49,8 @@ declare_args() {
 }
 
 if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B") {
-  rgb_led = true
+  # TODO: Update ledwigget/SPAM to support RGB
+  #rgb_led = true
 }
 
 efr32_sdk("sdk") {

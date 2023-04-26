@@ -25,8 +25,6 @@
 #include "led_widget_rgb.h"
 #endif //RGB_LED_ENABLED
 
-#include "sl_simple_led_instances.h"
-
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -42,7 +40,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#define LIGHT_LED &sl_led_led1
+#define LIGHT_LED 1
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
 
