@@ -108,6 +108,14 @@ menu "CHIP Core"
             help
                 Build CHIP test binaries.
 
+        config DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS
+            int  "Set threshold in ms"
+            default 700
+            help
+                 Time threshold for events dispatching. By default set to 0 to
+                 to disable event dispatching time measurement and suppress the
+                 logs for Long dispatch time.
+
         # TODO: add log level selection
 
     endmenu # "General Options"
