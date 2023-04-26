@@ -119,7 +119,7 @@ Mac OS X
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export SILABS_BOARD=BRD4187C
-          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" silabs_board=\"${SILABS_BOARD}\""
+          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" SILABS_BOARD=\"${SILABS_BOARD}\""
           $ ninja -C out/debug
           ```
 
@@ -139,7 +139,7 @@ Mac OS X
     or use gn as previously mentioned but adding the following arguments:
 
           ```
-          $ gn gen out/debug '--args=silabs_board="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
+          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
           ```
 
 *   Build the example with pigweed RCP

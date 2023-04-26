@@ -112,7 +112,7 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip/examples/lighting-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export silabs_board=BRD4187C
+          $ export SILABS_BOARD=BRD4187C
           $ gn gen out/debug
           $ ninja -C out/debug
 
@@ -127,7 +127,7 @@ Silicon Labs platform.
 
     or use gn as previously mentioned but adding the following arguments:
 
-          $ gn gen out/debug '--args=silabs_board="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
+          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
 
 *   Build the example with pigweed RPC
 
@@ -138,7 +138,7 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip/examples/lighting-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export silabs_board=BRD4187C
+          $ export SILABS_BOARD=BRD4187C
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
 
