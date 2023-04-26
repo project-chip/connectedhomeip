@@ -14144,6 +14144,7 @@ class ModeSelect(Cluster):
     class Bitmaps:
         class ModeSelectFeature(IntFlag):
             kDeponoff = 0x1
+            kExt = 0x2
 
     class Structs:
         @dataclass

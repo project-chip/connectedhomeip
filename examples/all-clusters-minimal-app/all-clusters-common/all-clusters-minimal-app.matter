@@ -1984,6 +1984,7 @@ server cluster BooleanState = 69 {
 server cluster ModeSelect = 80 {
   bitmap ModeSelectFeature : BITMAP32 {
     kDeponoff = 0x1;
+    kExt = 0x2;
   }
 
   struct SemanticTagStruct {

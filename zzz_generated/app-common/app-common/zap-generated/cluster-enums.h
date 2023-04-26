@@ -1396,6 +1396,7 @@ enum class CommonSemanticTags : uint16_t
 enum class ModeSelectFeature : uint32_t
 {
     kDeponoff = 0x1,
+    kExt      = 0x2,
 };
 } // namespace ModeSelect
 

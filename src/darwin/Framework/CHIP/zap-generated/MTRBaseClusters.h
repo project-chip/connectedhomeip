@@ -20068,6 +20068,7 @@ typedef NS_ENUM(uint16_t, MTRModeSelectCommonSemanticTags) {
 
 typedef NS_OPTIONS(uint32_t, MTRModeSelectFeature) {
     MTRModeSelectFeatureDEPONOFF API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
+    MTRModeSelectFeatureEXT MTR_NEWLY_AVAILABLE = 0x2,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRDoorLockAlarmCode) {
