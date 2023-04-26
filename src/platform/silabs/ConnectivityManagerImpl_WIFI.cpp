@@ -382,7 +382,7 @@ void ConnectivityManagerImpl::OnStationConnected()
     (void) PlatformMgr().PostEvent(&event);
     // Setting the rs911x in the power save mode
 #if (CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI)
-    // TODO : Remove stop advertising after BLEManagerImpl is fixed
+    // TODO: Remove stop advertising after BLEManagerImpl is fixed
 #if RSI_BLE_ENABLE
     chip::DeviceLayer::Internal::BLEManagerImpl().StopAdvertising();
 #endif /* RSI_BLE_ENABLE */

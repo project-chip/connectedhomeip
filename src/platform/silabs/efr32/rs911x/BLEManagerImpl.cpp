@@ -666,7 +666,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t status = 0;
     // TODO: add the below code in a condition if (mFlags.Has(Flags::kAdvertising))
-    // Since DriveBLEState is not called the device is still advertising advertising
+    // Since DriveBLEState is not called the device is still advertising
     mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
     status = rsi_ble_stop_advertising();

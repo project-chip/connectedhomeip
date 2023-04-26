@@ -343,6 +343,7 @@ template("efr32_sdk") {
       if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
         defines += [
           # Used for wifi devices to get packet details
+          # TODO: Remove this flag, once the communication is fixed
           "WIFI_DEBUG_ENABLED=1",
         ]
       }

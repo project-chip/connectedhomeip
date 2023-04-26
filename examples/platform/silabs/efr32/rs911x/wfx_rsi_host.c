@@ -32,6 +32,7 @@
 
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
+#include "rsi_error.h"
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxRsiTaskStack[WFX_RSI_TASK_SZ] = { 0 };
@@ -206,7 +207,7 @@ sl_status_t wfx_connect_to_ap(void)
  ***********************************************************************/
 sl_status_t wfx_power_save()
 {
-    if (wfx_rsi_power_save() != 0)
+    if (wfx_rsi_power_save() != RSI_ERROR_NONE)
     {
         return SL_STATUS_FAIL;
     }
