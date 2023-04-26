@@ -72,8 +72,8 @@ namespace Internal {
 CHIP_ERROR SilabsConfig::Init()
 {
     // nvm3_Sem is created in nvm3_lockBegin()
-    // nvm3_open() is  called by nvm3_initDefault() in sl_platform_init() in SLC-generated sl_event_handler.c
-    return CHIP_NO_ERROR;
+
+    return MapNvm3Error(nvm3_open(nvm3_defaultHandle, nvm3_defaultInit));
 }
 
 void SilabsConfig::DeInit()
