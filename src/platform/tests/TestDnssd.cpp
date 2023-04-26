@@ -83,9 +83,11 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     if (ctx->mBrowsedServicesCount == ++ctx->mResolvedServicesCount)
     {
         chip::DeviceLayer::SystemLayer().CancelTimer(Timeout, context);
-        // After last service is resolved, stop the event loop,
-        // so the test case can gracefully exit.
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        chip::DeviceLayer::SystemLayer().ScheduleLambda([]() {
+            // After last service is resolved, stop the event loop,
+            // so the test case can gracefully exit.
+            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        });
     }
 }
 
