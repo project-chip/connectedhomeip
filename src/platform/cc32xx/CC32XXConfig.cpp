@@ -282,7 +282,7 @@ public:
 
             // value is stored in the LL, we do not need the value variable above
 
-            delete value;
+            delete[] value;
         }
     }
 };

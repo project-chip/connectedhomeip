@@ -287,9 +287,10 @@ MTR_NEWLY_AVAILABLE
  *
  * Lists of attribute and event paths to read can be provided via attributePaths and eventPaths.
  *
- * The completion will be called with an error if the input parameters are invalid (e.g., both attributePaths and eventPaths are
- * empty.) or the entire read interaction fails. Otherwise it will be called with values, which may be empty (e.g. if no paths
- * matched the wildcard paths passed in) or may include per-path errors if particular paths failed.
+ * The completion will be called with an error if the entire read interaction fails. Otherwise it
+ * will be called with an array of values. This array may be empty (e.g. if no paths matched the
+ * wildcard paths passed in, or if empty lists of paths were passed in) or may include per-path
+ * errors if particular paths failed.
  *
  * If the sum of the lengths of attributePaths and eventPaths exceeds 9, the read may fail due to the device not supporting that
  * many read paths.
@@ -394,8 +395,8 @@ MTR_NEWLY_AVAILABLE
  *
  * Lists of attribute and event paths to subscribe to can be provided via attributePaths and eventPaths.
  *
- * The reportHandler will be called with an error if the inputs are invalid (e.g., both attributePaths and eventPaths are
- * empty), or if the subscription fails entirely.
+ * The reportHandler will be called with an error if the subscription fails
+ * entirely (including when both attributePaths and eventPaths are empty).
  *
  * The reportHandler will be called with arrays of response-value dictionaries
  * (which may be data or errors) as path-specific data is received.

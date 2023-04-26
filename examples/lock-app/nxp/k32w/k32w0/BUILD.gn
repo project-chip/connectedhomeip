@@ -109,6 +109,7 @@ k32w0_executable("lock_app") {
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${chip_root}/third_party/simw-top-mini:se05x",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",

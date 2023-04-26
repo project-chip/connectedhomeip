@@ -569,14 +569,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                            });
                        });
 
-                   // Set up a cluster state cache.  We really just want this for the
-                   // logic it has for tracking data versions and event numbers so we
-                   // minimize the amount of data we request on resubscribes; we
-                   // don't care about the data it stores.  Ideally we could use the
-                   // dataversion-management logic without needing to store the data
-                   // separately from the data store we already have, or we would
-                   // stop storing our data separately.
-                   auto clusterStateCache = std::make_unique<ClusterStateCache>(*callback.get());
+                   // Set up a cluster state cache.  We just want this for the logic it has for
+                   // tracking data versions and event numbers so we minimize the amount of data we
+                   // request on resubscribes, so tell it not to store data.
+                   auto clusterStateCache = std::make_unique<ClusterStateCache>(*callback.get(),
+                       /* highestReceivedEventNumber = */ NullOptional,
+                       /* cacheData = */ false);
                    auto readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
                        clusterStateCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
