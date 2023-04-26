@@ -21,11 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "SensorsCallbacks.h"
-
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
-#endif // ENABLE_WSTK_LEDS
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -41,13 +37,11 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef ENABLE_WSTK_LEDS
 #if defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
-#define SENSOR_LED &sl_led_led1
+#define SENSOR_LED 1
 #else
-#define SENSOR_LED &sl_led_led0
+#define SENSOR_LED 0
 #endif
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
@@ -60,9 +54,7 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-#ifdef ENABLE_WSTK_LEDS
 LEDWidget sSensorLED;
-#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -148,10 +140,8 @@ CHIP_ERROR AppTask::Init()
         appError(err);
     }
 
-#ifdef ENABLE_WSTK_LEDS
     sSensorLED.Init(SENSOR_LED);
     sSensorLED.Set(false);
-#endif // ENABLE_WSTK_LEDS
 
     SilabsSensors::InitSensor();
 
@@ -249,9 +239,7 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
 }
 #endif
 
-#ifdef ENABLE_WSTK_LEDS
 void AppTask::SetAppLED(bool state)
 {
     sSensorLED.Set(state);
 }
-#endif

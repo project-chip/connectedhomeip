@@ -20,11 +20,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
-#endif // ENABLE_WSTK_LEDS
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
@@ -41,19 +37,10 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef ENABLE_WSTK_LEDS
-#if defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
-#define LIGHT_LED &sl_led_led1
-#else
-#define LIGHT_LED &sl_led_led0
-#endif
-#endif // ENABLE_WSTK_LEDS
-
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
-#endif
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;

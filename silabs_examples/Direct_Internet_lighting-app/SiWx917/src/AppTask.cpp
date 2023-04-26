@@ -40,19 +40,15 @@
 #include "dic.h"
 #endif
 
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
 #define APP_ACTION_LED 1
-#endif // ENABLE_WSTK_LEDS
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
 
-#ifdef ENABLE_WSTK_LEDS
 LEDWidget sLightLED;
-#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -166,10 +162,8 @@ CHIP_ERROR AppTask::Init()
     chip::DeviceLayer::PlatformMgr().AddEventHandler(AppSpecificConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));
 #endif
 
-#ifdef ENABLE_WSTK_LEDS
     sLightLED.Init(APP_ACTION_LED);
     sLightLED.Set(LightMgr().IsLightOn());
-#endif // ENABLE_WSTK_LEDS
 
     return err;
 }

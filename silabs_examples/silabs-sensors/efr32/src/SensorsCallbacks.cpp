@@ -139,9 +139,7 @@ void SilabsSensors::ActionTriggered(AppEvent * aEvent)
 bool SilabsSensors::mIsSensorTriggered;
 void SilabsSensors::UpdateBinarySensor(bool state)
 {
-#ifdef ENABLE_WSTK_LEDS
         AppTask::GetAppTask().SetAppLED(state);
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
         AppTask::GetAppTask().GetLCD().WriteDemoUI(state);

@@ -35,19 +35,15 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
 #define APP_ACTION_LED 1
-#endif // ENABLE_WSTK_LEDS
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
 
-#ifdef ENABLE_WSTK_LEDS
 LEDWidget sOnOffLED;
-#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -138,10 +134,8 @@ CHIP_ERROR AppTask::Init()
 
     PlugMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-#ifdef ENABLE_WSTK_LEDS
     sOnOffLED.Init(APP_ACTION_LED);
     sOnOffLED.Set(PlugMgr().IsPlugOn());
-#endif // ENABLE_WSTK_LEDS
 
     return err;
 }
@@ -247,9 +241,8 @@ void AppTask::ActionInitiated(OnOffPlugManager::Action_t aAction, int32_t aActor
     // Action initiated, update the light led
     bool lightOn = aAction == OnOffPlugManager::ON_ACTION;
     SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
-#ifdef ENABLE_WSTK_LEDS
     sOnOffLED.Set(lightOn);
-#endif // ENABLE_WSTK_LEDS
+
 #ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(lightOn);
 #endif

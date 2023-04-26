@@ -20,11 +20,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
-#endif // ENABLE_WSTK_LEDS
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
@@ -41,13 +37,11 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef ENABLE_WSTK_LEDS
 #if defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
-#define LIGHT_LED &sl_led_led1
+#define LIGHT_LED 1
 #else
-#define LIGHT_LED &sl_led_led0
+#define LIGHT_LED 0
 #endif
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
@@ -60,9 +54,7 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-#ifdef ENABLE_WSTK_LEDS
 LEDWidget sLightLED;
-#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -157,10 +149,8 @@ CHIP_ERROR AppTask::Init()
 
     LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-#ifdef ENABLE_WSTK_LEDS
     sLightLED.Init(LIGHT_LED);
     sLightLED.Set(LightMgr().IsLightOn());
-#endif // ENABLE_WSTK_LEDS
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
@@ -298,9 +288,7 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     bool lightOn = aAction == LightingManager::ON_ACTION;
     SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
 
-#ifdef ENABLE_WSTK_LEDS
     sLightLED.Set(lightOn);
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(lightOn);
