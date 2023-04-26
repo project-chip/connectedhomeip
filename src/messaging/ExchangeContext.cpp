@@ -156,6 +156,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     bool reliableTransmissionRequested =
         GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
+    bool startedResponseTimer = false;
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
     {
@@ -177,6 +178,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 SetResponseExpected(false);
                 return err;
             }
+            startedResponseTimer = true;
         }
     }
 
@@ -217,8 +219,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         }
 #endif
-
-        if (err != CHIP_NO_ERROR && sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
+        // We should only cancel the response timer if the ExchangeContext fails to send the message that starts the response timer.
+        if (err != CHIP_NO_ERROR && startedResponseTimer)
         {
             CancelResponseTimer();
             SetResponseExpected(false);
