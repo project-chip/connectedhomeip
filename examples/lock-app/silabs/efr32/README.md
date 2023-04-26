@@ -118,8 +118,8 @@ Mac OS X
           $ cd ~/connectedhomeip/examples/silabs/lock-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4187C
-          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" silabs_board=\"${EFR32_BOARD}\""
+          $ export SILABS_BOARD=BRD4187C
+          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" silabs_board=\"${SILABS_BOARD}\""
           $ ninja -C out/debug
           ```
 
@@ -154,7 +154,7 @@ Mac OS X
           $ cd ~/connectedhomeip/examples/lock-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4187C
+          $ export SILABS_BOARD=BRD4187C
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
           ```
