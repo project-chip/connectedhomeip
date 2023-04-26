@@ -338,10 +338,15 @@ template("efr32_sdk") {
         "SL_CATALOG_POWER_MANAGER_PRESENT",
         "SL_CATALOG_SLEEPTIMER_PRESENT",
         "SL_SLEEP_TIME_MS=${sleep_time_ms}",
-
-        # Used for wifi devices to get packet details
-        "WIFI_DEBUG_ENABLED=1",
       ]
+
+      if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
+        defines += [
+          # Used for wifi devices to get packet details
+          # TODO: Remove this flag, once the communication is fixed
+          "WIFI_DEBUG_ENABLED=1",
+        ]
+      }
     }
 
     if (chip_build_libshell) {  # matter shell

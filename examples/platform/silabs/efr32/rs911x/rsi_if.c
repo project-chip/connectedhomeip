@@ -181,6 +181,7 @@ int32_t wfx_rsi_disconnect()
     return status;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
 /******************************************************************
  * @fn   wfx_rsi_power_save()
  * @brief
@@ -190,16 +191,29 @@ int32_t wfx_rsi_disconnect()
  * @return
  *        None
  *********************************************************************/
-void wfx_rsi_power_save()
+int32_t wfx_rsi_power_save()
 {
-    int32_t status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    int32_t status;
+#ifdef RSI_BLE_ENABLE
+    status = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    if (status != RSI_SUCCESS)
+    {
+        SILABS_LOG("BT Powersave Config Failed, Error Code : 0x%lX", status);
+        return status;
+    }
+#endif /* RSI_BLE_ENABLE */
+
+    status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
     if (status != RSI_SUCCESS)
     {
         SILABS_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
-        return;
+        return status;
     }
     SILABS_LOG("Powersave Config Success");
+    return status;
 }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+
 /******************************************************************
  * @fn   wfx_rsi_join_cb(uint16_t status, const uint8_t *buf, const uint16_t len)
  * @brief
@@ -596,13 +610,6 @@ void wfx_rsi_task(void * arg)
                 {
                     wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
                     hasNotifiedIPV4 = true;
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-#ifndef RSI_BLE_ENABLE
-                    // enabling the power save mode for RS9116 if sleepy device is enabled
-                    // if BLE is used on the rs9116 then powersave config is done after ble disconnect event
-                    wfx_rsi_power_save();
-#endif /* RSI_BLE_ENABLE */
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
@@ -622,13 +629,6 @@ void wfx_rsi_task(void * arg)
                 {
                     wfx_ipv6_notify(GET_IPV6_SUCCESS);
                     hasNotifiedIPV6 = true;
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-#ifndef RSI_BLE_ENABLE
-                    // enabling the power save mode for RS9116 if sleepy device is enabled
-                    // if BLE is used on the rs9116 then powersave config is done after ble disconnect event
-                    wfx_rsi_power_save();
-#endif /* RSI_BLE_ENABLE */
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
