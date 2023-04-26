@@ -1,5 +1,5 @@
 {
-  "featureLevel": 95,
+  "featureLevel": 96,
   "creator": "zap",
   "keyValuePairs": [
     {
