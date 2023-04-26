@@ -52,6 +52,14 @@ struct DnssdContext
 
 } // namespace
 
+static void Timeout(chip::System::Layer * systemLayer, void * context)
+{
+    auto * ctx = static_cast<DnssdContext *>(context);
+    ChipLogError(DeviceLayer, "mDNS test timeout, is avahi daemon running?");
+    ctx->mTimeoutExpired = true;
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+}
+
 static void HandleResolve(void * context, DnssdService * result, const chip::Span<chip::Inet::IPAddress> & addresses,
                           CHIP_ERROR error)
 {
@@ -74,6 +82,7 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
 
     if (ctx->mBrowsedServicesCount == ++ctx->mResolvedServicesCount)
     {
+        chip::DeviceLayer::SystemLayer().CancelTimer(Timeout, context);
         // After last service is resolved, stop the event loop,
         // so the test case can gracefully exit.
         chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
@@ -104,14 +113,6 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
             NL_TEST_ASSERT(suite, ChipDnssdResolve(&services[i], services[i].mInterface, HandleResolve, context) == CHIP_NO_ERROR);
         }
     }
-}
-
-static void Timeout(chip::System::Layer * systemLayer, void * context)
-{
-    auto * ctx = static_cast<DnssdContext *>(context);
-    ChipLogError(DeviceLayer, "mDNS test timeout, is avahi daemon running?");
-    ctx->mTimeoutExpired = true;
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 static void DnssdErrorCallback(void * context, CHIP_ERROR error)
