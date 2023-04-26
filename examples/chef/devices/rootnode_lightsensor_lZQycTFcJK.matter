@@ -1229,6 +1229,7 @@ server cluster IlluminanceMeasurement = 1024 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
+  readonly attribute nullable enum8 lightSensorType = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1440,6 +1441,7 @@ endpoint 1 {
     ram      attribute measuredValue default = 0xC351;
     ram      attribute minMeasuredValue default = 1;
     ram      attribute maxMeasuredValue default = 0xfffe;
+    ram      attribute lightSensorType default = 1;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
