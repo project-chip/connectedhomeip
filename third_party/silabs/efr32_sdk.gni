@@ -340,9 +340,9 @@ template("efr32_sdk") {
         "SL_SLEEP_TIME_MS=${sleep_time_ms}",
       ]
 
-      if(defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi){
+      if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
         defines += [
-        # Used for wifi devices to get packet details
+          # Used for wifi devices to get packet details
           "WIFI_DEBUG_ENABLED=1",
         ]
       }
