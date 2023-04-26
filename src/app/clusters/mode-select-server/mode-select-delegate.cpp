@@ -7,6 +7,11 @@ using namespace chip::app::Clusters::ModeSelect;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 
+void Delegate::HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type &response)
+{
+    response.status = uint8_t(ChangeToModeResponseStatus::kSuccess);
+    // todo set text to null
+}
 
 Status Delegate::IsSupportedMode(uint8_t modeValue) 
 { 

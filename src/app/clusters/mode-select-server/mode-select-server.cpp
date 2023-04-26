@@ -39,6 +39,34 @@ namespace Clusters {
 namespace ModeSelect {
 
 // todo find a cleaner solution by modifying the zap generated code.
+EmberAfStatus Instance::GetFeature(uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpointId, clusterId, ModeSelect::Attributes::FeatureMap::Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+EmberAfStatus Instance::SetFeatureMap(uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpointId, clusterId, ModeSelect::Attributes::FeatureMap::Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
 EmberAfStatus Instance::GetCurrentMode(uint8_t * value) const
 {
     using Traits = NumericAttributeTraits<uint8_t>;
@@ -152,6 +180,21 @@ EmberAfStatus Instance::SetStartUpModeNull() const
 
 CHIP_ERROR Instance::Init()
 {
+    // Check that the cluster ID given is a valid mode select cluster ID.
+    bool isAModeSelectCluster = false;
+    for (uint32_t aliasedClusterId : AliasedClusters)
+    {
+        if (clusterId == aliasedClusterId)
+        {
+            isAModeSelectCluster = true;
+            break;
+        }
+    }
+    if (!isAModeSelectCluster){
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster ID given is not a mode select alias.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(msDelegate->Init());
@@ -291,6 +334,31 @@ void Instance::ModeSelectHandleChangeToMode(HandlerContext & ctx, const Commands
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: ChangeToMode successful");
 }
 
+void Instance::ModeSelectHandleChangeToModeWithStatus(HandlerContext & ctx, const Commands::ChangeToModeWithStatus::DecodableType & commandData)
+{
+    uint8_t newMode = commandData.newMode;
+
+    ModeSelect::Commands::ChangeToModeResponse::Type response;
+
+    if (msDelegate->IsSupportedMode(newMode) != Status::Success)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
+        response.status = uint8_t(ModeSelect::ChangeToModeResponseStatus::kUnsupportedMode);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+
+    msDelegate->HandleChangeToModeWitheStatus(newMode, response);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: HandleChangeToModeWitheStatus delegate call successfully");
+
+    if (response.status == uint8_t(ChangeToModeResponseStatus::kSuccess)) {
+        SetCurrentMode(newMode);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: HandleChangeToModeWitheStatus changed to mode %u", newMode);
+    }
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
     switch (handlerContext.mRequestPath.mCommandId)
@@ -299,7 +367,33 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Entering handling ChangeToMode");
 
         HandleCommand<Commands::ChangeToMode::DecodableType>(handlerContext, [this](HandlerContext & ctx, const auto & commandData) { ModeSelectHandleChangeToMode(ctx, commandData); });
+        break;
+    case ModeSelect::Commands::ChangeToModeWithStatus::Id:
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Entering handling ChangeToModeWithStatus");
+
+        HandleCommand<Commands::ChangeToModeWithStatus::DecodableType>(handlerContext, [this](HandlerContext & ctx, const auto & commandData) { ModeSelectHandleChangeToModeWithStatus(ctx, commandData); });
     }
+}
+
+bool Instance::HasFeature(ModeSelectFeature feature)
+{
+    bool success;
+    uint32_t featureMap;
+    success = (GetFeature(&featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+
+    return success && ((featureMap & to_underlying(feature)) != 0);
+}
+
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                               CommandHandlerInterface::CommandIdCallback callback, void * context)
+{
+    if (HasFeature(ModeSelect::ModeSelectFeature::kExt))
+    {
+        callback(ModeSelect::Commands::ChangeToModeWithStatus::Id, context);
+        callback(ModeSelect::Commands::ChangeToModeResponse::Id, context);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -371,6 +465,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
 
     return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
 }
+
 
 } // namespace ModeSelect
 } // namespace Clusters

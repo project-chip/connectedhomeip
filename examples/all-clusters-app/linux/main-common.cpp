@@ -218,6 +218,7 @@ void ApplicationInit()
     }
 
     modeSelectAliasA.Init();
+    modeSelectAliasA.SetFeatureMap(3);
 
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 

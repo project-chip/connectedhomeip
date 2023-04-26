@@ -33,11 +33,14 @@ namespace ModeSelect {
 class ModeSelectDelegate1 : public Delegate
 {
     CHIP_ERROR Init() override;
+
+    void HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type &response) override;
 public:
-    ModeSelectDelegate1(std::vector<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type> modes) : 
+
+    ModeSelectDelegate1(std::vector<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type> modes) :
     Delegate(modes)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectDelegate1: Contsucted");
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectDelegate1: Constructed");
     }
     ~ModeSelectDelegate1() override
     {
