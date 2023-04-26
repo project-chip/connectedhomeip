@@ -466,14 +466,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_MESSAGE_TOO_LONG                            CHIP_CORE_ERROR(0x04)
 
-/**
- *  @def CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION
- *
- *  @brief
- *    An exchange version is not supported.
- *
- */
-#define CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION                CHIP_CORE_ERROR(0x05)
+// AVAILABLE: 0x05
 
 /**
  *  @def CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS
