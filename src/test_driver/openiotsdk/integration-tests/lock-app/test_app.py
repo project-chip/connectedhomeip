@@ -48,7 +48,7 @@ def controllerConfig(request):
 def test_smoke_test(device):
     ret = device.wait_for_output("Open IoT SDK lock-app example application start")
     assert ret is not None and len(ret) > 0
-    ret = device.wait_for_output("Open IoT SDK lock-app example application run", timeout=30)
+    ret = device.wait_for_output("Open IoT SDK lock-app example application run")
     assert ret is not None and len(ret) > 0
 
 
@@ -74,7 +74,7 @@ def test_commissioning(device, controller):
     assert nodeId is not None
     log.info("Device {} connected".format(commissionable_device.addresses[0]))
 
-    ret = device.wait_for_output("Commissioning completed successfully", timeout=30)
+    ret = device.wait_for_output("Commissioning completed successfully")
     assert ret is not None and len(ret) > 0
 
     assert disconnect_device(devCtrl, nodeId)
@@ -104,7 +104,7 @@ def test_lock_ctrl(device, controller):
     nodeId = connect_device(devCtrl, setupPayload, commissionable_device)
     assert nodeId is not None
 
-    ret = device.wait_for_output("Commissioning completed successfully", timeout=30)
+    ret = device.wait_for_output("Commissioning completed successfully")
     assert ret is not None and len(ret) > 0
 
     err, res = send_zcl_command(devCtrl, "DoorLock", "SetUser", nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,

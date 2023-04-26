@@ -38,7 +38,7 @@ class Device:
         else:
             self.name = name
 
-    def send(self, command, expected_output=None, wait_before_read=None, wait_for_response=10, assert_output=True):
+    def send(self, command, expected_output=None, wait_before_read=None, wait_for_response=30, assert_output=True):
         """
         Send command for client
         :param command: Command
@@ -73,7 +73,7 @@ class Device:
             except queue.Empty:
                 return lines
 
-    def wait_for_output(self, search: str, timeout: float = 10, assert_timeout: bool = True, verbose: bool = False) -> [str]:
+    def wait_for_output(self, search: str, timeout: float = 30, assert_timeout: bool = True, verbose: bool = False) -> [str]:
         """
         Wait for expected output response
         :param search: Expected response string
