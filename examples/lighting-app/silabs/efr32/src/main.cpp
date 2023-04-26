@@ -30,6 +30,7 @@
 #include <matter_config.h>
 #ifdef SILABS_ATTESTATION_CREDENTIALS
 #include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
+using namespace chip::Credentials::Silabs;
 #else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif
@@ -59,16 +60,16 @@ int main(void)
         appError(CHIP_ERROR_INTERNAL);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    PlatformMgr().LockChipStack();
     // Initialize device attestation config
 #ifdef SILABS_ATTESTATION_CREDENTIALS
-    SetDeviceAttestationCredentialsProvider(Silabs::GetSilabsDacProvider());
+    SetDeviceAttestationCredentialsProvider(GetSilabsDacProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    PlatformMgr().UnlockChipStack();
 
     SILABS_LOG("Starting App Task");
     if (AppTask::GetAppTask().StartAppTask() != CHIP_NO_ERROR)
