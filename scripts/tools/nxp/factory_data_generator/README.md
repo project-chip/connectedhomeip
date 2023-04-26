@@ -1,4 +1,4 @@
-## NXP Factory Data Generator
+# NXP Factory Data Generator
 
 For usage of the tool, please see
 [Guide for writing manufacturing data on NXP devices](../../../../examples/platform/nxp/doc/manufacturing_flow.md).
