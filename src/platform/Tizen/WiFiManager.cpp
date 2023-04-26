@@ -528,6 +528,33 @@ void WiFiManager::_WiFiSetConnectionState(wifi_manager_connection_state_e connec
     ChipLogProgress(DeviceLayer, "Set WiFi connection state [%s]", __WiFiConnectionStateToStr(mConnectionState));
 }
 
+wifi_manager_ap_h WiFiManager::_WiFiGetConnectedAP()
+{
+    int wifiErr                   = WIFI_MANAGER_ERROR_NONE;
+    wifi_manager_ap_h connectedAp = nullptr;
+
+    wifiErr = wifi_manager_get_connected_ap(mWiFiManagerHandle, &connectedAp);
+    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
+    {
+        char * ssidStr = nullptr;
+        if (connectedAp != nullptr)
+        {
+            wifiErr = wifi_manager_ap_get_essid(connectedAp, &ssidStr);
+            if (wifiErr != WIFI_MANAGER_ERROR_NONE)
+            {
+                ChipLogError(DeviceLayer, "FAIL: get ssid of connected AP [%s]", get_error_message(wifiErr));
+            }
+        }
+        ChipLogProgress(DeviceLayer, "Get connected AP [%s]", ssidStr);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "FAIL: get connected AP [%s]", get_error_message(wifiErr));
+    }
+
+    return connectedAp;
+}
+
 wifi_manager_ap_h WiFiManager::_WiFiGetFoundAP()
 {
     int wifiErr               = WIFI_MANAGER_ERROR_NONE;
@@ -796,6 +823,58 @@ CHIP_ERROR WiFiManager::GetConnectionState(wifi_manager_connection_state_e * con
     }
 
     return err;
+}
+
+CHIP_ERROR WiFiManager::GetBssId(uint8_t * bssId)
+{
+    VerifyOrReturnError(bssId != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    char * bssIdStr = nullptr;
+    std::unique_ptr<char, decltype(&::free)> _{ bssIdStr, &::free };
+
+    wifi_manager_ap_h connectedAp = _WiFiGetConnectedAP();
+    if (connectedAp == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    int wifiErr = wifi_manager_ap_get_bssid(connectedAp, &bssIdStr);
+    if (wifiErr != WIFI_MANAGER_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "FAIL: get bssid [%s]", get_error_message(wifiErr));
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    if (sscanf(bssIdStr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &mWiFiBSSID[0], &mWiFiBSSID[1], &mWiFiBSSID[2], &mWiFiBSSID[3],
+               &mWiFiBSSID[4], &mWiFiBSSID[5]) != 6)
+    {
+        ChipLogError(DeviceLayer, "FAIL: parse bssid");
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    bssId = mWiFiBSSID;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WiFiManager::GetSecurityType(wifi_manager_security_type_e * securityType)
+{
+    wifi_manager_ap_h connectedAp = _WiFiGetConnectedAP();
+    if (connectedAp == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    wifi_manager_security_type_e secType;
+    int wifiErr = wifi_manager_ap_get_security_type(connectedAp, &secType);
+    if (wifiErr != WIFI_MANAGER_ERROR_NONE)
+    {
+        ChipLogError(DeviceLayer, "FAIL: get security type [%s]", get_error_message(wifiErr));
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    *securityType = secType;
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

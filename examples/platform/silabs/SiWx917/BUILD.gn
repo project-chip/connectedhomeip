@@ -236,6 +236,7 @@ source_set("siwx917-common") {
   ]
 
   sources = [
+    "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/heap_4_silabs.c",
     "${wifi_sdk_dir}/dhcp_client.cpp",
     "${wifi_sdk_dir}/ethernetif.cpp",
@@ -250,10 +251,6 @@ source_set("siwx917-common") {
 
   if (use_base_app) {
     sources += [ "BaseApplication.cpp" ]
-  }
-
-  if (use_wstk_leds) {
-    sources += [ "LEDWidget.cpp" ]
   }
 
   if (chip_enable_pw_rpc || chip_build_libshell) {

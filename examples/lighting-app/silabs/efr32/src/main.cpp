@@ -20,7 +20,6 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
-#include "init_efrPlatform.h"
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_simple_button_instances.h"
 #endif
@@ -35,11 +34,14 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif
 
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #define BLE_DEV_NAME "SiLabs-Light"
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
+using namespace chip::DeviceLayer::Silabs;
 
 #define UNUSED_PARAMETER(a) (a = a)
 
@@ -51,7 +53,8 @@ static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 // ================================================================================
 int main(void)
 {
-    init_efrPlatform();
+    GetPlatform().Init();
+
     if (SilabsMatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 

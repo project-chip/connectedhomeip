@@ -69,6 +69,11 @@ static_library("nrfconnect") {
       "FactoryDataProvider.cpp",
       "FactoryDataProvider.h",
     ]
+  } else {
+    sources += [
+      "DeviceInstanceInfoProviderImpl.cpp",
+      "DeviceInstanceInfoProviderImpl.h",
+    ]
   }
 
   if (chip_enable_openthread) {

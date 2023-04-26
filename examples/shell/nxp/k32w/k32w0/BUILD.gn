@@ -67,6 +67,7 @@ k32w0_executable("shell_app") {
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${chip_root}/third_party/simw-top-mini:se05x",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",

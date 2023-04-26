@@ -128,7 +128,6 @@ template("siwx917_sdk") {
         "LWIP_ICMP=1",
         "LWIP_IGMP=1",
         "LWIP_DHCP=1",
-        "LWIP_DNS=0",
       ]
     } else {
       defines += [ "LWIP_IPV4=0" ]
@@ -181,7 +180,14 @@ template("siwx917_sdk") {
     cflags += [
       "-Wno-maybe-uninitialized",
       "-Wno-shadow",
+      "-Wno-empty-body",
+      "-Wno-cpp",
+      "-Wno-missing-braces",
+      "-Wno-sign-compare",
       "-Wno-error",
+      "-Wno-unknown-warning-option",
+      "-Wno-unused-variable",
+      "-Wno-unused-function",
     ]
 
     if (defined(invoker.defines)) {
