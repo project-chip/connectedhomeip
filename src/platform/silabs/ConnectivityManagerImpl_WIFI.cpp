@@ -387,8 +387,9 @@ void ConnectivityManagerImpl::OnStationConnected()
     chip::DeviceLayer::Internal::BLEManagerImpl().StopAdvertising();
 #endif /* RSI_BLE_ENABLE */
     sl_status_t err = wfx_power_save();
-    if(err != SL_STATUS_OK){
-        ChipLogError(DeviceLayer,"Power save config for Wifi failed");
+    if (err != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "Power save config for Wifi failed");
     }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI */
     UpdateInternetConnectivityState();

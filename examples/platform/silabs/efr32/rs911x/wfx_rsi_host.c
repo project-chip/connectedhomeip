@@ -204,8 +204,10 @@ sl_status_t wfx_connect_to_ap(void)
  * @return  SL_STATUS_OK if successful,
  *          SL_STATUS_FAIL otherwise
  ***********************************************************************/
-sl_status_t wfx_power_save() {
-    if(wfx_rsi_power_save() != 0) {
+sl_status_t wfx_power_save()
+{
+    if (wfx_rsi_power_save() != 0)
+    {
         return SL_STATUS_FAIL;
     }
     return SL_STATUS_OK;
