@@ -181,6 +181,7 @@ int32_t wfx_rsi_disconnect()
     return status;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
 /******************************************************************
  * @fn   wfx_rsi_power_save()
  * @brief
@@ -190,7 +191,7 @@ int32_t wfx_rsi_disconnect()
  * @return
  *        None
  *********************************************************************/
-void wfx_rsi_power_save()
+int32_t wfx_rsi_power_save()
 {
     int32_t status;
 #ifdef RSI_BLE_ENABLE
@@ -198,7 +199,7 @@ void wfx_rsi_power_save()
     if (status != RSI_SUCCESS)
     {
         SILABS_LOG("BT Powersave Config Failed, Error Code : 0x%lX", status);
-        return;
+        return status;
     }
 #endif /* RSI_BLE_ENABLE */
 
@@ -206,10 +207,13 @@ void wfx_rsi_power_save()
     if (status != RSI_SUCCESS)
     {
         SILABS_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
-        return;
+        return status;
     }
     SILABS_LOG("Powersave Config Success");
+    return status;
 }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+
 /******************************************************************
  * @fn   wfx_rsi_join_cb(uint16_t status, const uint8_t *buf, const uint16_t len)
  * @brief

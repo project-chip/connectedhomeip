@@ -383,9 +383,14 @@ void ConnectivityManagerImpl::OnStationConnected()
     // Setting the rs911x in the power save mode
 #if (CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI)
     // TODO : Remove stop advertising after BLEManagerImpl is fixed
+#if RSI_BLE_ENABLE
     chip::DeviceLayer::Internal::BLEManagerImpl().StopAdvertising();
-    wfx_power_save();
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+#endif /* RSI_BLE_ENABLE */
+    sl_status_t err = wfx_power_save();
+    if(err != SL_STATUS_OK){
+        ChipLogError(DeviceLayer,"Power save config for Wifi failed");
+    }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI */
     UpdateInternetConnectivityState();
 }
 

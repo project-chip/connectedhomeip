@@ -195,9 +195,22 @@ sl_status_t wfx_connect_to_ap(void)
     return SL_STATUS_OK;
 }
 
-void wfx_power_save(){
-    wfx_rsi_power_save();
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+/*********************************************************************
+ * @fn  sl_status_t wfx_power_save()
+ * @brief
+ *      Implements the power save in sleepy application
+ * @param[in]  None
+ * @return  SL_STATUS_OK if successful,
+ *          SL_STATUS_FAIL otherwise
+ ***********************************************************************/
+sl_status_t wfx_power_save() {
+    if(wfx_rsi_power_save() != 0) {
+        return SL_STATUS_FAIL;
+    }
+    return SL_STATUS_OK;
 }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
 
 /*********************************************************************
  * @fn  void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
