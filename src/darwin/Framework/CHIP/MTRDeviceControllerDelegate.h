@@ -34,14 +34,8 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
 MTR_NEWLY_AVAILABLE
 @interface MTRProductIdentity : NSObject
 
-/**
- * Controllee's VendorID Attribute of Basic Information cluster
- */
 @property (nonatomic, copy, readonly) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
 
-/**
- * Controllee's ProductID Attribute of Basic Information cluster
- */
 @property (nonatomic, copy, readonly) NSNumber * productID MTR_NEWLY_AVAILABLE;
 
 - (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID;
@@ -84,6 +78,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
                    nodeID:(NSNumber * _Nullable)nodeID MTR_NEWLY_AVAILABLE;
+
 /**
  * Notify the delegate when commissioning infomation has been read from the Basic
  * Information cluster of the commissionee.
