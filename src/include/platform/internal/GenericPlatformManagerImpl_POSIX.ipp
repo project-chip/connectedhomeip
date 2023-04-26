@@ -163,6 +163,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     {
         mChipTask = pthread_self();
         mState.store(State::kRunning, std::memory_order_relaxed);
+        mShouldRunEventLoop.store(true, std::memory_order_relaxed);
     }
 
     pthread_mutex_unlock(&mStateLock);
