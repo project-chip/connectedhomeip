@@ -665,19 +665,17 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t status = 0;
-    // TODO: change this condition
-    if (1)
+    // TODO: add the below code in a condition if (mFlags.Has(Flags::kAdvertising))
+    // Since DriveBLEState is not called the device is still advertising advertising
+    mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
+    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+    status = rsi_ble_stop_advertising();
+    if (status != RSI_SUCCESS)
     {
-        mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
-        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-        status = rsi_ble_stop_advertising();
-        if (status != RSI_SUCCESS)
-        {
-            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
-        }
-        advertising_set_handle = 0xff;
-        CancelBleAdvTimeoutTimer();
+        ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
     }
+    advertising_set_handle = 0xff;
+    CancelBleAdvTimeoutTimer();
 
     // exit:
     return err;
