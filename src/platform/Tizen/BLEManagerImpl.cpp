@@ -65,6 +65,7 @@
 
 #include "CHIPDevicePlatformEvent.h"
 #include "ChipDeviceScanner.h"
+#include "SystemInfo.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -667,9 +668,16 @@ int BLEManagerImpl::StartBLEAdvertising()
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_adapter_le_add_advertising_service_data() failed. ret: %d", ret));
 
-    ret = bt_adapter_le_set_advertising_flags(
-        mAdvertiser, BT_ADAPTER_LE_ADVERTISING_FLAGS_GEN_DISC | BT_ADAPTER_LE_ADVERTISING_FLAGS_BREDR_UNSUP);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_set_advertising_flags() failed. ret: %d", ret));
+    if (SystemInfo::GetPlatformVersion() >= 7.5)
+    {
+        ret = bt_adapter_le_set_advertising_flags(
+            mAdvertiser, BT_ADAPTER_LE_ADVERTISING_FLAGS_GEN_DISC | BT_ADAPTER_LE_ADVERTISING_FLAGS_BREDR_UNSUP);
+        VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_set_advertising_flags() failed. ret: %d", ret));
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "setting function of advertising flags is available from tizen 7.5 or later");
+    }
 
     ret = bt_adapter_le_set_advertising_device_name(mAdvertiser, BT_ADAPTER_LE_PACKET_ADVERTISING, true);
     VerifyOrExit(ret == BT_ERROR_NONE,
@@ -954,7 +962,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
-    ChipLogProgress(DeviceLayer, "Initialize BLE");
+    ChipLogProgress(DeviceLayer, "Initialize BLE. Tizen Version: %.1f", SystemInfo::GetPlatformVersion());
     err = PlatformMgrImpl().GLibMatterContextInvokeSync(_BleInitialize, static_cast<void *>(nullptr));
     SuccessOrExit(err);
 
