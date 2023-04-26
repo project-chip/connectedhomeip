@@ -2502,13 +2502,16 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 {
     char protocol[chip::Dnssd::kDnssdProtocolTextMaxSize + 1];
 
+    if (strchr(serviceType, '.') == nullptr)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
     // Extract from the <type>.<protocol>.<domain-name>. the <type> part.
     size_t substringSize = strchr(serviceType, '.') - serviceType;
     if (substringSize >= ArraySize(mdnsService.mType))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    Platform::CopyString(mdnsService.mType, serviceType);
+    Platform::CopyString(mdnsService.mType, substringSize + 1, serviceType);
 
     // Extract from the <type>.<protocol>.<domain-name>. the <protocol> part.
     const char * protocolSubstringStart = serviceType + substringSize + 1;
@@ -2521,7 +2524,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    Platform::CopyString(protocol, protocolSubstringStart);
+    Platform::CopyString(protocol, substringSize + 1, protocolSubstringStart);
 
     if (strncmp(protocol, "_udp", chip::Dnssd::kDnssdProtocolTextMaxSize) == 0)
     {
@@ -2548,10 +2551,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        Platform::CopyString(mdnsService.mHostName, serviceInfo.mHostNameBuffer);
-
-        if (strchr(serviceType, '.') == nullptr)
-            return CHIP_ERROR_INVALID_ARGUMENT;
+        Platform::CopyString(mdnsService.mHostName, substringSize + 1, serviceInfo.mHostNameBuffer);
 
         mdnsService.mPort = serviceInfo.mPort;
     }
@@ -2563,7 +2563,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     if (!otIp6IsAddressUnspecified(&serviceInfo.mHostAddress))
     {
         mdnsService.mAddressType = Inet::IPAddressType::kIPv6;
-        mdnsService.mAddress     = chip::Optional<chip::Inet::IPAddress>(ToIPAddress(serviceInfo.mHostAddress));
+        mdnsService.mAddress     = MakeOptional(ToIPAddress(serviceInfo.mHostAddress));
     }
 
     // Check if TXT record was included in DNS response.
