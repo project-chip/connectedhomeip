@@ -21,6 +21,6 @@
 #import <UIKit/UIKit.h>
 
 @interface QRCodeViewController
-    : UIViewController <AVCaptureMetadataOutputObjectsDelegate, MTRDevicePairingDelegate, NFCNDEFReaderSessionDelegate>
+    : UIViewController <AVCaptureMetadataOutputObjectsDelegate, MTRDeviceControllerDelegate, NFCNDEFReaderSessionDelegate>
 
 @end
