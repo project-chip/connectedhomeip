@@ -18,6 +18,7 @@
 #import "MTRDeviceControllerDelegate.h"
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/CommissioningDelegate.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -36,6 +37,8 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
 
     void OnPairingDeleted(CHIP_ERROR error) override;
+
+    void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
 
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
 
