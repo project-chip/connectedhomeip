@@ -50,28 +50,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<BLConfig>::Init();
     SuccessOrExit(err);
 
-    BL_RST_REASON_E bootCause = bl_sys_rstinfo_get();
-    mBootReason               = to_underlying(BootReasonType::kUnspecified);
-    if (BL_RST_POR == bootCause)
-    {
-        mBootReason = to_underlying(BootReasonType::kPowerOnReboot);
-    }
-    else if (BL_RST_BOR == bootCause)
-    {
-        mBootReason = to_underlying(BootReasonType::kBrownOutReset);
-    }
-    else if (BL_RST_WDT == bootCause)
-    {
-        mBootReason = to_underlying(BootReasonType::kHardwareWatchdogReset);
-    }
-    // else if (BL_RST_HBN == bootCause) {
-    //     mBootReason = BootReasonType::SoftwareReset;
-    // }
-    else if (BL_RST_SOFTWARE == bootCause)
-    {
-        mBootReason = to_underlying(BootReasonType::kSoftwareReset);
-    }
-
     if (BLConfig::ConfigValueExists(BLConfig::kCounterKey_RebootCount))
     {
         err = GetRebootCount(rebootCount);
@@ -149,12 +127,6 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
 {
     BLConfig::Key configKey{ key };
     return WriteConfigValue(configKey, value);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
-{
-    bootReason = mBootReason;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
@@ -238,14 +210,5 @@ ConfigurationManager & ConfigurationMgrImpl()
 {
     return ConfigurationManagerImpl::GetDefaultInstance();
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
-{
-    bl_efuse_read_mac(buf);
-
-    return CHIP_NO_ERROR;
-}
-#endif
 } // namespace DeviceLayer
 } // namespace chip

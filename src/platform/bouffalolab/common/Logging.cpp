@@ -1,39 +1,54 @@
-/* See Project CHIP LICENSE file for licensing information. */
+/*
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#include <stdio.h>
 
 #include <platform/logging/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/logging/Constants.h>
 
-#include <stdio.h>
-#include <utils_log.h>
-
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #endif
+
+#include <FreeRTOS.h>
+#include <task.h>
+#include <utils_log.h>
 
 namespace chip {
 namespace Logging {
 namespace Platform {
 
+static char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-
 #ifndef PW_RPC_ENABLED
     vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
 
     switch (category)
     {
     case kLogCategory_Error:
-        log_error("[%s] %s\r\n", module, formattedMsg);
+        __utils_printf("[%10u][%s][ERROR] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
         break;
     case kLogCategory_Progress:
-    default:
-        log_info("[%s] %s\r\n", module, formattedMsg);
+        __utils_printf("[%10u][%s][PROGR] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
         break;
     case kLogCategory_Detail:
-        log_trace("[%s] %s\r\n", module, formattedMsg);
+        __utils_printf("[%10u][%s][DETAIL] %s\r\n", xTaskGetTickCount(), module, formattedMsg);
         break;
     }
 #else

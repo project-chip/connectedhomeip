@@ -17,18 +17,14 @@
 
 #pragma once
 
+#include <stdint.h>
+
+namespace chip {
+namespace DeviceLayer {
+struct ChipDeviceEvent;
+} // namespace DeviceLayer
+} // namespace chip
+
 // ==================== Platform Adaptations ====================
-
-#ifndef INET_CONFIG_ENABLE_IPV4
-#error Inet IPv4 configuration should be configured at build generation time
-#endif
-
-// ========== Platform-specific Configuration Overrides =========
-
-#ifndef INET_CONFIG_NUM_TCP_ENDPOINTS
-#define INET_CONFIG_NUM_TCP_ENDPOINTS 4
-#endif // INET_CONFIG_NUM_TCP_ENDPOINTS
-
-#ifndef INET_CONFIG_NUM_UDP_ENDPOINTS
-#define INET_CONFIG_NUM_UDP_ENDPOINTS 4
-#endif // INET_CONFIG_NUM_UDP_ENDPOINTS
+#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
+#define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *

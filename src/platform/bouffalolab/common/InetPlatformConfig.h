@@ -1,7 +1,6 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,25 +15,13 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for the CHIP Inet
- *          Layer on BL602 platforms using the Bouffalolab SDK.
- *
- */
-
 #pragma once
-
-#include <lwipopts.h>
 
 // ==================== Platform Adaptations ====================
 
-#define INET_CONFIG_ERROR_TYPE int32_t
-#define INET_CONFIG_NO_ERROR 0
-#define INET_CONFIG_ERROR_MIN 1000000
-#define INET_CONFIG_ERROR_MAX 1000999
-
-#define INET_CONFIG_ENABLE_IPV4 1
+#ifndef INET_CONFIG_ENABLE_IPV4
+#error Inet IPv4 configuration should be configured at build generation time
+#endif
 
 // ========== Platform-specific Configuration Overrides =========
 

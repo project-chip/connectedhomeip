@@ -21,7 +21,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/bouffalolab/BL702/DiagnosticDataProviderImpl.h>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
@@ -57,7 +57,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     otRadio_opt_t opt;
 
     // Initialize the configuration system.
-    err = Internal::BL702Config::Init();
+    err = Internal::BLConfig::Init();
     SuccessOrExit(err);
 
     opt.byte            = 0;

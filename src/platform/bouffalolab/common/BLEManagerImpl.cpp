@@ -23,8 +23,8 @@
 #include "BLEManagerImpl.h"
 
 #include <ble/CHIPBleServiceData.h>
-#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -695,8 +695,6 @@ bool BLEManagerImpl::SetSubscribed(bt_conn * conn)
     uint8_t index           = bt_conn_index(conn);
     bool isSubscribed       = mSubscribedConns[index];
     mSubscribedConns[index] = true;
-
-    ChipLogError(DeviceLayer, "BLEManagerImpl::SetSubscribed %u", index);
 
     // If we were not subscribed previously, increment the reference counter of the connection.
     if (!isSubscribed)

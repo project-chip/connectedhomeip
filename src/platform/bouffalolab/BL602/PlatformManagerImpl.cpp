@@ -26,7 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/PlatformManager.h>
-#include <platform/bouffalolab/BL602/DiagnosticDataProviderImpl.h>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
@@ -237,7 +237,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     TaskHandle_t backup_eventLoopTask;
 
     // Initialize the configuration system.
-    err = Internal::BL602Config::Init();
+    err = Internal::BLConfig::Init();
     SuccessOrExit(err);
 
     // Initialize LwIP.

@@ -1,4 +1,5 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
+# All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,58 +14,42 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "bl602")
 
 static_library("BL602") {
+
   sources = [
+    "ConnectivityManagerImpl.cpp",
+    "NetworkCommissioningDriver.cpp",
+    "PlatformManagerImpl.cpp",
+    "wifi_mgmr_portable.c",
+    "ConfigurationManagerImpl.cpp",
+    "DiagnosticDataProviderImpl.cpp",
+  ]
+
+  common_sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "BL602Config.cpp",
-    "BL602Config.h",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
-    "CHIPDevicePlatformConfig.h",
-    "CHIPDevicePlatformEvent.h",
-    "CHIPMem-Platform.cpp",
-    "CHIPPlatformConfig.h",
-    "ConfigurationManagerImpl.cpp",
-    "ConfigurationManagerImpl.h",
-    "ConnectivityManagerImpl.cpp",
-    "ConnectivityManagerImpl.h",
-    "DiagnosticDataProviderImpl.cpp",
-    "DiagnosticDataProviderImpl.h",
-    "InetPlatformConfig.h",
-    "Logging.cpp",
-    "NetworkCommissioningDriver.cpp",
-    "OTAImageProcessorImpl.cpp",
-    "PlatformManagerImpl.cpp",
-    "PlatformManagerImpl.h",
-    "SystemPlatformConfig.h",
-    "wifi_mgmr_portable.c",
-    "wifi_mgmr_portable.h",
-  ]
+    "../common/BLConfig.cpp",
+    "../common/BLEManagerImpl.cpp",
+    "../common/ConfigurationManagerImpl.cpp",
+    "../common/DiagnosticDataProviderImpl.cpp",
+    "../common/Logging.cpp",
+    "../common/OTAImageProcessorImpl.cpp",
+    "../common/KeyValueStoreManagerImpl.cpp",
 
-  deps = [
-    "${chip_root}/src/lib/dnssd:platform_header",
-    "${chip_root}/src/setup_payload",
-  ]
-
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
-
-  sources += [
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
-  ]
-
-  sources += [
     "${chip_root}/src/credentials/CHIPCert.h",
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "../common/FactoryDataProvider.cpp",
     "../common/FactoryDataProvider.h",
   ]
+#    "../common/CHIPmemory.cpp",
+
+  sources += common_sources
+
+  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

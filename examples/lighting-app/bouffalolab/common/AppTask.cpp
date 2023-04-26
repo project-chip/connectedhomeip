@@ -40,7 +40,7 @@
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <ThreadStackManagerImpl.h>
+#include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <utils_list.h>

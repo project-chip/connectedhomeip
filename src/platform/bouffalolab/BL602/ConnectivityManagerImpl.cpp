@@ -1,7 +1,6 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/* this file behaves like a config.h, comes first */
+
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <NetworkCommissioningDriver.h>

@@ -22,7 +22,7 @@
 
 #include <platform/KeyValueStoreManager.h>
 
-#include <platform/bouffalolab/BL702/bl702Config.h>
+#include <platform/bouffalolab/common/BLConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -37,7 +37,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 {
     VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
 
-    CHIP_ERROR err = BL702Config::ReadKVS(key, value, value_size, read_bytes_size, offset_bytes);
+    CHIP_ERROR err = BLConfig::ReadKVS(key, value, value_size, read_bytes_size, offset_bytes);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -49,12 +49,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 {
     VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
 
-    return BL702Config::WriteKVS(key, value, value_size);
+    return BLConfig::WriteKVS(key, value, value_size);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    return BL702Config::ClearKVS((char *) key);
+    return BLConfig::ClearKVS((char *) key);
 }
 
 } // namespace PersistedStorage

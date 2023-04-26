@@ -29,8 +29,6 @@ chip_inet_config_enable_tcp_endpoint = false
 
 chip_build_tests = false
 
-chip_config_memory_management = "platform"
-
 openthread_external_mbedtls = mbedtls_target
 openthread_project_core_config_file = "bl702-openthread-core-bl-config.h"
 openthread_core_config_platform_check_file =
@@ -39,8 +37,3 @@ openthread_project_include_dirs =
     [ "${chip_root}/src/platform/bouffalolab/BL702" ]
 openthread_external_platform =
     "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk"
-
-pw_build_LINK_DEPS = [
-  "$dir_pw_assert:impl",
-  "$dir_pw_log:impl",
-]

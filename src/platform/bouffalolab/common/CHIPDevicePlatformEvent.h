@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,12 +13,6 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
- */
-
-/**
- *    @file
- *          Defines platform-specific event types and data for the chip
- *          Device Layer on the BL602 platform.
  */
 
 #pragma once
@@ -34,7 +28,7 @@ namespace DeviceLayer {
 namespace DeviceEventType {
 
 /**
- * Enumerates Zephyr platform-specific event types that are visible to the application.
+ * Enumerates Bouffalo Lab platforms event types that are visible to the application.
  */
 enum PublicPlatformSpecificEventTypes
 {
@@ -42,7 +36,7 @@ enum PublicPlatformSpecificEventTypes
 };
 
 /**
- * Enumerates Zephyr platform-specific event types that are internal to the chip Device Layer.
+ * Enumerates Bouffalo Lab platforms event types that are internal to the chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
@@ -82,7 +76,7 @@ struct BleC2IndDoneEventType
 };
 
 /**
- * Represents platform-specific event information for BL602 platforms.
+ * Represents platform-specific event information for Bouffalo Lab platforms.
  */
 struct ChipDevicePlatformEvent final
 {

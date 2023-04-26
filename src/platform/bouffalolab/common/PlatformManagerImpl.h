@@ -16,15 +16,11 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the PlatformManager object
- *          for BL602 platforms using the Bouffalolab SDK.
- */
-
 #pragma once
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <aos/yloop.h>
+#endif
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
 namespace chip {
@@ -62,7 +58,9 @@ private:
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     friend void OnWiFiPlatformEvent(input_event_t * event, void * private_data);
+#endif
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 

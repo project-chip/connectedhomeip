@@ -19,6 +19,7 @@
 #include "OTAConfig.h"
 #include <app/server/Server.h>
 
+#include <platform/bouffalolab/common/OTAImageProcessorImpl.h>
 // Global OTA objects
 chip::DefaultOTARequestor gRequestorCore;
 chip::DefaultOTARequestorStorage gRequestorStorage;
