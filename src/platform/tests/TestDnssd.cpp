@@ -83,6 +83,11 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     if (ctx->mBrowsedServicesCount == ++ctx->mResolvedServicesCount)
     {
         chip::DeviceLayer::SystemLayer().CancelTimer(Timeout, context);
+        // StopEventLoopTask can be called from any thread, but when called from
+        // non-Matter one it will lock the Matter stack. The same locking rules
+        // are required when the resolve callback (this one) is called. In order
+        // to avoid deadlocks, we need to call the StopEventLoopTask from inside
+        // the Matter event loop by scheduling a lambda.
         chip::DeviceLayer::SystemLayer().ScheduleLambda([]() {
             // After last service is resolved, stop the event loop,
             // so the test case can gracefully exit.
