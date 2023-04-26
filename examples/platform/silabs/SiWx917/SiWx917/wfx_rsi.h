@@ -21,7 +21,7 @@
  * Interface to RSI Sapis
  */
 
-#define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256) /* Unknown how big this should be 	*/
+#define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256) /* Stack for the WLAN task	 	*/
 #define WFX_RSI_TASK_SZ (1024 + 1024)           /* Stack for the WFX/RSI task		*/
 #define WFX_RSI_BUF_SZ (1024 * 10)              /* May need tweak 			*/
 #define WFX_RSI_CONFIG_MAX_JOIN (5)             /* Max join retries			*/
