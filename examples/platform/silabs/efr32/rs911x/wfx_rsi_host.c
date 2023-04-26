@@ -30,9 +30,9 @@
 #include "event_groups.h"
 #include "task.h"
 
+#include "rsi_error.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
-#include "rsi_error.h"
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxRsiTaskStack[WFX_RSI_TASK_SZ] = { 0 };
