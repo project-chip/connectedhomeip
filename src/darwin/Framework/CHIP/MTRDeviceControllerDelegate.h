@@ -34,9 +34,9 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
 MTR_NEWLY_AVAILABLE
 @interface MTRProductIdentity : NSObject
 
-@property (nonatomic, copy, readonly) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, readonly) NSNumber * vendorID;
 
-@property (nonatomic, copy, readonly) NSNumber * productID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, readonly) NSNumber * productID;
 
 - (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID;
 @end
