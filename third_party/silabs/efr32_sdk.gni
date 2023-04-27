@@ -45,7 +45,10 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
-  sleep_time_ms = 30000  # 30 seconds sleep
+  # ICD Configuration flags
+  sl_ot_idle_interval_ms = 30000  # 30s Idle Intervals
+  sl_ot_active_interval_ms = 200  # 500ms Active Intervals
+  sl_active_mode_threshold = 1000  # 1s Active mode threshold
 
   silabs_log_enabled = true
 
@@ -337,7 +340,9 @@ template("efr32_sdk") {
         "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
         "SL_CATALOG_POWER_MANAGER_PRESENT",
         "SL_CATALOG_SLEEPTIMER_PRESENT",
-        "SL_SLEEP_TIME_MS=${sleep_time_ms}",
+        "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
+        "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
+        "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold}",
       ]
 
       if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
