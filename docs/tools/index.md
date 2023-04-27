@@ -1,6 +1,7 @@
 # Tools
 
-The Matter SDK provides tools that allow you to generate and manage different aspects of the Matter development.
+The Matter SDK provides tools that allow you to generate and manage different
+aspects of the Matter development.
 
 ## C++ tools
 
