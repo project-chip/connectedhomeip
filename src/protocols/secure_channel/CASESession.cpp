@@ -264,8 +264,8 @@ struct CASESession::SendSigma3Data
     std::atomic<FabricIndex> fabricIndex;
 
     // Use one or the other
-    FabricTable * fabricTable;
-    Crypto::OperationalKeystore * keystore;
+    const FabricTable * fabricTable;
+    const Crypto::OperationalKeystore * keystore;
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
     size_t msg_r3_signed_len;

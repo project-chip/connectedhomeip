@@ -723,7 +723,7 @@ public:
      *
      * @return The operational keystore, nullptr otherwise.
      */
-    Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
+    const Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
 
     /**
      * @brief Add a pending trusted root certificate for the next fabric created with `AddNewPendingFabric*` methods.
