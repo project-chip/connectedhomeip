@@ -33,6 +33,7 @@
 #include <lib/core/ScopedNodeId.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Base64.h>
+#include <lib/support/CHIPMem.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -66,7 +67,7 @@ public:
 
     /**
      * @brief
-     *   Initialize using configured fabrics and wait for session establishment requests.
+     *   Initialize using configured fabrics and wait for session establishment requests (as a responder).
      *
      * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabricTable                   Table of fabrics that are currently configured on the device
@@ -88,7 +89,7 @@ public:
 
     /**
      * @brief
-     *   Create and send session establishment request using device's operational credentials.
+     *   Create and send session establishment request (as an initiator) using device's operational credentials.
      *
      * @param sessionManager                session manager from which to allocate a secure session object
      * @param fabricTable                   The fabric table that contains a fabric in common with the peer
@@ -194,15 +195,16 @@ private:
     friend class TestCASESession;
     enum class State : uint8_t
     {
-        kInitialized       = 0,
-        kSentSigma1        = 1,
-        kSentSigma2        = 2,
-        kSentSigma3        = 3,
-        kSentSigma1Resume  = 4,
-        kSentSigma2Resume  = 5,
-        kFinished          = 6,
-        kFinishedViaResume = 7,
-        kBackgroundPending = 8,
+        kInitialized         = 0,
+        kSentSigma1          = 1,
+        kSentSigma2          = 2,
+        kSentSigma3          = 3,
+        kSentSigma1Resume    = 4,
+        kSentSigma2Resume    = 5,
+        kFinished            = 6,
+        kFinishedViaResume   = 7,
+        kSendSigma3Pending   = 8,
+        kHandleSigma3Pending = 9,
     };
 
     /*
@@ -233,11 +235,15 @@ private:
     CHIP_ERROR HandleSigma2(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2Resume(System::PacketBufferHandle && msg);
 
-    CHIP_ERROR SendSigma3();
-    struct Sigma3Work;
+    struct SendSigma3Data;
+    CHIP_ERROR SendSigma3a();
+    static CHIP_ERROR SendSigma3b(SendSigma3Data & data, bool & cancel);
+    CHIP_ERROR SendSigma3c(SendSigma3Data & data, CHIP_ERROR status);
+
+    struct HandleSigma3Work;
     CHIP_ERROR HandleSigma3a(System::PacketBufferHandle && msg);
-    static void HandleSigma3b(Sigma3Work & work);
-    CHIP_ERROR HandleSigma3c(Sigma3Work & work);
+    static void HandleSigma3b(HandleSigma3Work & work);
+    CHIP_ERROR HandleSigma3c(HandleSigma3Work & work);
 
     CHIP_ERROR SendSigma2Resume();
 
@@ -300,6 +306,10 @@ private:
     // Sequence number used to coordinate foreground/background work for a
     // particular session establishment.
     int mSequence = 0;
+
+    template <class DATA>
+    class WorkHelper;
+    Platform::SharedPtr<WorkHelper<SendSigma3Data>> mSendSigma3Helper;
 
     State mState;
 

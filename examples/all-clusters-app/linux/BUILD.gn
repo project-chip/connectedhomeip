@@ -52,14 +52,16 @@ source_set("chip-all-clusters-common") {
 
 source_set("chip-lock-app-common") {
   sources = [
-    "${chip_root}/examples/lock-app/linux/src/LockEndpoint.cpp",
-    "${chip_root}/examples/lock-app/linux/src/LockManager.cpp",
-    "${chip_root}/examples/lock-app/linux/src/ZCLDoorLockCallbacks.cpp",
+    "${chip_root}/examples/lock-app/lock-common/include/LockEndpoint.h",
+    "${chip_root}/examples/lock-app/lock-common/include/LockManager.h",
+    "${chip_root}/examples/lock-app/lock-common/src/LockEndpoint.cpp",
+    "${chip_root}/examples/lock-app/lock-common/src/LockManager.cpp",
+    "${chip_root}/examples/lock-app/lock-common/src/ZCLDoorLockCallbacks.cpp",
   ]
 
   deps = [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
 
-  include_dirs = [ "${chip_root}/examples/lock-app/linux/include" ]
+  include_dirs = [ "${chip_root}/examples/lock-app/lock-common/include" ]
 
   cflags = [ "-Wconversion" ]
 }

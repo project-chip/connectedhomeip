@@ -1,5 +1,5 @@
 {
-  "featureLevel": 92,
+  "featureLevel": 96,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -6141,11 +6141,11 @@
               "mfgCode": null,
               "side": "server",
               "type": "enum8",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0xFF",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -6255,5 +6255,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 262
     }
-  ]
+  ],
+  "log": []
 }
