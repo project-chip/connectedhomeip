@@ -391,19 +391,39 @@ static int32_t wfx_rsi_init(void)
  * @return
  *       None
  *******************************************************************************************/
+extern struct wpa_scan_results_arr *scan_results_array;
+void print_results()
+{
+  uint16_t i = 0;
+  printf("\n scan count       : %d", scan_results_array->num);
+
+  for (i = 0; i < scan_results_array->num; i++) {
+    //printf("\n\n Frequency        : %d", scan_results_array->res[i].freq);
+    printf("\n\n\n SSID             : %s", scan_results_array->res[i].ssid);
+    printf("\n Security Mode    : %d", scan_results_array->res[i].security_mode);
+    
+    //printf("\n RSSI             : %d", scan_results_array->res[i].level);
+    //printf("\n Channel          : %d", scan_results_array->res[i].channel_no);
+
+//     printf("\n BSSID            :");
+//     for (j = 0; j < 6; j++)
+//       printf("%01x:", scan_results_array->res[i].bssid[j]);
+   }
+}
 static void wfx_rsi_save_ap_info() // translation
 {
     int32_t status;
-    rsi_rsp_scan_t rsp;
+    //rsi_rsp_scan_t rsp;
 
     status =
-        rsi_wlan_scan_with_bitmap_options((int8_t *) &wfx_rsi.sec.ssid[0], AP_CHANNEL_NO_0, &rsp, sizeof(rsp), SCAN_BITMAP_OPTN_1);
+        rsi_wlan_scan_with_bitmap_options((int8_t *) &wfx_rsi.sec.ssid[0], AP_CHANNEL_NO_0, NULL, 0, RSI_SCAN_RESULTS_TO_HOST);
+        print_results();
     if (status)
     {
         /*
          * Scan is done - failed
          */
-#if WIFI_ENABLE_SECURITY_WPA3
+#if WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
         wfx_rsi.sec.security = WFX_SEC_WPA3;
 #else  /* !WIFI_ENABLE_SECURITY_WPA3 */
         wfx_rsi.sec.security = WFX_SEC_WPA2;
@@ -413,12 +433,15 @@ static void wfx_rsi_save_ap_info() // translation
     }
     else
     {
-        wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
-        wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
-        memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_MAX_STR_LEN);
-    }
+        // wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
+        // wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
+        // memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_MAX_STR_LEN);
 
-    switch (rsp.scan_info->security_mode)
+        // wfx_rsi.sec.security = scan_results_array->res[0].security_mode;
+        wfx_rsi.ap_chan      = scan_results_array->res[0].channel_no;
+        memcpy(&wfx_rsi.ap_mac.octet[0], &scan_results_array->res[0].bssid[0], BSSID_MAX_STR_LEN);
+    }
+    switch (scan_results_array->res[0].security_mode)
     {
     case SME_OPEN:
         wfx_rsi.sec.security = WFX_SEC_NONE;
@@ -434,10 +457,12 @@ static void wfx_rsi_save_ap_info() // translation
     case SME_WEP:
         wfx_rsi.sec.security = WFX_SEC_WEP;
         break;
+#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
     case SME_WPA3:
     case SME_WPA3_TRANSITION:
         wfx_rsi.sec.security = WFX_SEC_WPA3;
         break;
+#endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
     default:
         wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
         break;
@@ -465,18 +490,25 @@ static void wfx_rsi_do_join(void)
     }
     else
     {
-
         switch (wfx_rsi.sec.security)
         {
         case WFX_SEC_WEP:
             connect_security_mode = RSI_WEP;
             break;
-        case WFX_SEC_WPA:
-        case WFX_SEC_WPA2:
+        case WFX_SEC_WPA: 
             connect_security_mode = RSI_WPA_WPA2_MIXED;
             break;
+        case WFX_SEC_WPA2:
+#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
+            connect_security_mode = RSI_WPA3_TRANSITION;
+#else
+            connect_security_mode = RSI_WPA_WPA2_MIXED;
+#endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
+            break;
+#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
         case WFX_SEC_WPA3:
-            connect_security_mode = RSI_WPA3;
+            connect_security_mode = RSI_WPA3_TRANSITION;
+#endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
             break;
         case WFX_SEC_NONE:
             connect_security_mode = RSI_OPEN;
@@ -486,8 +518,9 @@ static void wfx_rsi_do_join(void)
             return;
         }
 
+
         SILABS_LOG("%s: WLAN: connecting to %s==%s, sec=%d", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
-                   wfx_rsi.sec.security);
+                 connect_security_mode);
 
         /*
          * Join the network

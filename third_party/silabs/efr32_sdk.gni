@@ -62,6 +62,12 @@ declare_args() {
 
   # Use SLC generated files
   slc_reuse_files = false
+
+  # "wpa_mixed" to force enable WPA/WPA2 security on rs91x
+  # "wpa3_transition" to force enable WPA2/WPA3 security on rs91x
+  # "wpa3_only" to force enable WPA3 security on rs91x
+  rs91x_security_mode = "wpa3_transition"
+
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -246,6 +252,9 @@ template("efr32_sdk") {
       if (chip_enable_wifi_ipv4) {
         defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
       }
+      if(rs91x_security_mode == "wpa3_transition") {
+        defines += [ "WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION=1" ]
+      }
       if (use_rs9116 || use_SiWx917) {
         defines += [
           "SL_HEAP_SIZE=32768",
@@ -256,6 +265,7 @@ template("efr32_sdk") {
           "RSI_WLAN_ENABLE",
           "RSI_SPI_INTERFACE",
           "RSI_WITH_OS",
+          "PROCESS_SCAN_RESULTS_AT_HOST",
         ]
       }
       if (use_SiWx917) {
