@@ -883,8 +883,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test008_SubscribeFailure
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
-
     // Set up expectation for report
     XCTestExpectation * errorReportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
@@ -916,11 +914,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }
         subscriptionEstablished:^{
             NSLog(@"subscribe attribute: OnOff established");
-            [expectation fulfill];
+            XCTFail("Should not have a subscriptionEstablished for an error case");
         }];
 
     // Wait till establishment and error report
-    [self waitForExpectations:[NSArray arrayWithObjects:expectation, errorReportExpectation, nil] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ errorReportExpectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test009_ReadAttributeWithParams

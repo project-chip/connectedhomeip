@@ -76,6 +76,9 @@ public:
     static const Key kConfigKey_VendorId;
     static const Key kConfigKey_ProductId;
 
+    static const Key kCounterKey_TotalOperationalHours;
+    static const Key kCounterKey_BootReason;
+
     static CHIP_ERROR Init(void);
 
     // Config value accessors.

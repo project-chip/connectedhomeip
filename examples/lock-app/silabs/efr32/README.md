@@ -102,7 +102,7 @@ Mac OS X
 
           ```
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/efr32/ ./out/lock_app BRD4161A
+          ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/efr32/ ./out/lock_app BRD4187C
           ```
 
 -   To delete generated executable, libraries and object files use:
@@ -118,8 +118,8 @@ Mac OS X
           $ cd ~/connectedhomeip/examples/silabs/lock-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4161A
-          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" silabs_board=\"${EFR32_BOARD}\""
+          $ export SILABS_BOARD=BRD4187C
+          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" SILABS_BOARD=\"${SILABS_BOARD}\""
           $ ninja -C out/debug
           ```
 
@@ -133,19 +133,19 @@ Mac OS X
 *   Build the example as Sleepy End Device (SED)
 
           ```
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/efr32/ ./out/lock-app_SED BRD4161A --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/efr32/ ./out/lock-app_SED BRD4187C --sed
           ```
 
     or use gn as previously mentioned but adding the following arguments:
 
           ```
-          $ gn gen out/debug '--args=silabs_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
+          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
           ```
 
 *   Build the example with pigweed RCP
 
           ```
-          $ ./scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/lock_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/lock_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
           ```
 
     or use GN/Ninja Directly
@@ -154,7 +154,7 @@ Mac OS X
           $ cd ~/connectedhomeip/examples/lock-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4161A
+          $ export SILABS_BOARD=BRD4187C
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
           ```

@@ -63,6 +63,8 @@ mw320_executable("shell_mw320") {
     "${chip_root}/src/setup_payload",
   ]
 
+  deps = [ "${chip_root}/src/platform:syscalls_stub" ]
+
   include_dirs = [
     "${chip_root}/src/platform/nxp/mw320",
     "${examples_plat_dir}/app/project_include",
@@ -84,7 +86,10 @@ mw320_executable("shell_mw320") {
 
   ldscript = "${examples_plat_dir}/app/ldscripts/88MW320_xx_xxxx_flash.ld"
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,--no-warn-rwx-segment",
+  ]
   defines = [
     "MW320_SHELL_STREAMER",
     "SHELL_STREAMER_APP_SPECIFIC",

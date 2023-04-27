@@ -19,14 +19,13 @@
 
 #pragma once
 
-#include "sl_led.h"
 #include <stdint.h>
 
 class LEDWidget
 {
 public:
     static void InitGpio(void);
-    void Init(const sl_led_t * led);
+    void Init(uint8_t led);
     void Set(bool state);
     void Invert(void);
     void Blink(uint32_t changeRateMS);
@@ -37,5 +36,6 @@ private:
     uint64_t mLastChangeTimeMS;
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
-    const sl_led_t * mLed;
+    uint8_t mLed;
+    bool mLedStatus;
 };

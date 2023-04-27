@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <jni.h>
 #include <memory>
+#include <sstream>
 #include <string>
 
 namespace chip {
@@ -51,6 +52,9 @@ jmethodID sRemoveServicesMethod   = nullptr;
 } // namespace
 
 // Implementation of functions declared in lib/dnssd/platform/Dnssd.h
+
+constexpr const char * kProtocolTcp = "._tcp";
+constexpr const char * kProtocolUdp = "._udp";
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
@@ -149,6 +153,33 @@ CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
     return CHIP_NO_ERROR;
 }
 
+std::string GetFullType(const char * type, DnssdServiceProtocol protocol)
+{
+    std::ostringstream typeBuilder;
+    typeBuilder << type;
+    typeBuilder << (protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? kProtocolUdp : kProtocolTcp);
+    return typeBuilder.str();
+}
+
+std::string GetFullTypeWithSubTypes(const char * type, DnssdServiceProtocol protocol)
+{
+    auto fullType = GetFullType(type, protocol);
+
+    std::string subtypeDelimiter = "._sub.";
+    size_t position              = fullType.find(subtypeDelimiter);
+    if (position != std::string::npos)
+    {
+        fullType = fullType.substr(position + subtypeDelimiter.size()) + "," + fullType.substr(0, position);
+    }
+
+    return fullType;
+}
+
+std::string GetFullType(const DnssdService * service)
+{
+    return GetFullType(service->mType, service->mProtocol);
+}
+
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
                            Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context, intptr_t * browseIdentifier)
 {
@@ -156,11 +187,8 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Ine
     VerifyOrReturnError(sBrowserObject != nullptr && sBrowseMethod != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sMdnsCallbackObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    std::string serviceType = type;
-    serviceType += '.';
-    serviceType += (protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp");
-
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    std::string serviceType = GetFullTypeWithSubTypes(type, protocol);
+    JNIEnv * env            = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jniServiceType(env, serviceType.c_str());
 
     env->CallVoidMethod(sBrowserObject, sBrowseMethod, jniServiceType.jniValue(), reinterpret_cast<jlong>(callback),
@@ -196,13 +224,18 @@ CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], 
     outServiceName[lengthWithoutProtocol] = '\0'; // Set a null terminator
 
     outProtocol = DnssdServiceProtocol::kDnssdProtocolUnknown;
-    if (strcmp("._tcp", dotPos) == 0)
+    if (strstr(dotPos, "._tcp") != 0)
     {
         outProtocol = DnssdServiceProtocol::kDnssdProtocolTcp;
     }
-    else if (strcmp("._udp", dotPos) == 0)
+    else if (strstr(dotPos, "._udp") != 0)
     {
         outProtocol = DnssdServiceProtocol::kDnssdProtocolUdp;
+    }
+    else
+    {
+        ChipLogError(Discovery, "protocol type don't include neithor TCP nor UDP!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ReturnErrorCodeIf(outProtocol == DnssdServiceProtocol::kDnssdProtocolUnknown, CHIP_ERROR_INVALID_ARGUMENT);
@@ -216,11 +249,8 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface,
     VerifyOrReturnError(sResolverObject != nullptr && sResolveMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(sMdnsCallbackObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    std::string serviceType = service->mType;
-    serviceType += '.';
-    serviceType += (service->mProtocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp");
-
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    std::string serviceType = GetFullType(service);
+    JNIEnv * env            = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jniInstanceName(env, service->mName);
     UtfString jniServiceType(env, serviceType.c_str());
 
@@ -432,8 +462,6 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     JniUtfString jniServiceType(env, serviceType);
-
-    VerifyOrReturn(strlen(jniServiceType.c_str()) <= kDnssdTypeAndProtocolMaxSize, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
     auto size              = env->GetArrayLength(instanceName);
     DnssdService * service = new DnssdService[size];

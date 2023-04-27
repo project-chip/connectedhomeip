@@ -163,6 +163,7 @@ config("qpg_retain_bootloader") {
   ldflags = [
     "-Wl,-u_binary_bl_userlicense_bin_start",
     "-Wl,-u_binary_bootloader_bin_start",
+    "-Wl,--no-warn-rwx-segment",
   ]
 }
 
