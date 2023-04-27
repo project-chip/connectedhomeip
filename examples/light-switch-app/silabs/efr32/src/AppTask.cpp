@@ -48,14 +48,16 @@
 
 #include <app/clusters/identify-server/identify-server.h>
 
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 /**********************************************************
  * Defines and Constants
  *********************************************************/
 
 #define SYSTEM_STATE_LED &sl_led_led0
 
-#define APP_FUNCTION_BUTTON &sl_button_btn0
-#define APP_LIGHT_SWITCH &sl_button_btn1
+#define APP_FUNCTION_BUTTON 0
+#define APP_LIGHT_SWITCH 1
 
 namespace {
 
@@ -151,6 +153,10 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
+#endif
+
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Light Switch");
 #endif
@@ -248,20 +254,18 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
-    VerifyOrReturn(buttonHandle != NULL);
-
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_LIGHT_SWITCH)
+    if (button == APP_LIGHT_SWITCH)
     {
         button_event.Handler = SwitchActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (buttonHandle == APP_FUNCTION_BUTTON)
+    else if (button == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);
