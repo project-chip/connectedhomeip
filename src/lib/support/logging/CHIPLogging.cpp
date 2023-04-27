@@ -53,10 +53,13 @@ void HandleTokenizedLog(uint32_t levels, pw_tokenizer_Token token, pw_tokenizer_
 {
     uint8_t encoded_message[PW_TOKENIZER_CFG_ENCODING_BUFFER_SIZE_BYTES];
 
+    memcpy(encoded_message, &token, sizeof(token));
+
     va_list args;
     va_start(args, types);
     // Use the C argument encoding API, since the C++ API requires C++17.
-    const size_t encoded_size = pw_tokenizer_EncodeArgs(types, args, encoded_message, sizeof(encoded_message));
+    const size_t encoded_size = sizeof(token) +
+        pw_tokenizer_EncodeArgs(types, args, encoded_message + sizeof(token), sizeof(encoded_message) - sizeof(token));
     va_end(args);
 
     uint8_t log_category = levels >> 8 & 0xFF;
