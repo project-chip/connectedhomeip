@@ -198,6 +198,9 @@ template("tizen_qemu_mkisofs") {
       args += invoker.assets
       inputs += invoker.assets
     }
+    if (defined(invoker.assets_non_tracked)) {
+      args += invoker.assets_non_tracked
+    }
 
     script = "${build_root}/gn_run_binary.py"
   }

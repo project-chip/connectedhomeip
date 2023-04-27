@@ -17,19 +17,24 @@ import("//build_overrides/tizen.gni")
 
 import("${tizen_sdk_build_root}/tizen_sdk.gni")
 
-tizen_qemu_mkisofs("chip-tests:runner") {
+tizen_qemu_mkisofs("chip-tests-runner") {
   runner = "runner.sh"
 
   # Build CHIP unit tests.
   deps = [ "${chip_root}/src:tests" ]
 
-  # Use artifacts created by the dependencies.
-  assets = []
+  # Bundle all created unit tests.
+  assets_non_tracked = [ rebase_path("${root_build_dir}/tests") ]
 }
 
 tizen_qemu_run("chip-tests") {
-  deps = [ ":chip-tests:runner" ]
-  mkisofs_outputs = get_target_outputs(":chip-tests:runner")
+  # Enable network support, so Tizen can obtain current date/time from the
+  # network. Correct date/time is required for the commissioning process -
+  # attestation will fail otherwise.
+  virtio_net = true
+
+  deps = [ ":chip-tests-runner" ]
+  mkisofs_outputs = get_target_outputs(":chip-tests-runner")
   iso_image = rebase_path(mkisofs_outputs[0])
 }
 

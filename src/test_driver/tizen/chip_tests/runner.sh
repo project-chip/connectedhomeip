@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #
 #    Copyright (c) 2021 Project CHIP Authors
@@ -20,3 +20,11 @@ set -e
 
 # Print CHIP logs on stdout
 dlogutil CHIP &
+
+STATUS=0
+# Run all executables in the /mnt/chip directory except the runner.sh script
+while IFS= read -r TEST ; do
+	$TEST || STATUS=$((STATUS + 1))
+done < <(find /mnt/chip -type f -executable ! -name runner.sh)
+
+exit $STATUS
