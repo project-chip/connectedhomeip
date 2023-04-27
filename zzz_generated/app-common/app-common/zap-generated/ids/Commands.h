@@ -607,6 +607,24 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace Commands
 } // namespace ModeSelect
 
+namespace RvcRun {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace RvcRun
+
 namespace DoorLock {
 namespace Commands {
 

@@ -4530,6 +4530,96 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRRVCRunClusterChangeToModeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newMode = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCRunClusterChangeToModeParams alloc] init];
+
+    other.newMode = self.newMode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
+    return descriptionString;
+}
+
+@end
+@implementation MTRRVCRunClusterChangeToModeWithStatusParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newMode = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCRunClusterChangeToModeWithStatusParams alloc] init];
+
+    other.newMode = self.newMode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
+    return descriptionString;
+}
+
+@end
+@implementation MTRRVCRunClusterChangeToModeResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _statusText = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCRunClusterChangeToModeResponseParams alloc] init];
+
+    other.status = self.status;
+    other.statusText = self.statusText;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
+    return descriptionString;
+}
+
+@end
 @implementation MTRDoorLockClusterLockDoorParams
 - (instancetype)init
 {

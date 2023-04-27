@@ -1198,6 +1198,36 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::CommonSeman
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRun::ChangeToModeResponseStatus val)
+{
+    using EnumType = RvcRun::ChangeToModeResponseStatus;
+    switch (val)
+    {
+    case EnumType::kBatteryLow:
+    case EnumType::kRobotStuck:
+    case EnumType::kBinMissing:
+    case EnumType::kBinFull:
+    case EnumType::kWaterTankMissing:
+    case EnumType::kWaterTankLidOpen:
+    case EnumType::kCleaningPadMissing:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRun::SemanticTags val)
+{
+    using EnumType = RvcRun::SemanticTags;
+    switch (val)
+    {
+    case EnumType::kIdle:
+    case EnumType::kCleaning:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;

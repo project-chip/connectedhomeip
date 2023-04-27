@@ -476,3 +476,8 @@ void MatterModeSelectPluginServerInitCallback()
 {
     // Nothing to do, the server init routine will be done in Instance::Init()
 }
+
+void MatterRvcRunPluginServerInitCallback()
+{
+    // Nothing to do, the server init routine will be done in Instance::Init()
+}

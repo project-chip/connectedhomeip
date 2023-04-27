@@ -27,23 +27,59 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// Parallel array data (*cluster*, attribute, privilege) for read attribute
+#define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
+}
 
+// Parallel array data (cluster, *attribute*, privilege) for read attribute
+#define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
+}
 
+// Parallel array data (cluster, attribute, *privilege*) for read attribute
+#define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// Parallel array data (*cluster*, attribute, privilege) for write attribute
+#define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
+}
 
+// Parallel array data (cluster, *attribute*, privilege) for write attribute
+#define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
+}
 
+// Parallel array data (cluster, attribute, *privilege*) for write attribute
+#define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// Parallel array data (*cluster*, command, privilege) for invoke command
+#define GENERATED_ACCESS_INVOKE_COMMAND__CLUSTER { \
+}
 
+// Parallel array data (cluster, *command*, privilege) for invoke command
+#define GENERATED_ACCESS_INVOKE_COMMAND__COMMAND { \
+}
 
+// Parallel array data (cluster, command, *privilege*) for invoke command
+#define GENERATED_ACCESS_INVOKE_COMMAND__PRIVILEGE { \
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// Parallel array data (*cluster*, event, privilege) for read event
+#define GENERATED_ACCESS_READ_EVENT__CLUSTER { \
+}
 
+// Parallel array data (cluster, *event*, privilege) for read event
+#define GENERATED_ACCESS_READ_EVENT__EVENT { \
+}
 
+// Parallel array data (cluster, event, *privilege*) for read event
+#define GENERATED_ACCESS_READ_EVENT__PRIVILEGE { \
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

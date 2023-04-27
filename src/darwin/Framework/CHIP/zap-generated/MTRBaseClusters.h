@@ -20071,6 +20071,26 @@ typedef NS_OPTIONS(uint32_t, MTRModeSelectFeature) {
     MTRModeSelectFeatureEXT MTR_NEWLY_AVAILABLE = 0x2,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRRVCRunChangeToModeResponseStatus) {
+    MTRRVCRunChangeToModeResponseStatusBatteryLow MTR_NEWLY_AVAILABLE = 0x40,
+    MTRRVCRunChangeToModeResponseStatusRobotStuck MTR_NEWLY_AVAILABLE = 0x41,
+    MTRRVCRunChangeToModeResponseStatusBinMissing MTR_NEWLY_AVAILABLE = 0x42,
+    MTRRVCRunChangeToModeResponseStatusBinFull MTR_NEWLY_AVAILABLE = 0x43,
+    MTRRVCRunChangeToModeResponseStatusWaterTankMissing MTR_NEWLY_AVAILABLE = 0x44,
+    MTRRVCRunChangeToModeResponseStatusWaterTankLidOpen MTR_NEWLY_AVAILABLE = 0x45,
+    MTRRVCRunChangeToModeResponseStatusCleaningPadMissing MTR_NEWLY_AVAILABLE = 0x46,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint16_t, MTRRVCRunSemanticTags) {
+    MTRRVCRunSemanticTagsIdle MTR_NEWLY_AVAILABLE = 0x4000,
+    MTRRVCRunSemanticTagsCleaning MTR_NEWLY_AVAILABLE = 0x4001,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint32_t, MTRRVCRunFeature) {
+    MTRRVCRunFeatureDEPONOFF MTR_NEWLY_AVAILABLE = 0x1,
+    MTRRVCRunFeatureEXT MTR_NEWLY_AVAILABLE = 0x2,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDoorLockAlarmCode) {
     MTRDoorLockAlarmCodeLockJammed API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
     MTRDoorLockAlarmCodeLockFactoryReset API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x01,

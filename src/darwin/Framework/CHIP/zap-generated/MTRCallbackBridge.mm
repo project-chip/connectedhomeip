@@ -6356,6 +6356,10 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
             newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                           length:entry_0.label.size()
                                                         encoding:NSUTF8StringEncoding];
+            newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                          length:entry_0.label.size()
+                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
             newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
@@ -6365,6 +6369,28 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
                     MTRModeSelectClusterSemanticTagStruct * newElement_2;
                     newElement_2 = [MTRModeSelectClusterSemanticTagStruct new];
                     newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                    newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                    [array_2 addObject:newElement_2];
+                }
+                CHIP_ERROR err = iter_2.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, err);
+                    return;
+                }
+                newElement_0.semanticTags = array_2;
+            }
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                auto iter_2 = entry_0.semanticTags.begin();
+                while (iter_2.Next()) {
+                    auto & entry_2 = iter_2.GetValue();
+                    MTRModeSelectClusterSemanticTagStruct * newElement_2;
+                    newElement_2 = [MTRModeSelectClusterSemanticTagStruct new];
+                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                     [array_2 addObject:newElement_2];
                 }
@@ -16312,6 +16338,106 @@ void MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackBridge::OnSu
 };
 
 void MTRNullableModeSelectClusterCommonSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRRVCRunClusterChangeToModeResponseStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RvcRun::ChangeToModeResponseStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRRVCRunClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableRVCRunClusterChangeToModeResponseStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRun::ChangeToModeResponseStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableRVCRunClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRRVCRunClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RvcRun::SemanticTags value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRRVCRunClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableRVCRunClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRun::SemanticTags> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableRVCRunClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

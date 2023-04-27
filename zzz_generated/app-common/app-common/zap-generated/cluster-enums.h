@@ -1400,6 +1400,45 @@ enum class ModeSelectFeature : uint32_t
 };
 } // namespace ModeSelect
 
+namespace RvcRun {
+
+// Enum for ChangeToModeResponseStatus
+enum class ChangeToModeResponseStatus : uint8_t
+{
+    kBatteryLow         = 0x40,
+    kRobotStuck         = 0x41,
+    kBinMissing         = 0x42,
+    kBinFull            = 0x43,
+    kWaterTankMissing   = 0x44,
+    kWaterTankLidOpen   = 0x45,
+    kCleaningPadMissing = 0x46,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for SemanticTags
+enum class SemanticTags : uint16_t
+{
+    kIdle     = 0x4000,
+    kCleaning = 0x4001,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kDeponoff = 0x1,
+    kExt      = 0x2,
+};
+} // namespace RvcRun
+
 namespace DoorLock {
 
 // Enum for AlarmCodeEnum

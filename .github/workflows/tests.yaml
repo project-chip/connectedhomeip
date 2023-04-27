@@ -169,6 +169,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/pump-configuration-and-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pwm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/rvc-run-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/scene.xml \
                       src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml \

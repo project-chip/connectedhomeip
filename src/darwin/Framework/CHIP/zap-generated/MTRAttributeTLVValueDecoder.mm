@@ -7744,6 +7744,10 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                     newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                                   length:entry_0.label.size()
                                                                 encoding:NSUTF8StringEncoding];
+                    newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                                  length:entry_0.label.size()
+                                                                encoding:NSUTF8StringEncoding];
+                    newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
                     newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
                     { // Scope for our temporary variables
                         auto * array_2 = [NSMutableArray new];
@@ -7753,6 +7757,28 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                             MTRModeSelectClusterSemanticTagStruct * newElement_2;
                             newElement_2 = [MTRModeSelectClusterSemanticTagStruct new];
                             newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                            newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                            newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                            newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                            [array_2 addObject:newElement_2];
+                        }
+                        CHIP_ERROR err = iter_2.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.semanticTags = array_2;
+                    }
+                    { // Scope for our temporary variables
+                        auto * array_2 = [NSMutableArray new];
+                        auto iter_2 = entry_0.semanticTags.begin();
+                        while (iter_2.Next()) {
+                            auto & entry_2 = iter_2.GetValue();
+                            MTRModeSelectClusterSemanticTagStruct * newElement_2;
+                            newElement_2 = [MTRModeSelectClusterSemanticTagStruct new];
+                            newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                            newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                            newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                             newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                             [array_2 addObject:newElement_2];
                         }
