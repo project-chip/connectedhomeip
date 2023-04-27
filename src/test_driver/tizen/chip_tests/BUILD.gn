@@ -12,10 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("//build_overrides/tizen.gni")
+
+import("${tizen_sdk_build_root}/tizen_sdk.gni")
+
+tizen_qemu_mkisofs("chip-tests:runner") {
+  runner = "runner.sh"
+
+  # Build CHIP unit tests.
+  deps = [ "${chip_root}/src:tests" ]
+
+  # Use artifacts created by the dependencies.
+  assets = []
+}
+
+tizen_qemu_run("chip-tests") {
+  deps = [ ":chip-tests:runner" ]
+  mkisofs_outputs = get_target_outputs(":chip-tests:runner")
+  iso_image = rebase_path(mkisofs_outputs[0])
+}
+
 group("check") {
+  deps = [ ":chip-tests" ]
   testonly = true
-  deps = [
-    "chip_tests:check",
-    "integration_tests/lighting-app:check",
-  ]
 }

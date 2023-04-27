@@ -151,10 +151,12 @@ template("chip_test_suite") {
       }
     }
 
-    group("${_suite_name}_run") {
-      deps = []
-      foreach(_test, tests) {
-        deps += [ ":${_test}_run" ]
+    if (chip_pw_run_tests) {
+      group("${_suite_name}_run") {
+        deps = []
+        foreach(_test, tests) {
+          deps += [ ":${_test}_run" ]
+        }
       }
     }
   } else {
