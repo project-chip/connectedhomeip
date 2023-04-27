@@ -40,6 +40,7 @@ static_library("BL602") {
     "../common/Logging.cpp",
     "../common/OTAImageProcessorImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
+    "../common/ConnectivityManagerImpl.cpp",
 
     "${chip_root}/src/credentials/CHIPCert.h",
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",

@@ -67,7 +67,6 @@ using namespace ::chip::DeviceLayer::Internal;
 namespace chip {
 namespace DeviceLayer {
 
-ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 ConnectivityManager::WiFiStationState ConnectivityManagerImpl::mWiFiStationState =
     ConnectivityManager::kWiFiStationState_NotConnected;
 
@@ -100,34 +99,6 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
     DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 
     return err;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_Init()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Initialize the generic base classes that require it.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
-#endif
-
-    SuccessOrExit(err);
-
-    err = SetWiFiStationMode(kWiFiStationMode_Enabled);
-    NetworkCommissioning::BLWiFiDriver::GetInstance().ReConnectWiFiNetwork();
-
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-    // Forward the event to the generic base classes as needed.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
-#endif
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)

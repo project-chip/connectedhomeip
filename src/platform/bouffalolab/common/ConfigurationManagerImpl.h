@@ -38,8 +38,6 @@ public:
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
 
 private:
-    uint32_t mBootReason;
-
     // ===== Members that implement the ConfigurationManager private interface.
 
     CHIP_ERROR Init(void) override;

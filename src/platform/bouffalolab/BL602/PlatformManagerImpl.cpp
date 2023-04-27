@@ -1,7 +1,6 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright (c) 2019 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,12 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the PlatformManager object
- *          for BL602 platforms using the Bouffalolab BL602 SDK.
- */
-/* this file behaves like a config.h, comes first */
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 

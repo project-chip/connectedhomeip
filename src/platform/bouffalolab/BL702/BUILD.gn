@@ -25,7 +25,6 @@ if (chip_enable_openthread) {
 
 static_library("BL702") {
   sources = [
-    "ConnectivityManagerImpl.cpp",
     "DiagnosticDataProviderImpl.cpp",
     "PlatformManagerImpl.cpp",
   ]
@@ -40,6 +39,7 @@ static_library("BL702") {
     "../common/Logging.cpp",
     "../common/OTAImageProcessorImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
+    "../common/ConnectivityManagerImpl.cpp",
 
     "${chip_root}/src/credentials/CHIPCert.h",
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",

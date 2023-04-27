@@ -28,6 +28,13 @@
 #include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
+#ifdef BL602
+#include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
+#endif
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
@@ -54,8 +61,16 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    CHIP_ERROR err = SetWiFiStationMode(kWiFiStationMode_Enabled);
+    NetworkCommissioning::BLWiFiDriver::GetInstance().ReConnectWiFiNetwork();
+
+    ReturnErrorOnFailure(err);
+#endif
+
     return CHIP_NO_ERROR;
 }
+
 
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
