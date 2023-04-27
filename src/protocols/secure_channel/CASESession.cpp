@@ -145,7 +145,7 @@ public:
     // Set `cancel` to true if calling the after work callback is not necessary.
     typedef CHIP_ERROR (*WorkCallback)(DATA & data, bool & cancel);
 
-    // After work callback, processed in the main CHIP task via `PlatformManager::ScheduleWork`.
+    // After work callback, processed in the main Matter task via `PlatformManager::ScheduleWork`.
     // This is a member function to be called on the associated session after the work callback.
     // The `status` value is the result of the work callback (called beforehand).
     typedef CHIP_ERROR (CASESession::*AfterWorkCallback)(DATA & data, CHIP_ERROR status);
@@ -226,7 +226,7 @@ private:
     // Handler for the after work callback.
     static void AfterWorkHandler(intptr_t arg)
     {
-        // Since this runs in the main CHIP thread, the session shouldn't be otherwise used (messages, timers, etc.)
+        // Since this runs in the main Matter thread, the session shouldn't be otherwise used (messages, timers, etc.)
         WorkHelper * helper = reinterpret_cast<WorkHelper *>(arg);
         if (auto * session = helper->mSession.load())
         {
