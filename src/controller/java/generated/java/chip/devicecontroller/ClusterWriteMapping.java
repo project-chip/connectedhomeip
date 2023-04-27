@@ -1719,6 +1719,23 @@ public class ClusterWriteMapping {
             writeFanControlWindSettingCommandParams);
     writeFanControlInteractionInfo.put(
         "writeWindSettingAttribute", writeFanControlWindSettingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeFanControlAirflowDirectionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo fanControlairflowDirectionCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeFanControlAirflowDirectionCommandParams.put(
+        "value", fanControlairflowDirectionCommandParameterInfo);
+    InteractionInfo writeFanControlAirflowDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FanControlCluster) cluster)
+                  .writeAirflowDirectionAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeFanControlAirflowDirectionCommandParams);
+    writeFanControlInteractionInfo.put(
+        "writeAirflowDirectionAttribute", writeFanControlAirflowDirectionAttributeInteractionInfo);
     writeAttributeMap.put("fanControl", writeFanControlInteractionInfo);
     Map<String, InteractionInfo> writeThermostatUserInterfaceConfigurationInteractionInfo =
         new LinkedHashMap<>();

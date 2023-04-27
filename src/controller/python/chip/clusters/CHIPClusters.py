@@ -5304,6 +5304,13 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x0000000B: {
+                "attributeName": "AirflowDirection",
+                "attributeId": 0x0000000B,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

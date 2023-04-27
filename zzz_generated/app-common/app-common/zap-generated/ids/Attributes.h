@@ -3142,6 +3142,10 @@ namespace WindSetting {
 static constexpr AttributeId Id = 0x0000000A;
 } // namespace WindSetting
 
+namespace AirflowDirection {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace AirflowDirection
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
