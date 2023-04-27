@@ -136,6 +136,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/dishwasher-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/fan-control-cluster.xml \

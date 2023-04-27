@@ -2458,6 +2458,26 @@ client cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** This cluster provides a way to access options associated with the operation of a Dishwasher device type. */
+client cluster DishwasherControl = 88 {
+  bitmap DishwasherControlFeature : BITMAP32 {
+    kSteamwash = 0x1;
+    kHeateddry = 0x2;
+    kExtdry = 0x4;
+  }
+
+  readonly attribute bitmap32 availableOptionsForCurrentMode[] = 0;
+  attribute optional boolean steamWash = 1;
+  attribute optional boolean heatedDry = 2;
+  attribute optional boolean extendedDry = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** An interface to a generic way to secure a door */
 client cluster DoorLock = 257 {
   enum AlarmCodeEnum : ENUM8 {
@@ -5413,6 +5433,7 @@ endpoint 1 {
   binding cluster UserLabel;
   binding cluster BooleanState;
   binding cluster ModeSelect;
+  binding cluster DishwasherControl;
   binding cluster DoorLock;
   binding cluster WindowCovering;
   binding cluster BarrierControl;
