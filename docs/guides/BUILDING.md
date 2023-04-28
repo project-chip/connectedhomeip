@@ -57,7 +57,7 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 
 #### UI builds
 
-If building `-with-ui` variant, also install SDL2:
+If building via `build_examples.py` and `-with-ui` variant, also install SDL2:
 
 ```
 sudo apt-get install libsdl2-dev
@@ -250,6 +250,43 @@ ninja -C out/host src/inet/tests:tests_run
 > ```
 >
 > This means that the tests passed in a previous build.
+
+## Using `build_examples.py`
+
+The script `./scripts/build/build_examples.py` provides a uniform build interface
+into using `gn`, `cmake`, `ninja` and other tools as needed to compile various
+platforms.
+
+Use `./scripts/build/build_examples.py targets` to see a list of supported targets.
+
+Example build commands:
+
+```
+# Compiles and runs all tests on the host:
+/scripts/build/build_examples.py --target linux-x64-tests build
+
+# Compiles fuzzing tagets using libfuzzer (fuzzing requires clang)
+/scripts/build/build_examples.py --target linux-x64-tests-clang-libfuzzer build
+
+# Compiles a esp32 example
+./scripts/build/build_examples.py --target esp32-m5stack-all-clusters build
+
+# Compiles a nrf example
+./scripts/build/build_examples.py --target nrf-nrf5340dk-pump build
+```
+
+### Fuzzing tests
+
+Fuzzing tests are only compiled but not executed (you have to manually execute them).
+
+To compile, use:
+
+```
+./scripts/build/build_examples.py --target linux-x64-tests-clang-libfuzzer build
+```
+
+After which tests should be located in `out/linux-x64-tests-clang-libfuzzer/tests/`.
+
 
 ## Build custom configuration
 

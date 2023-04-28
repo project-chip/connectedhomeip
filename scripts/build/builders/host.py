@@ -371,6 +371,9 @@ class HostBuilder(GnBuilder):
         if self.app == HostApp.SIMULATED_APP2:
             self.extra_gn_options.append('chip_tests_zap_config="app2"')
 
+        if self.app == HostApp.TESTS and fuzzing_type != HostFuzzingType.NONE:
+            self.build_command = 'fuzz_tests'
+
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
             return self.extra_gn_options
