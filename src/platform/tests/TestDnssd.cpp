@@ -15,12 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a unit test suite for the mDNS code functionality.
- *
- */
-
 #include <atomic>
 
 #include <nlunit-test.h>
