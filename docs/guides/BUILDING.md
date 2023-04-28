@@ -267,7 +267,7 @@ Example build commands:
 /scripts/build/build_examples.py --target linux-x64-tests build
 
 # Compiles fuzzing tagets using libfuzzer (fuzzing requires clang)
-/scripts/build/build_examples.py --target linux-x64-tests-clang-libfuzzer build
+/scripts/build/build_examples.py --target linux-x64-tests-clang-asan-libfuzzer build
 
 # Compiles a esp32 example
 ./scripts/build/build_examples.py --target esp32-m5stack-all-clusters build
@@ -279,16 +279,17 @@ Example build commands:
 ### Fuzzing tests
 
 Fuzzing tests are only compiled but not executed (you have to manually execute
-them).
+them). For best error detection, some form of sanitizer like `asan` should
+be used.
 
 To compile, use:
 
 ```
-./scripts/build/build_examples.py --target linux-x64-tests-clang-libfuzzer build
+./scripts/build/build_examples.py --target linux-x64-tests-clang-asan-libfuzzer build
 ```
 
 After which tests should be located in
-`out/linux-x64-tests-clang-libfuzzer/tests/`.
+`out/linux-x64-tests-clang-asan-libfuzzer/tests/`.
 
 ## Build custom configuration
 
