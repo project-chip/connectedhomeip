@@ -279,8 +279,8 @@ Example build commands:
 ### Fuzzing tests
 
 Fuzzing tests are only compiled but not executed (you have to manually execute
-them). For best error detection, some form of sanitizer like `asan` should
-be used.
+them). For best error detection, some form of sanitizer like `asan` should be
+used.
 
 To compile, use:
 
