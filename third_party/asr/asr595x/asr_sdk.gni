@@ -1,0 +1,142 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/jlink.gni")
+import("//build_overrides/mbedtls.gni")
+
+import("//build_overrides/asr.gni")
+import("asr_board.gni")
+
+# Defines an asr SDK build target.
+#
+# Parameters:
+#   sources - The sources files to build.
+#
+template("asr_sdk_sources") {
+  if (defined(invoker.asr_project_dir)) {
+    asr_project_dir = invoker.asr_project_dir
+  }
+
+  # While most asr sdk includes come from the asr_sdk_config config (in
+  # BUILD.gn), this template gets instantiated by each project each of which
+  # provides a few extra includes/defines. Handle those here.
+  config("project_configs") {
+    include_dirs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+    include_dirs += [ "${asr_project_dir}/include" ]
+
+    defines = []
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+  }
+
+  sdk_target_name = target_name
+
+  # Add sources here
+  source_set(sdk_target_name) {
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    _third_party_src = [
+# at
+        "at_cmd/atcmd_comm.c",
+        "at_cmd/atcmd_user.c",
+        "at_cmd/atcmd_matter.c",
+# common
+        "common/alto/src/alto_common.c",
+        "common/alto/src/hbird_common.c",
+        "common/alto/src/system_hbird.c",
+        "common/alto/src/GCC/startup_hbird.S",
+        "common/alto/src/GCC/intexc_hbird.S",
+# rtos
+        "freertos/Source/croutine.c",
+        "freertos/Source/event_groups.c",
+        "freertos/Source/list.c",
+        "freertos/Source/portable/GCC/port.c",
+        "freertos/Source/portable/GCC/portasm.S",
+        "freertos/Source/portable/MemMang/heap_5.c",
+        "freertos/Source/queue.c",
+        "freertos/Source/stream_buffer.c",
+        "freertos/Source/tasks.c",
+        "freertos/Source/timers.c",
+        "legartos/lega_rtos.c",
+# peripheral
+        "peripheral/asr/src/alto/asr_alto_apll_rf.c",
+        "peripheral/asr/src/alto/asr_alto_board.c",
+        "peripheral/asr/src/alto/asr_alto_efuse.c",
+        "peripheral/asr/src/alto/asr_alto_pinmux.c",
+        "peripheral/asr/src/alto/asr_alto_port.c",
+        "peripheral/asr/src/alto/asr_alto_boot.c",
+        "peripheral/asr/src/alto/asr_alto_ram_layout.c",
+        "peripheral/asr/src/asr_dma.c",
+        "peripheral/asr/src/asr_efuse.c",
+        "peripheral/asr/src/asr_flash.c",
+        "peripheral/asr/src/asr_flash_alg.c",
+        "peripheral/asr/src/asr_i2c.c",
+        "peripheral/asr/src/asr_gpio.c",
+        "peripheral/asr/src/asr_pwm.c",
+        "peripheral/asr/src/asr_pinmux.c",
+        "peripheral/asr/src/asr_adc.c",
+        "peripheral/asr/src/asr_psram.c",
+        "peripheral/asr/src/asr_rf_spi.c",
+        "peripheral/asr/src/asr_rtc.c",
+        "peripheral/asr/src/asr_timer.c",
+        "peripheral/asr/src/asr_uart.c",
+        "peripheral/asr/src/asr_wdg.c",
+# platform
+        "platform/alto/system/prinfs/printf-stdarg.c",
+        "platform/alto/system/prinfs/printf_uart.c",
+        "platform/alto/system/prinfs/sysCalls.c",
+        "platform/alto/system/soc/soc_init.c",
+        "platform/alto/system/soc/system_cm4.c",
+        "platform/alto/system/soc/systick_delay.c",
+#elog
+        "common/alto/easylogger/elog_async.c",
+        "common/alto/easylogger/elog_buf.c",
+        "common/alto/easylogger/elog_module.c",
+        "common/alto/easylogger/elog_port.c",
+        "common/alto/easylogger/elog_utils.c",
+        "common/alto/easylogger/elog.c",
+# ble
+        "projects/alto_demo/ble_demo/duet_hl_matter/app.c",
+        "projects/alto_demo/ble_demo/duet_hl_matter/user_platform.c",
+# matter
+        "matter/asr_factory_config.c",
+    ]
+
+    foreach(src, _third_party_src) {
+      sources += [ rebase_path(src,
+                               "${asr_project_dir}",
+                               "${asr_sdk_build_root}/asr_sdk/") ]
+    }
+
+    public_deps = []
+    if (defined(invoker.public_deps)) {
+      public_deps += invoker.public_deps
+    }
+
+    public_deps += [ "${chip_root}/src/lwip:lwip" ]
+
+    public_configs = [ ":project_configs" ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}

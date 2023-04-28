@@ -1,0 +1,126 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/jlink.gni")
+import("//build_overrides/mbedtls.gni")
+
+import("//build_overrides/asr.gni")
+import("asr_board.gni")
+
+# Defines an asr SDK build target.
+#
+# Parameters:
+#   sources - The sources files to build.
+#
+template("asr_sdk_sources") {
+  if (defined(invoker.asr_project_dir)) {
+    asr_project_dir = invoker.asr_project_dir
+  }
+
+  # While most asr sdk includes come from the asr_sdk_config config (in
+  # BUILD.gn), this template gets instantiated by each project each of which
+  # provides a few extra includes/defines. Handle those here.
+  config("project_configs") {
+    include_dirs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+    include_dirs += [ "${asr_project_dir}/include" ]
+
+    defines = []
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+  }
+
+  sdk_target_name = target_name
+
+  # Add sources here
+  source_set(sdk_target_name) {
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    _third_party_src = [
+#at
+        "at_cmd/atcmd_comm.c",
+        "at_cmd/atcmd_user.c",
+        "at_cmd/atcmd_matter.c",
+        "peripheral/duet/src/duet_boot.c",
+        "peripheral/duet/src/duet_board.c",
+        "peripheral/duet/src/duet_efuse.c",
+        "peripheral/duet/src/duet_flash.c",
+        "peripheral/duet/src/duet_flash_alg.c",
+        "peripheral/duet/src/duet_wdg.c",
+        "peripheral/duet/src/duet_timer.c",
+        "peripheral/duet/src/duet_gpio.c",
+        "peripheral/duet/src/duet_i2c.c",
+        "peripheral/duet/src/duet_rf_spi.c",
+        "peripheral/duet/src/duet_pwm.c",
+        "peripheral/duet/src/duet_rtc.c",
+        "peripheral/duet/src/duet_pinmux.c",
+        "peripheral/duet/src/duet_uart.c",
+        "peripheral/duet/src/duet_adc.c",
+        "peripheral/duet/src/duet_dma.c",
+        "platform/duet/system/sysCalls.c",
+        "platform/duet/system/soc_init.c",
+        "platform/duet/system/printf_uart.c",
+        "platform/duet/system/printf-stdarg.c",
+        "platform/duet/system/system_cm4.c",
+        "platform/duet/system/startup_cm4.S",
+        "platform/duet/ethernetif_wifi.c",
+#rtos
+        "platform/duet/lega_rtos.c",
+        "freertos/Source/croutine.c",
+        "freertos/Source/event_groups.c",
+        "freertos/Source/list.c",
+        "freertos/Source/queue.c",
+        "freertos/Source/tasks.c",
+        "freertos/Source/timers.c",
+        "freertos/Source/portable/MemMang/heap_5.c",
+        "freertos/Source/portable/GCC/ARM_CM4F/port.c",
+#ble
+        "demo/matter_demo/app/ble_demo/duet_hl_matter/app.c",
+        "demo/matter_demo/app/ble_demo/duet_hl_matter/user_platform.c",
+        "matter/asr_factory_config.c",
+#elog
+        "common/duet/easylogger/elog_async.c",
+        "common/duet/easylogger/elog_buf.c",
+        "common/duet/easylogger/elog_module.c",
+        "common/duet/easylogger/elog_port.c",
+        "common/duet/easylogger/elog_utils.c",
+        "common/duet/easylogger/elog.c",
+    ]
+
+    foreach(src, _third_party_src) {
+      sources += [ rebase_path(src,
+                               "${asr_project_dir}",
+                               "${asr_sdk_build_root}/asr_sdk/") ]
+    }
+
+    public_deps = []
+    if (defined(invoker.public_deps)) {
+      public_deps += invoker.public_deps
+    }
+
+    public_deps += [ "${chip_root}/src/lwip:lwip" ]
+
+    public_configs = [ ":project_configs" ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}
