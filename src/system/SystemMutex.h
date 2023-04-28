@@ -24,8 +24,6 @@
 
 #pragma once
 
-#include <mutex>
-
 // Include configuration headers
 #include <system/SystemConfig.h>
 
@@ -94,38 +92,6 @@ namespace System {
 #define CHIP_NO_THREAD_SAFETY_ANALYSIS CHIP_TSA_ATTRIBUTE__(no_thread_safety_analysis)
 
 /**
- *  @class LockGuard
- *
- *  @brief
- *      This class template is a wrapper for std::lock_guard that provides
- *      a way to annotate the lock guard with thread safety attributes.
- *
- */
-template <typename _Mutex>
-class CHIP_SCOPED_CAPABILITY LockGuard : public std::lock_guard<_Mutex>
-{
-public:
-    explicit LockGuard(_Mutex & __m) CHIP_ACQUIRE(__m) : std::lock_guard<_Mutex>(__m) {}
-    ~LockGuard() CHIP_RELEASE() = default;
-};
-
-/**
- *  @class UniqueLock
- *
- *  @brief
- *      This class template is a wrapper for std::unique_lock that provides
- *      a way to annotate the unique lock with thread safety attributes.
- *
- */
-template <typename _Mutex>
-class CHIP_SCOPED_CAPABILITY UniqueLock : public std::unique_lock<_Mutex>
-{
-public:
-    explicit UniqueLock(_Mutex & __m) CHIP_ACQUIRE(__m) : std::unique_lock<_Mutex>(__m) {}
-    ~UniqueLock() CHIP_RELEASE() = default;
-};
-
-/**
  *  @class Mutex
  *
  *  @brief
@@ -185,9 +151,6 @@ private:
     Mutex(const Mutex &) = delete;
     Mutex & operator=(const Mutex &) = delete;
 };
-
-using MutexLockGuard  = LockGuard<Mutex>;
-using MutexUniqueLock = UniqueLock<Mutex>;
 
 #if CHIP_SYSTEM_CONFIG_NO_LOCKING
 inline CHIP_ERROR Init(Mutex & aMutex)
