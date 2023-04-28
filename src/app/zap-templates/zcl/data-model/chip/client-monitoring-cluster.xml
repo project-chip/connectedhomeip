@@ -30,9 +30,9 @@ limitations under the License.
         <code>0x1046</code>
         <define>CLIENT_MONITORING_CLUSTER</define>
         <description>Client Monitoring allows for ensuring that listed clients are notified when a server is available for communication.</description>
-        <attribute side="server" code="0x00" define="IDLE_MODE_INTERVAL" type="INT32U" min="0x1F4" max="0X5265C00" default="0x1F4" writable="false" optional="false" isNullable="false">IdleModeInterval</attribute>
-        <attribute side="server" code="0x01" define="ACTIVE_MODE_INTERVAL" type="INT32U" min="0x12C" default="0x12C" writable="false" optional="false" isNullable="false">ActiveModeInterval</attribute>
-        <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="INT16U" min="0x12C" default="0x12C" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
+        <attribute side="server" code="0x00" define="IDLE_MODE_INTERVAL" type="INT32U" min="500" max="86400000" default="500" writable="false" optional="false" isNullable="false">IdleModeInterval</attribute>
+        <attribute side="server" code="0x01" define="ACTIVE_MODE_INTERVAL" type="INT32U" min="300" default="300" writable="false" optional="false" isNullable="false">ActiveModeInterval</attribute>
+        <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="INT16U" min="300" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
 
         <attribute side="server" code="0x03" define="EXPECTED_CLIENTS" type="ARRAY" entryType="MonitoringRegistrationStruct" writable="false" optional="false" isNullable="false" reportable="false">
             <description>ExpectedClients</description>
