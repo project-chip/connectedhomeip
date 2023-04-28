@@ -112,9 +112,9 @@ menu "CHIP Core"
             int  "Set threshold in ms"
             default 700
             help
-                 Time threshold for events dispatching. By default set to 0 to
-                 to disable event dispatching time measurement and suppress the
-                 logs for Long dispatch time.
+                 Time threshold for warning that dispatched took too long. You can
+		 set this default set to 0 to to disable event dispatching time
+		 measurement and suppress the logs "Long dispatch time:...".
 
         # TODO: add log level selection
 
