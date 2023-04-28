@@ -35,7 +35,6 @@ namespace Utilities {
 
 namespace {
 
-
 // Sets up a limit on recursion depth, to avoid any stack overflows
 // on very deep TLV structures. Embedded has limited stack space.
 constexpr size_t kMaxRecursionDepth = 10;
@@ -72,7 +71,8 @@ static CHIP_ERROR Iterate(TLVReader & aReader, size_t aDepth, IterateHandler aHa
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
-    if (aDepth >= kMaxRecursionDepth) {
+    if (aDepth >= kMaxRecursionDepth)
+    {
         return CHIP_ERROR_RECURSION_DEPTH_LIMIT;
     }
 
