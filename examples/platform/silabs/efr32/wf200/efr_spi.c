@@ -51,11 +51,12 @@
 
 #if SL_WIFI
 #include "spi_multiplex.h"
-StaticSemaphore_t spi_sem_peripharal;
-SemaphoreHandle_t spi_sem_sync_hdl;
 #endif
 
 #define USART SL_WFX_HOST_PINOUT_SPI_PERIPHERAL
+
+StaticSemaphore_t spi_sem_peripheral;
+SemaphoreHandle_t spi_sem_sync_hdl;
 
 StaticSemaphore_t xEfrSpiSemaBuffer;
 static SemaphoreHandle_t spi_sem;
@@ -76,13 +77,6 @@ uint8_t wirq_irq_nb = SL_WFX_HOST_PINOUT_SPI_WIRQ_PIN; // SL_WFX_HOST_PINOUT_SPI
 #define PIN_OUT_SET 1
 #define PIN_OUT_CLEAR 0
 
-/****************************************************************************
- * @fn  sl_status_t sl_wfx_host_init_bus(void)
- * @brief
- *  Initialize SPI peripheral
- * @param[in] None
- * @return returns SL_STATUS_OK
- *****************************************************************************/
 sl_status_t sl_wfx_host_init_bus(void)
 {
     spi_enabled = true;
@@ -112,19 +106,12 @@ sl_status_t sl_wfx_host_init_bus(void)
     xSemaphoreGive(spi_sem);
 
 #if defined(EFR32MG24)
-    spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripharal);
+    spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripheral);
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif /* EFR32MG24 */
     return SL_STATUS_OK;
 }
 
-/****************************************************************************
- * @fn  sl_status_t sl_wfx_host_deinit_bus(void)
- * @brief
- *     De-initialize SPI peripheral and DMAs
- * @param[in] None
- * @return returns SL_STATUS_OK
- *****************************************************************************/
 sl_status_t sl_wfx_host_deinit_bus(void)
 {
     vSemaphoreDelete(spi_sem);
@@ -139,13 +126,6 @@ sl_status_t sl_wfx_host_deinit_bus(void)
     return SL_STATUS_OK;
 }
 
-/****************************************************************************
- * @fn  sl_status_t sl_wfx_host_spi_cs_assert()
- * @brief
- *     Assert chip select.
- * @param[in] None
- * @return returns SL_STATUS_OK
- *****************************************************************************/
 sl_status_t sl_wfx_host_spi_cs_assert()
 {
     configASSERT(spi_sem_sync_hdl);
@@ -153,18 +133,11 @@ sl_status_t sl_wfx_host_spi_cs_assert()
     {
         return SL_STATUS_TIMEOUT;
     }
-    spi_drv_reinit(SL_BIT_RATE_EXP_HDR);
+    SPIDRV_ReInit(SL_BIT_RATE_EXP_HDR);
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
     return SL_STATUS_OK;
 }
 
-/****************************************************************************
- * @fn  sl_status_t sl_wfx_host_spi_cs_deassert()
- * @brief
- *     De-Assert chip select.
- * @param[in] None
- * @return returns SL_STATUS_OK
- *****************************************************************************/
 sl_status_t sl_wfx_host_spi_cs_deassert()
 {
     GPIO_PinOutSet(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
@@ -245,22 +218,6 @@ void transmitDMA(uint8_t * buffer, uint16_t buffer_length)
                             dmadrvDataSize1, NULL, NULL);
 }
 
-/****************************************************************************
- * @fn  sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_t type,
-                                                  uint8_t *header,
-                                                  uint16_t header_length,
-                                                  uint8_t *buffer,
-                                                  uint16_t buffer_length)
- * @brief
- * WFX SPI transfer implementation
- * @param[in] type:
- * @param[in] header:
- * @param[in] header_length:
- * @param[in] buffer:
- * @param[in] buffer_length:
- * @return  returns SL_STATUS_OK if successful,
- *          SL_STATUS_FAIL otherwise
- *****************************************************************************/
 sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_t type, uint8_t * header, uint16_t header_length,
                                                   uint8_t * buffer, uint16_t buffer_length)
 {
@@ -316,55 +273,24 @@ sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_
     return SL_STATUS_OK;
 }
 
-/****************************************************************************
- * @fn   void sl_wfx_host_start_platform_interrupt(void)
- * @brief
- * Enable WFX interrupt
- * @param[in]  none
- * @return None
- *****************************************************************************/
 void sl_wfx_host_start_platform_interrupt(void)
 {
     // Enable (and clear) the bus interrupt
     GPIO_ExtIntConfig(SL_WFX_HOST_PINOUT_SPI_WIRQ_PORT, SL_WFX_HOST_PINOUT_SPI_WIRQ_PIN, wirq_irq_nb, true, false, true);
 }
 
-/****************************************************************************
- * @fn   sl_status_t sl_wfx_host_disable_platform_interrupt(void)
- * @brief
- * Disable WFX interrupt
- * @param[in]  None
- * @return  returns SL_STATUS_OK if successful,
- *          SL_STATUS_FAIL otherwise
- *****************************************************************************/
 sl_status_t sl_wfx_host_disable_platform_interrupt(void)
 {
     GPIO_IntDisable(1 << wirq_irq_nb);
     return SL_STATUS_OK;
 }
 
-/****************************************************************************
- * @fn   sl_status_t sl_wfx_host_enable_platform_interrupt(void)
- * @brief
- *      enable the platform interrupt
- * @param[in]  None
- * @return  returns SL_STATUS_OK if successful,
- *          SL_STATUS_FAIL otherwise
- *****************************************************************************/
 sl_status_t sl_wfx_host_enable_platform_interrupt(void)
 {
     GPIO_IntEnable(1 << wirq_irq_nb);
     return SL_STATUS_OK;
 }
 
-/****************************************************************************
- * @fn   sl_status_t sl_wfx_host_enable_spi(void)
- * @brief
- *       enable spi
- * @param[in]  None
- * @return  returns SL_STATUS_OK if successful,
- *          SL_STATUS_FAIL otherwise
- *****************************************************************************/
 sl_status_t sl_wfx_host_enable_spi(void)
 {
     if (spi_enabled == false)
@@ -374,14 +300,6 @@ sl_status_t sl_wfx_host_enable_spi(void)
     return SL_STATUS_OK;
 }
 
-/****************************************************************************
- * @fn   sl_status_t sl_wfx_host_disable_spi(void)
- * @brief
- *       disable spi
- * @param[in]  None
- * @return  returns SL_STATUS_OK if successful,
- *          SL_STATUS_FAIL otherwise
- *****************************************************************************/
 sl_status_t sl_wfx_host_disable_spi(void)
 {
     if (spi_enabled == true)
@@ -444,4 +362,81 @@ void sl_wfx_host_gpio_init(void)
     NVIC_ClearPendingIRQ(1 << wirq_irq_nb);
     NVIC_SetPriority(GPIO_EVEN_IRQn, 5);
     NVIC_SetPriority(GPIO_ODD_IRQn, 5);
+}
+
+void sl_wfx_host_spiflash_cs_assert(void)
+{
+    GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+}
+
+void sl_wfx_host_spiflash_cs_deassert(void)
+{
+    GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+}
+
+void sl_wfx_host_pre_bootloader_spi_transfer(void)
+{
+    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
+    {
+        return;
+    }
+    /*
+     * Assert CS pin for EXT SPI Flash
+     */
+    SPIDRV_ReInit(SL_BIT_RATE_SPI_FLASH);
+    sl_wfx_host_spiflash_cs_assert();
+}
+
+void sl_wfx_host_post_bootloader_spi_transfer(void)
+{
+    /*
+     * De-Assert CS pin for EXT SPI Flash
+     */
+    sl_wfx_host_spiflash_cs_deassert();
+    xSemaphoreGive(spi_sem_sync_hdl);
+}
+
+void sl_wfx_host_pre_lcd_spi_transfer(void)
+{
+    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
+    {
+        return;
+    }
+    SPIDRV_ReInit(SL_BIT_RATE_LCD);
+    /*LCD CS is handled as part of LCD gsdk*/
+}
+
+void sl_wfx_host_post_lcd_spi_transfer(void)
+{
+    xSemaphoreGive(spi_sem_sync_hdl);
+}
+
+void sl_wfx_host_pre_uart_transfer(void)
+{
+    if (spi_sem_sync_hdl == NULL)
+    {
+        // UART is initialized before host SPI interface
+        // spi_sem_sync_hdl will not be initalized during execution
+        GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
+        return;
+    }
+    sl_wfx_disable_irq();
+    sl_wfx_host_disable_platform_interrupt();
+    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
+    {
+        return;
+    }
+    GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
+}
+
+void sl_wfx_host_post_uart_transfer(void)
+{
+    if (spi_sem_sync_hdl == NULL)
+    {
+        return;
+    }
+    GPIO_PinModeSet(gpioPortA, 8, gpioModeInputPull, 1);
+    xSemaphoreGive(spi_sem_sync_hdl);
+    sl_wfx_host_enable_platform_interrupt();
+    sl_wfx_enable_irq();
 }

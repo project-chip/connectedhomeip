@@ -71,12 +71,6 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
         err = CHIP_ERROR_INTERNAL;
     }
 
-#if (defined(EFR32MG24) && defined(RS911X_WIFI))
-    if (pr_type != LCD)
-    {
-        pr_type = LCD;
-    }
-#endif
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);
     if (DMD_OK != status)
@@ -128,11 +122,11 @@ int SilabsLCD::Update(void)
 {
     int status;
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    pre_lcd_spi_transfer();
+    sl_wfx_host_pre_lcd_spi_transfer();
 #endif
     status = DMD_updateDisplay();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    post_lcd_spi_transfer();
+    sl_wfx_host_post_lcd_spi_transfer();
 #endif
     /*
      * TO-DO; Above logic can be optimised by writing a common API
@@ -201,12 +195,12 @@ void SilabsLCD::WriteQRCode()
         }
     }
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    pre_lcd_spi_transfer();
+    sl_wfx_host_pre_lcd_spi_transfer();
 #endif
 
     DMD_updateDisplay();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    post_lcd_spi_transfer();
+    sl_wfx_host_post_lcd_spi_transfer();
 #endif
 }
 

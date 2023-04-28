@@ -109,11 +109,11 @@ void demoUIDisplayHeader(char * name)
         GLIB_drawStringOnLine(&glibContext, name, 5, GLIB_ALIGN_CENTER, 0, 0, true);
     }
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    pre_lcd_spi_transfer();
+    sl_wfx_host_pre_lcd_spi_transfer();
 #endif
     DMD_updateDisplay();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    post_lcd_spi_transfer();
+    sl_wfx_host_post_lcd_spi_transfer();
 #endif
 }
 
@@ -122,11 +122,11 @@ void demoUIDisplayApp(bool on)
     GLIB_drawBitmap(&glibContext, APP_X_POSITION, APP_Y_POSITION, APP_BITMAP_WIDTH, APP_BITMAP_HEIGHT,
                     (on ? OnStateBitMap : OffStateBitMap));
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    pre_lcd_spi_transfer();
+    sl_wfx_host_pre_lcd_spi_transfer();
 #endif
     DMD_updateDisplay();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    post_lcd_spi_transfer();
+    sl_wfx_host_post_lcd_spi_transfer();
 #endif
 }
 
@@ -139,11 +139,11 @@ void demoUIDisplayProtocol(demoUIProtocol protocol, bool isConnected)
                     (protocol == DEMO_UI_PROTOCOL1 ? (isConnected ? PROT1_BITMAP_CONN : PROT1_BITMAP)
                                                    : (isConnected ? PROT2_BITMAP_CONN : PROT2_BITMAP)));
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    pre_lcd_spi_transfer();
+    sl_wfx_host_pre_lcd_spi_transfer();
 #endif
     DMD_updateDisplay();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    post_lcd_spi_transfer();
+    sl_wfx_host_post_lcd_spi_transfer();
 #endif
 }
 
