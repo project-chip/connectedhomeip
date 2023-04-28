@@ -52,6 +52,9 @@ public:
 
     void InitializeWithObject(jobject managerObject);
 
+    void OnConnectSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
+    void OnConnectFailed(void * appState, CHIP_ERROR err);
+
 private:
     // ===== Members that implement the BLEManager internal interface.
 
