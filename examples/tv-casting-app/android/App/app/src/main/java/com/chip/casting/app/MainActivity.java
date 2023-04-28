@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
    * TvCastingApp
    */
   private boolean initJni() {
-    tvCastingApp = new TvCastingApp();
+    tvCastingApp = TvCastingApp.getInstance();
 
     tvCastingApp.setDACProvider(new DACProviderStub());
 
