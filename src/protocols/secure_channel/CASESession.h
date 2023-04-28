@@ -240,10 +240,10 @@ private:
     static CHIP_ERROR SendSigma3b(SendSigma3Data & data, bool & cancel);
     CHIP_ERROR SendSigma3c(SendSigma3Data & data, CHIP_ERROR status);
 
-    struct HandleSigma3Work;
+    struct HandleSigma3Data;
     CHIP_ERROR HandleSigma3a(System::PacketBufferHandle && msg);
-    static void HandleSigma3b(HandleSigma3Work & work);
-    CHIP_ERROR HandleSigma3c(HandleSigma3Work & work);
+    static CHIP_ERROR HandleSigma3b(HandleSigma3Data & data, bool & cancel);
+    CHIP_ERROR HandleSigma3c(HandleSigma3Data & data, CHIP_ERROR status);
 
     CHIP_ERROR SendSigma2Resume();
 
@@ -303,13 +303,10 @@ private:
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
-    // Sequence number used to coordinate foreground/background work for a
-    // particular session establishment.
-    int mSequence = 0;
-
     template <class DATA>
     class WorkHelper;
     Platform::SharedPtr<WorkHelper<SendSigma3Data>> mSendSigma3Helper;
+    Platform::SharedPtr<WorkHelper<HandleSigma3Data>> mHandleSigma3Helper;
 
     State mState;
 
