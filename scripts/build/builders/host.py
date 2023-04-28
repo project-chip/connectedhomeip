@@ -34,6 +34,7 @@ class HostCryptoLibrary(Enum):
         elif self == HostCryptoLibrary.BORINGSSL:
             return 'chip_crypto="boringssl"'
 
+
 class HostFuzzingType(Enum):
     """Defines fuzz target options available for host targets."""
     NONE = auto()
@@ -245,7 +246,7 @@ class HostBuilder(GnBuilder):
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
-                 separate_event_loop=True, fuzzing_type:HostFuzzingType=HostFuzzingType.NONE, use_clang=False,
+                 separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None):
