@@ -253,11 +253,12 @@ ninja -C out/host src/inet/tests:tests_run
 
 ## Using `build_examples.py`
 
-The script `./scripts/build/build_examples.py` provides a uniform build interface
-into using `gn`, `cmake`, `ninja` and other tools as needed to compile various
-platforms.
+The script `./scripts/build/build_examples.py` provides a uniform build
+interface into using `gn`, `cmake`, `ninja` and other tools as needed to compile
+various platforms.
 
-Use `./scripts/build/build_examples.py targets` to see a list of supported targets.
+Use `./scripts/build/build_examples.py targets` to see a list of supported
+targets.
 
 Example build commands:
 
@@ -277,7 +278,8 @@ Example build commands:
 
 ### Fuzzing tests
 
-Fuzzing tests are only compiled but not executed (you have to manually execute them).
+Fuzzing tests are only compiled but not executed (you have to manually execute
+them).
 
 To compile, use:
 
@@ -285,8 +287,8 @@ To compile, use:
 ./scripts/build/build_examples.py --target linux-x64-tests-clang-libfuzzer build
 ```
 
-After which tests should be located in `out/linux-x64-tests-clang-libfuzzer/tests/`.
-
+After which tests should be located in
+`out/linux-x64-tests-clang-libfuzzer/tests/`.
 
 ## Build custom configuration
 
