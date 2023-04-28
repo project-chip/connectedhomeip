@@ -116,7 +116,7 @@ private:
 update OTA image. If the `PAA` changes, make sure to generate the new
 certificates using the new `PAA` (which is only used by the controller, e.g.
 `chip-tool`). Please see the
-[manufacturing flow guide](../../../../examples/platform/nxp/doc/manufacturing_flow.md)
+[manufacturing flow guide](../../../../docs/guides/nxp_manufacturing_flow.md)
 for generating new certificates.
 
 Example of OTA image generation with factory data and application update (using

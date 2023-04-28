@@ -25,7 +25,9 @@
  */
 #include <protocols/secure_channel/CASESession.h>
 
+#include <atomic>
 #include <inttypes.h>
+#include <memory>
 #include <string.h>
 
 #include <lib/core/CHIPEncoding.h>
@@ -41,6 +43,7 @@
 #include <protocols/secure_channel/PairingSession.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 #include <protocols/secure_channel/StatusReport.h>
+#include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <trace/trace.h>
 #include <transport/SessionManager.h>
@@ -129,6 +132,185 @@ static constexpr ExchangeContext::Timeout kExpectedLowProcessingTime    = System
 static constexpr ExchangeContext::Timeout kExpectedSigma1ProcessingTime = kExpectedLowProcessingTime;
 static constexpr ExchangeContext::Timeout kExpectedHighProcessingTime   = System::Clock::Seconds16(30);
 
+// Helper for managing a session's outstanding work.
+// Holds work data which is provided to a scheduled work callback (standalone),
+// then (if not canceled) to a scheduled after work callback (on the session).
+template <class DATA>
+class CASESession::WorkHelper
+{
+public:
+    // Work callback, processed in the background via `PlatformManager::ScheduleBackgroundWork`.
+    // This is a non-member function which does not use the associated session.
+    // The return value is passed to the after work callback (called afterward).
+    // Set `cancel` to true if calling the after work callback is not necessary.
+    typedef CHIP_ERROR (*WorkCallback)(DATA & data, bool & cancel);
+
+    // After work callback, processed in the main Matter task via `PlatformManager::ScheduleWork`.
+    // This is a member function to be called on the associated session after the work callback.
+    // The `status` value is the result of the work callback (called beforehand).
+    typedef CHIP_ERROR (CASESession::*AfterWorkCallback)(DATA & data, CHIP_ERROR status);
+
+    // Create a work helper using the specified session, work callback, after work callback, and data (template arg).
+    // Lifetime is not managed, see `Create` for that option.
+    WorkHelper(CASESession & session, WorkCallback workCallback, AfterWorkCallback afterWorkCallback) :
+        mSession(&session), mWorkCallback(workCallback), mAfterWorkCallback(afterWorkCallback)
+    {}
+
+    // Create a work helper using the specified session, work callback, after work callback, and data (template arg).
+    // Lifetime is managed by sharing between the caller (typically the session) and the helper itself (while work is scheduled).
+    static Platform::SharedPtr<WorkHelper> Create(CASESession & session, WorkCallback workCallback,
+                                                  AfterWorkCallback afterWorkCallback)
+    {
+        auto ptr = Platform::MakeShared<WorkHelper>(session, workCallback, afterWorkCallback);
+        if (ptr)
+        {
+            ptr->mWeakPtr = ptr; // used by `ScheduleWork`
+        }
+        return ptr;
+    }
+
+    // Do the work immediately.
+    // No scheduling, no outstanding work, no shared lifetime management.
+    CHIP_ERROR DoWork()
+    {
+        if (!mSession || !mWorkCallback || !mAfterWorkCallback)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        WorkHelper * helper = this;
+        bool cancel         = false;
+        helper->mStatus     = helper->mWorkCallback(helper->mData, cancel);
+        if (!cancel)
+        {
+            helper->mStatus = (helper->mSession->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
+        }
+        return helper->mStatus;
+    }
+
+    // Schedule the work after configuring the data.
+    // If lifetime is managed, the helper shares management while work is outstanding.
+    CHIP_ERROR ScheduleWork()
+    {
+        if (!mSession || !mWorkCallback || !mAfterWorkCallback)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        mStrongPtr  = mWeakPtr.lock(); // set in `Create`
+        auto status = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(WorkHandler, reinterpret_cast<intptr_t>(this));
+        if (status != CHIP_NO_ERROR)
+        {
+            mStrongPtr.reset();
+        }
+        return status;
+    }
+
+    // Cancel the work, by clearing the associated session.
+    void CancelWork() { mSession.store(nullptr); }
+
+private:
+    // Handler for the work callback.
+    static void WorkHandler(intptr_t arg)
+    {
+        WorkHelper * helper = reinterpret_cast<WorkHelper *>(arg);
+        bool cancel         = false;
+        VerifyOrExit(helper->mSession.load(), ;); // cancelled by `CancelWork`?
+        helper->mStatus = helper->mWorkCallback(helper->mData, cancel);
+        VerifyOrExit(!cancel, ;);                 // canceled by `mWorkCallback`?
+        VerifyOrExit(helper->mSession.load(), ;); // cancelled by `CancelWork`?
+        SuccessOrExit(DeviceLayer::PlatformMgr().ScheduleWork(AfterWorkHandler, reinterpret_cast<intptr_t>(helper)));
+        return;
+    exit:
+        helper->mStrongPtr.reset();
+    }
+
+    // Handler for the after work callback.
+    static void AfterWorkHandler(intptr_t arg)
+    {
+        // Since this runs in the main Matter thread, the session shouldn't be otherwise used (messages, timers, etc.)
+        WorkHelper * helper = reinterpret_cast<WorkHelper *>(arg);
+        if (auto * session = helper->mSession.load())
+        {
+            (session->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
+        }
+        helper->mStrongPtr.reset();
+    }
+
+private:
+    // Lifetime management: `ScheduleWork` sets `mStrongPtr` from `mWeakPtr`.
+    Platform::WeakPtr<WorkHelper> mWeakPtr;
+
+    // Lifetime management: `ScheduleWork` sets `mStrongPtr` from `mWeakPtr`.
+    Platform::SharedPtr<WorkHelper> mStrongPtr;
+
+    // Associated session, cleared by `CancelWork`.
+    std::atomic<CASESession *> mSession;
+
+    // Work callback, called by `WorkHandler`.
+    WorkCallback mWorkCallback;
+
+    // After work callback, called by `AfterWorkHandler`.
+    AfterWorkCallback mAfterWorkCallback;
+
+    // Return value of `mWorkCallback`, passed to `mAfterWorkCallback`.
+    CHIP_ERROR mStatus;
+
+public:
+    // Data passed to `mWorkCallback` and `mAfterWorkCallback`.
+    DATA mData;
+};
+
+struct CASESession::SendSigma3Data
+{
+    std::atomic<FabricIndex> fabricIndex;
+
+    // Use one or the other
+    const FabricTable * fabricTable;
+    const Crypto::OperationalKeystore * keystore;
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
+    size_t msg_r3_signed_len;
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Encrypted;
+    size_t msg_r3_encrypted_len;
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
+    MutableByteSpan icaCert;
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
+    MutableByteSpan nocCert;
+
+    P256ECDSASignature tbsData3Signature;
+};
+
+struct CASESession::HandleSigma3Work
+{
+    // Status of background processing.
+    CHIP_ERROR status;
+
+    // Session to use after background processing.
+    CASESession * session;
+
+    // Sequence number used to coordinate foreground/background work for a
+    // particular session establishment.
+    int sequence;
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
+    size_t msg_r3_signed_len;
+
+    ByteSpan initiatorNOC;
+    ByteSpan initiatorICAC;
+
+    uint8_t rootCertBuf[kMaxCHIPCertLength];
+    ByteSpan fabricRCAC;
+
+    P256ECDSASignature tbsData3Signature;
+
+    FabricId fabricId;
+    NodeId initiatorNodeId;
+
+    ValidationContext validContext;
+};
+
 CASESession::~CASESession()
 {
     // Let's clear out any security state stored in the object, before destroying it.
@@ -144,6 +326,14 @@ void CASESession::OnSessionReleased()
 
 void CASESession::Clear()
 {
+    // Cancel any outstanding work.
+    if (mSendSigma3Helper)
+    {
+        mSendSigma3Helper->mData.fabricIndex = kUndefinedFabricIndex;
+        mSendSigma3Helper->CancelWork();
+        mSendSigma3Helper.reset();
+    }
+
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
     mCommissioningHash.Clear();
@@ -925,7 +1115,7 @@ CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle &
 {
     MATTER_TRACE_EVENT_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
     ReturnErrorOnFailure(HandleSigma2(std::move(msg)));
-    ReturnErrorOnFailure(SendSigma3());
+    ReturnErrorOnFailure(SendSigma3a());
 
     return CHIP_NO_ERROR;
 }
@@ -1099,91 +1289,155 @@ exit:
     return err;
 }
 
-CHIP_ERROR CASESession::SendSigma3()
+CHIP_ERROR CASESession::SendSigma3a()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma3", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    MutableByteSpan messageDigestSpan(mMessageDigest);
-    System::PacketBufferHandle msg_R3;
-    size_t data_len;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Encrypted;
-    size_t msg_r3_encrypted_len;
-
-    uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
-
-    AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
-    size_t msg_r3_signed_len;
-
-    P256ECDSASignature tbsData3Signature;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
-    MutableByteSpan icaCert;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
-    MutableByteSpan nocCert;
-
     ChipLogDetail(SecureChannel, "Sending Sigma3");
 
-    VerifyOrExit(mEphemeralKey != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(icacBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
-    icaCert = MutableByteSpan{ icacBuf.Get(), kMaxCHIPCertLength };
+    auto helper = WorkHelper<SendSigma3Data>::Create(*this, &SendSigma3b, &CASESession::SendSigma3c);
+    VerifyOrExit(helper, err = CHIP_ERROR_NO_MEMORY);
+    {
+        auto & data = helper->mData;
 
-    VerifyOrExit(nocBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
-    nocCert = MutableByteSpan{ nocBuf.Get(), kMaxCHIPCertLength };
+        VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        data.fabricIndex = mFabricIndex;
+        data.fabricTable = nullptr;
+        data.keystore    = nullptr;
 
-    VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        {
+            const FabricInfo * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+            VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND);
+            auto * keystore = mFabricsTable->GetOperationalKeystore();
+            if (!fabricInfo->HasOperationalKey() && keystore != nullptr && keystore->SupportsSignWithOpKeypairInBackground())
+            {
+                // NOTE: used to sign in background.
+                data.keystore = keystore;
+            }
+            else
+            {
+                // NOTE: used to sign in foreground.
+                data.fabricTable = mFabricsTable;
+            }
+        }
 
-    SuccessOrExit(err = mFabricsTable->FetchICACert(mFabricIndex, icaCert));
-    SuccessOrExit(err = mFabricsTable->FetchNOCCert(mFabricIndex, nocCert));
+        VerifyOrExit(mEphemeralKey != nullptr, err = CHIP_ERROR_INTERNAL);
 
-    // Prepare Sigma3 TBS Data Blob
-    msg_r3_signed_len = TLV::EstimateStructOverhead(icaCert.size(), nocCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
+        VerifyOrExit(data.icacBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+        data.icaCert = MutableByteSpan{ data.icacBuf.Get(), kMaxCHIPCertLength };
 
-    VerifyOrExit(msg_R3_Signed.Alloc(msg_r3_signed_len), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(data.nocBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+        data.nocCert = MutableByteSpan{ data.nocBuf.Get(), kMaxCHIPCertLength };
 
-    SuccessOrExit(err = ConstructTBSData(nocCert, icaCert, ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
-                                         ByteSpan(mRemotePubKey, mRemotePubKey.Length()), msg_R3_Signed.Get(), msg_r3_signed_len));
+        SuccessOrExit(err = mFabricsTable->FetchICACert(mFabricIndex, data.icaCert));
+        SuccessOrExit(err = mFabricsTable->FetchNOCCert(mFabricIndex, data.nocCert));
+
+        // Prepare Sigma3 TBS Data Blob
+        data.msg_r3_signed_len =
+            TLV::EstimateStructOverhead(data.icaCert.size(), data.nocCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
+
+        VerifyOrExit(data.msg_R3_Signed.Alloc(data.msg_r3_signed_len), err = CHIP_ERROR_NO_MEMORY);
+
+        SuccessOrExit(err = ConstructTBSData(
+                          data.nocCert, data.icaCert, ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
+                          ByteSpan(mRemotePubKey, mRemotePubKey.Length()), data.msg_R3_Signed.Get(), data.msg_r3_signed_len));
+
+        if (data.keystore != nullptr)
+        {
+            SuccessOrExit(err = helper->ScheduleWork());
+            mSendSigma3Helper = helper;
+            mExchangeCtxt->WillSendMessage();
+            mState = State::kSendSigma3Pending;
+        }
+        else
+        {
+            SuccessOrExit(err = helper->DoWork());
+        }
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
+        mState = State::kInitialized;
+    }
+
+    return err;
+}
+
+CHIP_ERROR CASESession::SendSigma3b(SendSigma3Data & data, bool & cancel)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Generate a signature
-    err = mFabricsTable->SignWithOpKeypair(mFabricIndex, ByteSpan{ msg_R3_Signed.Get(), msg_r3_signed_len }, tbsData3Signature);
+    if (data.keystore != nullptr)
+    {
+        // Recommended case: delegate to operational keystore
+        err = data.keystore->SignWithOpKeypair(data.fabricIndex, ByteSpan{ data.msg_R3_Signed.Get(), data.msg_r3_signed_len },
+                                               data.tbsData3Signature);
+    }
+    else
+    {
+        // Legacy case: delegate to fabric table fabric info
+        err = data.fabricTable->SignWithOpKeypair(data.fabricIndex, ByteSpan{ data.msg_R3_Signed.Get(), data.msg_r3_signed_len },
+                                                  data.tbsData3Signature);
+    }
     SuccessOrExit(err);
 
     // Prepare Sigma3 TBE Data Blob
-    msg_r3_encrypted_len = TLV::EstimateStructOverhead(nocCert.size(), icaCert.size(), tbsData3Signature.Length());
+    data.msg_r3_encrypted_len =
+        TLV::EstimateStructOverhead(data.nocCert.size(), data.icaCert.size(), data.tbsData3Signature.Length());
 
-    VerifyOrExit(msg_R3_Encrypted.Alloc(msg_r3_encrypted_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(data.msg_R3_Encrypted.Alloc(data.msg_r3_encrypted_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES),
+                 err = CHIP_ERROR_NO_MEMORY);
 
     {
         TLV::TLVWriter tlvWriter;
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
-        tlvWriter.Init(msg_R3_Encrypted.Get(), msg_r3_encrypted_len);
+        tlvWriter.Init(data.msg_R3_Encrypted.Get(), data.msg_r3_encrypted_len);
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kTag_TBEData_SenderNOC), nocCert));
-        if (!icaCert.empty())
+        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kTag_TBEData_SenderNOC), data.nocCert));
+        if (!data.icaCert.empty())
         {
-            SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kTag_TBEData_SenderICAC), icaCert));
+            SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kTag_TBEData_SenderICAC), data.icaCert));
         }
 
         // We are now done with ICAC and NOC certs so we can release the memory.
         {
-            icacBuf.Free();
-            icaCert = MutableByteSpan{};
+            data.icacBuf.Free();
+            data.icaCert = MutableByteSpan{};
 
-            nocBuf.Free();
-            nocCert = MutableByteSpan{};
+            data.nocBuf.Free();
+            data.nocCert = MutableByteSpan{};
         }
 
-        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(kTag_TBEData_Signature), tbsData3Signature.ConstBytes(),
-                                               static_cast<uint32_t>(tbsData3Signature.Length())));
+        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(kTag_TBEData_Signature), data.tbsData3Signature.ConstBytes(),
+                                               static_cast<uint32_t>(data.tbsData3Signature.Length())));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize());
-        msg_r3_encrypted_len = static_cast<size_t>(tlvWriter.GetLengthWritten());
+        data.msg_r3_encrypted_len = static_cast<size_t>(tlvWriter.GetLengthWritten());
     }
+
+exit:
+    return err;
+}
+
+CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    System::PacketBufferHandle msg_R3;
+    size_t data_len;
+
+    uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
+
+    AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
+
+    VerifyOrDieWithMsg(data.keystore == nullptr || mState == State::kSendSigma3Pending, SecureChannel, "Bad internal state.");
+
+    SuccessOrExit(err = status);
 
     // Generate S3K key
     {
@@ -1193,12 +1447,13 @@ CHIP_ERROR CASESession::SendSigma3()
     }
 
     // Generated Encrypted data blob
-    SuccessOrExit(err = AES_CCM_encrypt(msg_R3_Encrypted.Get(), msg_r3_encrypted_len, nullptr, 0, sr3k.KeyHandle(), kTBEData3_Nonce,
-                                        kTBEDataNonceLength, msg_R3_Encrypted.Get(), msg_R3_Encrypted.Get() + msg_r3_encrypted_len,
-                                        CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+    SuccessOrExit(err =
+                      AES_CCM_encrypt(data.msg_R3_Encrypted.Get(), data.msg_r3_encrypted_len, nullptr, 0, sr3k.KeyHandle(),
+                                      kTBEData3_Nonce, kTBEDataNonceLength, data.msg_R3_Encrypted.Get(),
+                                      data.msg_R3_Encrypted.Get() + data.msg_r3_encrypted_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Generate Sigma3 Msg
-    data_len = TLV::EstimateStructOverhead(CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, msg_r3_encrypted_len);
+    data_len = TLV::EstimateStructOverhead(CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, data.msg_r3_encrypted_len);
 
     msg_R3 = System::PacketBufferHandle::New(data_len);
     VerifyOrExit(!msg_R3.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -1210,8 +1465,8 @@ CHIP_ERROR CASESession::SendSigma3()
         tlvWriter.Init(std::move(msg_R3));
         err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType);
         SuccessOrExit(err);
-        err = tlvWriter.PutBytes(TLV::ContextTag(1), msg_R3_Encrypted.Get(),
-                                 static_cast<uint32_t>(msg_r3_encrypted_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+        err = tlvWriter.PutBytes(TLV::ContextTag(1), data.msg_R3_Encrypted.Get(),
+                                 static_cast<uint32_t>(data.msg_r3_encrypted_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
         SuccessOrExit(err);
         err = tlvWriter.EndContainer(outerContainerType);
         SuccessOrExit(err);
@@ -1229,49 +1484,28 @@ CHIP_ERROR CASESession::SendSigma3()
 
     ChipLogProgress(SecureChannel, "Sent Sigma3 msg");
 
-    err = mCommissioningHash.Finish(messageDigestSpan);
-    SuccessOrExit(err);
+    {
+        MutableByteSpan messageDigestSpan(mMessageDigest);
+        SuccessOrExit(err = mCommissioningHash.Finish(messageDigestSpan));
+    }
 
     mState = State::kSentSigma3;
 
 exit:
+    mSendSigma3Helper.reset();
 
-    if (err != CHIP_NO_ERROR)
+    // If data.keystore is set, processing occurred in the background, so if an error occurred,
+    // need to send status report (normally occurs in SendSigma3a), and discard exchange and
+    // abort pending establish (normally occurs in OnMessageReceived).
+    if (data.keystore != nullptr && err != CHIP_NO_ERROR)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-        mState = State::kInitialized;
+        DiscardExchange();
+        AbortPendingEstablish(err);
     }
+
     return err;
 }
-
-struct CASESession::Sigma3Work
-{
-    // Status of background processing.
-    CHIP_ERROR status;
-
-    // Session to use after background processing.
-    CASESession * session;
-
-    // Sequence number used to coordinate foreground/background work for a
-    // particular session establishment.
-    int sequence;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
-    size_t msg_r3_signed_len;
-
-    ByteSpan initiatorNOC;
-    ByteSpan initiatorICAC;
-
-    uint8_t rootCertBuf[kMaxCHIPCertLength];
-    ByteSpan fabricRCAC;
-
-    P256ECDSASignature tbsData3Signature;
-
-    FabricId fabricId;
-    NodeId initiatorNodeId;
-
-    ValidationContext validContext;
-};
 
 CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 {
@@ -1297,7 +1531,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 
     ChipLogProgress(SecureChannel, "Received Sigma3 msg");
 
-    auto * workPtr = Platform::New<Sigma3Work>();
+    auto * workPtr = Platform::New<HandleSigma3Work>();
     VerifyOrExit(workPtr != nullptr, err = CHIP_ERROR_NO_MEMORY);
     {
         auto & work = *workPtr;
@@ -1415,12 +1649,12 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
             }
         }
 
-        SuccessOrExit(
-            err = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(
-                [](intptr_t arg) { HandleSigma3b(*reinterpret_cast<Sigma3Work *>(arg)); }, reinterpret_cast<intptr_t>(&work)));
+        SuccessOrExit(err = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(
+                          [](intptr_t arg) { HandleSigma3b(*reinterpret_cast<HandleSigma3Work *>(arg)); },
+                          reinterpret_cast<intptr_t>(&work)));
         workPtr = nullptr; // scheduling succeeded, so don't delete
         mExchangeCtxt->WillSendMessage();
-        mState = State::kBackgroundPending;
+        mState = State::kHandleSigma3Pending;
     }
 
 exit:
@@ -1434,7 +1668,7 @@ exit:
     return err;
 }
 
-void CASESession::HandleSigma3b(Sigma3Work & work)
+void CASESession::HandleSigma3b(HandleSigma3Work & work)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1471,7 +1705,7 @@ exit:
 
     auto err2 = DeviceLayer::PlatformMgr().ScheduleWork(
         [](intptr_t arg) {
-            auto & work2 = *reinterpret_cast<Sigma3Work *>(arg);
+            auto & work2 = *reinterpret_cast<HandleSigma3Work *>(arg);
             work2.session->HandleSigma3c(work2);
         },
         reinterpret_cast<intptr_t>(&work));
@@ -1482,7 +1716,7 @@ exit:
     }
 }
 
-CHIP_ERROR CASESession::HandleSigma3c(Sigma3Work & work)
+CHIP_ERROR CASESession::HandleSigma3c(HandleSigma3Work & work)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     bool ignoreFailure = true;
@@ -1490,7 +1724,7 @@ CHIP_ERROR CASESession::HandleSigma3c(Sigma3Work & work)
     // Special case: if for whatever reason not in expected state or sequence,
     // don't do anything, including sending a status report or aborting the
     // pending establish.
-    VerifyOrExit(mState == State::kBackgroundPending, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::kHandleSigma3Pending, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSequence == work.sequence, err = CHIP_ERROR_INCORRECT_STATE);
 
     ignoreFailure = false;
