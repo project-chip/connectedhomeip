@@ -136,6 +136,10 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
             }
             res = Status::Success;
         }
+        else
+        {
+            res = Status::Success;
+        }
         break;
     }
     case SpeedSetting::Id: {
@@ -384,6 +388,7 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
                                ChipLogError(Zcl, "Failed to set PercentSetting with error: 0x%02x", status));
             }
         }
+        break;
     }
     default:
         break;
