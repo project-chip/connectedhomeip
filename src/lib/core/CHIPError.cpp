@@ -74,9 +74,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_MESSAGE_TOO_LONG.AsInteger():
         desc = "Message too long";
         break;
-    case CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION.AsInteger():
-        desc = "Unsupported exchange version";
-        break;
     case CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS.AsInteger():
         desc = "Too many unsolicited message handlers";
         break;
