@@ -80,7 +80,7 @@ tests:
               - name: "arg1"
                 value: 3
               - name: "arg2"
-                value: 4
+                value: 1
               - name: "arg3"
                 value: false
       response:
@@ -95,7 +95,7 @@ tests:
           - values:
                 - value: { arg1: 1, arg2: 2, arg3: true }
           - values:
-                - value: { arg1: 3, arg2: 4, arg3: false }
+                - value: { arg1: 3, arg2: 1, arg3: false }
 
     - label: "Subscribe to the event"
       command: "subscribeEvent"
@@ -106,7 +106,7 @@ tests:
           - values:
                 - value: { arg1: 1, arg2: 2, arg3: true }
           - values:
-                - value: { arg1: 3, arg2: 4, arg3: false }
+                - value: { arg1: 3, arg2: 1, arg3: false }
 
     - label: "Generate a third event on the accessory"
       command: "TestEmitTestEventRequest"
