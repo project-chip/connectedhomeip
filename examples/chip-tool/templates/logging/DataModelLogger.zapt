@@ -3,9 +3,19 @@
 #include <lib/core/CHIPError.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
-{{#structs_with_clusters groupByStructName=1}}
-static CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::Clusters::{{#unless (is_number_greater_than structClusterCount 1)}}{{as_camel_cased clusterName false}}{{else}}detail{{/unless}}::Structs::{{name}}::DecodableType & value);
-{{/structs_with_clusters}}
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> struct_logger_decl namespace="detail"}}
+{{/if}}
+{{/zcl_structs}}
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+{{#unless has_more_than_one_cluster}}
+{{> struct_logger_decl namespace=(as_camel_cased ../name false)}}
+{{/unless}}
+{{/zcl_structs}}
+{{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_events}}

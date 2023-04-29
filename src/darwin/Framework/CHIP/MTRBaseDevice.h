@@ -41,6 +41,20 @@ NS_ASSUME_NONNULL_BEGIN
  *                MTRDataKey: Data-value NSDictionary object.
  *                              Included when there is data and when there is no error.
  *                              The data-value is described below.
+ *                MTREventNumberKey : NSNumber-wrapped uint64_t value. Monotonically increasing, and consecutive event reports
+ *                                    should have consecutive numbers unless device reboots, or if events are lost.
+ *                                    Only present when both MTREventPathKey and MTRDataKey are present.
+ *                MTREventPriorityKey : NSNumber-wrapped MTREventPriority value.
+ *                                      Only present when both MTREventPathKey and MTRDataKey are present.
+ *                MTREventTimeTypeKey : NSNumber-wrapped MTREventTimeType value.
+ *                                      Only present when both MTREventPathKey and MTRDataKey are present.
+ *                MTREventSystemUpTimeKey : NSNumber-wrapped NSTimeInterval value.
+ *                                          Only present when MTREventTimeTypeKey is MTREventTimeTypeSystemUpTime.
+ *                MTREventTimestampDateKey : NSDate object.
+ *                                           Only present when MTREventTimeTypeKey is MTREventTimeTypeTimestampDate.
+ *
+ *                Only one of MTREventTimestampDateKey and MTREventSystemUpTimeKey will be present, depending on the value for
+ *                MTREventTimeTypeKey.
  *
  *                A data-value is an NSDictionary object with the following key values:
  *
@@ -117,6 +131,11 @@ extern NSString * const MTRDoubleValueType;
 extern NSString * const MTRNullValueType;
 extern NSString * const MTRStructureValueType;
 extern NSString * const MTRArrayValueType;
+extern NSString * const MTREventNumberKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventPriorityKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventTimeTypeKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventSystemUpTimeKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventTimestampDateKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 @class MTRClusterStateCacheContainer;
 @class MTRAttributeCacheContainer;
@@ -129,6 +148,38 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
     MTRTransportTypeBLE,
     MTRTransportTypeTCP,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * A path indicating an attribute being requested (for read or subscribe).
+ *
+ * nil is used to represent wildcards.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRAttributeRequestPath : NSObject <NSCopying>
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint;
+@property (nonatomic, readonly, copy, nullable) NSNumber * cluster;
+@property (nonatomic, readonly, copy, nullable) NSNumber * attribute;
+
++ (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
+                                             clusterID:(NSNumber * _Nullable)clusterID
+                                           attributeID:(NSNumber * _Nullable)attributeID MTR_NEWLY_AVAILABLE;
+@end
+
+/**
+ * A path indicating an event being requested (for read or subscribe).
+ *
+ * nil is used to represent wildcards.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTREventRequestPath : NSObject <NSCopying>
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint;
+@property (nonatomic, readonly, copy, nullable) NSNumber * cluster;
+@property (nonatomic, readonly, copy, nullable) NSNumber * event;
+
++ (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
+                                         clusterID:(NSNumber * _Nullable)clusterID
+                                           eventID:(NSNumber * _Nullable)eventID MTR_NEWLY_AVAILABLE;
+@end
 
 @interface MTRBaseDevice : NSObject
 
@@ -168,7 +219,7 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  * eventReportHandler will be called any time an event is reported (with a
  * non-nil "value")
  *
- * The array passed to eventReportHandler will contain CHIPEventReport
+ * The array passed to eventReportHandler will contain MTREventReport
  * instances.  Errors for specific paths, not the whole subscription, will be
  * reported via those objects.
  *
@@ -228,6 +279,27 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Reads multiple attribute or event paths from the device.
+ *
+ * Nil is treated as an empty array for attributePaths and eventPaths.
+ *
+ * Lists of attribute and event paths to read can be provided via attributePaths and eventPaths.
+ *
+ * The completion will be called with an error if the entire read interaction fails. Otherwise it
+ * will be called with an array of values. This array may be empty (e.g. if no paths matched the
+ * wildcard paths passed in, or if empty lists of paths were passed in) or may include per-path
+ * errors if particular paths failed.
+ *
+ * If the sum of the lengths of attributePaths and eventPaths exceeds 9, the read may fail due to the device not supporting that
+ * many read paths.
+ */
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
  * Write to attribute in a designated attribute path
@@ -295,6 +367,17 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * A non-nil attributeID along with a nil clusterID will only succeed if the
  * attribute ID is for a global attribute that applies to all clusters.
+ *
+ * The reportHandler will be called with an error if the subscription fails
+ * entirely.
+ *
+ * The reportHandler will be called with arrays of response-value dictionaries
+ * (which may be data or errors) as path-specific data is received.
+ *
+ * subscriptionEstablished will be called when the subscription is first
+ * successfully established (after the initial set of data reports has been
+ * delivered to reportHandler).  If params allow automatic resubscription, it
+ * will be called any time resubscription succeeds.
  */
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
                                   clusterID:(NSNumber * _Nullable)clusterID
@@ -304,6 +387,38 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
                               reportHandler:(MTRDeviceResponseHandler)reportHandler
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Subscribes to multiple attribute or event paths.
+ *
+ * Nil is treated as an empty array for attributePaths and eventPaths.
+ *
+ * Lists of attribute and event paths to subscribe to can be provided via attributePaths and eventPaths.
+ *
+ * The reportHandler will be called with an error if the subscription fails
+ * entirely (including when both attributePaths and eventPaths are empty).
+ *
+ * The reportHandler will be called with arrays of response-value dictionaries
+ * (which may be data or errors) as path-specific data is received.
+ *
+ * subscriptionEstablished will be called when the subscription is first
+ * successfully established (after the initial set of data reports has been
+ * delivered to reportHandler).  If params allow automatic resubscription, it
+ * will be called any time resubscription succeeds.
+ *
+ * resubscriptionScheduled will be called if subscription drop is detected and
+ * params allow automatic resubscription.
+ *
+ * If the sum of the lengths of attributePaths and eventPaths exceeds 3, the subscribe may fail due to the device not supporting
+ * that many paths for a subscription.
+ */
+- (void)subscribeToAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                       eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                           params:(MTRSubscribeParams * _Nullable)params
+                            queue:(dispatch_queue_t)queue
+                    reportHandler:(MTRDeviceResponseHandler)reportHandler
+          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+          resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled MTR_NEWLY_AVAILABLE;
 
 /**
  * Deregister all local report handlers for a remote device
@@ -392,6 +507,17 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * If all of endpointID, clusterID, eventID are nil, all events on the
  * device will be subscribed to.
+ *
+ * The reportHandler will be called with an error if the subscription fails
+ * entirely.
+ *
+ * The reportHandler will be called with arrays of response-value dictionaries
+ * (which may be data or errors) as path-specific data is received.
+ *
+ * subscriptionEstablished will be called when the subscription is first
+ * successfully established (after the initial set of data reports has been
+ * delivered to reportHandler).  If params allow automatic resubscription, it
+ * will be called any time resubscription succeeds.
  */
 - (void)subscribeToEventsWithEndpointID:(NSNumber * _Nullable)endpointID
                               clusterID:(NSNumber * _Nullable)clusterID

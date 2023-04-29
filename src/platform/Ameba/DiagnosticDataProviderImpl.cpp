@@ -186,56 +186,49 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     NetworkInterface * head = NULL;
     struct ifaddrs * ifaddr = nullptr;
 
-    if (xnetif == NULL)
+    // xnetif is never null, no need to check. If we do check with -Werror=address, we get compiler error.
+    for (struct netif * ifa = xnetif; ifa != NULL; ifa = ifa->next)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        for (struct netif * ifa = xnetif; ifa != NULL; ifa = ifa->next)
+        NetworkInterface * ifp = new NetworkInterface();
+
+        Platform::CopyString(ifp->Name, ifa->name);
+
+        ifp->name          = CharSpan::fromCharString(ifp->Name);
+        ifp->isOperational = true;
+        if ((ifa->flags) & NETIF_FLAG_ETHERNET)
+            ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
+        else
+            ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+        ifp->offPremiseServicesReachableIPv4.SetNull();
+        ifp->offPremiseServicesReachableIPv6.SetNull();
+
+        memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
+
+        if (0)
         {
-            NetworkInterface * ifp = new NetworkInterface();
-
-            Platform::CopyString(ifp->Name, ifa->name);
-
-            ifp->name          = CharSpan::fromCharString(ifp->Name);
-            ifp->isOperational = true;
-            if ((ifa->flags) & NETIF_FLAG_ETHERNET)
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
-            else
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
-            ifp->offPremiseServicesReachableIPv4.SetNull();
-            ifp->offPremiseServicesReachableIPv6.SetNull();
-
-            memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
-
-            if (0)
-            {
-                ChipLogError(DeviceLayer, "Failed to get network hardware address");
-            }
-            else
-            {
-                // Set 48-bit IEEE MAC Address
-                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
-            }
-
-            if (ifa->ip_addr.u_addr.ip4.addr != 0)
-            {
-                memcpy(ifp->Ipv4AddressesBuffer[0], &(ifa->ip_addr.u_addr.ip4.addr), kMaxIPv4AddrSize);
-                ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
-                ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
-            }
-
-            if (ifa->ip6_addr->u_addr.ip6.addr != 0)
-            {
-                memcpy(ifp->Ipv6AddressesBuffer[0], &(ifa->ip6_addr->u_addr.ip6.addr), kMaxIPv6AddrSize);
-                ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
-                ifp->IPv6Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, 1);
-            }
-
-            ifp->Next = head;
-            head      = ifp;
+            ChipLogError(DeviceLayer, "Failed to get network hardware address");
         }
+        else
+        {
+            // Set 48-bit IEEE MAC Address
+            ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+        }
+
+        if (ifa->ip_addr.u_addr.ip4.addr != 0)
+        {
+            memcpy(ifp->Ipv4AddressesBuffer[0], &(ifa->ip_addr.u_addr.ip4.addr), kMaxIPv4AddrSize);
+            ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
+            ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
+        }
+
+        // ifa->ip6_addr->u_addr.ip6.addr is never null, no need to check. If we do check with -Werror=address, we get compiler
+        // error.
+        memcpy(ifp->Ipv6AddressesBuffer[0], &(ifa->ip6_addr->u_addr.ip6.addr), kMaxIPv6AddrSize);
+        ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
+        ifp->IPv6Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, 1);
+
+        ifp->Next = head;
+        head      = ifp;
     }
 
     *netifpp = head;

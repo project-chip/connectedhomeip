@@ -1,6 +1,6 @@
 import enum
 from dataclasses import dataclass, field
-from typing import List, Optional, Union
+from typing import List, Optional, Set, Union
 
 from lark.tree import Meta
 
@@ -13,7 +13,7 @@ class ParseMetaData:
     column: Optional[int]
     start_pos: Optional[int]
 
-    def __init__(self, meta: Meta = None, line: int = None, column: int = None, start_pos: int = None):
+    def __init__(self, meta: Optional[Meta] = None, line: Optional[int] = None, column: Optional[int] = None, start_pos: Optional[int] = None):
         if meta:
             self.line = meta.line
             self.column = meta.column
@@ -236,7 +236,7 @@ class AttributeInstantiation:
 class ServerClusterInstantiation:
     name: str
     attributes: List[AttributeInstantiation] = field(default_factory=list)
-    events_emitted: List[str] = field(default_factory=set)
+    events_emitted: Set[str] = field(default_factory=set)
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)

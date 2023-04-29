@@ -19,7 +19,7 @@
 
 #include <cstdint>
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 
 class LEDWidget
 {

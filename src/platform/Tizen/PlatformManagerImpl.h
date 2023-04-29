@@ -66,6 +66,7 @@ public:
     {
         return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
     }
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -78,6 +79,8 @@ private:
     friend PlatformManager & PlatformMgr();
     friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
+
+    System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
     static PlatformManagerImpl sInstance;
 

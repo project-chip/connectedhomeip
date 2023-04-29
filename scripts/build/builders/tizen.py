@@ -88,6 +88,7 @@ class TizenBuilder(GnBuilder):
                  app: TizenApp = TizenApp.LIGHT,
                  board: TizenBoard = TizenBoard.ARM,
                  enable_ble: bool = True,
+                 enable_thread: bool = True,
                  enable_wifi: bool = True,
                  use_asan: bool = False,
                  use_tsan: bool = False,
@@ -114,6 +115,8 @@ class TizenBuilder(GnBuilder):
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
+        if not enable_thread:
+            self.extra_gn_options.append('chip_enable_openthread=false')
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
         if use_asan:

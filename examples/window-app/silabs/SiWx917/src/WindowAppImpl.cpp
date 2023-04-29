@@ -27,7 +27,7 @@
 #ifdef QR_CODE_ENABLED
 #include <qrcodegen.h>
 #else
-#include "SiWx917DeviceDataProvider.h"
+#include "SilabsDeviceDataProvider.h"
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #endif // QR_CODE_ENABLED
@@ -167,7 +167,9 @@ void WindowAppImpl::OnTaskCallback(void * parameter)
     }
     SILABS_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     sWiFiNetworkCommissioningInstance.Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     /* added for commissioning with wifi */
 #endif
 
@@ -203,10 +205,9 @@ CHIP_ERROR WindowAppImpl::Init()
     }
 
     // Initialize LEDs
-#ifdef ENABLE_WSTK_LEDS
+
     mStatusLED.Init(APP_STATE_LED);
     mActionLED.Init(APP_ACTION_LED);
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
     slLCD.Init();
@@ -217,7 +218,7 @@ CHIP_ERROR WindowAppImpl::Init()
     char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan QRCode(qrCodeBuffer);
 
-    if (SIWx917::SIWx917DeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
+    if (Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
     {
         PrintQrCodeURL(QRCode);
     }
@@ -393,21 +394,19 @@ void WindowAppImpl::UpdateLEDs()
     Cover & cover = GetCover();
     if (mResetWarning)
     {
-#ifdef ENABLE_WSTK_LEDS
+
         mStatusLED.Set(false);
         mStatusLED.Blink(500);
 
         mActionLED.Set(false);
         mActionLED.Blink(500);
-#endif // ENABLE_WSTK_LEDS
     }
     else
     {
         if (mState.isWinking)
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mStatusLED.Blink(200, 200);
-#endif // ENABLE_WSTK_LEDS
         }
         else
 #if CHIP_ENABLE_OPENTHREAD
@@ -417,22 +416,11 @@ void WindowAppImpl::UpdateLEDs()
 #endif
 
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mStatusLED.Blink(950, 50);
-#endif // ENABLE_WSTK_LEDS
         }
-        else if (mState.haveBLEConnections)
-        {
-#ifdef ENABLE_WSTK_LEDS
-            mStatusLED.Blink(100, 100);
-#endif // ENABLE_WSTK_LEDS
-        }
-        else
-        {
-#ifdef ENABLE_WSTK_LEDS
-            mStatusLED.Blink(50, 950);
-#endif // ENABLE_WSTK_LEDS
-        }
+        else if (mState.haveBLEConnections) { mStatusLED.Blink(100, 100); }
+        else { mStatusLED.Blink(50, 950); }
 
         // Action LED
         NPercent100ths current;
@@ -450,27 +438,23 @@ void WindowAppImpl::UpdateLEDs()
 
         if (OperationalState::Stall != cover.mLiftOpState)
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mActionLED.Blink(100);
-#endif // ENABLE_WSTK_LEDS
         }
         else if (LimitStatus::IsUpOrOpen == liftLimit)
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mActionLED.Set(true);
-#endif // ENABLE_WSTK_LEDS
         }
         else if (LimitStatus::IsDownOrClose == liftLimit)
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mActionLED.Set(false);
-#endif // ENABLE_WSTK_LEDS
         }
         else
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mActionLED.Blink(1000);
-#endif // ENABLE_WSTK_LEDS
         }
     }
 }
@@ -519,10 +503,9 @@ void WindowAppImpl::UpdateLCD()
 
 void WindowAppImpl::OnMainLoop()
 {
-#ifdef ENABLE_WSTK_LEDS
+
     mStatusLED.Animate();
     mActionLED.Animate();
-#endif // ENABLE_WSTK_LEDS
 }
 
 //------------------------------------------------------------------------------

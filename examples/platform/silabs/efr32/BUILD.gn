@@ -179,10 +179,10 @@ source_set("efr32-attestation-credentials") {
   public_configs = [ ":attestation-credentials-config" ]
 }
 
-source_set("efr32-factory-data-provider") {
+source_set("silabs-factory-data-provider") {
   sources = [
-    "EFR32DeviceDataProvider.cpp",
-    "EFR32DeviceDataProvider.h",
+    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
+    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.h",
   ]
 
   public_deps = [
@@ -221,16 +221,14 @@ config("efr32-common-config") {
   }
 
   if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
+    defines += [ "SILABS_OTA_ENABLED" ]
   }
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  # Do not warn for LOAD segment with RWX permissions
-  # Uncomment this cflag when pigweed update is done and GCC 12.2 is used.
-  #ldflags = [ "-Wl,--no-warn-rwx-segment" ]
+  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
 config("silabs-wifi-config") {
@@ -282,6 +280,7 @@ source_set("efr32-common") {
   include_dirs = [ "." ]
 
   sources = [
+    "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/heap_4_silabs.c",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "efr32_utils.cpp",
@@ -293,16 +292,12 @@ source_set("efr32-common") {
     sources += [ "BaseApplication.cpp" ]
   }
 
-  if (use_wstk_leds) {
-    sources += [ "LEDWidget.cpp" ]
-  }
-
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
     sources += [ "uart.cpp" ]
   }
 
   if (chip_enable_ota_requestor) {
-    sources += [ "OTAConfig.cpp" ]
+    sources += [ "${silabs_common_plat_dir}/OTAConfig.cpp" ]
   }
 
   if (!disable_lcd) {
@@ -356,7 +351,7 @@ source_set("efr32-common") {
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
-    public_deps += [ ":efr32-factory-data-provider" ]
+    public_deps += [ ":silabs-factory-data-provider" ]
   }
 
   if (chip_config_use_icd_subscription_callbacks) {

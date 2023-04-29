@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include "OTAImageProcessorImpl.h"
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <platform/silabs/OTAImageProcessorImpl.h>
 
 extern "C" {
 #include "btl_interface.h"
@@ -190,6 +190,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_verifyImage() error %ld", err);
+        // Call the OTARequestor API to reset the state
+        GetRequestorInstance()->CancelImageUpdate();
 
         return;
     }
@@ -198,6 +200,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err);
+        // Call the OTARequestor API to reset the state
+        GetRequestorInstance()->CancelImageUpdate();
 
         return;
     }
