@@ -39,7 +39,6 @@
 
 #include "gpiointerrupt.h"
 
-#include "sl_spidrv_exp_config.h"
 #include "sl_wfx_board.h"
 #include "sl_wfx_host.h"
 #include "sl_wfx_task.h"
@@ -49,8 +48,14 @@
 #include "sl_power_manager.h"
 #endif
 
-#if SL_WIFI
+#if defined(EFR32MG12)
+#include "sl_spidrv_exp_config.h"
+extern SPIDRV_Handle_t sl_spidrv_exp_handle;
+#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
+#elif defined(EFR32MG24)
 #include "spi_multiplex.h"
+#else
+#error "Unknown platform"
 #endif
 
 #define USART SL_WFX_HOST_PINOUT_SPI_PERIPHERAL
@@ -133,7 +138,9 @@ sl_status_t sl_wfx_host_spi_cs_assert()
     {
         return SL_STATUS_TIMEOUT;
     }
+#if defined(EFR32MG24)
     SPIDRV_ReInit(SL_BIT_RATE_EXP_HDR);
+#endif /* EFR32MG24 */
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
     return SL_STATUS_OK;
 }
@@ -364,6 +371,7 @@ void sl_wfx_host_gpio_init(void)
     NVIC_SetPriority(GPIO_ODD_IRQn, 5);
 }
 
+#if defined(EFR32MG24)
 void sl_wfx_host_spiflash_cs_assert(void)
 {
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
@@ -440,3 +448,4 @@ void sl_wfx_host_post_uart_transfer(void)
     sl_wfx_host_enable_platform_interrupt();
     sl_wfx_enable_irq();
 }
+#endif /* EFR32MG24 */

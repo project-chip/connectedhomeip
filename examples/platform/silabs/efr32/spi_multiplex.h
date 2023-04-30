@@ -17,21 +17,22 @@
 
 #pragma once
 
+#if defined(EFR32MG24)
 #ifdef __cplusplus
 extern "C" {
 #endif
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "sl_mx25_flash_shutdown_usart_config.h"
-#ifdef WF200_WIFI
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
 #include "sl_spidrv_exp_config.h"
-#endif
-#ifdef RS911X_WIFI
+#endif /* EFR32MG24 && WF200_WIFI */
+#if (defined(EFR32MG24) && defined(RS911X_WIFI))
 #include "sl_spidrv_eusart_exp_config.h"
-#endif
+#endif /* EFR32MG24 && RS911X_WIFI */
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
 #include "sl_wfx_host_api.h"
-#endif
+#endif /* EFR32MG24 && WF200_WIFI */
 #include "em_eusart.h"
 #include "spidrv.h"
 
@@ -161,3 +162,4 @@ void sl_wfx_host_post_uart_transfer(void);
 #ifdef __cplusplus
 }
 #endif
+#endif /* EFR32MG24 */

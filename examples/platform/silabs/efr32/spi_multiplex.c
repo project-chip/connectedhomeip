@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#if defined(EFR32MG24)
+
 #include "dmadrv.h"
 #include "em_bus.h"
 #include "em_cmu.h"
@@ -41,3 +43,5 @@ void SPIDRV_ReInit(uint32_t baudrate)
 
     USART_InitSync(USART0, &usartInit);
 }
+
+#endif /* EFR32MG24 */
