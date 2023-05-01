@@ -291,6 +291,16 @@ To compile, use:
 After which tests should be located in
 `out/linux-x64-tests-clang-asan-libfuzzer/tests/`.
 
+#### `ossfuzz` configurations
+
+`ossfuzz` configurations are not stand-alone fuzzing and instead serve
+as an integration point with external fuzzing automated builds.
+
+They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
+`$LIB_FUZZING_ENGINE`.
+
+You likely want `libfuzzer` + `asan` builds instead for local testing.
+
 ## Build custom configuration
 
 The build is configured by setting build arguments. These you can set in one of
