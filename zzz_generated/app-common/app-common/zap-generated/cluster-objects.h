@@ -25859,19 +25859,19 @@ struct TypeInfo
 } // namespace ElectricalMeasurement
 namespace ClientMonitoring {
 namespace Structs {
-namespace MonitoringRegistration {
+namespace MonitoringRegistrationStruct {
 enum class Fields : uint8_t
 {
-    kClientNodeId = 1,
-    kICid         = 2,
+    kClientNodeID = 1,
+    kKey          = 2,
     kFabricIndex  = 254,
 };
 
 struct Type
 {
 public:
-    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
-    uint64_t ICid                 = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeID = static_cast<chip::NodeId>(0);
+    chip::ByteSpan key;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -25891,7 +25891,7 @@ private:
 
 using DecodableType = Type;
 
-} // namespace MonitoringRegistration
+} // namespace MonitoringRegistrationStruct
 } // namespace Structs
 
 namespace Commands {
@@ -25901,6 +25901,11 @@ namespace RegisterClientMonitoring {
 struct Type;
 struct DecodableType;
 } // namespace RegisterClientMonitoring
+
+namespace RegisterClientMonitoringResponse {
+struct Type;
+struct DecodableType;
+} // namespace RegisterClientMonitoringResponse
 
 namespace UnregisterClientMonitoring {
 struct Type;
@@ -25918,8 +25923,8 @@ namespace Commands {
 namespace RegisterClientMonitoring {
 enum class Fields : uint8_t
 {
-    kClientNodeId = 0,
-    kICid         = 1,
+    kClientNodeID = 0,
+    kKey          = 1,
 };
 
 struct Type
@@ -25929,12 +25934,12 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RegisterClientMonitoring::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
 
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint64_t ICid             = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeID = static_cast<chip::NodeId>(0);
+    chip::ByteSpan key;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::ClientMonitoring::Commands::RegisterClientMonitoringResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -25945,16 +25950,50 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RegisterClientMonitoring::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
 
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint64_t ICid             = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeID = static_cast<chip::NodeId>(0);
+    chip::ByteSpan key;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RegisterClientMonitoring
+namespace RegisterClientMonitoringResponse {
+enum class Fields : uint8_t
+{
+    kStatus     = 0,
+    kICDCounter = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RegisterClientMonitoringResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint32_t> ICDCounter;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RegisterClientMonitoringResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint32_t> ICDCounter;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RegisterClientMonitoringResponse
 namespace UnregisterClientMonitoring {
 enum class Fields : uint8_t
 {
-    kClientNodeId = 0,
-    kICid         = 1,
+    kClientNodeID = 0,
 };
 
 struct Type
@@ -25964,8 +26003,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::UnregisterClientMonitoring::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
 
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint64_t ICid             = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeID = static_cast<chip::NodeId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -25980,8 +26018,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::UnregisterClientMonitoring::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
 
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint64_t ICid             = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeID = static_cast<chip::NodeId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UnregisterClientMonitoring
@@ -26056,17 +26093,30 @@ struct TypeInfo
 namespace ExpectedClients {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType>;
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistrationStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistrationStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType> &;
+        chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistrationStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ExpectedClients::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ExpectedClients
+namespace ICDCounter {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ICDCounter::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ICDCounter
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -26116,6 +26166,7 @@ struct TypeInfo
         Attributes::ActiveModeInterval::TypeInfo::DecodableType activeModeInterval   = static_cast<uint32_t>(0);
         Attributes::ActiveModeThreshold::TypeInfo::DecodableType activeModeThreshold = static_cast<uint16_t>(0);
         Attributes::ExpectedClients::TypeInfo::DecodableType expectedClients;
+        Attributes::ICDCounter::TypeInfo::DecodableType ICDCounter = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

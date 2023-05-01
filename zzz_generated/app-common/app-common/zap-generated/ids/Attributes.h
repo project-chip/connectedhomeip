@@ -4912,6 +4912,10 @@ namespace ExpectedClients {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace ExpectedClients
 
+namespace ICDCounter {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ICDCounter
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
