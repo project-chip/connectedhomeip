@@ -18,19 +18,6 @@ application by following the _[Build Guide](./readme_building.md)_ and have
 transferred the _`unify-matter-bridge`_ to your Raspberry Pi 4 (RPi4) running
 the 64-bit version of Raspberry Pi OS Bullseye.
 
-> **Note:**
->
-> The requirements for using the Matter Bridge with the Google Home App (GHA)
-> are:
->
-> -   Inclusion in the
->     [Matter Early Access Program (EAP)](https://developers.home.google.com/matter/eap/).
-> -   A project properly configured in the
->     [Google Home Developer Console](https://console.home.google.com/projects).
-> -   Use of the specified version of the Google Home App for Android.
->
-> This guide will use the CLI tool called _`chip-tool`_ for commissioning and
-> device control.
 
 - [Unify Matter Bridge User's Guide](#unify-matter-bridge-users-guide)
   - [Running the Matter Bridge](#running-the-matter-bridge)
@@ -160,6 +147,48 @@ console output, as described above. To commission the Matter Bridge with the
 ```bash
 chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 ```
+
+
+### Using Google Nest Hub
+
+It is possible to use the Google Nest Hub (2nd. Gen) for controlling the Matter devices on the Unify Matter Bridge. Go through the following steps to configure this:
+
+Prerequisites:
+- Android Phone, Android 12 or newer
+- Google Nest Hub, 2nd. Generation
+
+Setup:
+- Create a Google Account or using existing
+- Go to [Google Developer Console](https://console.home.google.com/projects)
+  - Click "Create a new project"
+    - Next page click "Create project"
+    - Input a unique project name 
+  - Click "+ Add Matter integration"
+    - Next: Develop
+    - Next: Setup
+    - Input following fields:
+      - Product name of your choice
+      - Device Type: Control Bridge
+      - Test VID: default
+      - Product ID (PID): 0x8001
+    - Save & Continue
+    - Save
+- On your Android Phone
+  - Configure the phone to use the same Google Account
+  - Install Google Home application
+  - To add the Nest Hub
+    - Click "+" in the Google Home app - Add new device and let the phone search for your hub over BT - make sure hub is in reach
+  - To add the Matter Bridge to your Google Home (and Hub)
+    - In the console of the Matter Bridge application running on the Raspberry Pi
+      - Hit `Return`, this should present `Unify>`
+      - Type `commission`, this will show SetupQRCode, either click the link or in the Developer UI go to the "Commissionable Devices" page (note that a new QR code will be created whenever bridge is restarted, make sure to use the latest as identified in the output on the console)
+    - In the Google Home app click "+"
+      - Google Home should report "Matter-enabled device found"
+      -   If the bridge is not automatically found, a list of device types will be shown, click the "Matter-device" on the list
+      - Google Home will now ask for scanning the QR code - scan the QR code as described above
+        - If Google Home is stuck during commissioning, type `commission` again in the Matter Bridge console while Google Home is waiting
+  - All supported Unify devices should now be available for control in both Google Home application as well as the Google Nest Hub
+    - On the Nest Hub, swipe down from the top of the display or select "Home Control" to access the devices
 
 ### Toggle an OnOff device
 
