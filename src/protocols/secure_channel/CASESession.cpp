@@ -1633,12 +1633,10 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
             }
         }
 
-        {
-            SuccessOrExit(err = helper->ScheduleWork());
-            mHandleSigma3Helper = helper;
-            mExchangeCtxt->WillSendMessage();
-            mState = State::kHandleSigma3Pending;
-        }
+        SuccessOrExit(err = helper->ScheduleWork());
+        mHandleSigma3Helper = helper;
+        mExchangeCtxt->WillSendMessage();
+        mState = State::kHandleSigma3Pending;
     }
 
 exit:
