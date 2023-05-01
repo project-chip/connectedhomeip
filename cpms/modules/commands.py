@@ -34,13 +34,11 @@ class Command(object):
 
     def execute(self, serial):
         # Send
-        serial.open()
         serial.start()
         serial.send(self.serialize())
         # Receive
         resp = serial.receive()
         serial.stop()
-        serial.close()
         # Decode
         enc = Encoder(resp)
         rid = enc.getUint8()

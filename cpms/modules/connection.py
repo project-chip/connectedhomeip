@@ -1,17 +1,29 @@
-import pylink
+from .util import *
 
+import pylink
 # https://pylink.readthedocs.io/en/latest/installation.html
 # pip install pylink-square
 
-class SerialComm:
-    def __init__(self, part_number, serial_num):
+class Connection:
+    DEFAULT_PORT = 19020
+
+    def __init__(self, part_number):
         self.link = pylink.JLink()
         self.part_number = part_number
-        self.serial = serial_num
 
-    def open(self):
-        # print("‣ Serial open {}; {}".format(self.board, self.serial))
-        self.link.open(serial_no=self.serial)
+    def open(self, conn):
+        if conn.serial_num:
+            print("\n▪︎ Open SERIAL connection {} to {}".format(conn.serial_num, self.part_number))
+            self.link.open(serial_no=conn.serial_num)
+        elif conn.ip_addr:
+            port = conn.port or Connection.DEFAULT_PORT
+            ip_addr = "{}:{}".format(conn.ip_addr, port)
+            print("\n▪︎ Open TCP connection {} to {}".format(ip_addr, self.part_number))
+            self.link.open(ip_addr=ip_addr)
+        else:
+            print("\n▪︎ Open DEFAULT connection to {}".format(self.part_number))
+            self.link.open()
+
         self.link.set_tif(interface=pylink.JLinkInterfaces.SWD)
         self.link.connect(chip_name=self.part_number, speed="auto", verbose=True)
 

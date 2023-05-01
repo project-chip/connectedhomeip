@@ -51,18 +51,24 @@ class DeviceInfo:
 
 class Commander:
 
-    def __init__(self, jtag_serial = None):
-        self.jtag = jtag_serial
+    def __init__(self, conn):
+        self.conn = conn
 
-    def execute(self, args, serial = False, output = True, check = False):
+    def execute(self, args, output = True, check = False):
         args.insert(0, 'commander')
-        if serial and (self.jtag is not None):
-            args.extend(["--serialno", self.jtag])
+        if self.conn.serial_num:
+            args.extend(["--serialno", self.conn.serial_num])
+        elif self.conn.ip_addr:
+            if self.conn.port:
+                args.extend(["--ip", "{}:{}".format(self.conn.ip_addr, self.conn.port)])
+            else:
+                args.extend(["--ip", self.conn.ip_addr])
+        cmd = ' '.join(args)
         return execute(args, output, check)
 
     def info(self):
-        output = self.execute(['device', 'info'], True)
-        return DeviceInfo(output)
+        res = self.execute(['device', 'info'], True, True)
+        return DeviceInfo(res)
 
     def flash(self, image_path):
-        return self.execute(['flash' , image_path], True)
+        return self.execute(['flash' , image_path], False, True)

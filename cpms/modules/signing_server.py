@@ -3,7 +3,6 @@ from .util import *
 
 class SigningServer:
 
-
     def __init__(self, base_dir):
         self.base_dir = base_dir
         temp_dir = "{}/temp".format(base_dir)
@@ -21,20 +20,12 @@ class SigningServer:
         # Write CSR to file
         with open(self.csr_pem, 'w') as f:
             f.write(csr)
-        
+
         # Generate DAC
-        execute(["openssl", "x509", "-sha256", "-req", "-days", "18250",
-            "-extensions", "v3_ica", "-extfile", self.config_file,
-            "-set_serial", str(serial_num),
-            "-CA", self.pai_cert_der, "-CAkey", self.pai_key_der,
-            "-in", self.csr_pem, "-outform", "der", "-out", self.dac_cert_der])
-
-        # # Read PAI from file
-        # with open(self.pai_cert_der, 'r') as f:
-        #     pai = f.read()
-
-        # # Read DAC from file
-        # with open(self.dac_cert_der, 'r') as f:
-        #     dac = f.read()
+        execute(['openssl', 'x509', '-sha256', '-req', '-days', '18250',
+            '-extensions', 'v3_ica', '-extfile', self.config_file,
+            '-set_serial', str(serial_num),
+            '-CA', self.pai_cert_der, '-CAkey', self.pai_key_der, '-CAform', 'DER', '-CAkeyform', 'DER',
+            '-in', self.csr_pem, '-outform', 'der', '-out', self.dac_cert_der])
 
         return (self.pai_cert_der, self.dac_cert_der)

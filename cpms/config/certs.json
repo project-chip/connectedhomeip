@@ -1,18 +1,14 @@
 {
-    "generate": false,
-    "cpms": false,
-    "csr": false,
-    "vendor_id": 4169,
-    "product_id": 32773,
-    "discriminator": 3841,
-    "attestation": {
-        "pkcs12": "/temp/kudelski/certs.p12",
-        "key_pass": "cBiqGji1ARHKQ8gv6kiVh1uJQDn/dMXlTXbNOXwjNDE=",
-        "certification": "./temp/cd.der"
-    },
-    "spake2p": {
-        "passcode": 62034001,
-        "salt": "U1BBS0UyUCBLZXkgU2FsdA==",
-        "iterations": 1500
+    "version": "1.0",
+    "matter": {
+        "vendor_id": 4169,
+        "product_id": 32773,
+        "discriminator": 3841,
+        "attestation": {
+            "key_id": 0,
+            "pkcs12": "temp/certs.p12",
+            "key_pass": "cBiqGji1ARHKQ8gv6kiVh1uJQDn/dMXlTXbNOXwjNDE=",
+            "certification": "temp/cd.der"
+        }
     }
 }

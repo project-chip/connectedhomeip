@@ -1,10 +1,13 @@
 {
-    "vendor_id": 4169,
-    "product_id": 32773,
-    "discriminator": 3841,
-    "spake2p": {
-        "passcode": 62034001,
-        "salt": "U1BBS0UyUCBLZXkgU2FsdA==",
-        "iterations": 1500
+    "version": "1.0",
+    "matter": {
+        "vendor_id": 4169,
+        "product_id": 32773,
+        "discriminator": 3841,
+        "spake2p": {
+            "passcode": 62034001,
+            "salt": "U1BBS0UyUCBLZXkgU2FsdA==",
+            "iterations": 1500
+        }
     }
 }
