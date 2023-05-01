@@ -32,6 +32,9 @@ exclude_patterns = [
     "examples/thermostat/nxp/linux-se05x/README.md",
     "examples/common/m5stack-tft/repo",
     "docs/guides/README.md",
+    "scripts/tools/memory/memdf/README.md",
+    "scripts/tools/memory/platform/README.md",
+    "scripts/tools/memory/README-GitHub-CI.md",
 ]
 
 
@@ -69,6 +72,8 @@ external_content_contents = [
     (MATTER_BASE, "examples/**/*.png"),
     (MATTER_BASE, "examples/**/*.jpg"),
     (MATTER_BASE, "examples/**/*.JPG"),
+    (MATTER_BASE, "src/tools/**/*.md"),
+    (MATTER_BASE, "scripts/tools/**/*.md"),
 ]
 external_content_link_prefixes = [
     "src/",

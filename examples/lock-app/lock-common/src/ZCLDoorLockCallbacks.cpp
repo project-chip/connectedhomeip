@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,17 +24,20 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DoorLock;
-
+// App handles physical aspects of locking but not locking logic. That is it
+// should wait for door to be locked on lock command and return success) but
+// door lock server should check pin before even calling the lock-door
+// callback.
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
                                             OperationErrorEnum & err)
 {
-    return LockManager::Instance().Lock(endpointId, pinCode, err);
+    return LockManager::Instance().Lock(endpointId, pinCode, err, OperationSourceEnum::kRemote);
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
                                               OperationErrorEnum & err)
 {
-    return LockManager::Instance().Unlock(endpointId, pinCode, err);
+    return LockManager::Instance().Unlock(endpointId, pinCode, err, OperationSourceEnum::kRemote);
 }
 
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
@@ -72,6 +75,12 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t w
     return LockManager::Instance().GetSchedule(endpointId, weekdayIndex, userIndex, schedule);
 }
 
+DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex,
+                                          EmberAfPluginDoorLockHolidaySchedule & schedule)
+{
+    return LockManager::Instance().GetSchedule(endpointId, holidayIndex, schedule);
+}
+
 DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                           DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
                                           uint8_t endHour, uint8_t endMinute)
@@ -92,12 +101,10 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t y
     return LockManager::Instance().GetSchedule(endpointId, yearDayIndex, userIndex, schedule);
 }
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                       uint8_t * value)
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
+                                          uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
-    VerifyOrReturn(attributePath.mClusterId == DoorLock::Id && attributePath.mAttributeId == DoorLock::Attributes::LockState::Id);
-
-    emberAfDoorLockClusterPrintln("Door Lock attribute changed");
+    return LockManager::Instance().SetSchedule(endpointId, holidayIndex, status, localStartTime, localEndTime, operatingMode);
 }
 
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)

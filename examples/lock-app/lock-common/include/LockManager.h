@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,12 +27,18 @@
 class LockManager
 {
 public:
-    LockManager() {}
+    LockManager() = default;
 
     bool InitEndpoint(chip::EndpointId endpointId);
 
-    bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
-    bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
+    bool SetDoorState(chip::EndpointId endpointId, DoorStateEnum doorState);
+
+    bool SendLockAlarm(chip::EndpointId endpointId, AlarmCodeEnum alarmCode);
+
+    bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+              OperationSourceEnum opSource);
+    bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+                OperationSourceEnum opSource);
 
     bool GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
     bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
@@ -50,10 +56,14 @@ public:
                          EmberAfPluginDoorLockWeekDaySchedule & schedule);
     DlStatus GetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex,
                          EmberAfPluginDoorLockYearDaySchedule & schedule);
+    DlStatus GetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule);
+
     DlStatus SetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status,
                          DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
     DlStatus SetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
                          uint32_t localStartTime, uint32_t localEndTime);
+    DlStatus SetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime,
+                         uint32_t localEndTime, OperatingModeEnum operatingMode);
 
     static LockManager & Instance();
 

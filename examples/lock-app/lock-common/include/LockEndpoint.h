@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,35 +36,47 @@ struct LockUserInfo
 struct LockCredentialInfo;
 struct WeekDaysScheduleInfo;
 struct YearDayScheduleInfo;
+struct HolidayScheduleInfo;
 
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
+static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES     = 6;
 
 class LockEndpoint
 {
 public:
     LockEndpoint(chip::EndpointId endpointId, uint16_t numberOfLockUsersSupported, uint16_t numberOfCredentialsSupported,
-                 uint8_t weekDaySchedulesPerUser, uint8_t yearDaySchedulesPerUser, uint8_t numberOfCredentialsPerUser) :
+                 uint8_t weekDaySchedulesPerUser, uint8_t yearDaySchedulesPerUser, uint8_t numberOfCredentialsPerUser,
+                 uint8_t numberOfHolidaySchedules) :
         mEndpointId{ endpointId },
-        mLockState{ DlLockState::kLocked }, mLockUsers(numberOfLockUsersSupported),
-        mLockCredentials(numberOfCredentialsSupported + 1),
+        mLockState{ DlLockState::kLocked }, mDoorState{ DoorStateEnum::kDoorClosed }, mLockUsers(numberOfLockUsersSupported),
+        mLockCredentials(DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES, std::vector<LockCredentialInfo>(numberOfCredentialsSupported + 1)),
         mWeekDaySchedules(numberOfLockUsersSupported, std::vector<WeekDaysScheduleInfo>(weekDaySchedulesPerUser)),
-        mYearDaySchedules(numberOfLockUsersSupported, std::vector<YearDayScheduleInfo>(yearDaySchedulesPerUser))
+        mYearDaySchedules(numberOfLockUsersSupported, std::vector<YearDayScheduleInfo>(yearDaySchedulesPerUser)),
+        mHolidaySchedules(numberOfHolidaySchedules)
     {
         for (auto & lockUser : mLockUsers)
         {
             lockUser.credentials.reserve(numberOfCredentialsPerUser);
         }
+        DoorLockServer::Instance().SetDoorState(endpointId, mDoorState);
+        DoorLockServer::Instance().SetLockState(endpointId, mLockState);
     }
 
     inline chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
-    bool Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
-    bool Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
+    bool Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
+    bool Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
 
     bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
     bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
                  uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
                  const CredentialStruct * credentials, size_t totalCredentials);
+
+    bool SetDoorState(DoorStateEnum newState);
+
+    DoorStateEnum GetDoorState() const;
+
+    bool SendLockAlarm(AlarmCodeEnum alarmCode) const;
 
     bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential) const;
@@ -75,24 +87,34 @@ public:
 
     DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule);
     DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule);
+    DlStatus GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule);
+
     DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour,
                          uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
     DlStatus SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime,
                          uint32_t localEndTime);
+    DlStatus SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
+                         OperatingModeEnum operatingMode);
 
 private:
-    bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
+    bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+                      OperationSourceEnum opSource = OperationSourceEnum::kUnspecified);
     const char * lockStateToString(DlLockState lockState) const;
+
+    bool weekDayScheduleInAction(uint16_t userIndex) const;
+    bool yearDayScheduleInAction(uint16_t userIndex) const;
 
     chip::EndpointId mEndpointId;
     DlLockState mLockState;
+    DoorStateEnum mDoorState;
 
     // This is very naive implementation of users/credentials/schedules database and by no means the best practice. Proper storage
     // of those items is out of scope of this example.
     std::vector<LockUserInfo> mLockUsers;
-    std::vector<LockCredentialInfo> mLockCredentials;
+    std::vector<std::vector<LockCredentialInfo>> mLockCredentials;
     std::vector<std::vector<WeekDaysScheduleInfo>> mWeekDaySchedules;
     std::vector<std::vector<YearDayScheduleInfo>> mYearDaySchedules;
+    std::vector<HolidayScheduleInfo> mHolidaySchedules;
 };
 
 struct LockCredentialInfo
@@ -115,4 +137,10 @@ struct YearDayScheduleInfo
 {
     DlScheduleStatus status;
     EmberAfPluginDoorLockYearDaySchedule schedule;
+};
+
+struct HolidayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockHolidaySchedule schedule;
 };

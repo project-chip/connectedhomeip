@@ -172,7 +172,9 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
     {
         proxy->Retain();
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
-        if (!services[i].mAddress.HasValue())
+
+        // Check if SRV, TXT and AAAA records were received in DNS responses
+        if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !services[i].mAddress.HasValue())
         {
             ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
         }

@@ -809,7 +809,7 @@ HELP OPTIONS
        Print the version and then exit.
 ```
 
-#### gen-cd example
+#### print-cd example
 
 An example of printing a Certificate Declaration (CD), which is provided as a
 command line argument in a hex format:

@@ -26,9 +26,7 @@
 #include "AppEvent.h"
 #include "BindingHandler.h"
 
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#endif // ENABLE_WSTK_LEDS
 
 #include "LightSwitchMgr.h"
 

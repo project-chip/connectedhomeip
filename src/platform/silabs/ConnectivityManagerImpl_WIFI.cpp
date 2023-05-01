@@ -380,13 +380,24 @@ void ConnectivityManagerImpl::OnStationConnected()
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
     (void) PlatformMgr().PostEvent(&event);
-
+    // Setting the rs911x in the power save mode
+#if (CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI)
+    // TODO: Remove stop advertising after BLEManagerImpl is fixed
+#if RSI_BLE_ENABLE
+    chip::DeviceLayer::Internal::BLEManagerImpl().StopAdvertising();
+#endif /* RSI_BLE_ENABLE */
+    sl_status_t err = wfx_power_save();
+    if (err != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "Power save config for Wifi failed");
+    }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI */
     UpdateInternetConnectivityState();
 }
 
 void ConnectivityManagerImpl::OnStationDisconnected()
 {
-    // TODO Invoke WARM to perform actions that occur when the WiFi station interface goes down.
+    // TODO: Invoke WARM to perform actions that occur when the WiFi station interface goes down.
 
     // Alert other components of the new state.
     ChipDeviceEvent event;
@@ -409,6 +420,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
+        NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
     }
 }
 

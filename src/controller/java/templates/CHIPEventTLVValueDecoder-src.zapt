@@ -51,7 +51,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         return nullptr;
                     }
                     {{#zcl_event_fields}}
-                    {{>decode_value target=(concat "value_" (asLowerCamelCase name)) source=(concat "cppValue." (asLowerCamelCase name)) cluster=(asUpperCamelCase parent.parent.name) depth=0 earlyReturn="nullptr"}}
+                    {{>decode_value target=(concat "value_" (asLowerCamelCase name)) source=(concat "cppValue." (asLowerCamelCase name)) cluster=parent.parent.name depth=0 earlyReturn="nullptr"}}
 
                     {{/zcl_event_fields}}
                     jclass {{asLowerCamelCase name}}StructClass;
