@@ -3860,6 +3860,77 @@ class ChipClusters:
             },
         },
     }
+    _DISHWASHER_CONTROL_CLUSTER_INFO = {
+        "clusterName": "DishwasherControl",
+        "clusterId": 0x00000058,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "AvailableOptionsForCurrentMode",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SteamWash",
+                "attributeId": 0x00000001,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000002: {
+                "attributeName": "HeatedDry",
+                "attributeId": 0x00000002,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000003: {
+                "attributeName": "ExtendedDry",
+                "attributeId": 0x00000003,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _DOOR_LOCK_CLUSTER_INFO = {
         "clusterName": "DoorLock",
         "clusterId": 0x00000101,
@@ -9267,6 +9338,7 @@ class ChipClusters:
         0x00000041: _USER_LABEL_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
+        0x00000058: _DISHWASHER_CONTROL_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
         0x00000103: _BARRIER_CONTROL_CLUSTER_INFO,
@@ -9336,6 +9408,7 @@ class ChipClusters:
         "UserLabel": _USER_LABEL_CLUSTER_INFO,
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
+        "DishwasherControl": _DISHWASHER_CONTROL_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
         "BarrierControl": _BARRIER_CONTROL_CLUSTER_INFO,

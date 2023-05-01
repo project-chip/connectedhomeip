@@ -2017,6 +2017,37 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace ModeSelect
 
+namespace DishwasherControl {
+namespace Attributes {
+
+namespace SteamWash {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace SteamWash
+
+namespace HeatedDry {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace HeatedDry
+
+namespace ExtendedDry {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace ExtendedDry
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace DishwasherControl
+
 namespace DoorLock {
 namespace Attributes {
 

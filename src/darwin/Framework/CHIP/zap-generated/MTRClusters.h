@@ -2719,6 +2719,58 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
+ * Cluster Dishwasher Control
+ *    This cluster provides a way to access options associated with the operation of a Dishwasher device type.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterDishwasherControl : MTRCluster
+
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAvailableOptionsForCurrentModeWithParams:(MTRReadParams * _Nullable)params
+    MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeSteamWashWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeSteamWashWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeSteamWashWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                  params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeHeatedDryWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeHeatedDryWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeHeatedDryWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                  params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeExtendedDryWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeExtendedDryWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeExtendedDryWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                    params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
  * Cluster Door Lock
  *    An interface to a generic way to secure a door
  */

@@ -203,6 +203,11 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
+@interface MTRClusterDishwasherControl ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
 @interface MTRClusterDoorLock ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;

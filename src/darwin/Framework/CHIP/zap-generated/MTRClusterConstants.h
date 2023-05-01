@@ -276,6 +276,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeProxyValidID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000044,
     MTRClusterIDTypeBooleanStateID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
+    MTRClusterIDTypeDishwasherControlID MTR_NEWLY_AVAILABLE = 0x00000058,
     MTRClusterIDTypeDoorLockID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000101,
     MTRClusterIDTypeWindowCoveringID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000102,
     MTRClusterIDTypeBarrierControlID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000103,
@@ -3641,6 +3642,24 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterModeSelectAttributeFeatureMapID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster DishwasherControl attributes
+    MTRAttributeIDTypeClusterDishwasherControlAttributeAvailableOptionsForCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterDishwasherControlAttributeSteamWashID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterDishwasherControlAttributeHeatedDryID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterDishwasherControlAttributeExtendedDryID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterDishwasherControlAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterDishwasherControlAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterDishwasherControlAttributeEventListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterDishwasherControlAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterDishwasherControlAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterDishwasherControlAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster DoorLock deprecated attribute names

@@ -12632,6 +12632,161 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 @end
 
+@implementation MTRClusterDishwasherControl
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAvailableOptionsForCurrentModeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                        attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeAvailableOptionsForCurrentModeID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeSteamWashWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeSteamWashID)
+                                             params:params];
+}
+
+- (void)writeAttributeSteamWashWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeSteamWashWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeSteamWashWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                  params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(_endpoint)
+                                    clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeSteamWashID)
+                                        value:dataValueDictionary
+                        expectedValueInterval:expectedValueIntervalMs
+                            timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeHeatedDryWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeHeatedDryID)
+                                             params:params];
+}
+
+- (void)writeAttributeHeatedDryWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeHeatedDryWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeHeatedDryWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                  params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(_endpoint)
+                                    clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeHeatedDryID)
+                                        value:dataValueDictionary
+                        expectedValueInterval:expectedValueIntervalMs
+                            timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeExtendedDryWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeExtendedDryID)
+                                             params:params];
+}
+
+- (void)writeAttributeExtendedDryWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeExtendedDryWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeExtendedDryWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                    params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(_endpoint)
+                                    clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                  attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeExtendedDryID)
+                                        value:dataValueDictionary
+                        expectedValueInterval:expectedValueIntervalMs
+                            timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeGeneratedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeAcceptedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeEventListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherControlAttributeClusterRevisionID)
+                                             params:params];
+}
+
+@end
+
 @implementation MTRClusterDoorLock
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue

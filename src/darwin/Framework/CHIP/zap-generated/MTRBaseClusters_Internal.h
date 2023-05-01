@@ -202,6 +202,11 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
+@interface MTRBaseClusterDishwasherControl ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
 @interface MTRBaseClusterDoorLock ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;

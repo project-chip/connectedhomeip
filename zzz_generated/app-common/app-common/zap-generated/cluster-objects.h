@@ -13347,6 +13347,117 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ModeSelect
+namespace DishwasherControl {
+
+namespace Attributes {
+
+namespace AvailableOptionsForCurrentMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const uint32_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AvailableOptionsForCurrentMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AvailableOptionsForCurrentMode
+namespace SteamWash {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SteamWash::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SteamWash
+namespace HeatedDry {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HeatedDry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HeatedDry
+namespace ExtendedDry {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ExtendedDry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ExtendedDry
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::AvailableOptionsForCurrentMode::TypeInfo::DecodableType availableOptionsForCurrentMode;
+        Attributes::SteamWash::TypeInfo::DecodableType steamWash     = static_cast<bool>(0);
+        Attributes::HeatedDry::TypeInfo::DecodableType heatedDry     = static_cast<bool>(0);
+        Attributes::ExtendedDry::TypeInfo::DecodableType extendedDry = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace DishwasherControl
 namespace DoorLock {
 namespace Structs {
 namespace CredentialStruct {

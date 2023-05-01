@@ -7408,6 +7408,158 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
+ * Cluster Dishwasher Control
+ *
+ * This cluster provides a way to access options associated with the operation of a Dishwasher device type.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRBaseClusterDishwasherControl : MTRCluster
+
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeAvailableOptionsForCurrentModeWithCompletion:(void (^)(NSArray * _Nullable value,
+                                                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeAvailableOptionsForCurrentModeWithParams:(MTRSubscribeParams *)params
+                                           subscriptionEstablished:
+                                               (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                                     reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                       NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
++ (void)readAttributeAvailableOptionsForCurrentModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                                endpoint:(NSNumber *)endpoint
+                                                                   queue:(dispatch_queue_t)queue
+                                                              completion:(void (^)(NSArray * _Nullable value,
+                                                                             NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeSteamWashWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeSteamWashWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeSteamWashWithValue:(NSNumber * _Nonnull)value
+                                  params:(MTRWriteParams * _Nullable)params
+                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeSteamWashWithParams:(MTRSubscribeParams *)params
+                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeSteamWashWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                           endpoint:(NSNumber *)endpoint
+                                              queue:(dispatch_queue_t)queue
+                                         completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeHeatedDryWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeHeatedDryWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeHeatedDryWithValue:(NSNumber * _Nonnull)value
+                                  params:(MTRWriteParams * _Nullable)params
+                              completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeHeatedDryWithParams:(MTRSubscribeParams *)params
+                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeHeatedDryWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                           endpoint:(NSNumber *)endpoint
+                                              queue:(dispatch_queue_t)queue
+                                         completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeExtendedDryWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeExtendedDryWithValue:(NSNumber * _Nonnull)value
+                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeExtendedDryWithValue:(NSNumber * _Nonnull)value
+                                    params:(MTRWriteParams * _Nullable)params
+                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeExtendedDryWithParams:(MTRSubscribeParams *)params
+                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeExtendedDryWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                             endpoint:(NSNumber *)endpoint
+                                                queue:(dispatch_queue_t)queue
+                                           completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value,
+                                                             NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                      endpoint:(NSNumber *)endpoint
+                                                         queue:(dispatch_queue_t)queue
+                                                    completion:(void (^)(NSArray * _Nullable value,
+                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value,
+                                                            NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                     endpoint:(NSNumber *)endpoint
+                                                        queue:(dispatch_queue_t)queue
+                                                   completion:(void (^)(NSArray * _Nullable value,
+                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeEventListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeEventListWithParams:(MTRSubscribeParams *)params
+                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeEventListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                           endpoint:(NSNumber *)endpoint
+                                              queue:(dispatch_queue_t)queue
+                                         completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                               endpoint:(NSNumber *)endpoint
+                                                  queue:(dispatch_queue_t)queue
+                                             completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                            endpoint:(NSNumber *)endpoint
+                                               queue:(dispatch_queue_t)queue
+                                          completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                 endpoint:(NSNumber *)endpoint
+                                                    queue:(dispatch_queue_t)queue
+                                               completion:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
  * Cluster Door Lock
  *
  * An interface to a generic way to secure a door
@@ -20038,6 +20190,12 @@ typedef NS_ENUM(uint8_t, MTRGroupKeyManagementGroupKeySecurityPolicy) {
 typedef NS_OPTIONS(uint32_t, MTRModeSelectFeature) {
     MTRModeSelectFeatureDEPONOFF API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_OPTIONS(uint32_t, MTRDishwasherControlFeature) {
+    MTRDishwasherControlFeatureSTEAMWASH MTR_NEWLY_AVAILABLE = 0x1,
+    MTRDishwasherControlFeatureHEATEDDRY MTR_NEWLY_AVAILABLE = 0x2,
+    MTRDishwasherControlFeatureEXTDRY MTR_NEWLY_AVAILABLE = 0x4,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockAlarmCode) {
     MTRDoorLockAlarmCodeLockJammed API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,

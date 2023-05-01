@@ -286,6 +286,12 @@
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_DISHWASHER_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DISHWASHER_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DISHWASHER_CONTROL_CLUSTER { chip::app::Clusters::DishwasherControl::Id, "Dishwasher Control" },
+#else
+#define CHIP_PRINTCLUSTER_DISHWASHER_CONTROL_CLUSTER
+#endif
+
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER { chip::app::Clusters::DoorLock::Id, "Door Lock" },
 #else
@@ -523,6 +529,7 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_DISHWASHER_CONTROL_CLUSTER                                                                                   \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \

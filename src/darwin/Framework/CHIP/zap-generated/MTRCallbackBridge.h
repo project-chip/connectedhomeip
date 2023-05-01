@@ -875,6 +875,16 @@ typedef void (*ModeSelectAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*DishwasherControlAvailableOptionsForCurrentModeListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<uint32_t> & data);
+typedef void (*DishwasherControlGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DishwasherControlAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DishwasherControlEventListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*DishwasherControlAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*DoorLockCredentialRulesSupportAttributeCallback)(void *,
                                                                 chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask>);
 typedef void (*DoorLockSupportedOperatingModesAttributeCallback)(
@@ -6802,6 +6812,172 @@ public:
     void OnSubscriptionEstablished();
     using MTRModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRModeSelectAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherControlAvailableOptionsForCurrentModeListAttributeCallback>
+{
+public:
+    MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherControlAvailableOptionsForCurrentModeListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherControlAvailableOptionsForCurrentModeListAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint32_t> & value);
+};
+
+class MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherControlGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherControlGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRDishwasherControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherControlGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRDishwasherControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherControlGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherControlAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherControlAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRDishwasherControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherControlAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRDishwasherControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherControlAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherControlEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherControlEventListListAttributeCallback>
+{
+public:
+    MTRDishwasherControlEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherControlEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherControlEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherControlEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRDishwasherControlEventListListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherControlEventListListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherControlEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action,
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherControlEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherControlEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherControlEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherControlAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherControlAttributeListListAttributeCallback>
+{
+public:
+    MTRDishwasherControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherControlAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRDishwasherControlAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherControlAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherControlAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherControlAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherControlAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

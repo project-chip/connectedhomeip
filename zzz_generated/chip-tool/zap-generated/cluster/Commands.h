@@ -74,6 +74,7 @@
 | ProxyValid                                                          | 0x0044 |
 | BooleanState                                                        | 0x0045 |
 | ModeSelect                                                          | 0x0050 |
+| DishwasherControl                                                   | 0x0058 |
 | DoorLock                                                            | 0x0101 |
 | WindowCovering                                                      | 0x0102 |
 | BarrierControl                                                      | 0x0103 |
@@ -3758,6 +3759,26 @@ public:
 private:
     chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type mRequest;
 };
+
+/*----------------------------------------------------------------------------*\
+| Cluster DishwasherControl                                           | 0x0058 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * AvailableOptionsForCurrentMode                                    | 0x0000 |
+| * SteamWash                                                         | 0x0001 |
+| * HeatedDry                                                         | 0x0002 |
+| * ExtendedDry                                                       | 0x0003 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
@@ -11914,6 +11935,76 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterDishwasherControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::DishwasherControl;
+
+    const char * clusterName = "DishwasherControl";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "available-options-for-current-mode", Attributes::AvailableOptionsForCurrentMode::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "steam-wash", Attributes::SteamWash::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "heated-dry", Attributes::HeatedDry::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "extended-dry", Attributes::ExtendedDry::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint32_t>>>(
+            Id, "available-options-for-current-mode", Attributes::AvailableOptionsForCurrentMode::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "steam-wash", 0, 1, Attributes::SteamWash::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "heated-dry", 0, 1, Attributes::HeatedDry::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "extended-dry", 0, 1, Attributes::ExtendedDry::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, "available-options-for-current-mode", Attributes::AvailableOptionsForCurrentMode::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "steam-wash", Attributes::SteamWash::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "heated-dry", Attributes::HeatedDry::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "extended-dry", Attributes::ExtendedDry::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::DoorLock;
@@ -16153,6 +16244,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterProxyValid(commands, credsIssuerConfig);
     registerClusterBooleanState(commands, credsIssuerConfig);
     registerClusterModeSelect(commands, credsIssuerConfig);
+    registerClusterDishwasherControl(commands, credsIssuerConfig);
     registerClusterDoorLock(commands, credsIssuerConfig);
     registerClusterWindowCovering(commands, credsIssuerConfig);
     registerClusterBarrierControl(commands, credsIssuerConfig);

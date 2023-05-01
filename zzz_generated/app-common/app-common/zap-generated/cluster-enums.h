@@ -1366,6 +1366,17 @@ enum class ModeSelectFeature : uint32_t
 };
 } // namespace ModeSelect
 
+namespace DishwasherControl {
+
+// Bitmap for DishwasherControlFeature
+enum class DishwasherControlFeature : uint32_t
+{
+    kSteamwash = 0x1,
+    kHeateddry = 0x2,
+    kExtdry    = 0x4,
+};
+} // namespace DishwasherControl
+
 namespace DoorLock {
 
 // Enum for AlarmCodeEnum

@@ -361,6 +361,14 @@ void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Dishwasher Control Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherControlClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Door Lock Cluster Init
  *
  * Cluster Init
@@ -3769,6 +3777,84 @@ void emberAfModeSelectClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Dishwasher Control Cluster
+//
+
+/** @brief Dishwasher Control Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDishwasherControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Control Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherControlClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Control Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterDishwasherControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Dishwasher Control Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterDishwasherControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Dishwasher Control Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterDishwasherControlClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Dishwasher Control Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDishwasherControlClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Control Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDishwasherControlClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Door Lock Cluster
