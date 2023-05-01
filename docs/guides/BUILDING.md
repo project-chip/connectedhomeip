@@ -276,11 +276,11 @@ Example build commands:
 ./scripts/build/build_examples.py --target nrf-nrf5340dk-pump build
 ```
 
-### Fuzzing tests
+### `libfuzzer` unit tests
 
-Fuzzing tests are only compiled but not executed (you have to manually execute
-them). For best error detection, some form of sanitizer like `asan` should be
-used.
+`libfuzzer` unit tests tests are only compiled but not executed (you have to 
+manually execute them). For best error detection, some form of sanitizer 
+like `asan` should be used.
 
 To compile, use:
 
