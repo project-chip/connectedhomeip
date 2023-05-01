@@ -108,7 +108,10 @@ chip_test_suite("tests") {
     "TestAttributeValueEncoder.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
-    "TestClientMonitoringRegistrationTable.cpp",
+
+    # Disable CM cluster table tests until update is done
+    # https://github.com/project-chip/connectedhomeip/issues/24425
+    # "TestClientMonitoringRegistrationTable.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -159,7 +162,10 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":binding-test-srcs",
-    ":client-monitoring-test-srcs",
+
+    # Disable CM cluster table tests until update is done
+    #https://github.com/project-chip/connectedhomeip/issues/24425
+    # ":client-monitoring-test-srcs",
     ":ota-requestor-test-srcs",
     ":scenes-table-test-srcs",
     "${chip_root}/src/app",
