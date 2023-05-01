@@ -46,8 +46,9 @@
    1. [Commissioning Process Overview](general/COMMISSIONING.md)
    2. [Security Overview](general/SECURITY.md)
    3. [Matter Attestation Credentials for EFR32](../../silabs_examples/credentials/README.md)
-   4. [Matter Sleepy End Devices over Openthread](general/OT_SLEEPY_END_DEVICE.md)
-   5. [Matter OTA Software Update](general/OTA_SOFTWARE_UPDATE.md)
+   4. [Matter Intermittently Connected Devices](general/MATTER_ICD.md)
+   5. [Matter Sleepy End Devices over Openthread](general/OT_SLEEPY_END_DEVICE.md)
+   6. [Matter OTA Software Update](general/OTA_SOFTWARE_UPDATE.md)
 
 9. Reference Guides
 
