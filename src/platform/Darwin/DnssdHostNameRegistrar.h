@@ -50,12 +50,16 @@ namespace Dnssd {
         {
             for (auto & interface : interfaces) {
                 auto interfaceId = interface.first;
-                auto interfaceAddress = static_cast<const void *>(&interface.second);
-                auto interfaceAddressLen = sizeof(interface.second);
 
-                LogErrorOnFailure(
-                    RegisterInterface(interfaceId, type, interfaceAddress, static_cast<uint16_t>(interfaceAddressLen)));
+                LogErrorOnFailure(RegisterInterface(interfaceId, interface.second, type));
             }
+        }
+
+        template <typename T> CHIP_ERROR RegisterInterface(uint32_t interfaceId, const T & interfaceAddress, uint16_t type)
+        {
+            auto interfaceAddressLen = sizeof(interfaceAddress);
+
+            return RegisterInterface(interfaceId, type, &interfaceAddress, static_cast<uint16_t>(interfaceAddressLen));
         }
 
         CHIP_ERROR RegisterInterface(uint32_t interfaceId, uint16_t rtype, const void * rdata, uint16_t rdlen);

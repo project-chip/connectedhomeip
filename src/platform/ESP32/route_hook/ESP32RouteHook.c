@@ -163,7 +163,7 @@ esp_err_t esp_route_hook_init(esp_netif_t * netif)
     lwip_netif = netif_get_by_index((uint8_t) netif_idx);
     ESP_RETURN_ON_FALSE(lwip_netif != NULL, ESP_ERR_INVALID_ARG, TAG, "Invalid network interface");
 
-    for (esp_route_hook_t * iter = s_hooks; iter != NULL; iter++)
+    for (esp_route_hook_t * iter = s_hooks; iter != NULL; iter = iter->next)
     {
         if (iter->netif == lwip_netif)
         {
