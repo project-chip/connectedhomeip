@@ -278,9 +278,9 @@ Example build commands:
 
 ### `libfuzzer` unit tests
 
-`libfuzzer` unit tests tests are only compiled but not executed (you have to 
-manually execute them). For best error detection, some form of sanitizer 
-like `asan` should be used.
+`libfuzzer` unit tests tests are only compiled but not executed (you have to
+manually execute them). For best error detection, some form of sanitizer like
+`asan` should be used.
 
 To compile, use:
 
@@ -293,8 +293,8 @@ After which tests should be located in
 
 #### `ossfuzz` configurations
 
-`ossfuzz` configurations are not stand-alone fuzzing and instead serve
-as an integration point with external fuzzing automated builds.
+`ossfuzz` configurations are not stand-alone fuzzing and instead serve as an
+integration point with external fuzzing automated builds.
 
 They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
 `$LIB_FUZZING_ENGINE`.
