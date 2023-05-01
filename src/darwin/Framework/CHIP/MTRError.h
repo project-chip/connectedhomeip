@@ -59,6 +59,16 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * into a fabric when it's already part of that fabric.
      */
     MTRErrorCodeFabricExists         = 11,
+    /**
+     * MTRErrorCodeUnknownSchema means the schema for the given cluster/attribute,
+     * cluster/event, or cluster/command combination is not known.
+     */
+    MTRErrorCodeUnknownSchema MTR_NEWLY_AVAILABLE = 12,
+    /**
+     * MTRErrorCodeSchemaMismatch means that provided data did not match the
+     * expected schema.
+     */
+    MTRErrorCodeSchemaMismatch MTR_NEWLY_AVAILABLE = 13,
 };
 // clang-format on
 
