@@ -77,18 +77,18 @@ public:
      * EncodeValue encodes the value field of the report, it should be called exactly once.
      */
     template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true, typename... Ts>
-    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, T && item, Ts &&... aArgs)
+    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, TLV::Tag tag, T && item, Ts &&... aArgs)
     {
-        return DataModel::Encode(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()),
-                                 TLV::ContextTag(AttributeDataIB::Tag::kData), item, std::forward<Ts>(aArgs)...);
+        return DataModel::Encode(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()), tag, item,
+                                 std::forward<Ts>(aArgs)...);
     }
 
     template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true, typename... Ts>
-    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, FabricIndex accessingFabricIndex, T && item,
-                           Ts &&... aArgs)
+    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, TLV::Tag tag, FabricIndex accessingFabricIndex,
+                           T && item, Ts &&... aArgs)
     {
-        return DataModel::EncodeForRead(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()),
-                                        TLV::ContextTag(AttributeDataIB::Tag::kData), accessingFabricIndex, item);
+        return DataModel::EncodeForRead(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()), tag,
+                                        accessingFabricIndex, item, std::forward<Ts>(aArgs)...);
     }
 };
 
@@ -224,10 +224,19 @@ public:
         // An empty list is encoded iff both mCurrentEncodingListIndex and mEncodeState.mCurrentEncodingListIndex are invalid
         // values. After encoding the empty list, mEncodeState.mCurrentEncodingListIndex and mCurrentEncodingListIndex are set to 0.
         ReturnErrorOnFailure(EnsureListStarted());
-        ReturnErrorOnFailure(aCallback(ListEncodeHelper(*this)));
-        // The Encode procedure finished without any error, clear the state.
-        mEncodeState = AttributeEncodeState();
-        return CHIP_NO_ERROR;
+        CHIP_ERROR err = aCallback(ListEncodeHelper(*this));
+
+        // Even if encoding list items failed, make sure we EnsureListEnded().
+        // Since we encode list items atomically, in the case when we just
+        // didn't fit the next item we want to make sure our list is properly
+        // ended before the reporting engine starts chunking.
+        EnsureListEnded();
+        if (err == CHIP_NO_ERROR)
+        {
+            // The Encode procedure finished without any error, clear the state.
+            mEncodeState = AttributeEncodeState();
+        }
+        return err;
     }
 
     bool TriedEncode() const { return mTriedEncode; }
@@ -261,7 +270,17 @@ private:
         TLV::TLVWriter backup;
         mAttributeReportIBsBuilder.Checkpoint(backup);
 
-        CHIP_ERROR err = EncodeAttributeReportIB(std::forward<Ts>(aArgs)...);
+        CHIP_ERROR err;
+        if (mEncodingInitialList)
+        {
+            // Just encode a single item, with an anonymous tag.
+            AttributeReportBuilder builder;
+            err = builder.EncodeValue(mAttributeReportIBsBuilder, TLV::AnonymousTag(), std::forward<Ts>(aArgs)...);
+        }
+        else
+        {
+            err = EncodeAttributeReportIB(std::forward<Ts>(aArgs)...);
+        }
         if (err != CHIP_NO_ERROR)
         {
             // For list chunking, ReportEngine should not rollback the buffer when CHIP_ERROR_NO_MEMORY or similar error occurred.
@@ -288,25 +307,28 @@ private:
     CHIP_ERROR EncodeAttributeReportIB(Ts &&... aArgs)
     {
         AttributeReportBuilder builder;
-
         ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
-        ReturnErrorOnFailure(builder.EncodeValue(mAttributeReportIBsBuilder, std::forward<Ts>(aArgs)...));
+        ReturnErrorOnFailure(builder.EncodeValue(mAttributeReportIBsBuilder, TLV::ContextTag(AttributeDataIB::Tag::kData),
+                                                 std::forward<Ts>(aArgs)...));
 
         return builder.FinishAttribute(mAttributeReportIBsBuilder);
     }
 
     /**
-     * EnsureListStarted encodes the first item of one report with lists (an
-     * empty list), as needed.
+     * EnsureListStarted sets our mCurrentEncodingListIndex to 0, and:
      *
-     * If internal state indicates we have already encoded the empty list, this function will encode nothing, set
-     * mCurrentEncodingListIndex to 0 and return CHIP_NO_ERROR.
+     * * If we are just starting the list, gets us ready to encode list items.
      *
-     * In all cases this function guarantees that mPath.mListOp is AppendItem
-     * after it returns, because at that point we will be encoding the list
-     * items.
+     * * If we are continuing a chunked list, guarantees that mPath.mListOp is
+     *   AppendItem after it returns.
      */
     CHIP_ERROR EnsureListStarted();
+
+    /**
+     * EnsureListEnded writes out the end of the list and our attribute data IB,
+     * if we were encoding our initial list
+     */
+    void EnsureListEnded();
 
     bool mTriedEncode = false;
     AttributeReportIBs::Builder & mAttributeReportIBsBuilder;
@@ -314,6 +336,10 @@ private:
     ConcreteDataAttributePath mPath;
     DataVersion mDataVersion;
     bool mIsFabricFiltered = false;
+    // mEncodingInitialList is true if we're encoding a list and we have not
+    // started chunking it yet, so we're encoding a single attribute report IB
+    // for the whole list, not one per item.
+    bool mEncodingInitialList = false;
     AttributeEncodeState mEncodeState;
     ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
 };

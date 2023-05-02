@@ -13,6 +13,7 @@ discussion/index
 guides/index
 style/index
 examples/index
+tools/index
 BUG_REPORT
 code_generation
 ERROR_CODES

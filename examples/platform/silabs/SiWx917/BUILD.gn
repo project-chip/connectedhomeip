@@ -186,6 +186,8 @@ config("siwx917-common-config") {
   if (siwx917_commissionable_data) {
     defines += [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
   }
+
+  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
 config("silabs-wifi-config") {
@@ -238,6 +240,7 @@ source_set("siwx917-common") {
   sources = [
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/heap_4_silabs.c",
+    "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "${wifi_sdk_dir}/dhcp_client.cpp",
     "${wifi_sdk_dir}/ethernetif.cpp",
     "${wifi_sdk_dir}/lwip_netif.cpp",

@@ -420,7 +420,6 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
 
     chip::Inet::IPAddress ip;
     ReturnErrorOnFailure(chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip));
-    interfaces[interfaceId].addresses.push_back(ip);
 
 #ifdef CHIP_PROGRESS_LOGGING
     char addrStr[INET6_ADDRSTRLEN];
@@ -428,19 +427,18 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
     ChipLogProgress(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
 #endif // CHIP_PROGRESS_LOGGING
 
+    if (ip.IsIPv6LinkLocal() && interfaceId == kDNSServiceInterfaceIndexLocalOnly)
+    {
+        // We need a real interface to use a link-local address.  Just ignore
+        // this one, because trying to use it will simply lead to "No route to
+        // host" errors.
+        ChipLogProgress(Discovery, "Mdns: Ignoring link-local address with no usable interface");
+        return CHIP_NO_ERROR;
+    }
+
+    interfaces[interfaceId].addresses.push_back(ip);
+
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ResolveContext::OnNewLocalOnlyAddress()
-{
-    sockaddr_in6 sockaddr;
-    memset(&sockaddr, 0, sizeof(sockaddr));
-    sockaddr.sin6_len    = sizeof(sockaddr);
-    sockaddr.sin6_family = AF_INET6;
-    sockaddr.sin6_addr   = in6addr_loopback;
-    sockaddr.sin6_port   = htons((unsigned short) interfaces[kDNSServiceInterfaceIndexLocalOnly].service.mPort);
-
-    return OnNewAddress(kDNSServiceInterfaceIndexLocalOnly, reinterpret_cast<struct sockaddr *>(&sockaddr));
 }
 
 bool ResolveContext::HasAddress()

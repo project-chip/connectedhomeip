@@ -2,7 +2,7 @@
 orphan: true
 ---
 
-## Manufacturing data
+# NXP manufacturing data guide
 
 By default, the example application is configured to use generic test
 certificates and provisioning data embedded with the application code. It is
