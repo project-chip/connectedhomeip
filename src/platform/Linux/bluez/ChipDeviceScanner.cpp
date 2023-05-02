@@ -136,7 +136,9 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         return CHIP_ERROR_INTERNAL;
     }
 
+    DeviceLayer::PlatformMgr().LockChipStack();
     CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
+    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if (err != CHIP_NO_ERROR)
     {
