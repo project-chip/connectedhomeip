@@ -58,6 +58,9 @@ for define in "${defines[@]}"; do
     esac
     target_defines+=,\"${define//\"/\\\"}\"
 done
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
+    target_defines+=,\"CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES=1\"
+}
 target_defines=[${target_defines:1}]
 
 declare target_arch=
@@ -139,6 +142,12 @@ declare -a args=(
 [[ $CHIP_IS_BLE == NO ]] && {
     args+=(
         'chip_config_network_layer_ble=false'
+    )
+}
+
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
+    args+=(
+        'enable_encoding_sentinel_enum_values=true'
     )
 }
 
