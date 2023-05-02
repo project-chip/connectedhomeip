@@ -1,20 +1,20 @@
 /*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+*
+*    Copyright (c) 2023 Project CHIP Authors
+*    All rights reserved.
+*
+*    Licensed under the Apache License, Version 2.0 (the "License");
+*    you may not use this file except in compliance with the License.
+*    You may obtain a copy of the License at
+*
+*        http://www.apache.org/licenses/LICENSE-2.0
+*
+*    Unless required by applicable law or agreed to in writing, software
+*    distributed under the License is distributed on an "AS IS" BASIS,
+*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*    See the License for the specific language governing permissions and
+*    limitations under the License.
+*/
 
 #include "main-common.h"
 #include "AllClustersCommandDelegate.h"
@@ -27,7 +27,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/mode-select-server/mode-select-server.h>
 #include <app/clusters/mode-select-server/mode-select-delegate.h>
-#include "../all-clusters-common/include/mode-select-1-delegate.h"
+#include "../all-clusters-common/include/mode-select-delegates.h"
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
@@ -159,8 +159,21 @@ namespace {
         chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Cappuccino", 4, List<const SemanticTagStructType>(semanticTagsCappucino)),
         chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Espresso", 7, List<const SemanticTagStructType>(semanticTagsEspresso))
     };
-    Clusters::ModeSelect::ModeSelectDelegate1 aliasDelegate1(coffeeOptions);
-    Clusters::ModeSelect::Instance modeSelectAliasA(0x1, 0x50, &aliasDelegate1);
+    Clusters::ModeSelect::ModeSelectDelegate modeSelectDelegate(coffeeOptions);
+    Clusters::ModeSelect::Instance modeSelectInstance(0x1, 0x50, &modeSelectDelegate);
+
+    constexpr SemanticTagStructType semanticTagsIdle[]     = { { .value = 0 } };
+    constexpr SemanticTagStructType semanticTagsCleaning[] = { { .value = 0 } };
+    constexpr SemanticTagStructType semanticTagsMapping[] = { { .value = 0 } };
+
+    std::vector<ModeOptionStructType> rvcRunOptions = {
+        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Idle", 0, List<const SemanticTagStructType>(semanticTagsIdle)),
+        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Cleaning", 1, List<const SemanticTagStructType>(semanticTagsCleaning)),
+        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Mapping", 2, List<const SemanticTagStructType>(semanticTagsMapping)),
+    };
+    Clusters::ModeSelect::RvcRunDelegate RvcRunDelegate(rvcRunOptions);
+    Clusters::ModeSelect::Instance rvcRunInstance(0x1, 0x54, &RvcRunDelegate);
+
 }
 
 void ApplicationInit()
@@ -217,8 +230,10 @@ void ApplicationInit()
         sEthernetNetworkCommissioningInstance.Init();
     }
 
-    modeSelectAliasA.Init();
-    modeSelectAliasA.SetFeatureMap(3);
+    modeSelectInstance.Init();
+    modeSelectInstance.SetFeatureMap(3);
+    rvcRunInstance.Init();
+    rvcRunInstance.SetFeatureMap(3);
 
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-// todo update the above?
 
 #ifndef SOME_UNIQUE_NAME_HERE
 #define SOME_UNIQUE_NAME_HERE
@@ -32,21 +31,24 @@ using ModeOptionStructType  = chip::app::Clusters::ModeSelect::Structs::ModeOpti
 using SemanticTagStructType = chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type;
 
 template <typename T>
-using List               = chip::app::DataModel::List<T>;
+using List = chip::app::DataModel::List<T>;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ModeSelect {
 
-class Delegate {
+class Delegate
+{
 public:
     const std::vector<ModeOptionStructType> modeOptions;
+
     /**
      * This is a helper function to build a mode option structure. It takes the label/name of the mode,
      * the value of the mode and a list of semantic tags that apply to this mode.
      */
-    static ModeOptionStructType BuildModeOptionStruct(const char * label, uint8_t mode, const List<const SemanticTagStructType> & semanticTags)
+    static ModeOptionStructType BuildModeOptionStruct(const char * label, uint8_t mode,
+                                                      const List<const SemanticTagStructType> & semanticTags)
     {
         Structs::ModeOptionStruct::Type option;
         option.label        = CharSpan::fromCharString(label);
@@ -55,18 +57,16 @@ public:
         return option;
     }
 
-    explicit Delegate(std::vector<ModeOptionStructType> modes) : modeOptions(std::move(modes))
-    {
-        
-    }
+    explicit Delegate(std::vector<ModeOptionStructType> modes) : modeOptions(std::move(modes)) {}
 
     virtual CHIP_ERROR Init() = 0;
 
     Status IsSupportedMode(uint8_t mode);
 
-    Status GetMode(uint8_t mode, ModeOptionStructType &modeOption);
+    Status GetMode(uint8_t mode, ModeOptionStructType & modeOption);
 
-    virtual void HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type &response);
+    virtual Status HandleChangeToMode(uint8_t mode);
+    virtual void HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type & response);
 
     virtual ~Delegate() = default;
 };

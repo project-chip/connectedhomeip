@@ -1,6 +1,7 @@
-/**
+/*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,12 +18,11 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/mode-select-server/mode-select-server.h>
+#include <app/clusters/on-off-server/on-off-server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#include <app/util/af.h>
-#include <app/clusters/mode-select-server/mode-select-server.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <app/clusters/on-off-server/on-off-server.h>
 
 // using namespace std;
 using namespace chip;
@@ -39,12 +39,13 @@ namespace Clusters {
 namespace ModeSelect {
 
 // todo find a cleaner solution by modifying the zap generated code.
-EmberAfStatus Instance::GetFeature(uint32_t * value)
+EmberAfStatus Instance::GetFeature(uint32_t * value) const
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpointId, clusterId, ModeSelect::Attributes::FeatureMap::Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status =
+        emberAfReadAttribute(endpointId, clusterId, ModeSelect::Attributes::FeatureMap::Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -54,7 +55,7 @@ EmberAfStatus Instance::GetFeature(uint32_t * value)
     return status;
 }
 
-EmberAfStatus Instance::SetFeatureMap(uint32_t value)
+EmberAfStatus Instance::SetFeatureMap(uint32_t value) const
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
@@ -64,15 +65,17 @@ EmberAfStatus Instance::SetFeatureMap(uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpointId, clusterId, ModeSelect::Attributes::FeatureMap::Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpointId, clusterId, ModeSelect::Attributes::FeatureMap::Id, writable,
+                                 ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Instance::GetCurrentMode(uint8_t * value) const
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpointId, clusterId, ModeSelect::Attributes::CurrentMode::Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status =
+        emberAfReadAttribute(endpointId, clusterId, ModeSelect::Attributes::CurrentMode::Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -92,9 +95,8 @@ EmberAfStatus Instance::SetCurrentMode(uint8_t value) const
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpointId,
-                                 clusterId,ModeSelect::Attributes::CurrentMode::Id,
-                                 writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpointId, clusterId, ModeSelect::Attributes::CurrentMode::Id, writable,
+                                 ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Instance::GetOnMode(DataModel::Nullable<uint8_t> & value) const
@@ -141,8 +143,9 @@ EmberAfStatus Instance::GetStartUpMode(DataModel::Nullable<uint8_t> & value) con
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpointId, clusterId, ModeSelect::Attributes::StartUpMode::Id, readable, sizeof(temp));
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status =
+        emberAfReadAttribute(endpointId, clusterId, ModeSelect::Attributes::StartUpMode::Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -165,7 +168,8 @@ EmberAfStatus Instance::SetStartUpMode(uint8_t value) const
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpointId, clusterId, ModeSelect::Attributes::StartUpMode::Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpointId, clusterId, ModeSelect::Attributes::StartUpMode::Id, writable,
+                                 ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Instance::SetStartUpModeNull() const
@@ -174,9 +178,9 @@ EmberAfStatus Instance::SetStartUpModeNull() const
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpointId, clusterId, ModeSelect::Attributes::StartUpMode::Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpointId, clusterId, ModeSelect::Attributes::StartUpMode::Id, writable,
+                                 ZCL_INT8U_ATTRIBUTE_TYPE);
 }
-
 
 CHIP_ERROR Instance::Init()
 {
@@ -190,11 +194,13 @@ CHIP_ERROR Instance::Init()
             break;
         }
     }
-    if (!isAModeSelectCluster){
+    if (!isAModeSelectCluster)
+    {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster ID given is not a mode select alias.");
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
     }
 
+    // todo do we need to check if the cluster has been selected in zap?
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(msDelegate->Init());
@@ -286,13 +292,6 @@ CHIP_ERROR Instance::Init()
 template <typename RequestT, typename FuncT>
 void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
 {
-    // todo
-    // if !RequestT::IsValidClusterId(handlerContext.mRequestPath.mClusterId)
-    // {
-    //     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCluster);
-    //     return;        
-    // }
-
     if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
     {
         RequestT requestPayload;
@@ -308,7 +307,7 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
         if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                        Protocols::InteractionModel::Status::InvalidCommand);
+                                                     Protocols::InteractionModel::Status::InvalidCommand);
             return;
         }
 
@@ -316,12 +315,11 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
     }
 }
 
-void Instance::ModeSelectHandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
+void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
 {
     uint8_t newMode = commandData.newMode;
 
     Status checkSupportedModeStatus = msDelegate->IsSupportedMode(newMode);
-
     if (Status::Success != checkSupportedModeStatus)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
@@ -329,12 +327,20 @@ void Instance::ModeSelectHandleChangeToMode(HandlerContext & ctx, const Commands
         return;
     }
 
+    Status checkIsChangeToThisModeAllowed = msDelegate->HandleChangeToMode(newMode);
+    if (Status::Success != checkIsChangeToThisModeAllowed)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, checkIsChangeToThisModeAllowed);
+        return;
+    }
+
     SetCurrentMode(newMode);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: ChangeToMode successful");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: ChangeToMode changed to mode %u", newMode);
 }
 
-void Instance::ModeSelectHandleChangeToModeWithStatus(HandlerContext & ctx, const Commands::ChangeToModeWithStatus::DecodableType & commandData)
+void Instance::HandleChangeToModeWithStatus(HandlerContext & ctx,
+                                            const Commands::ChangeToModeWithStatus::DecodableType & commandData)
 {
     uint8_t newMode = commandData.newMode;
 
@@ -349,9 +355,9 @@ void Instance::ModeSelectHandleChangeToModeWithStatus(HandlerContext & ctx, cons
     }
 
     msDelegate->HandleChangeToModeWitheStatus(newMode, response);
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: HandleChangeToModeWitheStatus delegate call successfully");
 
-    if (response.status == uint8_t(ChangeToModeResponseStatus::kSuccess)) {
+    if (response.status == uint8_t(ChangeToModeResponseStatus::kSuccess))
+    {
         SetCurrentMode(newMode);
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: HandleChangeToModeWitheStatus changed to mode %u", newMode);
     }
@@ -359,6 +365,7 @@ void Instance::ModeSelectHandleChangeToModeWithStatus(HandlerContext & ctx, cons
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
+// This function is called by the interaction model engine when a command destined for this instance is received.
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
     switch (handlerContext.mRequestPath.mCommandId)
@@ -366,16 +373,20 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     case ModeSelect::Commands::ChangeToMode::Id:
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Entering handling ChangeToMode");
 
-        HandleCommand<Commands::ChangeToMode::DecodableType>(handlerContext, [this](HandlerContext & ctx, const auto & commandData) { ModeSelectHandleChangeToMode(ctx, commandData); });
+        HandleCommand<Commands::ChangeToMode::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleChangeToMode(ctx, commandData); });
         break;
     case ModeSelect::Commands::ChangeToModeWithStatus::Id:
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Entering handling ChangeToModeWithStatus");
 
-        HandleCommand<Commands::ChangeToModeWithStatus::DecodableType>(handlerContext, [this](HandlerContext & ctx, const auto & commandData) { ModeSelectHandleChangeToModeWithStatus(ctx, commandData); });
+        HandleCommand<Commands::ChangeToModeWithStatus::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleChangeToModeWithStatus(ctx, commandData); });
     }
 }
 
-bool Instance::HasFeature(ModeSelectFeature feature)
+
+bool Instance::HasFeature(ModeSelectFeature feature) const
 {
     bool success;
     uint32_t featureMap;
@@ -384,9 +395,11 @@ bool Instance::HasFeature(ModeSelectFeature feature)
     return success && ((featureMap & to_underlying(feature)) != 0);
 }
 
+// List the commands supported by this instance.
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
 {
+    callback(ModeSelect::Commands::ChangeToMode::Id, context);
     if (HasFeature(ModeSelect::ModeSelectFeature::kExt))
     {
         callback(ModeSelect::Commands::ChangeToModeWithStatus::Id, context);
@@ -396,6 +409,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     return CHIP_NO_ERROR;
 }
 
+// Implements the read functionality for non-standard attributes.
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
@@ -409,7 +423,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
         CHIP_ERROR err;
         const auto mo = msDelegate->modeOptions;
-        err = aEncoder.EncodeList([mo](const auto & encoder) -> CHIP_ERROR {
+        err           = aEncoder.EncodeList([mo](const auto & encoder) -> CHIP_ERROR {
             for (ModeOptionStructType mode : mo)
             {
                 ReturnErrorOnFailure(encoder.Encode(mode));
@@ -422,6 +436,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     return CHIP_NO_ERROR;
 }
 
+// Implements checking before attribute writes.
 CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, AttributeValueDecoder & aDecoder)
 {
     EmberAfStatus result;
@@ -459,13 +474,13 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
         }
     }
 
-    if (result == EMBER_ZCL_STATUS_SUCCESS) {
+    if (result == EMBER_ZCL_STATUS_SUCCESS)
+    {
         return CHIP_NO_ERROR;
     }
 
     return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
 }
-
 
 } // namespace ModeSelect
 } // namespace Clusters
