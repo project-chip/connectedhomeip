@@ -17876,8 +17876,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
 
     DirectionEnum direction = static_cast<DirectionEnum>(0);
-    bool wrap               = static_cast<bool>(0);
-    bool lowestOff          = static_cast<bool>(0);
+    Optional<bool> wrap;
+    Optional<bool> lowestOff;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -17893,8 +17893,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
 
     DirectionEnum direction = static_cast<DirectionEnum>(0);
-    bool wrap               = static_cast<bool>(0);
-    bool lowestOff          = static_cast<bool>(0);
+    Optional<bool> wrap;
+    Optional<bool> lowestOff;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Step

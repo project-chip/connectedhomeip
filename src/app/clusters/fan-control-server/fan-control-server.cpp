@@ -125,8 +125,9 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         {
             FanModeSequenceType fanModeSequence;
             FanModeSequence::Get(attributePath.mEndpointId, &fanModeSequence);
-            if ((fanModeSequence == FanModeSequenceType::kOffLowHighAuto) ||
-                (fanModeSequence == FanModeSequenceType::kOffLowMedHighAuto))
+            if (SupportsAuto(attributePath.mEndpointId) &&
+                ((fanModeSequence == FanModeSequenceType::kOffLowHighAuto) ||
+                 (fanModeSequence == FanModeSequenceType::kOffLowMedHighAuto)))
             {
                 *value = static_cast<uint8_t>(FanModeType::kAuto);
             }

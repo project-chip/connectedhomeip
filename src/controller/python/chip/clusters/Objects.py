@@ -19410,13 +19410,13 @@ class FanControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="direction", Tag=0, Type=FanControl.Enums.DirectionEnum),
-                        ClusterObjectFieldDescriptor(Label="wrap", Tag=1, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="lowestOff", Tag=2, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="wrap", Tag=1, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="lowestOff", Tag=2, Type=typing.Optional[bool]),
                     ])
 
             direction: 'FanControl.Enums.DirectionEnum' = 0
-            wrap: 'bool' = False
-            lowestOff: 'bool' = False
+            wrap: 'typing.Optional[bool]' = None
+            lowestOff: 'typing.Optional[bool]' = None
 
     class Attributes:
         @dataclass

@@ -5862,9 +5862,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _direction = @(0);
 
-        _wrap = @(0);
+        _wrap = nil;
 
-        _lowestOff = @(0);
+        _lowestOff = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }

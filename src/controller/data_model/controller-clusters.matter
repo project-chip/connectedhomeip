@@ -3603,8 +3603,8 @@ client cluster FanControl = 514 {
 
   request struct StepRequest {
     DirectionEnum direction = 0;
-    boolean wrap = 1;
-    boolean lowestOff = 2;
+    optional boolean wrap = 1;
+    optional boolean lowestOff = 2;
   }
 
   /** The Step command speeds up or slows down the fan, in steps. */

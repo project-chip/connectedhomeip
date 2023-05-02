@@ -17983,8 +17983,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 }
                 request.direction
                     = static_cast<std::remove_reference_t<decltype(request.direction)>>(params.direction.unsignedCharValue);
-                request.wrap = params.wrap.boolValue;
-                request.lowestOff = params.lowestOff.boolValue;
+                if (params.wrap != nil) {
+                    auto & definedValue_0 = request.wrap.Emplace();
+                    definedValue_0 = params.wrap.boolValue;
+                }
+                if (params.lowestOff != nil) {
+                    auto & definedValue_0 = request.lowestOff.Emplace();
+                    definedValue_0 = params.lowestOff.boolValue;
+                }
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);

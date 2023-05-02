@@ -4956,9 +4956,9 @@ MTR_NEWLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nonnull direction MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull wrap MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable wrap MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull lowestOff MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable lowestOff MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
