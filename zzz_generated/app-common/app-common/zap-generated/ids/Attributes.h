@@ -1814,13 +1814,13 @@ namespace TimeSource {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace TimeSource
 
-namespace TrustedTimeNodeId {
+namespace TrustedTimeSource {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace TrustedTimeNodeId
+} // namespace TrustedTimeSource
 
-namespace DefaultNtp {
+namespace DefaultNTP {
 static constexpr AttributeId Id = 0x00000004;
-} // namespace DefaultNtp
+} // namespace DefaultNTP
 
 namespace TimeZone {
 static constexpr AttributeId Id = 0x00000005;
@@ -1838,9 +1838,21 @@ namespace TimeZoneDatabase {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace TimeZoneDatabase
 
-namespace NtpServerPort {
+namespace NTPServerAvailable {
 static constexpr AttributeId Id = 0x00000009;
-} // namespace NtpServerPort
+} // namespace NTPServerAvailable
+
+namespace TimeZoneListMaxSize {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace TimeZoneListMaxSize
+
+namespace DSTOffsetListMaxSize {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace DSTOffsetListMaxSize
+
+namespace SupportsDNSResolve {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace SupportsDNSResolve
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

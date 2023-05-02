@@ -1358,6 +1358,40 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TimeSynchronization::S
     ComplexArgumentParser::Finalize(request.validUntil);
 }
 
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("FabricScopedTrustedTimeSourceStruct.nodeID", "nodeID", value.isMember("nodeID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("FabricScopedTrustedTimeSourceStruct.endpoint", "endpoint",
+                                                                  value.isMember("endpoint")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nodeID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.nodeID, value["nodeID"]));
+    valueCopy.removeMember("nodeID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
+    valueCopy.removeMember("endpoint");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.nodeID);
+    ComplexArgumentParser::Finalize(request.endpoint);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type & request,
                                         Json::Value & value)
@@ -1394,6 +1428,45 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TimeSynchronization::S
     ComplexArgumentParser::Finalize(request.offset);
     ComplexArgumentParser::Finalize(request.validAt);
     ComplexArgumentParser::Finalize(request.name);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TrustedTimeSourceStruct.fabricIndex", "fabricIndex",
+                                                                  value.isMember("fabricIndex")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("TrustedTimeSourceStruct.nodeID", "nodeID", value.isMember("nodeID")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("TrustedTimeSourceStruct.endpoint", "endpoint", value.isMember("endpoint")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    valueCopy.removeMember("fabricIndex");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "nodeID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.nodeID, value["nodeID"]));
+    valueCopy.removeMember("nodeID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpoint");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpoint, value["endpoint"]));
+    valueCopy.removeMember("endpoint");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.fabricIndex);
+    ComplexArgumentParser::Finalize(request.nodeID);
+    ComplexArgumentParser::Finalize(request.endpoint);
 }
 
 CHIP_ERROR

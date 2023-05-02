@@ -1851,7 +1851,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _validStarting = @(0);
 
-        _validUntil = @(0);
+        _validUntil = nil;
     }
     return self;
 }

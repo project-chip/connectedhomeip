@@ -175,6 +175,32 @@ static constexpr EventId Id = 0x00000002;
 } // namespace Events
 } // namespace WiFiNetworkDiagnostics
 
+namespace TimeSynchronization {
+namespace Events {
+
+namespace DSTTableEmpty {
+static constexpr EventId Id = 0x00000000;
+} // namespace DSTTableEmpty
+
+namespace DSTStatus {
+static constexpr EventId Id = 0x00000001;
+} // namespace DSTStatus
+
+namespace TimeZoneStatus {
+static constexpr EventId Id = 0x00000002;
+} // namespace TimeZoneStatus
+
+namespace TimeFailure {
+static constexpr EventId Id = 0x00000003;
+} // namespace TimeFailure
+
+namespace MissingTrustedTimeSource {
+static constexpr EventId Id = 0x00000004;
+} // namespace MissingTrustedTimeSource
+
+} // namespace Events
+} // namespace TimeSynchronization
+
 namespace BridgedDeviceBasicInformation {
 namespace Events {
 

@@ -107,8 +107,15 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::DecodableType & value);
 
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::DecodableType & value);
+
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::DecodableType & value);
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
@@ -254,6 +261,16 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TimeSynchronization::Events::DSTTableEmpty::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TimeSynchronization::Events::DSTStatus::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TimeSynchronization::Events::TimeZoneStatus::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TimeSynchronization::Events::TimeFailure::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TimeSynchronization::Events::MissingTrustedTimeSource::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::BridgedDeviceBasicInformation::Events::StartUp::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

@@ -1111,6 +1111,17 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::Gr
         return static_cast<EnumType>(5);
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::StatusCode val)
+{
+    using EnumType = TimeSynchronization::StatusCode;
+    switch (val)
+    {
+    case EnumType::kTimeNotAccepted:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::TimeSourceEnum val)
 {
     using EnumType = TimeSynchronization::TimeSourceEnum;
@@ -1120,22 +1131,35 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::Ti
     case EnumType::kUnknown:
     case EnumType::kAdmin:
     case EnumType::kNodeTimeCluster:
-    case EnumType::kNonFabricSntp:
-    case EnumType::kNonFabricNtp:
-    case EnumType::kFabricSntp:
-    case EnumType::kFabricNtp:
-    case EnumType::kMixedNtp:
-    case EnumType::kNonFabricSntpNts:
-    case EnumType::kNonFabricNtpNts:
-    case EnumType::kFabricSntpNts:
-    case EnumType::kFabricNtpNts:
-    case EnumType::kMixedNtpNts:
+    case EnumType::kNonMatterSNTP:
+    case EnumType::kNonMatterNTP:
+    case EnumType::kMatterSNTP:
+    case EnumType::kMatterNTP:
+    case EnumType::kMixedNTP:
+    case EnumType::kNonMatterSNTPNTS:
+    case EnumType::kNonMatterNTPNTS:
+    case EnumType::kMatterSNTPNTS:
+    case EnumType::kMatterNTPNTS:
+    case EnumType::kMixedNTPNTS:
     case EnumType::kCloudSource:
     case EnumType::kPtp:
     case EnumType::kGnss:
         return val;
     default:
         return static_cast<EnumType>(17);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::TimeZoneDatabaseEnum val)
+{
+    using EnumType = TimeSynchronization::TimeZoneDatabaseEnum;
+    switch (val)
+    {
+    case EnumType::kFull:
+    case EnumType::kPartial:
+    case EnumType::kNone:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
     }
 }
 
