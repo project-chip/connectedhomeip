@@ -58,7 +58,7 @@ jobs:
                       .environment
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              run: bash -c "source scripts/bootstrap.sh"
+              run: bash scripts/bootstrap.sh
 
             - name: Build lighting-app
               timeout-minutes: 30

@@ -57,7 +57,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
-              run: bash -c "source scripts/bootstrap.sh"
+              run: bash scripts/bootstrap.sh
 
             - name: Generate all
               timeout-minutes: 5
