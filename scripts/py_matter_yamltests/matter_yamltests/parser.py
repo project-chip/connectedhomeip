@@ -962,8 +962,8 @@ class TestParser:
         yaml_loader = YamlLoader()
         filename, name, pics, config, tests = yaml_loader.load(test_file)
 
-        self.__apply_config_override(config, parser_config.config_override)
         self.__apply_legacy_config(config)
+        self.__apply_config_override(config, parser_config.config_override)
 
         self.filename = filename
         self.name = name
@@ -974,11 +974,20 @@ class TestParser:
             PICSChecker(parser_config.pics),
             tests
         )
+        self.timeout = config['timeout']
 
     def __apply_config_override(self, config, config_override):
         for key, value in config_override.items():
-            if value is None:
+            if value is None or not key in config:
                 continue
+
+            if type(value) is str:
+                if key == 'timeout' or key == 'endpoint':
+                    value = int(value)
+                elif key == 'nodeId' and value.startswith('0x'):
+                    value = int(value, 16)
+                elif key == 'nodeId':
+                    value = int(value)
 
             if isinstance(config[key], dict) and 'defaultValue' in config[key]:
                 config[key]['defaultValue'] = value
