@@ -57,7 +57,7 @@ static_library("efr32") {
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
     "${silabs_platform_dir}/SystemPlatformConfig.h",
-    "${silabs_platform_dir}/platformAbstraction/GSDK_SPAM.cpp",
+    "${silabs_platform_dir}/platformAbstraction/GsdkSpam.cpp",
     "${silabs_platform_dir}/platformAbstraction/SilabsPlatform.h",
     "${silabs_platform_dir}/platformAbstraction/SilabsPlatformBase.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
