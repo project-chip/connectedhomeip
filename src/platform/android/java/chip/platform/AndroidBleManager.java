@@ -43,13 +43,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.TimeUnit;
 
 public class AndroidBleManager implements BleManager {
 
@@ -108,7 +101,8 @@ public class AndroidBleManager implements BleManager {
     this();
     mContext = context;
     @SuppressWarnings("unchecked")
-    BluetoothManager manager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+    BluetoothManager manager =
+        (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
     mBluetoothAdapter = manager.getAdapter();
     mConnectionHandler = new BleConnectionHandler(Looper.getMainLooper());
   }
@@ -184,8 +178,7 @@ public class AndroidBleManager implements BleManager {
     }
 
     @Override
-    public void onDescriptorWrite(
-        BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {
+    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {
       BluetoothGattCharacteristic characteristic = desc.getCharacteristic();
 
       byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
@@ -221,8 +214,7 @@ public class AndroidBleManager implements BleManager {
     }
 
     @Override
-    public void onDescriptorRead(
-        BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {}
+    public void onDescriptorRead(BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {}
   }
 
   @Override
@@ -468,7 +460,8 @@ public class AndroidBleManager implements BleManager {
   }
 
   @Override
-  public void onNewConnection(int discriminator, boolean isShortDiscriminator, long implPtr, long appStatePtr) {
+  public void onNewConnection(
+      int discriminator, boolean isShortDiscriminator, long implPtr, long appStatePtr) {
     Log.d(TAG, "onNewConnection : " + discriminator + ", " + isShortDiscriminator);
     if (mContext == null) {
       return;
@@ -529,31 +522,35 @@ public class AndroidBleManager implements BleManager {
       return;
     }
 
-    mScanCallback = new ScanCallback() {
-      @Override
-      public void onScanResult(int callbackType, ScanResult result) {
-        BluetoothDevice device = result.getDevice();
-        Log.i(TAG, "Bluetooth Device Scanned Addr: " + device.getAddress() + ", " + device.getName());
-        Message msg = mConnectionHandler.obtainMessage();
-        msg.what = MSG_BLE_CONNECT;
-        msg.obj = (Object) device;
-        mConnectionHandler.sendMessage(msg);
-      }
+    mScanCallback =
+        new ScanCallback() {
+          @Override
+          public void onScanResult(int callbackType, ScanResult result) {
+            BluetoothDevice device = result.getDevice();
+            Log.i(
+                TAG,
+                "Bluetooth Device Scanned Addr: " + device.getAddress() + ", " + device.getName());
+            Message msg = mConnectionHandler.obtainMessage();
+            msg.what = MSG_BLE_CONNECT;
+            msg.obj = (Object) device;
+            mConnectionHandler.sendMessage(msg);
+          }
 
-      @Override
-      public void onScanFailed(int errorCode) {
-        Log.e(TAG, "Scan failed " + errorCode);
-      }
-    };
+          @Override
+          public void onScanFailed(int errorCode) {
+            Log.e(TAG, "Scan failed " + errorCode);
+          }
+        };
 
     byte[] serviceData = bundle.getByteArray(MSG_BUNDLE_SERVICE_DATA);
     byte[] serviceDataMask = bundle.getByteArray(MSG_BUNDLE_SERVICE_DATA_MASK);
-    ScanFilter scanFilter = new ScanFilter.Builder()
-        .setServiceData(new ParcelUuid(UUID.fromString(CHIP_UUID)), serviceData, serviceDataMask)
-        .build();
-    ScanSettings scanSettings = new ScanSettings.Builder()
-        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-        .build();
+    ScanFilter scanFilter =
+        new ScanFilter.Builder()
+            .setServiceData(
+                new ParcelUuid(UUID.fromString(CHIP_UUID)), serviceData, serviceDataMask)
+            .build();
+    ScanSettings scanSettings =
+        new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
     Log.i(TAG, "Starting Bluetooth scan");
     scanner.startScan(Arrays.asList(scanFilter), scanSettings, mScanCallback);
   }
@@ -568,7 +565,6 @@ public class AndroidBleManager implements BleManager {
       scanner.stopScan(mScanCallback);
       mScanCallback = null;
     }
-
   }
 
   private void connectBLE(Object bluetoothDeviceObj) {
@@ -622,7 +618,7 @@ public class AndroidBleManager implements BleManager {
 
       Message msg = mConnectionHandler.obtainMessage();
       msg.what = MSG_BLE_CONNECT_SUCCESS;
-      msg.obj = (Object)gatt;
+      msg.obj = (Object) gatt;
 
       mConnectionHandler.sendMessage(msg);
     }
@@ -635,16 +631,18 @@ public class AndroidBleManager implements BleManager {
     BluetoothGatt gatt = (BluetoothGatt) gattObj;
     int connId = addConnection(gatt);
 
-    setBleCallback(new BleCallback() {
-      @Override
-      public void onCloseBleComplete(int connId) {
-        Log.d(TAG, "onCloseBleComplete : " + connId);
-      }
-      @Override
-      public void onNotifyChipConnectionClosed(int connId) {
-        Log.d(TAG, "onNotifyChipConnectionClosed : " + connId);
-      }
-    });
+    setBleCallback(
+        new BleCallback() {
+          @Override
+          public void onCloseBleComplete(int connId) {
+            Log.d(TAG, "onCloseBleComplete : " + connId);
+          }
+
+          @Override
+          public void onNotifyChipConnectionClosed(int connId) {
+            Log.d(TAG, "onNotifyChipConnectionClosed : " + connId);
+          }
+        });
 
     if (mBleConnectCallback != null) {
       mBleConnectCallback.onConnectSuccess(connId);
@@ -669,12 +667,15 @@ public class AndroidBleManager implements BleManager {
     int opcode = 0;
     int version = 0;
     int versionDiscriminator = ((version & 0xf) << 12) | (discriminator & 0xfff);
-    return new byte[] { (byte) (opcode & 0xFF), (byte) (versionDiscriminator & 0xFF),
-        (byte) ((versionDiscriminator >> 8) & 0xFF) };
+    return new byte[] {
+      (byte) (opcode & 0xFF),
+      (byte) (versionDiscriminator & 0xFF),
+      (byte) ((versionDiscriminator >> 8) & 0xFF)
+    };
   }
 
   private byte[] getServiceDataMask(boolean isShortDiscriminator) {
-    return new byte[] { (byte) 0xFF, (byte) (isShortDiscriminator ? 0x00 : 0xFF), (byte) 0xFF };
+    return new byte[] {(byte) 0xFF, (byte) (isShortDiscriminator ? 0x00 : 0xFF), (byte) 0xFF};
   }
 
   // CLIENT_CHARACTERISTIC_CONFIG is the well-known UUID of the client characteristic descriptor

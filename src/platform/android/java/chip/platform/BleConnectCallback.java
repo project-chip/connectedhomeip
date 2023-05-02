@@ -35,5 +35,6 @@ public class BleConnectCallback {
   }
 
   private native void onConnectSuccess(long implPtr, long appStatePtr, int connectionId);
+
   private native void onConnectFailed(long implPtr, long appStatePtr);
 }

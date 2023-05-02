@@ -181,7 +181,7 @@ public class ChipDeviceController {
       @Nullable byte[] csrNonce,
       @Nullable NetworkCredentials networkCredentials) {
     pairDeviceWithCode(deviceControllerPtr, deviceId, setupCode, csrNonce, networkCredentials);
-    }
+  }
 
   public void establishPaseConnection(long deviceId, int connId, long setupPincode) {
     if (connectionId == 0) {
@@ -1005,11 +1005,11 @@ public class ChipDeviceController {
       @Nullable byte[] csrNonce);
 
   private native void pairDeviceWithCode(
-    long deviceControllerPtr,
-    long deviceId,
-    String setupCode,
-    @Nullable byte[] csrNonce,
-    @Nullable NetworkCredentials networkCredentials);
+      long deviceControllerPtr,
+      long deviceId,
+      String setupCode,
+      @Nullable byte[] csrNonce,
+      @Nullable NetworkCredentials networkCredentials);
 
   private native void establishPaseConnection(
       long deviceControllerPtr, long deviceId, int connId, long setupPincode);

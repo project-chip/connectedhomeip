@@ -29,23 +29,22 @@ using namespace chip::DeviceLayer::Internal;
 
 CHIP_ERROR BleConnectCallbackJNI_OnLoad(JavaVM * jvm, void * reserved)
 {
-  ChipLogProgress(DeviceLayer, "BleConnectCallbackJNI_OnLoad");
-  return CHIP_NO_ERROR;
+    ChipLogProgress(DeviceLayer, "BleConnectCallbackJNI_OnLoad");
+    return CHIP_NO_ERROR;
 }
 
 void BleConnectCallbackJNI_OnUnload(JavaVM * jvm, void * reserved) {}
 
 JNI_METHOD(void, onConnectSuccess)(JNIEnv * env, jobject self, jlong managerImplPtr, jlong appStatePtr, jint connId)
 {
-   BLEManagerImpl * impl = reinterpret_cast<BLEManagerImpl *>(managerImplPtr);
-   void * appState = reinterpret_cast<void *>(appStatePtr);
-   impl->OnConnectSuccess(appState, reinterpret_cast<BLE_CONNECTION_OBJECT>(connId));
-
+    BLEManagerImpl * impl = reinterpret_cast<BLEManagerImpl *>(managerImplPtr);
+    void * appState       = reinterpret_cast<void *>(appStatePtr);
+    impl->OnConnectSuccess(appState, reinterpret_cast<BLE_CONNECTION_OBJECT>(connId));
 }
 
 JNI_METHOD(void, onConnectFailed)(JNIEnv * env, jobject self, jlong managerImplPtr, jlong appStatePtr)
 {
-   BLEManagerImpl * impl = reinterpret_cast<BLEManagerImpl *>(managerImplPtr);
-   void * appState = reinterpret_cast<void *>(appStatePtr);
-   impl->OnConnectFailed(appState, BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK);
+    BLEManagerImpl * impl = reinterpret_cast<BLEManagerImpl *>(managerImplPtr);
+    void * appState       = reinterpret_cast<void *>(appStatePtr);
+    impl->OnConnectFailed(appState, BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK);
 }

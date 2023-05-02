@@ -452,12 +452,14 @@ exit:
 
 // ===== start implement virtual methods on BleConnectionDelegate.
 
-void BLEManagerImpl::OnConnectSuccess(void * appState, BLE_CONNECTION_OBJECT connObj) {
+void BLEManagerImpl::OnConnectSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)
+{
     chip::DeviceLayer::StackLock lock;
     BleConnectionDelegate::OnConnectionComplete(appState, connObj);
 }
 
-void BLEManagerImpl::OnConnectFailed(void * appState, CHIP_ERROR err) {
+void BLEManagerImpl::OnConnectFailed(void * appState, CHIP_ERROR err)
+{
     chip::DeviceLayer::StackLock lock;
     BleConnectionDelegate::OnConnectionError(appState, err);
 }
@@ -488,7 +490,9 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
         discriminator = connDiscriminator.GetLongValue();
     }
 
-    env->CallVoidMethod(mBLEManagerObject, mOnNewConnectionMethod, static_cast<jint>(discriminator), static_cast<jboolean>(connDiscriminator.IsShortDiscriminator()), reinterpret_cast<jlong>(this), reinterpret_cast<jlong>(appState));
+    env->CallVoidMethod(mBLEManagerObject, mOnNewConnectionMethod, static_cast<jint>(discriminator),
+                        static_cast<jboolean>(connDiscriminator.IsShortDiscriminator()), reinterpret_cast<jlong>(this),
+                        reinterpret_cast<jlong>(appState));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:

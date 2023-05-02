@@ -36,8 +36,8 @@
 #include <trace/trace.h>
 
 #include "AndroidChipPlatform-JNI.h"
-#include "BleConnectCallback-JNI.h"
 #include "BLEManagerImpl.h"
+#include "BleConnectCallback-JNI.h"
 #include "CommissionableDataProviderImpl.h"
 #include "DiagnosticDataProviderImpl.h"
 #include "DnssdImpl.h"
