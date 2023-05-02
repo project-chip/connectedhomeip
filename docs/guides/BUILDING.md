@@ -264,10 +264,10 @@ Example build commands:
 
 ```
 # Compiles and runs all tests on the host:
-/scripts/build/build_examples.py --target linux-x64-tests build
+./scripts/build/build_examples.py --target linux-x64-tests build
 
 # Compiles fuzzing tagets using libfuzzer (fuzzing requires clang)
-/scripts/build/build_examples.py --target linux-x64-tests-clang-asan-libfuzzer build
+./scripts/build/build_examples.py --target linux-x64-tests-clang-asan-libfuzzer build
 
 # Compiles a esp32 example
 ./scripts/build/build_examples.py --target esp32-m5stack-all-clusters build
