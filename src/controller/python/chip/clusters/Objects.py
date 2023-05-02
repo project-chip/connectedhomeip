@@ -11035,7 +11035,7 @@ class TimeSynchronization(Cluster):
                 ClusterObjectFieldDescriptor(Label="UTCTime", Tag=0x00000000, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="granularity", Tag=0x00000001, Type=TimeSynchronization.Enums.GranularityEnum),
                 ClusterObjectFieldDescriptor(Label="timeSource", Tag=0x00000002, Type=typing.Optional[TimeSynchronization.Enums.TimeSourceEnum]),
-                ClusterObjectFieldDescriptor(Label="trustedTimeSource", Tag=0x00000003, Type=typing.Union[None, Nullable, TimeSynchronization.Structs.TrustedTimeSourceStruct]),
+                ClusterObjectFieldDescriptor(Label="trustedTimeSource", Tag=0x00000003, Type=typing.Union[Nullable, TimeSynchronization.Structs.TrustedTimeSourceStruct]),
                 ClusterObjectFieldDescriptor(Label="defaultNTP", Tag=0x00000004, Type=typing.Union[None, Nullable, str]),
                 ClusterObjectFieldDescriptor(Label="timeZone", Tag=0x00000005, Type=typing.Optional[typing.List[TimeSynchronization.Structs.TimeZoneStruct]]),
                 ClusterObjectFieldDescriptor(Label="DSTOffset", Tag=0x00000006, Type=typing.Optional[typing.List[TimeSynchronization.Structs.DSTOffsetStruct]]),
@@ -11056,7 +11056,7 @@ class TimeSynchronization(Cluster):
     UTCTime: 'typing.Union[Nullable, uint]' = None
     granularity: 'TimeSynchronization.Enums.GranularityEnum' = None
     timeSource: 'typing.Optional[TimeSynchronization.Enums.TimeSourceEnum]' = None
-    trustedTimeSource: 'typing.Union[None, Nullable, TimeSynchronization.Structs.TrustedTimeSourceStruct]' = None
+    trustedTimeSource: 'typing.Union[Nullable, TimeSynchronization.Structs.TrustedTimeSourceStruct]' = None
     defaultNTP: 'typing.Union[None, Nullable, str]' = None
     timeZone: 'typing.Optional[typing.List[TimeSynchronization.Structs.TimeZoneStruct]]' = None
     DSTOffset: 'typing.Optional[typing.List[TimeSynchronization.Structs.DSTOffsetStruct]]' = None
@@ -11356,9 +11356,9 @@ class TimeSynchronization(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, TimeSynchronization.Structs.TrustedTimeSourceStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, TimeSynchronization.Structs.TrustedTimeSourceStruct])
 
-            value: 'typing.Union[None, Nullable, TimeSynchronization.Structs.TrustedTimeSourceStruct]' = None
+            value: 'typing.Union[Nullable, TimeSynchronization.Structs.TrustedTimeSourceStruct]' = NullValue
 
         @dataclass
         class DefaultNTP(ClusterAttributeDescriptor):

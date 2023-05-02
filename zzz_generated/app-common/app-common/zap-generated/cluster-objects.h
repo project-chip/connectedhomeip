@@ -10427,6 +10427,31 @@ struct Type;
 struct DecodableType;
 } // namespace SetDefaultNTP
 
+namespace SetTrustedTimeSource {
+struct Type;
+struct DecodableType;
+} // namespace SetTrustedTimeSource
+
+namespace SetTimeZone {
+struct Type;
+struct DecodableType;
+} // namespace SetTimeZone
+
+namespace SetTimeZoneResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetTimeZoneResponse
+
+namespace SetDSTOffset {
+struct Type;
+struct DecodableType;
+} // namespace SetDSTOffset
+
+namespace SetDefaultNTP {
+struct Type;
+struct DecodableType;
+} // namespace SetDefaultNTP
+
 } // namespace Commands
 
 namespace Commands {
@@ -10467,7 +10492,7 @@ public:
     Optional<TimeSourceEnum> timeSource;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SetUTCTime
+}; // namespace SetUtcTime
 namespace SetTrustedTimeSource {
 enum class Fields : uint8_t
 {

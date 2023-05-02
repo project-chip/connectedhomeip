@@ -8547,7 +8547,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster TimeSynchronization deprecated command id names
 
     // Cluster TimeSynchronization commands
-    MTRCommandIDTypeClusterTimeSynchronizationCommandSetUTCTimeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterTimeSynchronizationCommandSetUtcTimeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+    = 0x00000000,
     MTRCommandIDTypeClusterTimeSynchronizationCommandSetTrustedTimeSourceID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterTimeSynchronizationCommandSetTimeZoneID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRCommandIDTypeClusterTimeSynchronizationCommandSetTimeZoneResponseID MTR_NEWLY_AVAILABLE = 0x00000003,

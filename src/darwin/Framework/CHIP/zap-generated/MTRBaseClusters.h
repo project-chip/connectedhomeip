@@ -19987,7 +19987,7 @@ typedef NS_ENUM(uint8_t, MTRTimeSynchronizationTimeSource) {
     MTRTimeSynchronizationTimeSourceMixedNTPNTS MTR_NEWLY_AVAILABLE = 0x0D,
     MTRTimeSynchronizationTimeSourceCloudSource API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0E,
     MTRTimeSynchronizationTimeSourcePTP MTR_NEWLY_AVAILABLE = 0x0F,
-    MTRTimeSynchronizationTimeSourceGNSS MTR_NEWLY_AVAILABLE = 0x10,
+    MTRTimeSynchronizationTimeSourceGnss API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRBridgedDeviceBasicInformationColor) {
