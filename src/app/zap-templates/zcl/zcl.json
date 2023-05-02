@@ -140,6 +140,7 @@
             "CapabilityMinima",
             "ProductAppearance"
         ],
+        "Bridged Device Basic Information": ["ProductAppearance"],
         "Descriptor": ["ClusterRevision"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
