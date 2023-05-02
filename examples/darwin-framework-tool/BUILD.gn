@@ -100,6 +100,12 @@ action("build-darwin-framework") {
     args += [ "--no-clang" ]
   }
 
+  if (config_enable_yaml_tests) {
+    args += [ "--enable_encoding_sentinel_enum_values" ]
+  } else {
+    args += [ "--no-enable_encoding_sentinel_enum_values" ]
+  }
+
   output_name = "Matter.framework"
   outputs = [
     "${root_out_dir}/macos_framework_output/Build/Products/${output_sdk_type}/${output_name}",

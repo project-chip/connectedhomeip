@@ -45,6 +45,7 @@
 #include <platform/Linux/dbus/wpa/DBusWpaBss.h>
 #include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
+#include <system/SystemMutex.h>
 
 #include <mutex>
 #endif
@@ -207,7 +208,7 @@ private:
 
     static bool mAssociationStarted;
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
-    static GDBusWpaSupplicant mWpaSupplicant;
+    static GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
     // Access to mWpaSupplicant has to be protected by a mutex because it is accessed from
     // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.
     static std::mutex mWpaSupplicantMutex;

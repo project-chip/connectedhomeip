@@ -915,6 +915,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+ *
+ * @brief Defines whether encoding the "not a known enum value" enum values is
+ *        allowed.  Should only be enabled in certain test applications.  This
+ *        flag must not be enabled on actual devices.
+ */
+#ifndef CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+#define CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES 0
+#endif
+
+/**
  * @def CHIP_CONFIG_LAMBDA_EVENT_SIZE
  *
  * @brief The maximum size of the lambda which can be post into system event queue.
