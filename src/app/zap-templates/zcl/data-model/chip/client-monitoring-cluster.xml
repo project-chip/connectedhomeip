@@ -37,7 +37,6 @@ limitations under the License.
         <attribute side="server" code="0x03" define="EXPECTED_CLIENTS" type="ARRAY" entryType="MonitoringRegistrationStruct" writable="false" optional="false" isNullable="false">
             <description>ExpectedClients</description>
             <access op="read" privilege="administer"/>
-            <access modifier="fabric-scoped"/>
         </attribute>
 
         <attribute side="server" code="0x04" define="ICD_COUNTER" type="INT32U" writable="false" optional="false" isNullable="false">
