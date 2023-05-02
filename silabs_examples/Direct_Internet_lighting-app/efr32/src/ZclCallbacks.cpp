@@ -40,18 +40,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
+    {
 #ifdef DIC_ENABLE
-    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
-    {
-        dic_buff_t buffValue;
-
-        buffValue.dataP = (uint8_t *)(value ? ( *value ? "on" : "off") : "invalid");
-        buffValue.dataLen = strlen((const char *)buffValue.dataP);
-        DIC_SendMsg("light/state", &buffValue);
-    }
+        DIC_SendMsg("light/state", (const char *)(value ? ( *value ? "on" : "off") : "invalid"));
 #endif
-    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
-    {
         LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
     }
     else if (clusterId == LevelControl::Id)

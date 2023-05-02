@@ -40,7 +40,7 @@ typedef struct {
 
 dic_err_t DIC_Init(void);
 
-dic_err_t DIC_SendMsg(const char *subject, dic_buff_t *content);
+dic_err_t DIC_SendMsg(const char *subject, const char *content);
 
 #ifdef __cplusplus
 }

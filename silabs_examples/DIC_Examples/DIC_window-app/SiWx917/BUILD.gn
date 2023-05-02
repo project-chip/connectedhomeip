@@ -1,0 +1,116 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
+import("${efr32_sdk_build_root}/silabs_executable.gni")
+
+assert(current_os == "freertos")
+
+project_dir = "${chip_root}/examples/window-app"
+examples_project_dir= "${chip_root}/silabs_examples/DIC_Examples/DIC_window-app"
+efr32_project_dir = "${project_dir}/silabs/SiWx917"
+examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+import("${examples_plat_dir}/args.gni")
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+}
+
+siwx917_sdk("sdk") {
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${examples_plat_dir}/FreeRTOSConfig.h",
+  ]
+
+  include_dirs = [
+    "${chip_root}/src/platform/silabs/SiWx917",
+    "${efr32_project_dir}/include",
+    "${examples_plat_dir}",
+    "${chip_root}/src/lib",
+    "${examples_common_plat_dir}",
+  ]
+}
+
+silabs_executable("DIC_window_app") {
+  output_name = "chip-siwx917-DIC_window-example.out"
+  output_dir = root_out_dir
+  include_dirs = [
+    "include",
+    "${project_dir}/common/include",
+  ]
+  defines = []
+
+  sources = [
+    "${examples_project_dir}/common/src/WindowApp.cpp",
+    "${project_dir}/common/src/ZclCallbacks.cpp",
+    "src/WindowAppImpl.cpp",
+    "${efr32_project_dir}/src/main.cpp",
+  ]
+  if (enable_dic) {
+    sources += [ "${chip_root}/silabs_examples/DIC_Examples/DIC_EventHandler.cpp" ]
+    include_dirs +=[ "${chip_root}/silabs_examples/DIC_Examples"]
+  }
+
+  if (!disable_lcd) {
+    sources += [ "src/LcdPainter.cpp" ]
+  }
+
+  deps = [
+    ":sdk",
+    "${examples_plat_dir}:siwx917-common",
+    app_data_model,
+  ]
+
+  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
+   # MQTT
+  if (enable_dic) {
+   deps += [ "${examples_plat_dir}:efr32-dic" ]
+  }
+}
+
+group("siwx917") {
+  deps = [ ":DIC_window_app" ]
+}
+
+group("default") {
+  deps = [ ":siwx917" ]
+}

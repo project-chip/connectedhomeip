@@ -21,7 +21,7 @@
  */
 
 #include "AppConfig.h"
-#include "LightingManager.h"
+#include "OnOffPlugManager.h"
 
 #ifdef DIC_ENABLE
 #include "dic.h"
@@ -46,52 +46,16 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 #ifdef DIC_ENABLE
         DIC_SendMsg("light/state", (const char *)(value ? ( *value ? "on" : "off") : "invalid"));
 #endif
-        LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+        PlugMgr().InitiateAction(AppEvent::kEventType_Plug, *value ? OnOffPlugManager::ON_ACTION : OnOffPlugManager::OFF_ACTION);
     }
     else if (clusterId == LevelControl::Id)
     {
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
-
-        // WIP Apply attribute change to Light
-    }
-    else if (clusterId == ColorControl::Id)
-    {
-        ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
-
-        // WIP Apply attribute change to Light
-    }
-    else if (clusterId == OnOffSwitchConfiguration::Id)
-    {
-        ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
-
-        // WIP Apply attribute change to Light
     }
     else if (clusterId == Identify::Id)
     {
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
-}
-
-/** @brief OnOff Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- * TODO Issue #3841
- * emberAfOnOffClusterInitCallback happens before the stack initialize the cluster
- * attributes to the default value.
- * The logic here expects something similar to the deprecated Plugins callback
- * emberAfPluginOnOffClusterServerPostInitCallback.
- *
- */
-void emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-    // TODO: implement any additional Cluster Server init actions
 }

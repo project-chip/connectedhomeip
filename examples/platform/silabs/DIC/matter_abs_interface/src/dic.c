@@ -188,9 +188,12 @@ vTaskDelete(dicTask);
   return DIC_ERR_FAIL;
 }
 
-dic_err_t DIC_SendMsg(const char * subject, dic_buff_t *content)
+dic_err_t DIC_SendMsg(const char *subject, const char *content)
 {
-  if (!subject || !content || !content->dataP)
+  dic_buff_t buffValue;
+  buffValue.dataP =(uint8_t *) content;
+  buffValue.dataLen = strlen(content);
+  if (!subject || !content )
   {
     SILABS_LOG("null args passed to DIC_SendMsg()");
     return DIC_ERR_INVAL;
@@ -200,7 +203,7 @@ dic_err_t DIC_SendMsg(const char * subject, dic_buff_t *content)
     SILABS_LOG("Err: DIC not in valid state!");
     return DIC_ERR_FAIL;
   }
-  if (MQTT_ERR_OK != mqtt_publish(mqtt_client, subject, content->dataP, content->dataLen, 0, 0, dic_pub_resp_cb, NULL))
+  if (MQTT_ERR_OK != mqtt_publish(mqtt_client, subject, buffValue.dataP, buffValue.dataLen, 0, 0, dic_pub_resp_cb, NULL))
   {
     SILABS_LOG("Err: failed request publish!");
     return DIC_ERR_FAIL;
