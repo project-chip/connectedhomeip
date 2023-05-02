@@ -58,7 +58,6 @@ class ProjectArgProcessor:
                 self.gn_args[arg['name']] = arg['default']['value'][0].translate(argtype)
 
     def process_defaults(self):
-        self.add_default('chip_build_tests', False)
         self.add_default('custom_toolchain', 'custom')
 
     def process_env(self):
