@@ -172,7 +172,7 @@ client cluster Scenes = 5 {
   }
 
   response struct AddSceneResponse = 0 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -183,7 +183,7 @@ client cluster Scenes = 5 {
   }
 
   response struct ViewSceneResponse = 1 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
@@ -197,7 +197,7 @@ client cluster Scenes = 5 {
   }
 
   response struct RemoveSceneResponse = 2 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -207,7 +207,7 @@ client cluster Scenes = 5 {
   }
 
   response struct RemoveAllScenesResponse = 3 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
   }
 
@@ -217,7 +217,7 @@ client cluster Scenes = 5 {
   }
 
   response struct StoreSceneResponse = 4 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -233,7 +233,7 @@ client cluster Scenes = 5 {
   }
 
   response struct GetSceneMembershipResponse = 6 {
-    ENUM8 status = 0;
+    status status = 0;
     nullable INT8U capacity = 1;
     group_id groupID = 2;
     optional INT8U sceneList[] = 3;
@@ -248,7 +248,7 @@ client cluster Scenes = 5 {
   }
 
   response struct EnhancedAddSceneResponse = 64 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -259,7 +259,7 @@ client cluster Scenes = 5 {
   }
 
   response struct EnhancedViewSceneResponse = 65 {
-    ENUM8 status = 0;
+    status status = 0;
     group_Id groupID = 1;
     INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
@@ -276,7 +276,7 @@ client cluster Scenes = 5 {
   }
 
   response struct CopySceneResponse = 66 {
-    ENUM8 status = 0;
+    status status = 0;
     group_Id groupIdentifierFrom = 1;
     INT8U sceneIdentifierFrom = 2;
   }
