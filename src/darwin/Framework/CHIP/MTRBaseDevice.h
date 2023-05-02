@@ -650,7 +650,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
 @property (nonatomic, readonly, copy) MTREventPath * path;
 
 /**
- * eventNumber will not have a useful value if error" is not nil.
+ * eventNumber will not have a useful value if "error" is not nil.
  */
 @property (nonatomic, readonly, copy) NSNumber * eventNumber; // EventNumber type (uint64_t)
 
