@@ -150,7 +150,7 @@ chef_$PLATFORM:
               scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform $PLATFORM
         - name: Bootstrap
           timeout-minutes: 25
-          run: source scripts/bootstrap.sh
+          run: bash -c "source scripts/bootstrap.sh"
         - name: CI Examples $PLATFORM
           shell: bash
           run: |
