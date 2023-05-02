@@ -74,7 +74,7 @@ void HandleTokenizedLog(uint32_t levels, pw_tokenizer_Token token, pw_tokenizer_
 
     if (required_buffer_size > sizeof(stack_buffer))
     {
-        allocated_buffer = (char *) chip::Platform::MemoryAlloc();
+        allocated_buffer = (char *) chip::Platform::MemoryAlloc(required_buffer_size);
         if (allocated_buffer)
         {
             logging_buffer = allocated_buffer;
@@ -96,7 +96,7 @@ void HandleTokenizedLog(uint32_t levels, pw_tokenizer_Token token, pw_tokenizer_
     }
     if (allocated_buffer)
     {
-        chip::Platform::MemoryFree(buffer);
+        chip::Platform::MemoryFree(allocated_buffer);
     }
 }
 
