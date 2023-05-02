@@ -1,4 +1,4 @@
-#`FactoryDataProvider` for EFR32 Matter device
+# `FactoryDataProvider` for EFR32 Matter device
 
 ## Introduction
 

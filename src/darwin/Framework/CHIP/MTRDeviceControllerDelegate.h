@@ -28,6 +28,19 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
     = 3,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * A representation of a (vendor, product) pair that identifies a specific product.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRProductIdentity : NSObject
+
+@property (nonatomic, copy, readonly) NSNumber * vendorID;
+
+@property (nonatomic, copy, readonly) NSNumber * productID;
+
+- (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID;
+@end
+
 @class MTRDeviceController;
 
 /**
@@ -52,8 +65,28 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 /**
  * Notify the delegate when commissioning is completed.
  */
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error;
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error MTR_NEWLY_DEPRECATED("Please use controller:commissioningComplete:nodeID:");
 
+/**
+ * Notify the delegate when commissioning is completed.
+ *
+ * Exactly one of error and nodeID will be nil.
+ *
+ * If nodeID is not nil, then it represents the node id the node was assigned, as encoded in its operational certificate.
+ */
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID MTR_NEWLY_AVAILABLE;
+
+/**
+ * Notify the delegate when commissioning infomation has been read from the Basic
+ * Information cluster of the commissionee.
+ *
+ * At the point when this notification happens, device attestation has not been performed yet,
+ * so the information delivered by this notification should not be trusted.
+ */
+- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info MTR_NEWLY_AVAILABLE;
 @end
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {

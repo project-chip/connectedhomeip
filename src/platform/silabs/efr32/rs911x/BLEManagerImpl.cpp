@@ -661,23 +661,21 @@ exit:
     return CHIP_NO_ERROR; // err;
 }
 
-// TODO:: Implementation need to be done.
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t status = 0;
-    if (mFlags.Has(Flags::kAdvertising))
+    // TODO: add the below code in a condition if (mFlags.Has(Flags::kAdvertising))
+    // Since DriveBLEState is not called the device is still advertising
+    mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
+    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+    status = rsi_ble_stop_advertising();
+    if (status != RSI_SUCCESS)
     {
-        mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
-        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-        status = rsi_ble_stop_advertising();
-        if (status != RSI_SUCCESS)
-        {
-            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
-        }
-        advertising_set_handle = 0xff;
-        CancelBleAdvTimeoutTimer();
+        ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
     }
+    advertising_set_handle = 0xff;
+    CancelBleAdvTimeoutTimer();
 
     // exit:
     return err;
@@ -722,24 +720,6 @@ void BLEManagerImpl::HandleConnectionCloseEvent(uint16_t reason)
     uint8_t connHandle = 1;
 
     ChipLogProgress(DeviceLayer, "Disconnect Event for handle : %d", connHandle);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    int32_t status;
-    status = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
-    if (status != RSI_SUCCESS)
-    {
-        SILABS_LOG("BT Powersave Config Failed, Error Code : 0x%lX", status);
-        return;
-    }
-
-    status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
-    if (status != RSI_SUCCESS)
-    {
-        SILABS_LOG("WLAN Powersave Config Failed, Error Code : 0x%lX", status);
-        return;
-    }
-    SILABS_LOG("Powersave Config Success");
-#endif
 
     if (RemoveConnection(connHandle))
     {

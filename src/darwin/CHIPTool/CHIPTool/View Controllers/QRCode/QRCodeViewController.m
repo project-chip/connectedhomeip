@@ -408,7 +408,7 @@
 
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = InitializeMTR();
-    [self.chipController setPairingDelegate:self queue:callbackQueue];
+    [self.chipController setDeviceControllerDelegate:self queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
@@ -478,8 +478,8 @@
     }
 }
 
-// MARK: MTRDevicePairingDelegate
-- (void)onPairingComplete:(NSError * _Nullable)error
+// MARK: MTRDeviceControllerDelegate
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
@@ -672,16 +672,24 @@
     }
 }
 
-- (void)onCommissioningComplete:(NSError * _Nullable)error
+// MARK: MTRDeviceControllerDelegate
+- (void)controller:(MTRDeviceController *)controller
+    commissioningComplete:(NSError * _Nullable)error
+                   nodeID:(NSNumber * _Nullable)nodeID
 {
     if (error != nil) {
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }
     // track this device
-    uint64_t deviceId = MTRGetNextAvailableDeviceID() - 1;
-    MTRSetDevicePaired(deviceId, YES);
+    MTRSetDevicePaired([nodeID unsignedLongLongValue], YES);
     [self setVendorIDOnAccessory];
+}
+
+// MARK: MTRDeviceControllerDelegate
+- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRProductIdentity *)info
+{
+    NSLog(@"readCommissioningInfo, vendorID:%@, productID:%@", info.vendorID, info.productID);
 }
 
 - (void)updateUIFields:(MTRSetupPayload *)payload rawPayload:(nullable NSString *)rawPayload isManualCode:(BOOL)isManualCode
@@ -789,7 +797,7 @@
 {
     self.chipController = MTRRestartController(self.chipController);
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.csa.matter.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
-    [self.chipController setPairingDelegate:self queue:callbackQueue];
+    [self.chipController setDeviceControllerDelegate:self queue:callbackQueue];
 }
 
 - (void)handleRendezVousDefault:(NSString *)payload
