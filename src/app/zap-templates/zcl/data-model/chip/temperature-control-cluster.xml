@@ -40,16 +40,16 @@ limitations under the License.
 
     <globalAttribute side="server" code="0xFFFD" value="1" />
 
-    <attribute side="server" code="0x0000" define="TEMPERATURE_SETPOINT"            type="TEMPERATURE"                                         writable="false" optional="true">TemperatureSetpoint</attribute>
-    <attribute side="server" code="0x0001" define="MIN_TEMPERATURE"                 type="TEMPERATURE"                                         writable="false" optional="true">MinTemperature</attribute>
-    <attribute side="server" code="0x0002" define="MAX_TEMPERATURE"                 type="TEMPERATURE"                                         writable="false" optional="true">MaxTemperature</attribute>
-    <attribute side="server" code="0x0003" define="STEP"                            type="TEMPERATURE"                                         writable="false" optional="true">Step</attribute>
+    <attribute side="server" code="0x0000" define="TEMPERATURE_SETPOINT"            type="INT16S"                                         writable="false" optional="true">TemperatureSetpoint</attribute>
+    <attribute side="server" code="0x0001" define="MIN_TEMPERATURE"                 type="INT16S"                                         writable="false" optional="true">MinTemperature</attribute>
+    <attribute side="server" code="0x0002" define="MAX_TEMPERATURE"                 type="INT16S"                                         writable="false" optional="true">MaxTemperature</attribute>
+    <attribute side="server" code="0x0003" define="STEP"                            type="INT16S"                                         writable="false" optional="true">Step</attribute>
     <attribute side="server" code="0x0004" define="CURRENT_TEMPERATURE_LEVEL_INDEX" type="INT8U"       min="0x00" max="0x1F"                   writable="false" optional="true">CurrentTemperatureLevelIndex</attribute>
     <attribute side="server" code="0x0005" define="SUPPORTED_TEMPERATURE_LEVELS"    type="ARRAY" entryType="TemperatureLevelStruct" max="0x1F" writable="false" optional="true">SupportedTemperatureLevels</attribute>
 
     <command source="client" code="0x00" name="SetTemperature" optional="false">
       <description>Upon receipt, the device SHALL set its temperature setpoint or level depending on the feature supported.</description>
-      <arg name="TargetTemperature" type="TEMPERATURE"/>
+      <arg name="TargetTemperature" type="INT16S"/>
       <arg name="TargetTemperatureLevel" type="INT8U"/>
     </command>
 

@@ -65,10 +65,10 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="PHASE_LIST"              type="ARRAY" entryType="CHAR_STRING"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="INT8U"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
-    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="ELAPSED_S"                                min="0x00" max="0x3F480" writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
+    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="INT32U"                                min="0x00" max="0x3F480" writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
     <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="ARRAY" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
     <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="OperationalStateStruct"                                            writable="false"                    optional="false">OperationalState</attribute>
-    <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStatStruct"                                                   writable="false"                    optional="false">OperationalError</attribute>
+    <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                   writable="false"                    optional="false">OperationalError</attribute>
 
     <command source="client" code="0x00" name="Pause" response="OperationalCommandResponse" optional="false">
       <description>Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server.</description>
@@ -99,8 +99,8 @@ limitations under the License.
      <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
       <description>OperationCompletion</description>
       <field id="0" name="CompletionErrorCode"  type="ErrorStateEnum" />
-      <field id="1" name="TotalOperationalTime" type="ELAPSED_S" />
-      <field id="2" name="PausedTime"           type="ELAPSED_S" />
+      <field id="1" name="TotalOperationalTime" type="INT32U" />
+      <field id="2" name="PausedTime"           type="INT32U" />
     </event>
 
   </cluster>

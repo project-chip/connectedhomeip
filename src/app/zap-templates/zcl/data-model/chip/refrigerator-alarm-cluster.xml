@@ -48,7 +48,7 @@ limitations under the License.
       <field id="0" name="Active"   type="AlarmMap" />
       <field id="1" name="Inactive" type="AlarmMap" />
       <field id="2" name="State"    type="AlarmMap" />
-      <field id="2" name="Mask"     type="AlarmMap" />
+      <field id="3" name="Mask"     type="AlarmMap" />
 
     </event>
 

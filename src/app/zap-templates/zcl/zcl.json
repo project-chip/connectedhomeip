@@ -60,6 +60,9 @@
         "onoff-cluster.xml",
         "onoff-switch-configuration-cluster.xml",
         "operational-credentials-cluster.xml",
+        "operational-state-cluster.xml",
+        "operational-state-dishwasher-cluster.xml",
+        "operational-state-rvc-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",
@@ -68,11 +71,13 @@
         "proxy-valid-cluster.xml",
         "pump-configuration-and-control-cluster.xml",
         "pwm-cluster.xml",
+        "refrigerator-alarm-cluster.xml",
         "relative-humidity-measurement-cluster.xml",
         "scene.xml",
         "software-diagnostics-cluster.xml",
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
+        "temperature-control-cluster.xml",
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
         "thermostat-cluster.xml",
@@ -94,9 +99,15 @@
     "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
+            "defaultResponsePolicy": [
+                "Always",
+                "Conditional",
+                "Never"
+            ]
         },
-        "bool": ["commandDiscovery"]
+        "bool": [
+            "commandDiscovery"
+        ]
     },
     "defaults": {
         "text": {
@@ -139,7 +150,9 @@
             "UniqueID",
             "CapabilityMinima"
         ],
-        "Descriptor": ["ClusterRevision"],
+        "Descriptor": [
+            "ClusterRevision"
+        ],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -270,7 +283,14 @@
         ]
     },
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
+    "ZCLDataTypes": [
+        "ARRAY",
+        "BITMAP",
+        "ENUM",
+        "NUMBER",
+        "STRING",
+        "STRUCT"
+    ],
     "fabricHandling": {
         "automaticallyCreateFields": true,
         "indexFieldId": 254,
