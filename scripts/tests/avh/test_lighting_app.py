@@ -66,6 +66,13 @@ class TestLightingApp(unittest.TestCase):
         self.chip_tool_instance.create()
         self.lighting_app_instance.create()
 
+        self.logger.info(
+            f"\tchip-tool instance id = {self.chip_tool_instance.instance_id}"
+        )
+        self.logger.info(
+            f"\tlighting-app instance id = {self.lighting_app_instance.instance_id}"
+        )
+
         self.chip_tool_instance.wait_for_state_on()
         self.lighting_app_instance.wait_for_state_on()
 
