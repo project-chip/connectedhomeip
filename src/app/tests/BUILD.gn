@@ -54,17 +54,17 @@ source_set("binding-test-srcs") {
   ]
 }
 
-source_set("client-monitoring-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.cpp",
-    "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.h",
-  ]
+# source_set("client-monitoring-test-srcs") {
+#   sources = [
+#     "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.cpp",
+#     "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.h",
+#   ]
 
-  public_deps = [
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/lib/core",
-  ]
-}
+#   public_deps = [
+#     "${chip_root}/src/app/common:cluster-objects",
+#     "${chip_root}/src/lib/core",
+#   ]
+# }
 
 source_set("ota-requestor-test-srcs") {
   sources = [
