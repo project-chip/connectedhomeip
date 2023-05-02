@@ -19,6 +19,11 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
  
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#include "PWR_Configuration.h"
+#include "PWR_Interface.h"
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 /* controller task configuration */
