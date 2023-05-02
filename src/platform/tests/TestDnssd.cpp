@@ -104,6 +104,10 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     NL_TEST_ASSERT(suite, result != nullptr);
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
 
+    // The NL_TEST_ASSERT above will not abort the test, so we need to
+    // explicitly abort it here to avoid dereferencing a null pointer.
+    VerifyOrReturn(result != nullptr, );
+
     if (!addresses.empty())
     {
         addresses.data()[0].ToString(addrBuf, sizeof(addrBuf));
