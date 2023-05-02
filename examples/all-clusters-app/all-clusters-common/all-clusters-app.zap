@@ -1,5 +1,5 @@
 {
-  "featureLevel": 92,
+  "featureLevel": 96,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -18,17 +18,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
+    },
+    {
+      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data with some extensions"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -1466,7 +1466,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "boolean",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
