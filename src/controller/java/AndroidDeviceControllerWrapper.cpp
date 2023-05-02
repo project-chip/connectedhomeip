@@ -221,9 +221,10 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
     err = opCredsIssuer->Initialize(*wrapper.get(), &wrapper->mAutoCommissioner, wrapper.get()->mJavaObjectRef);
 #endif
-    if (err != CHIP_NO_ERROR) {
-      *errInfoOnFailure = err;
-      return nullptr;
+    if (err != CHIP_NO_ERROR)
+    {
+        *errInfoOnFailure = err;
+        return nullptr;
     }
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
