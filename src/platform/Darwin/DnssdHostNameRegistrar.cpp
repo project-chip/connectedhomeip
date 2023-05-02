@@ -284,9 +284,31 @@ DNSServiceErrorType HostNameRegistrar::Init(const char * hostname, Inet::IPAddre
 
 CHIP_ERROR HostNameRegistrar::Register()
 {
-    // If the target interface is kDNSServiceInterfaceIndexLocalOnly, there are no interfaces to register against
-    // the dns daemon.
-    VerifyOrReturnError(!IsLocalOnly(), CHIP_NO_ERROR);
+    // If the target interface is kDNSServiceInterfaceIndexLocalOnly, just
+    // register the loopback addresses.
+    if (IsLocalOnly())
+    {
+        ReturnErrorOnFailure(ResetSharedConnection());
+
+        InetInterfacesVector inetInterfaces;
+        Inet6InterfacesVector inet6Interfaces;
+        // Instead of mInterfaceId (which will not match any actual interface),
+        // use kDNSServiceInterfaceIndexAny and restrict to loopback interfaces.
+        GetInterfaceAddresses(kDNSServiceInterfaceIndexAny, mAddressType, inetInterfaces, inet6Interfaces,
+                              true /* searchLoopbackOnly */);
+
+        // But we register the IPs with mInterfaceId, not the actual interface
+        // IDs, so that resolution code that is grouping addresses by interface
+        // ends up doing the right thing, since we registered our SRV record on
+        // mInterfaceId.
+        //
+        // And only register the IPv6 ones, for simplicity.
+        for (auto & interface : inet6Interfaces)
+        {
+            ReturnErrorOnFailure(RegisterInterface(mInterfaceId, interface.second, kDNSServiceType_AAAA));
+        }
+        return CHIP_NO_ERROR;
+    }
 
     return StartMonitorInterfaces(^(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces) {
         ReturnOnFailure(ResetSharedConnection());
@@ -305,11 +327,10 @@ CHIP_ERROR HostNameRegistrar::RegisterInterface(uint32_t interfaceId, uint16_t r
 
 void HostNameRegistrar::Unregister()
 {
-    // If the target interface is kDNSServiceInterfaceIndexLocalOnly, there are no interfaces to register against
-    // the dns daemon.
-    VerifyOrReturn(!IsLocalOnly());
-
-    StopMonitorInterfaces();
+    if (!IsLocalOnly())
+    {
+        StopMonitorInterfaces();
+    }
     StopSharedConnection();
 }
 

@@ -82,6 +82,7 @@ def build_darwin_framework(args):
         'CHIP_IS_ASAN': args.asan,
         'CHIP_IS_BLE': args.ble,
         'CHIP_IS_CLANG': args.clang,
+        'CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES': args.enable_encoding_sentinel_enum_values
     }
     for option in options:
         command += ["{}={}".format(option, "YES" if options[option] else "NO")]
@@ -115,6 +116,9 @@ def build_darwin_framework(args):
             ldflags += [
                 get_file_from_pigweed("libclang_rt.asan_osx_dynamic.dylib")
             ]
+
+    if args.enable_encoding_sentinel_enum_values:
+        cflags += ["-DCHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES=1"]
 
     command += ["OTHER_CFLAGS=" + ' '.join(cflags), "OTHER_LDFLAGS=" + ' '.join(ldflags)]
     command_result = run_command(command)
@@ -158,6 +162,7 @@ if __name__ == "__main__":
     parser.add_argument('--asan', action=argparse.BooleanOptionalAction)
     parser.add_argument('--ble', action=argparse.BooleanOptionalAction)
     parser.add_argument('--clang', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--enable_encoding_sentinel_enum_values', action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
     build_darwin_framework(args)

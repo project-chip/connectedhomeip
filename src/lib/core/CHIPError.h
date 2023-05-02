@@ -466,7 +466,10 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_MESSAGE_TOO_LONG                            CHIP_CORE_ERROR(0x04)
 
-// AVAILABLE: 0x05
+/**
+ *    Recursion depth overflow
+ */
+#define CHIP_ERROR_RECURSION_DEPTH_LIMIT                       CHIP_CORE_ERROR(0x05)
 
 /**
  *  @def CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS
