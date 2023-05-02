@@ -87,7 +87,7 @@ void HandleTokenizedLog(uint32_t levels, pw_tokenizer_Token token, pw_tokenizer_
 
     if (logging_buffer)
     {
-        for (int i = 0; i < encoded_size; i++)
+        for (size_t i = 0; i < encoded_size; i++)
         {
             sprintf(logging_buffer + 2 * i, "%02x", encoded_message[i]);
         }
