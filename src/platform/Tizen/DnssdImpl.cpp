@@ -55,6 +55,9 @@ constexpr const char * kEmptyAddressIpv6 = "0000:0000:0000:0000:0000:0000:0000:0
 // and the browsing callback is called multiple times (once for each service found).
 constexpr unsigned int kDnssdBrowseTimeoutMs = 250;
 
+// The number of miliseconds after which a mDNS resolve is considered failed.
+constexpr unsigned int kDnssdResolveTimeoutMs = 5000;
+
 bool IsSupportedProtocol(chip::Dnssd::DnssdServiceProtocol protocol)
 {
     return (protocol == chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolUdp) ||
@@ -391,6 +394,20 @@ exit:
     rCtx->mInstance->RemoveContext(rCtx);
 }
 
+gboolean OnResolveTimeout(void * userData)
+{
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
+    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
+
+    rCtx->Finalize(CHIP_ERROR_TIMEOUT);
+
+    // After this point the context might be no longer valid
+    rCtx->mInstance->RemoveContext(rCtx);
+
+    // This is a one-shot timer
+    return G_SOURCE_REMOVE;
+}
+
 CHIP_ERROR ResolveAsync(chip::Dnssd::ResolveContext * rCtx)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
@@ -398,8 +415,16 @@ CHIP_ERROR ResolveAsync(chip::Dnssd::ResolveContext * rCtx)
     int ret = dnssd_resolve_service(rCtx->mServiceHandle, OnResolve, rCtx);
     VerifyOrReturnValue(ret == DNSSD_ERROR_NONE, GetChipError(ret),
                         ChipLogError(DeviceLayer, "dnssd_resolve_service() failed. ret: %d", ret));
-
     rCtx->mIsResolving = true;
+
+    // Tizen API does not provide a way to set timeout for resolve operation. In case
+    // the resolve operation takes too long (e.g. the service is off the network), we
+    // set a timeout here, so that the application can be notified about the failure.
+    auto * source = g_timeout_source_new(kDnssdResolveTimeoutMs);
+    g_source_set_callback(source, OnResolveTimeout, rCtx, nullptr);
+    g_source_attach(source, g_main_context_get_thread_default());
+    rCtx->mTimeoutSource = source;
+
     return CHIP_NO_ERROR;
 }
 
@@ -470,6 +495,11 @@ ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const c
 
 ResolveContext::~ResolveContext()
 {
+    if (mTimeoutSource != nullptr)
+    {
+        g_source_destroy(mTimeoutSource);
+        g_source_unref(mTimeoutSource);
+    }
     g_free(mResultTxtRecord);
 }
 

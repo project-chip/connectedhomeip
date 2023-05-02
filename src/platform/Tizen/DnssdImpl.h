@@ -103,6 +103,7 @@ struct ResolveContext : public GenericContext
     void * mCbContext;
 
     dnssd_service_h mServiceHandle = 0;
+    GSource * mTimeoutSource       = nullptr;
     bool mIsResolving              = false;
 
     // Resolved service
