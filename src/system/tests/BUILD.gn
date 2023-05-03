@@ -28,6 +28,7 @@ chip_test_suite("tests") {
     "TestSystemScheduleLambda.cpp",
     "TestSystemTimer.cpp",
     "TestSystemWakeEvent.cpp",
+    "TestTLVPacketBufferBackingStore.cpp",
     "TestTimeSource.cpp",
   ]
 
