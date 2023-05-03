@@ -57,7 +57,7 @@ limitations under the License.
     <item name="MixedNTPNTS" value="0x0D"/>
     <item name="CloudSource" value="0x0E"/>
     <item name="PTP" value="0x0F"/>
-    <item name="Gnss" value="0x10"/>
+    <item name="GNSS" value="0x10"/>
   </enum>
 
   <enum name="TimeZoneDatabaseEnum" type="ENUM8">
