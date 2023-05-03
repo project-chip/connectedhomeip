@@ -117,7 +117,7 @@ limitations under the License.
     <attribute side="server" code="0x000B" define="DST_OFFSET_LIST_MAX_SIZE" type="INT8U" min="1" optional="true">DSTOffsetListMaxSize</attribute>
     <attribute side="server" code="0x000C" define="SUPPORTS_DNS_RESOLVE" type="boolean" optional="true">SupportsDNSResolve</attribute>
 
-    <command source="client" code="0x00" name="SetUtcTime" optional="false">
+    <command source="client" code="0x00" name="SetUTCTime" optional="false">
       <description>This command MAY be issued by Administrator to set the time.</description>
       <arg name="UtcTime" type="epoch_us"/>
       <arg name="Granularity" type="GranularityEnum"/>
