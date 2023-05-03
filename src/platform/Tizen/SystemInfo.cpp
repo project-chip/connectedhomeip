@@ -32,26 +32,29 @@ namespace Internal {
 
 SystemInfo SystemInfo::sInstance;
 
-double SystemInfo::GetPlatformVersion()
+CHIP_ERROR SystemInfo::GetPlatformVersion(PlatformVersion & version)
 {
-    char * version;
+    char * platformVersion;
     int ret;
 
-    if (sInstance.mVersion > 0)
+    if (sInstance.mMajor > 0)
     {
-        return sInstance.mVersion;
+        version.mMajor = sInstance.mMajor;
+        version.mMinor = sInstance.mMinor;
+        return CHIP_NO_ERROR;
     }
 
-    ret = system_info_get_platform_string("http://tizen.org/feature/platform.version", &version);
+    ret = system_info_get_platform_string("http://tizen.org/feature/platform.version", &platformVersion);
     if (ret != SYSTEM_INFO_ERROR_NONE)
     {
         ChipLogError(DeviceLayer, "system_info_get_platform_string() failed. %s", get_error_message(ret));
-        return -1;
+        return CHIP_ERROR_INTERNAL;
     }
 
-    sInstance.mVersion = stod(version);
-    free(version);
-    return sInstance.mVersion;
+    sInstance.mMajor = version.mMajor = (uint8_t)(platformVersion[0] - '0');
+    sInstance.mMinor = version.mMinor = (uint8_t)(platformVersion[2] - '0');
+    free(platformVersion);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

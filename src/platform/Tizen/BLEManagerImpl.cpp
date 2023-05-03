@@ -620,6 +620,7 @@ int BLEManagerImpl::StartBLEAdvertising()
     Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo = {
         0x0,
     };
+    PlatformVersion version;
 
     if (sInstance.mAdvReqInProgress)
     {
@@ -668,7 +669,9 @@ int BLEManagerImpl::StartBLEAdvertising()
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_adapter_le_add_advertising_service_data() failed. ret: %d", ret));
 
-    if (SystemInfo::GetPlatformVersion() >= 7.5)
+    err = SystemInfo::GetPlatformVersion(version);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "GetPlatformVersion() failed. %s", ErrorStr(err)));
+    if (version.mMajor >= 7 && version.mMinor >= 5)
     {
         ret = bt_adapter_le_set_advertising_flags(
             mAdvertiser, BT_ADAPTER_LE_ADVERTISING_FLAGS_GEN_DISC | BT_ADAPTER_LE_ADVERTISING_FLAGS_BREDR_UNSUP);
@@ -962,7 +965,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
-    ChipLogProgress(DeviceLayer, "Initialize BLE. Tizen Version: %.1f", SystemInfo::GetPlatformVersion());
+    ChipLogProgress(DeviceLayer, "Initialize BLE");
     err = PlatformMgrImpl().GLibMatterContextInvokeSync(_BleInitialize, static_cast<void *>(nullptr));
     SuccessOrExit(err);
 

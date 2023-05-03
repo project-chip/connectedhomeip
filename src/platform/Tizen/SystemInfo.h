@@ -17,18 +17,28 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
+#include <stdint.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+struct PlatformVersion
+{
+    uint8_t mMajor;
+    uint8_t mMinor;
+};
+
 class SystemInfo
 {
 public:
-    static double GetPlatformVersion(void);
+    static CHIP_ERROR GetPlatformVersion(PlatformVersion & version);
 
 private:
     static SystemInfo sInstance;
-    double mVersion = -1;
+    uint8_t mMajor = 0;
+    uint8_t mMinor = 0;
 };
 
 } // namespace Internal
