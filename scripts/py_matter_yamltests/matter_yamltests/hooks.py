@@ -98,12 +98,15 @@ class TestRunnerHooks():
         """
         pass
 
-    def test_start(self, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int):
         """
         This method is called when the runner starts running a single test.
 
         Parameters
         ----------
+        filename: str
+            The name of the file containing the test that is starting.
+
         name: str
             The name of the test that is starting.
 
@@ -126,7 +129,7 @@ class TestRunnerHooks():
         """
         pass
 
-    def step_skipped(self, name: str):
+    def step_skipped(self, name: str, expression: str):
         """
         This method is called when running a step is skipped.
 
@@ -134,6 +137,9 @@ class TestRunnerHooks():
         ----------
         name: str
             The name of the test step that is skipped.
+
+        expression: str
+            The PICS expression that results in the test step being skipped.
         """
         pass
 
@@ -148,7 +154,7 @@ class TestRunnerHooks():
         """
         pass
 
-    def step_success(self, logger, logs, duration: int):
+    def step_success(self, logger, logs, duration: int, request):
         """
         This method is called when running a step succeeds.
 
@@ -162,10 +168,13 @@ class TestRunnerHooks():
 
         duration: int
             How long it took to run the test step, in milliseconds.
+
+        request:
+            The original request as defined by the test step.
         """
         pass
 
-    def step_failure(self, logger, logs, duration: int, expected, received):
+    def step_failure(self, logger, logs, duration: int, request, received):
         """
         This method is called when running a step fails.
 
@@ -180,8 +189,8 @@ class TestRunnerHooks():
         duration: int
             How long it took to run the test step, in milliseconds.
 
-        expected:
-            The expected response as defined by the test step.
+        request:
+            The original request as defined by the test step.
 
         received:
             The received response.

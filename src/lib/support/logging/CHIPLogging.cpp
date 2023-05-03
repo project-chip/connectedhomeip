@@ -62,19 +62,41 @@ void HandleTokenizedLog(uint32_t levels, pw_tokenizer_Token token, pw_tokenizer_
         pw_tokenizer_EncodeArgs(types, args, encoded_message + sizeof(token), sizeof(encoded_message) - sizeof(token));
     va_end(args);
 
-    uint8_t log_category = levels >> 8 & 0xFF;
-    uint8_t log_module   = levels & 0xFF;
-    char * buffer        = (char *) chip::Platform::MemoryAlloc(2 * encoded_size + 1);
+    uint8_t log_category  = levels >> 8 & 0xFF;
+    uint8_t log_module    = levels & 0xFF;
+    char * logging_buffer = nullptr;
 
-    if (buffer)
+    // To reduce the number of alloc/free that is happening we will use a stack
+    // buffer when buffer required to log is small.
+    char stack_buffer[32];
+    char * allocated_buffer     = nullptr;
+    size_t required_buffer_size = 2 * encoded_size + 1;
+
+    if (required_buffer_size > sizeof(stack_buffer))
     {
-        for (int i = 0; i < encoded_size; i++)
+        allocated_buffer = (char *) chip::Platform::MemoryAlloc(required_buffer_size);
+        if (allocated_buffer)
         {
-            sprintf(buffer + 2 * i, "%02x", encoded_message[i]);
+            logging_buffer = allocated_buffer;
         }
-        buffer[2 * encoded_size] = '\0';
-        Log(log_module, log_category, "%s", buffer);
-        chip::Platform::MemoryFree(buffer);
+    }
+    else
+    {
+        logging_buffer = stack_buffer;
+    }
+
+    if (logging_buffer)
+    {
+        for (size_t i = 0; i < encoded_size; i++)
+        {
+            sprintf(logging_buffer + 2 * i, "%02x", encoded_message[i]);
+        }
+        logging_buffer[2 * encoded_size] = '\0';
+        Log(log_module, log_category, "%s", logging_buffer);
+    }
+    if (allocated_buffer)
+    {
+        chip::Platform::MemoryFree(allocated_buffer);
     }
 }
 
