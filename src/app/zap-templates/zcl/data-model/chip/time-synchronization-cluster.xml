@@ -119,7 +119,7 @@ limitations under the License.
 
     <command source="client" code="0x00" name="SetUTCTime" optional="false">
       <description>This command MAY be issued by Administrator to set the time.</description>
-      <arg name="UtcTime" type="epoch_us"/>
+      <arg name="UTCTime" type="epoch_us"/>
       <arg name="Granularity" type="GranularityEnum"/>
       <arg name="TimeSource" type="TimeSourceEnum" optional="true"/>
       <access op="invoke" privilege="administer"/>
