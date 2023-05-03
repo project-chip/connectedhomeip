@@ -105,11 +105,11 @@ silabs_executable("thermostat_app") {
   defines = []
 
   sources = [
+    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/SensorManager.cpp",
     "src/TemperatureManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
   ]
 
   if (use_temp_sensor) {
