@@ -50,8 +50,6 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    static constexpr uint16_t ClusterRevision = 1;
-
     CHIP_ERROR ReadPercentCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSpeedCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
