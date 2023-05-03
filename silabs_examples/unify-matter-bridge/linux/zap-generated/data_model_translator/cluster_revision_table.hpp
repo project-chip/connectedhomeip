@@ -45,7 +45,7 @@ const std::map<int, int> zap_cluster_revisions = {
         37,
         0,
     },
-    { 40, 1 },
+    { 40, 2 },
     {
         41,
         0,
