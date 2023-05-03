@@ -238,24 +238,12 @@ tests:
       PICS: OO.S.C00.Rsp
       command: "Off"
 
-    # We get an acknowledgment that the command off above is received, but it takes
-    # a few milliseconds for the off command to actually turn it off. Without this
-    # delay the preceding reboot command might happen before the command is fully
-    # processed resulting in flaky test failure that comes from the readAddribute
-    # verification after the reboot.
-    # TODO once https://github.com/CHIP-Specifications/chip-test-plans/pull/2464 is
-    # merged, change this command to a readAtribute and update PICS code to
-    # OO.S.A0000. PR is blocked from being merged at this time due to freeze for
-    # SVE. Likely after March 17th, 2023 this PR can be merged and associated
-    # changes made here to officially fix the flake discovered by CI.
-    - label: "Wait for send Off command to take affect"
-      PICS: PICS_SDK_CI_ONLY
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10
+    - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
 
     - label: "Reboot target device"
       PICS: PICS_SDK_CI_ONLY

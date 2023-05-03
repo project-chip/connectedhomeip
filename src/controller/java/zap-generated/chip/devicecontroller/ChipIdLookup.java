@@ -217,9 +217,6 @@ public final class ChipIdLookup {
     if (clusterId == 2820L) {
       return "ElectricalMeasurement";
     }
-    if (clusterId == 4166L) {
-      return "ClientMonitoring";
-    }
     if (clusterId == 4294048773L) {
       return "UnitTesting";
     }
@@ -678,6 +675,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 19L) {
         return "CapabilityMinima";
+      }
+      if (attributeId == 20L) {
+        return "ProductAppearance";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1518,6 +1518,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 18L) {
         return "UniqueID";
+      }
+      if (attributeId == 20L) {
+        return "ProductAppearance";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -3618,39 +3621,6 @@ public final class ChipIdLookup {
       }
       return "";
     }
-    if (clusterId == 4166L) {
-      if (attributeId == 0L) {
-        return "IdleModeInterval";
-      }
-      if (attributeId == 1L) {
-        return "ActiveModeInterval";
-      }
-      if (attributeId == 2L) {
-        return "ActiveModeThreshold";
-      }
-      if (attributeId == 3L) {
-        return "ExpectedClients";
-      }
-      if (attributeId == 65528L) {
-        return "GeneratedCommandList";
-      }
-      if (attributeId == 65529L) {
-        return "AcceptedCommandList";
-      }
-      if (attributeId == 65530L) {
-        return "EventList";
-      }
-      if (attributeId == 65531L) {
-        return "AttributeList";
-      }
-      if (attributeId == 65532L) {
-        return "FeatureMap";
-      }
-      if (attributeId == 65533L) {
-        return "ClusterRevision";
-      }
-      return "";
-    }
     if (clusterId == 4294048773L) {
       if (attributeId == 0L) {
         return "Boolean";
@@ -4290,9 +4260,6 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 2820L) {
-      return "";
-    }
-    if (clusterId == 4166L) {
       return "";
     }
     if (clusterId == 4294048773L) {

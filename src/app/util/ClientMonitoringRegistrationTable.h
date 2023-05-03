@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 
+// Disable CM cluster table until update is done
+// https://github.com/project-chip/connectedhomeip/issues/24425
+#if 0
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -96,3 +99,4 @@ private:
 };
 
 } // namespace chip
+#endif
