@@ -79,9 +79,7 @@ ChipDeviceScanner::~ChipDeviceScanner()
     StopScan();
 
     // In case the timeout timer is still active
-    DeviceLayer::PlatformMgr().LockChipStack();
     chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
-    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     g_object_unref(mManager);
     g_object_unref(mCancellable);
