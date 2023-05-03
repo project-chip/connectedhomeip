@@ -329,7 +329,7 @@ template("k32w0_sdk") {
     }
 
     if (chip_crypto == "platform" &&
-        chip_crypto_flavour == "NXP-Ultrafast-P256") {
+        chip_crypto_flavor == "NXP-Ultrafast-P256") {
       defines += [ "EC_P256_DSPEXT=1" ]
     }
 
