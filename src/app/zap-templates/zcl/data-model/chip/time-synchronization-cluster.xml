@@ -110,12 +110,12 @@ limitations under the License.
     <attribute side="server" code="0x0004" define="DEFAULT_NTP" type="CHAR_STRING" length="128" isNullable="true" optional="true">DefaultNTP</attribute>
     <attribute side="server" code="0x0005" define="TIME_ZONE" type="ARRAY" entryType="TimeZoneStruct" optional="true">TimeZone</attribute>
     <attribute side="server" code="0x0006" define="DST_OFFSET" type="ARRAY" entryType="DSTOffsetStruct" optional="true">DSTOffset</attribute>
-    <attribute side="server" code="0x0007" define="LOCAL_TIME" type="epoch_us" default="0x00" isNullable="true" optional="true">LocalTime</attribute>
+    <attribute side="server" code="0x0007" define="LOCAL_TIME" type="epoch_us" default="0xFFFFFFFFFFFFFFFF" isNullable="true" optional="true">LocalTime</attribute>
     <attribute side="server" code="0x0008" define="TIME_ZONE_DATABASE" type="TimeZoneDatabaseEnum" default="2" optional="true">TimeZoneDatabase</attribute>
-    <attribute side="server" code="0x0009" define="NTP_SERVER_AVAILABLE" type="boolean" optional="true">NTPServerAvailable</attribute>
+    <attribute side="server" code="0x0009" define="NTP_SERVER_AVAILABLE" type="boolean" default="false" optional="true">NTPServerAvailable</attribute>
     <attribute side="server" code="0x000A" define="TIME_ZONE_LIST_MAX_SIZE" type="INT8U" min="1" max="2" optional="true">TimeZoneListMaxSize</attribute>
     <attribute side="server" code="0x000B" define="DST_OFFSET_LIST_MAX_SIZE" type="INT8U" min="1" optional="true">DSTOffsetListMaxSize</attribute>
-    <attribute side="server" code="0x000C" define="SUPPORTS_DNS_RESOLVE" type="boolean" optional="true">SupportsDNSResolve</attribute>
+    <attribute side="server" code="0x000C" define="SUPPORTS_DNS_RESOLVE" type="boolean" default="false" optional="true">SupportsDNSResolve</attribute>
 
     <command source="client" code="0x00" name="SetUTCTime" optional="false">
       <description>This command MAY be issued by Administrator to set the time.</description>
