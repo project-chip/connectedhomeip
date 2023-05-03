@@ -37,14 +37,18 @@ void BleConnectCallbackJNI_OnUnload(JavaVM * jvm, void * reserved) {}
 
 JNI_METHOD(void, onConnectSuccess)(JNIEnv * env, jobject self, jlong managerImplPtr, jlong appStatePtr, jint connId)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     BLEManagerImpl * impl = reinterpret_cast<BLEManagerImpl *>(managerImplPtr);
     void * appState       = reinterpret_cast<void *>(appStatePtr);
     impl->OnConnectSuccess(appState, reinterpret_cast<BLE_CONNECTION_OBJECT>(connId));
+#endif
 }
 
 JNI_METHOD(void, onConnectFailed)(JNIEnv * env, jobject self, jlong managerImplPtr, jlong appStatePtr)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     BLEManagerImpl * impl = reinterpret_cast<BLEManagerImpl *>(managerImplPtr);
     void * appState       = reinterpret_cast<void *>(appStatePtr);
     impl->OnConnectFailed(appState, BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK);
+#endif
 }
