@@ -1098,12 +1098,16 @@ namespace RegisterClientMonitoring {
 static constexpr CommandId Id = 0x00000000;
 } // namespace RegisterClientMonitoring
 
-namespace UnregisterClientMonitoring {
+namespace RegisterClientMonitoringResponse {
 static constexpr CommandId Id = 0x00000001;
+} // namespace RegisterClientMonitoringResponse
+
+namespace UnregisterClientMonitoring {
+static constexpr CommandId Id = 0x00000002;
 } // namespace UnregisterClientMonitoring
 
 namespace StayAwakeRequest {
-static constexpr CommandId Id = 0x00000002;
+static constexpr CommandId Id = 0x00000003;
 } // namespace StayAwakeRequest
 
 } // namespace Commands

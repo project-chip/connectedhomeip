@@ -7380,14 +7380,15 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * RegisterClientMonitoring                                          |   0x00 |
-| * UnregisterClientMonitoring                                        |   0x01 |
-| * StayAwakeRequest                                                  |   0x02 |
+| * UnregisterClientMonitoring                                        |   0x02 |
+| * StayAwakeRequest                                                  |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * IdleModeInterval                                                  | 0x0000 |
 | * ActiveModeInterval                                                | 0x0001 |
 | * ActiveModeThreshold                                               | 0x0002 |
 | * ExpectedClients                                                   | 0x0003 |
+| * ICDCounter                                                        | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -7407,8 +7408,8 @@ public:
     ClientMonitoringRegisterClientMonitoring(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("register-client-monitoring", credsIssuerConfig)
     {
-        AddArgument("ClientNodeId", 0, UINT64_MAX, &mRequest.clientNodeId);
-        AddArgument("ICid", 0, UINT64_MAX, &mRequest.ICid);
+        AddArgument("ClientNodeID", 0, UINT64_MAX, &mRequest.clientNodeID);
+        AddArgument("Key", &mRequest.key);
         ClusterCommand::AddArguments();
     }
 
@@ -7439,23 +7440,22 @@ public:
     ClientMonitoringUnregisterClientMonitoring(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("unregister-client-monitoring", credsIssuerConfig)
     {
-        AddArgument("ClientNodeId", 0, UINT64_MAX, &mRequest.clientNodeId);
-        AddArgument("ICid", 0, UINT64_MAX, &mRequest.ICid);
+        AddArgument("ClientNodeID", 0, UINT64_MAX, &mRequest.clientNodeID);
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000001) on endpoint %u", endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00001046, 0x00000001, mRequest);
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00001046, 0x00000002, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000001) on Group %u", groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000002) on Group %u", groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000001, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000002, mRequest);
     }
 
 private:
@@ -7476,16 +7476,16 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000002) on endpoint %u", endpointIds.at(0));
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00001046, 0x00000002, mRequest);
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00001046, 0x00000003, mRequest);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000002) on Group %u", groupId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000003) on Group %u", groupId);
 
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000002, mRequest);
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000003, mRequest);
     }
 
 private:
@@ -15554,6 +15554,7 @@ void registerClusterClientMonitoring(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "active-mode-interval", Attributes::ActiveModeInterval::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "active-mode-threshold", Attributes::ActiveModeThreshold::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "expected-clients", Attributes::ExpectedClients::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "icdcounter", Attributes::ICDCounter::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -15568,8 +15569,10 @@ void registerClusterClientMonitoring(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<uint16_t>>(Id, "active-mode-threshold", 0, UINT16_MAX, Attributes::ActiveModeThreshold::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistrationStruct::Type>>>(
             Id, "expected-clients", Attributes::ExpectedClients::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "icdcounter", 0, UINT32_MAX, Attributes::ICDCounter::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -15588,6 +15591,7 @@ void registerClusterClientMonitoring(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "active-mode-interval", Attributes::ActiveModeInterval::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "active-mode-threshold", Attributes::ActiveModeThreshold::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "expected-clients", Attributes::ExpectedClients::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "icdcounter", Attributes::ICDCounter::Id, credsIssuerConfig),                       //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
