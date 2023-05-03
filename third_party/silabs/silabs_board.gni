@@ -158,7 +158,7 @@ if (silabs_board == "BRD4304A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB32VNA"
 
-  # MGM240L do not have an external flash or LCD
+  # MGM240P do not have an external flash or LCD
   use_external_flash = false
   show_qr_code = false
   disable_lcd = true
