@@ -2266,7 +2266,7 @@ static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode,
 
 static void LogStringAndReturnError(NSString * errorStr, CHIP_ERROR errorCode, NSError * __autoreleasing * error)
 {
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    MTR_LOG_ERROR("%s: %s", errorStr.UTF8String, errorCode.AsString());
     if (!error) {
         return;
     }
@@ -2292,30 +2292,72 @@ static bool CheckMemberOfType(NSDictionary<NSString *, id> * responseValue, NSSt
     return true;
 }
 
-// Allocates a buffer, encodes the data-value as TLV, and points the TLV::Reader to
-// the data.  Returns false if any of that fails, in which case error gets set.
-static bool EncodeDataValueToTLV(Platform::ScopedMemoryBuffer<uint8_t> & buffer, size_t bufferSize, NSDictionary * data,
-    TLV::TLVReader & reader, NSError * __autoreleasing * error)
+// Allocates a buffer, encodes the data-value as TLV, and points the TLV::Reader
+// to the data.  Returns false if any of that fails, in which case error gets
+// set.
+//
+// Data model decoding requires a contiguous buffer (because lists walk all the
+// data multiple times and TLVPacketBufferBackingStore doesn't have a way to
+// checkpoint and restore its state), but we can encode into chained packet
+// buffers and then decide whether we need a contiguous realloc.
+static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::ScopedMemoryBuffer<uint8_t> & flatBuffer,
+    NSDictionary * data, TLV::TLVReader & reader, NSError * __autoreleasing * error)
 {
-    if (!buffer.Calloc(bufferSize)) {
-        LogStringAndReturnError(@"Unable to allocate encoding buffer.", CHIP_ERROR_NO_MEMORY, error);
+    buffer = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        LogStringAndReturnError(@"Unable to allocate encoding buffer", CHIP_ERROR_NO_MEMORY, error);
         return false;
     }
 
-    TLV::TLVWriter writer;
-    writer.Init(buffer.Get(), bufferSize);
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ true);
 
     CHIP_ERROR errorCode = MTREncodeTLVFromDataValueDictionary(data, writer, TLV::AnonymousTag());
     if (errorCode != CHIP_NO_ERROR) {
-        LogStringAndReturnError(@"Unable to encode data-value to TLV.", errorCode, error);
+        LogStringAndReturnError(@"Unable to encode data-value to TLV", errorCode, error);
         return false;
     }
 
-    reader.Init(buffer.Get(), writer.GetLengthWritten());
+    errorCode = writer.Finalize(&buffer);
+    if (errorCode != CHIP_NO_ERROR) {
+        LogStringAndReturnError(@"Unable to encode data-value to TLV", errorCode, error);
+        return false;
+    }
+
+    if (buffer->HasChainedBuffer()) {
+        // We need to reallocate into a single contiguous buffer.
+        size_t remainingData = buffer->TotalLength();
+        if (!flatBuffer.Calloc(remainingData)) {
+            LogStringAndReturnError(@"Unable to allocate decoding buffer", CHIP_ERROR_NO_MEMORY, error);
+            return false;
+        }
+        size_t copiedData = 0;
+        while (!buffer.IsNull()) {
+            if (buffer->DataLength() > remainingData) {
+                // Should never happen, but let's be extra careful about buffer
+                // overruns.
+                LogStringAndReturnError(@"Encoding buffer size is bigger than it claimed", CHIP_ERROR_INCORRECT_STATE, error);
+                return false;
+            }
+
+            memcpy(flatBuffer.Get() + copiedData, buffer->Start(), buffer->DataLength());
+            copiedData += buffer->DataLength();
+            remainingData -= buffer->DataLength();
+            buffer.Advance();
+        }
+        if (remainingData != 0) {
+            LogStringAndReturnError(
+                @"Did not copy all data from Encoding buffer for some reason", CHIP_ERROR_INCORRECT_STATE, error);
+            return false;
+        }
+        reader.Init(flatBuffer.Get(), copiedData);
+    } else {
+        reader.Init(buffer->Start(), buffer->DataLength());
+    }
 
     errorCode = reader.Next(TLV::AnonymousTag());
     if (errorCode != CHIP_NO_ERROR) {
-        LogStringAndReturnError(@"data-value TLV encoding did not create a TLV element.", errorCode, error);
+        LogStringAndReturnError(@"data-value TLV encoding did not create a TLV element", errorCode, error);
         return false;
     }
 
@@ -2374,18 +2416,10 @@ static bool EncodeDataValueToTLV(Platform::ScopedMemoryBuffer<uint8_t> & buffer,
     NSDictionary * data = responseValue[MTRDataKey];
 
     // Encode the data to TLV and then decode from that, to reuse existing code.
-    // We don't know exactly how much data we can have here; if our value is a list it
-    // might well be larger than the amount of data that would fit in a single packet.
-    //
-    // We could start with some small buffer size and try growing it until it's
-    // big enough to encode into, but in practice we'd probably have to cap that
-    // at some max size anyway.  So just start with something that is likely to
-    // work for any conceivable attribute, like 20KiB.
-
-    constexpr size_t bufferSize = 20 * 1042;
-    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    System::PacketBufferHandle buffer;
+    Platform::ScopedMemoryBuffer<uint8_t> flatBuffer;
     TLV::TLVReader reader;
-    if (!EncodeDataValueToTLV(buffer, bufferSize, data, reader, error)) {
+    if (!EncodeDataValueToTLV(buffer, flatBuffer, data, reader, error)) {
         return nil;
     }
 
@@ -2507,11 +2541,10 @@ static bool EncodeDataValueToTLV(Platform::ScopedMemoryBuffer<uint8_t> & buffer,
     NSDictionary * data = responseValue[MTRDataKey];
 
     // Encode the data to TLV and then decode from that, to reuse existing code.
-    // For an event, we know it always fits in a single Matter message.
-    constexpr size_t bufferSize = kMaxSecureSduLengthBytes;
-    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    System::PacketBufferHandle buffer;
+    Platform::ScopedMemoryBuffer<uint8_t> flatBuffer;
     TLV::TLVReader reader;
-    if (!EncodeDataValueToTLV(buffer, bufferSize, data, reader, error)) {
+    if (!EncodeDataValueToTLV(buffer, flatBuffer, data, reader, error)) {
         return nil;
     }
     auto eventPath = [path _asConcretePath];

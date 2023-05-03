@@ -218,7 +218,7 @@
     XCTAssertNil(report.error);
 }
 
-- (void)test0010_StructAttribute
+- (void)test010_StructAttribute
 {
     // Basic Information, CapabilityMinima
     NSDictionary * input = @{
@@ -260,7 +260,7 @@
     XCTAssertNil(report.error);
 }
 
-- (void)test0011_StructAttributeOtherOrder
+- (void)test011_StructAttributeOtherOrder
 {
     // Basic Information, CapabilityMinima
     NSDictionary * input = @{
@@ -302,7 +302,7 @@
     XCTAssertNil(report.error);
 }
 
-- (void)test0012_ListAttribute
+- (void)test012_ListAttribute
 {
     // Descriptor, DeviceTypeList
     NSDictionary * input = @{
@@ -379,7 +379,7 @@
     XCTAssertNil(report.error);
 }
 
-- (void)test0013_UnsignedIntAttributeSignMismatch
+- (void)test013_UnsignedIntAttributeSignMismatch
 {
     // Pressure Measurement, Tolerance
     NSDictionary * input = @{
@@ -397,7 +397,7 @@
     XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
 }
 
-- (void)test0014_SignedIntAttributeSignMismatch
+- (void)test014_SignedIntAttributeSignMismatch
 {
     // Pressure Measurement, MeasuredValue
     NSDictionary * input = @{
@@ -415,7 +415,7 @@
     XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
 }
 
-- (void)test0015_UnknownAttribute
+- (void)test015_UnknownAttribute
 {
     // On/Off, nonexistent attribute
     NSDictionary * input = @{
@@ -433,7 +433,7 @@
     XCTAssertEqual(error.code, MTRErrorCodeUnknownSchema);
 }
 
-- (void)test0016_UnknownCluster
+- (void)test016_UnknownCluster
 {
     // Unknown cluster.
     NSDictionary * input = @{
@@ -451,7 +451,7 @@
     XCTAssertEqual(error.code, MTRErrorCodeUnknownSchema);
 }
 
-- (void)test0017_StringVsOctetStringMismatch
+- (void)test017_StringVsOctetStringMismatch
 {
     // Basic Information, SerialNumber
     NSDictionary * input = @{
@@ -469,7 +469,7 @@
     XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
 }
 
-- (void)test0018_OctetStringVsStringMismatch
+- (void)test018_OctetStringVsStringMismatch
 {
     // Thread Network Diagnostics, ChannelPage0Mask
     NSDictionary * input = @{
@@ -487,7 +487,7 @@
     XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
 }
 
-- (void)test0019_DoubleVsFloatMismatch
+- (void)test019_DoubleVsFloatMismatch
 {
     // Unit Testing, float_double
     NSDictionary * input = @{
@@ -510,7 +510,7 @@
     XCTAssertNil(report.error);
 }
 
-- (void)test0020_FloatVsDoubleMismatch
+- (void)test020_FloatVsDoubleMismatch
 {
     // Media Playback, PlaybackSpeed
     NSDictionary * input = @{
@@ -579,7 +579,7 @@
     XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
 }
 
-- (void)test0024_StructFieldIntegerTypeMismatch
+- (void)test024_StructFieldIntegerTypeMismatch
 {
     // Descriptor, DeviceTypeList
     NSDictionary * input = @{
@@ -640,7 +640,7 @@
     XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
 }
 
-- (void)test0025_EventPayloadWithSystemUptime
+- (void)test025_EventPayloadWithSystemUptime
 {
     // Access Control, AccessControlExtensionChanged
     NSDictionary * input = @{
@@ -722,7 +722,7 @@
     XCTAssertNil(report.error);
 }
 
-- (void)test0026_EventReportWithTimestampDate
+- (void)test026_EventReportWithTimestampDate
 {
     // Basic Information, Shutdown
     NSDictionary * input = @{
@@ -756,7 +756,7 @@
     XCTAssertTrue([report.value isKindOfClass:[MTRBasicInformationClusterShutDownEvent class]]);
 }
 
-- (void)test0027_AttributeWithDataAndError
+- (void)test027_AttributeWithDataAndError
 {
     // Pressure Measurement, Tolerance
     NSDictionary * input = @{
@@ -779,7 +779,7 @@
     XCTAssertEqualObjects(report.error, input[MTRErrorKey]);
 }
 
-- (void)test0028_EventReportWithDataAndError
+- (void)test028_EventReportWithDataAndError
 {
     // Basic Information, Shutdown
     NSDictionary * input = @{
@@ -813,7 +813,7 @@
     XCTAssertEqualObjects(report.error, input[MTRErrorKey]);
 }
 
-- (void)test0029_EventPayloadFailingSchemaCheck
+- (void)test029_EventPayloadFailingSchemaCheck
 {
     // Access Control, AccessControlExtensionChanged
     NSDictionary * input = @{
@@ -871,7 +871,7 @@
     XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
 }
 
-- (void)test0030_EventReportWithUnknownCluster
+- (void)test030_EventReportWithUnknownCluster
 {
     NSDictionary * input = @{
         MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(0xFF1FF1) eventID:@(0)],
@@ -892,7 +892,7 @@
     XCTAssertEqual(error.code, MTRErrorCodeUnknownSchema);
 }
 
-- (void)test0031_EventReportWithUnknownEvent
+- (void)test031_EventReportWithUnknownEvent
 {
     NSDictionary * input = @{
         MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(0x0028) eventID:@(1000)],
@@ -911,6 +911,66 @@
     XCTAssertNil(report);
     XCTAssertNotNil(error);
     XCTAssertEqual(error.code, MTRErrorCodeUnknownSchema);
+}
+
+- (void)test032_VeryLongListAttribute
+{
+    NSDictionary * singleListItem = @{
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[
+                @{
+                    MTRContextTagKey : @(0), // DeviceType
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(100),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(1), // Revision
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(17),
+                    },
+                },
+            ],
+        },
+    };
+
+    NSUInteger arrayLength = 1000;
+    NSMutableArray * inputArray = [[NSMutableArray alloc] initWithCapacity:arrayLength];
+    for (NSUInteger i = 0; i < arrayLength; ++i) {
+        [inputArray addObject:singleListItem];
+    }
+
+    // Descriptor, DeviceTypeList
+    NSDictionary * input = @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(0x001d) attributeID:@(0)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRArrayValueType,
+            MTRValueKey : inputArray,
+        },
+    };
+
+    NSError * error;
+    __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:input error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(report);
+
+    XCTAssertEqualObjects(input[MTRAttributePathKey], report.path);
+    XCTAssertNotNil(report.value);
+    XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+
+    NSArray * array = report.value;
+    XCTAssertTrue(array.count == inputArray.count);
+    for (id item in array) {
+        XCTAssertTrue([item isKindOfClass:[MTRDescriptorClusterDeviceTypeStruct class]]);
+        MTRDescriptorClusterDeviceTypeStruct * deviceType = item;
+        XCTAssertEqualObjects(deviceType.deviceType, @(100));
+        XCTAssertEqualObjects(deviceType.revision, @(17));
+    }
+
+    XCTAssertNil(report.error);
 }
 
 @end
