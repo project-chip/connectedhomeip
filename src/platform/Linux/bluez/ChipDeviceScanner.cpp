@@ -201,7 +201,7 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
         ChipLogError(Ble, "Failed to stop discovery %s", error->message);
         g_error_free(error);
     }
-    self->mIsScanning                    = false;
+    self->mIsScanning = false;
 
     return CHIP_NO_ERROR;
 }

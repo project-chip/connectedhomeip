@@ -33,6 +33,7 @@ def ScanFoundCallback(closure, address: str, discriminator: int, vendor: int,
 def ScanDoneCallback(closure):
     closure.ScanCompleted()
 
+
 @ScanErrorCallback
 def ScanErrorCallback(closure, errorCode: int):
     closure.ScanErrorCallback(errorCode)
