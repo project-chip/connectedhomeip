@@ -111,7 +111,7 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="TIME_ZONE" type="ARRAY" entryType="TimeZoneStruct" optional="true">TimeZone</attribute>
     <attribute side="server" code="0x0006" define="DST_OFFSET" type="ARRAY" entryType="DSTOffsetStruct" optional="true">DSTOffset</attribute>
     <attribute side="server" code="0x0007" define="LOCAL_TIME" type="epoch_us" default="0x00" isNullable="true" optional="true">LocalTime</attribute>
-    <attribute side="server" code="0x0008" define="TIME_ZONE_DATABASE" type="TimeZoneDatabaseEnum" default="3" optional="true">TimeZoneDatabase</attribute>
+    <attribute side="server" code="0x0008" define="TIME_ZONE_DATABASE" type="TimeZoneDatabaseEnum" default="2" optional="true">TimeZoneDatabase</attribute>
     <attribute side="server" code="0x0009" define="NTP_SERVER_AVAILABLE" type="boolean" optional="true">NTPServerAvailable</attribute>
     <attribute side="server" code="0x000A" define="TIME_ZONE_LIST_MAX_SIZE" type="INT8U" min="1" max="2" optional="true">TimeZoneListMaxSize</attribute>
     <attribute side="server" code="0x000B" define="DST_OFFSET_LIST_MAX_SIZE" type="INT8U" min="1" optional="true">DSTOffsetListMaxSize</attribute>
@@ -173,7 +173,7 @@ limitations under the License.
       <description>This event SHALL be generated if the node has attempted to update its time, but was unable to find a good time from any source.</description>
     </event>
 
-    <event code="0x0004" name="MissingTrustedTimeSource" priority="info" side="server" optional="false">
+    <event code="0x0004" name="MissingTrustedTimeSource" priority="info" side="server" optional="true">
       <description>This event SHALL be generated if the node attempts to update its time and finds that the TrustedTimeSource is null, or the specified peer cannot be reached.</description>
     </event>
 
