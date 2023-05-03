@@ -106,7 +106,7 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="UTC_TIME" type="epoch_us" isNullable="true" optional="false">UTCTime</attribute>
     <attribute side="server" code="0x0001" define="GRANULARITY" type="GranularityEnum" default="0x00" optional="false">Granularity</attribute>
     <attribute side="server" code="0x0002" define="TIME_SOURCE" type="TimeSourceEnum" default="0x00" optional="true">TimeSource</attribute>
-    <attribute side="server" code="0x0003" define="TRUSTED_TIME_SOURCE" type="TrustedTimeSourceStruct" isNullable="true" optional="false">TrustedTimeSource</attribute>
+    <attribute side="server" code="0x0003" define="TRUSTED_TIME_SOURCE" type="TrustedTimeSourceStruct" isNullable="true" optional="true">TrustedTimeSource</attribute>
     <attribute side="server" code="0x0004" define="DEFAULT_NTP" type="CHAR_STRING" length="128" isNullable="true" optional="true">DefaultNTP</attribute>
     <attribute side="server" code="0x0005" define="TIME_ZONE" type="ARRAY" entryType="TimeZoneStruct" optional="true">TimeZone</attribute>
     <attribute side="server" code="0x0006" define="DST_OFFSET" type="ARRAY" entryType="DSTOffsetStruct" optional="true">DSTOffset</attribute>
