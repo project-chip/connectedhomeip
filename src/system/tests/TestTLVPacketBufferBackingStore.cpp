@@ -73,13 +73,13 @@ void TLVPacketBufferBackingStoreTest::BasicEncodeDecode(nlTestSuite * inSuite, v
     CHIP_ERROR error = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerContainerType);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
-    error = writer.Put(TLV::AnonymousTag(), 7u);
+    error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
-    error = writer.Put(TLV::AnonymousTag(), 8u);
+    error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(8));
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
-    error = writer.Put(TLV::AnonymousTag(), 9u);
+    error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(9));
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
     error = writer.EndContainer(outerContainerType);
@@ -150,10 +150,10 @@ void TLVPacketBufferBackingStoreTest::MultiBufferEncode(nlTestSuite * inSuite, v
     CHIP_ERROR error = writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerContainerType);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
-    error = writer.Put(TLV::AnonymousTag(), 7u);
+    error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
-    error = writer.Put(TLV::AnonymousTag(), 8u);
+    error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(8));
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
     // Something to make sure we have 3 buffers.
