@@ -45,6 +45,8 @@ extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 SilabsLCD slLCD;
 #endif
 
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
@@ -186,6 +188,8 @@ void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 
 CHIP_ERROR WindowAppImpl::Init()
 {
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(WindowAppImpl::ButtonEventHandler);
+
     WindowApp::Init();
 
     // Initialize App Task
