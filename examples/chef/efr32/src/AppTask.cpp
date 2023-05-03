@@ -41,6 +41,8 @@
 
 #include <assert.h>
 
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -49,7 +51,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #define SYSTEM_STATE_LED 0
-#define APP_FUNCTION_BUTTON &sl_button_btn0
+#define APP_FUNCTION_BUTTON 0
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -123,6 +125,9 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
+#endif
 
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
@@ -164,18 +169,13 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
-    if (buttonHandle == NULL)
-    {
-        return;
-    }
-
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_FUNCTION_BUTTON)
+    if (button == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);

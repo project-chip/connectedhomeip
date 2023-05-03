@@ -43,7 +43,8 @@ public:
     void Finish() override;
     void PostEvent(const WindowApp::Event & event) override;
     void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId) override;
-    friend void sl_button_on_change(const sl_button_t * handle);
+    static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
+    void OnButtonChange(uint8_t button, uint8_t btnAction);
 
 protected:
     struct Timer : public WindowApp::Timer
@@ -67,7 +68,6 @@ protected:
     WindowApp::Timer * CreateTimer(const char * name, uint32_t timeoutInMs, WindowApp::Timer::Callback callback,
                                    void * context) override;
     WindowApp::Button * CreateButton(WindowApp::Button::Id id, const char * name) override;
-    void OnButtonChange(const sl_button_t * handle);
     void ProcessEvents();
     void DispatchEvent(const WindowApp::Event & event) override;
     void UpdateLEDs();
