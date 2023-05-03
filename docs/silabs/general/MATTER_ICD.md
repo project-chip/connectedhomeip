@@ -17,7 +17,7 @@ The device can set a maximum interval within this range:
 MinIntervalRequested ≤ MaxInterval ≤ MAX(1h, MaxIntervalRequested)
 ```
 
-#### Table 1 - Subscribe Response Action
+The following table shows the subscribe response fields.
 | Action Field | Type | Description |
 |-|-|-|
 | SubscriptionId | uint32 | identifies the subscription |
