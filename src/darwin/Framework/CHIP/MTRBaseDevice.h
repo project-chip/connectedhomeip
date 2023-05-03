@@ -601,7 +601,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * * string: NSString
  * * discrete/analog types: NSNumber
  *
- * Derived types are represented as the base type, except for "string".
+ * Derived types (in the Matter specification sense) are represented the same as
+ * the base type, except for "string" (which is a derived type of "octet string"
+ * in the specification).
  */
 @property (nonatomic, readonly, copy, nullable) id value;
 
