@@ -184,6 +184,11 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
         return CHIP_ERROR_INTERNAL;
     }
 
+    ChipDeviceScannerDelegate * delegate = this->mDelegate;
+    // callback is explicitly allowed to delete the scanner (hence no more
+    // references to this here)
+    delegate->OnScanComplete();
+
     return CHIP_NO_ERROR;
 }
 
@@ -196,12 +201,7 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
         ChipLogError(Ble, "Failed to stop discovery %s", error->message);
         g_error_free(error);
     }
-    ChipDeviceScannerDelegate * delegate = self->mDelegate;
     self->mIsScanning                    = false;
-
-    // callback is explicitly allowed to delete the scanner (hence no more
-    // references to 'self' here)
-    delegate->OnScanComplete();
 
     return CHIP_NO_ERROR;
 }
