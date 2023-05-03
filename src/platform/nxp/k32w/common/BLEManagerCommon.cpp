@@ -40,7 +40,7 @@
 #include "stdio.h"
 #include "timers.h"
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(CPU_JN518X) && defined(chip_with_low_power) && (chip_with_low_power == 1)
 #include "PWR_Configuration.h"
 #endif
 
@@ -53,6 +53,11 @@
  * Local data types
  *******************************************************************************/
 extern "C" bool_t Ble_ConfigureHostStackConfig(void);
+
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+extern "C" void PWR_DisallowDeviceToSleep(void);
+extern "C" void PWR_AllowDeviceToSleep(void);
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -126,7 +131,7 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x12 } };
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 static bool bleAppStopInProgress;
 #endif
 
@@ -179,7 +184,7 @@ CHIP_ERROR BLEManagerCommon::_Init()
     eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_INIT_COMPLETE, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
     VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_INIT_COMPLETE, err = CHIP_ERROR_INCORRECT_STATE);
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(CPU_JN518X) && defined(chip_with_low_power) && (chip_with_low_power == 1)
     PWR_ChangeDeepSleepMode(cPWR_PowerDown_RamRet);
 #endif
 
@@ -526,7 +531,7 @@ BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_start_advertising(gapAdverti
         return BLE_E_START_ADV;
     }
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     PWR_DisallowDeviceToSleep();
 #endif
 
@@ -534,13 +539,13 @@ BLEManagerCommon::ble_err_t BLEManagerCommon::blekw_start_advertising(gapAdverti
                                     CHIP_BLE_KW_EVNT_TIMEOUT);
     if (!(eventBits & CHIP_BLE_KW_EVNT_ADV_CHANGED))
     {
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
         PWR_AllowDeviceToSleep();
 #endif
         return BLE_E_START_ADV_FAILED;
     }
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     PWR_AllowDeviceToSleep();
 #endif
 
@@ -902,10 +907,8 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
     uint8_t deviceId = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is connected with device: %d.\n", deviceId);
 
-#if gClkUseFro32K
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if gClkUseFro32K && defined(chip_with_low_power) && (chip_with_low_power == 1)
     PWR_DisallowDeviceToSleep();
-#endif
 #endif
 
     mDeviceId        = deviceId;
@@ -920,10 +923,8 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
     uint8_t deviceId = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is disconnected with device: %d.\n", deviceId);
 
-#if gClkUseFro32K
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if gClkUseFro32K && defined(chip_with_low_power) && (chip_with_low_power == 1)
     PWR_AllowDeviceToSleep();
-#endif
 #endif
 
     mDeviceConnected = false;
@@ -1158,7 +1159,7 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
 
         /* Notify App Task that the BLE is connected now */
         (void) blekw_msg_add_u8(BLE_KW_MSG_CONNECTED, (uint8_t) deviceId);
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
         PWR_AllowDeviceToSleep();
 #endif
     }
@@ -1169,7 +1170,7 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
         /* Notify App Task that the BLE is disconnected now */
         (void) blekw_msg_add_u8(BLE_KW_MSG_DISCONNECTED, (uint8_t) deviceId);
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
         if (bleAppStopInProgress == TRUE)
         {
             bleAppStopInProgress = FALSE;
@@ -1400,7 +1401,7 @@ bool BLEManagerCommon::blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conI
         ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
         return false;
     }
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     else
     {
         bleAppStopInProgress = TRUE;

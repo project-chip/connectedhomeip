@@ -425,6 +425,7 @@ template("k32w0_sdk") {
 
     if (chip_with_low_power == 1) {
       defines += [
+        "chip_with_low_power=1",
         "cPWR_UsePowerDownMode=1",
         "cPWR_FullPowerDownMode=1",
         "DBG_PostStepTickAssess=0",
