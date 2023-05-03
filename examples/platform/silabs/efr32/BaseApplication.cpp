@@ -76,7 +76,7 @@
 #define SYSTEM_STATE_LED 0
 #endif // ENABLE_WSTK_LEDS
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-#define APP_FUNCTION_BUTTON &sl_button_btn0
+#define APP_FUNCTION_BUTTON 0
 #endif
 
 using namespace chip;
