@@ -373,8 +373,10 @@ target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
 add_dependencies(${COMPONENT_LIB} chip_gn)
 
 if(CONFIG_ENABLE_PW_RPC)
-    set(WRAP_FUNCTIONS esp_log_write)
-    target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
+    set(WRAP_FUNCTIONS esp_log_write esp_log_writev)
+    foreach(func ${WRAP_FUNCTIONS})
+        target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${func}")
+    endforeach()
 endif()
 
 # Build Matter OTA image
