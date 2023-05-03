@@ -1313,6 +1313,12 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000014: {
+                "attributeName": "ProductAppearance",
+                "attributeId": 0x00000014,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -3186,6 +3192,12 @@ class ChipClusters:
                 "attributeName": "UniqueID",
                 "attributeId": 0x00000012,
                 "type": "str",
+                "reportable": True,
+            },
+            0x00000014: {
+                "attributeName": "ProductAppearance",
+                "attributeId": 0x00000014,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {

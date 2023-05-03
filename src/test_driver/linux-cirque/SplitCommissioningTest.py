@@ -17,9 +17,7 @@ limitations under the License.
 
 import logging
 import os
-import pprint
 import sys
-import time
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
@@ -91,8 +89,10 @@ class TestSplitCommissioning(CHIPVirtualHome):
                    if device['type'] == 'MobileDevice']
 
         for server in server_ids:
-            self.execute_device_cmd(server, "CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" -ex run -ex \"bt 25\" --args {} --thread".format(
-                os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app")))
+            self.execute_device_cmd(server,
+                                    ("CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex "
+                                     "\"set pagination off\" -ex run -ex \"bt 25\" --args {} --thread").format(
+                                        os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app")))
 
         self.reset_thread_devices(server_ids)
 
@@ -105,7 +105,8 @@ class TestSplitCommissioning(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_repl-0.0-py3-none-any.whl")))
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 --address1 {} --address2 {} --paa-trust-store-path {}".format(
+        command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
+                   "{} -t 150 --address1 {} --address2 {} --paa-trust-store-path {}").format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/split_commissioning_test.py"),
             ethernet_ips[0], ethernet_ips[1], os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
