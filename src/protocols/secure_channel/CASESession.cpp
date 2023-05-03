@@ -174,10 +174,7 @@ public:
     // No scheduling, no outstanding work, no shared lifetime management.
     CHIP_ERROR DoWork()
     {
-        if (!mSession || !mWorkCallback || !mAfterWorkCallback)
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+        VerifyOrReturnError(mSession && mWorkCallback && mAfterWorkCallback, CHIP_ERROR_INCORRECT_STATE);
         auto * helper   = this;
         bool cancel     = false;
         helper->mStatus = helper->mWorkCallback(helper->mData, cancel);
@@ -192,10 +189,7 @@ public:
     // If lifetime is managed, the helper shares management while work is outstanding.
     CHIP_ERROR ScheduleWork()
     {
-        if (!mSession || !mWorkCallback || !mAfterWorkCallback)
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+        VerifyOrReturnError(mSession && mWorkCallback && mAfterWorkCallback, CHIP_ERROR_INCORRECT_STATE);
         // Hold strong ptr while work is outstanding
         mStrongPtr  = mWeakPtr.lock(); // set in `Create`
         auto status = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(WorkHandler, reinterpret_cast<intptr_t>(this));
@@ -225,24 +219,18 @@ private:
         auto * helper = reinterpret_cast<WorkHelper *>(arg);
         // Hold strong ptr while work is handled
         auto strongPtr(std::move(helper->mStrongPtr));
-        if (!helper->IsCancelled())
+        VerifyOrReturn(!helper->IsCancelled());
+        bool cancel = false;
+        // Execute callback in background thread; data must be OK with this
+        helper->mStatus = helper->mWorkCallback(helper->mData, cancel);
+        VerifyOrReturn(!cancel && !helper->IsCancelled());
+        // Hold strong ptr while work is outstanding
+        helper->mStrongPtr.swap(strongPtr);
+        auto status = DeviceLayer::PlatformMgr().ScheduleWork(AfterWorkHandler, reinterpret_cast<intptr_t>(helper));
+        if (status != CHIP_NO_ERROR)
         {
-            // Not cancelled by `CancelWork`
-            bool cancel = false;
-            // Execute callback in background thread; data must be OK with this
-            helper->mStatus = helper->mWorkCallback(helper->mData, cancel);
-            if (!cancel && !helper->IsCancelled())
-            {
-                // Not cancelled by `mWorkCallback` or `CancelWork`
-                // Hold strong ptr while work is outstanding
-                helper->mStrongPtr.swap(strongPtr);
-                auto status = DeviceLayer::PlatformMgr().ScheduleWork(AfterWorkHandler, reinterpret_cast<intptr_t>(helper));
-                if (status != CHIP_NO_ERROR)
-                {
-                    // Release strong ptr since scheduling failed
-                    helper->mStrongPtr.reset();
-                }
-            }
+            // Release strong ptr since scheduling failed
+            helper->mStrongPtr.reset();
         }
     }
 
