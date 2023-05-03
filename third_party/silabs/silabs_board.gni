@@ -64,6 +64,7 @@ assert(silabs_board != "", "silabs_board must be specified")
 # - BRD4180A / SLWSTK6006A / MG21 Module / 2.4GHz@20dBm
 # - BRD4186A / SLWSTK6006A  / MG24 / Wireless Starter Kit / 2.4GHz@10dBm
 # - BRD4187A / SLWSTK6006A  / MG24 / Wireless Starter Kit / 2.4GHz@20dBm
+# - MGM240P                 / MG24 / SparkFun MGM240P Thing Plus Matter / 2.4GHz@20dBm
 
 board_defines = []
 
@@ -157,6 +158,14 @@ if (silabs_board == "BRD4304A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240PB32VNA"
 
+  # MGM240L do not have an external flash or LCD
+  use_external_flash = false
+  show_qr_code = false
+  disable_lcd = true
+} else if (silabs_board == "MGM240P") {
+  silabs_family = "mgm24"
+  silabs_mcu = "MGM240PB32VNA"
+  
   # Explorer Kits do not have an external flash, buttons nor a LCD
   use_wstk_buttons = false
   use_external_flash = false
@@ -172,7 +181,7 @@ if (silabs_board == "BRD4304A") {
   disable_lcd = true
 } else {
   print(
-      "Please provide a valid value for SILABS_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A, BRD2704A)")
+      "Please provide a valid value for SILABS_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A, BRD2704A? MGM240P)")
   assert(false, "The board ${silabs_board} is unsupported")
 }
 
