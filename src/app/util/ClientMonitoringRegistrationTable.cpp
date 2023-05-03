@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 
+// Disable CM cluster table until update is done
+// https://github.com/project-chip/connectedhomeip/issues/24425
+#if 0
 #include "ClientMonitoringRegistrationTable.h"
 
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -77,3 +80,4 @@ bool ClientMonitoringRegistrationTable::HasValueForFabric(FabricIndex fabric)
 }
 
 } // namespace chip
+#endif
