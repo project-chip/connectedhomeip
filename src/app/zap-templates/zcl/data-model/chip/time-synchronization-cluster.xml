@@ -125,7 +125,7 @@ limitations under the License.
       <access op="invoke" privilege="administer"/>
     </command>
 
-    <command source="client" code="0x01" name="SetTrustedTimeSource" isFabricScoped="true" optional="false">
+    <command source="client" code="0x01" name="SetTrustedTimeSource" isFabricScoped="true" optional="true">
       <description>This command SHALL set TrustedTimeSource.</description>
       <arg name="TrustedTimeSource" type="FabricScopedTrustedTimeSourceStruct" isNullable="true"/>
       <access op="invoke" privilege="administer"/>
