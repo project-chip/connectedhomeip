@@ -59,14 +59,13 @@ CHIP_ERROR FanAttrAccess::ReadPercentCurrent(EndpointId endpoint, AttributeValue
     // Return PercentSetting attribute value for now
     DataModel::Nullable<uint8_t> percentSetting;
     PercentSetting::Get(endpoint, percentSetting);
+    uint8_t ret = 0;
     if (percentSetting.HasValidValue())
     {
-        return aEncoder.Encode(percentSetting.Value());
+        ret = percentSetting.Value();
     }
-    else
-    {
-        return aEncoder.Encode(0);
-    }
+
+    return aEncoder.Encode(ret);
 }
 
 CHIP_ERROR FanAttrAccess::ReadSpeedCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -74,14 +73,13 @@ CHIP_ERROR FanAttrAccess::ReadSpeedCurrent(EndpointId endpoint, AttributeValueEn
     // Return SpeedCurrent attribute value for now
     DataModel::Nullable<uint8_t> speedSetting;
     SpeedSetting::Get(endpoint, speedSetting);
+    uint8_t ret = 0;
     if (speedSetting.HasValidValue())
     {
-        return aEncoder.Encode(speedSetting.Value());
+        ret = speedSetting.Value();
     }
-    else
-    {
-        return aEncoder.Encode(0);
-    }
+
+    return aEncoder.Encode(ret);
 }
 
 FanAttrAccess gAttrAccess;
