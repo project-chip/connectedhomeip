@@ -2943,7 +2943,7 @@ private:
 | Cluster TimeSynchronization                                         | 0x0038 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * SetUtcTime                                                        |   0x00 |
+| * SetUTCTime                                                        |   0x00 |
 | * SetTrustedTimeSource                                              |   0x01 |
 | * SetTimeZone                                                       |   0x02 |
 | * SetDSTOffset                                                      |   0x04 |
@@ -3008,137 +3008,6 @@ public:
 
 private:
     chip::app::Clusters::TimeSynchronization::Commands::SetUTCTime::Type mRequest;
-};
-
-/*
- * Command SetTrustedTimeSource
- */
-class TimeSynchronizationSetTrustedTimeSource : public ClusterCommand
-{
-public:
-    TimeSynchronizationSetTrustedTimeSource(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-trusted-time-source", credsIssuerConfig), mComplex_TrustedTimeSource(&mRequest.trustedTimeSource)
-    {
-        AddArgument("TrustedTimeSource", &mComplex_TrustedTimeSource);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000001) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000038, 0x00000001, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000001) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000038, 0x00000001, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TimeSynchronization::Commands::SetTrustedTimeSource::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::Nullable<
-        chip::app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type>>
-        mComplex_TrustedTimeSource;
-};
-
-/*
- * Command SetTimeZone
- */
-class TimeSynchronizationSetTimeZone : public ClusterCommand
-{
-public:
-    TimeSynchronizationSetTimeZone(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-time-zone", credsIssuerConfig), mComplex_TimeZone(&mRequest.timeZone)
-    {
-        AddArgument("TimeZone", &mComplex_TimeZone);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000002) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000038, 0x00000002, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000002) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000038, 0x00000002, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TimeSynchronization::Commands::SetTimeZone::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
-        mComplex_TimeZone;
-};
-
-/*
- * Command SetDSTOffset
- */
-class TimeSynchronizationSetDSTOffset : public ClusterCommand
-{
-public:
-    TimeSynchronizationSetDSTOffset(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-dstoffset", credsIssuerConfig), mComplex_DSTOffset(&mRequest.DSTOffset)
-    {
-        AddArgument("DSTOffset", &mComplex_DSTOffset);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000004) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000038, 0x00000004, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000004) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000038, 0x00000004, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TimeSynchronization::Commands::SetDSTOffset::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
-        mComplex_DSTOffset;
-};
-
-/*
- * Command SetDefaultNTP
- */
-class TimeSynchronizationSetDefaultNTP : public ClusterCommand
-{
-public:
-    TimeSynchronizationSetDefaultNTP(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-default-ntp", credsIssuerConfig)
-    {
-        AddArgument("DefaultNTP", &mRequest.defaultNTP);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000005) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000038, 0x00000005, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000005) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000038, 0x00000005, mRequest);
-    }
-
-private:
-    chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::Type mRequest;
 };
 
 /*
@@ -11284,7 +11153,7 @@ void registerClusterTimeSynchronization(Commands & commands, CredentialIssuerCom
         // Commands
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig),                      //
-        make_unique<TimeSynchronizationSetUtcTime>(credsIssuerConfig),           //
+        make_unique<TimeSynchronizationSetUTCTime>(credsIssuerConfig),           //
         make_unique<TimeSynchronizationSetTrustedTimeSource>(credsIssuerConfig), //
         make_unique<TimeSynchronizationSetTimeZone>(credsIssuerConfig),          //
         make_unique<TimeSynchronizationSetDSTOffset>(credsIssuerConfig),         //

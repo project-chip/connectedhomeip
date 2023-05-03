@@ -6555,30 +6555,6 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
 /**
- * @brief Time Synchronization Cluster SetTrustedTimeSource Command callback (from client)
- */
-bool emberAfTimeSynchronizationClusterSetTrustedTimeSourceCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetTrustedTimeSource::DecodableType & commandData);
-/**
- * @brief Time Synchronization Cluster SetTimeZone Command callback (from client)
- */
-bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZone::DecodableType & commandData);
-/**
- * @brief Time Synchronization Cluster SetDSTOffset Command callback (from client)
- */
-bool emberAfTimeSynchronizationClusterSetDSTOffsetCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetDSTOffset::DecodableType & commandData);
-/**
- * @brief Time Synchronization Cluster SetDefaultNTP Command callback (from client)
- */
-bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData);
-/**
  * @brief Administrator Commissioning Cluster OpenCommissioningWindow Command callback (from client)
  */
 bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
