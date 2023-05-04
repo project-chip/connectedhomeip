@@ -353,7 +353,7 @@ class TypeLookupContext:
         return any(map(lambda s: s.name == name, self.all_bitmaps))
 
 
-def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType,IdlEnumType,IdlBitmapType]:
+def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType]:
     """
     Given a AST data type and a lookup context, match it to a type that can be later
     be used for generation.

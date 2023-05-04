@@ -18,9 +18,11 @@ from typing import List, MutableMapping, Optional
 
 from matter_idl.matter_idl_types import ClusterSide, Idl, ParseMetaData
 
+
 class MissingIdlError(Exception):
     def __init__(self):
         super().__init__(f"Missing IDL data")
+
 
 @dataclass
 class LocationInFile:
@@ -232,7 +234,8 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
         super(RequiredCommandsRule, self).__init__(name)
 
         # Maps cluster id to mandatory cluster requirement
-        self._mandatory_commands: MutableMapping[int, List[ClusterCommandRequirement]] = {}
+        self._mandatory_commands: MutableMapping[int,
+                                                 List[ClusterCommandRequirement]] = {}
 
     def __repr__(self):
         result = "RequiredCommandsRule{\n"

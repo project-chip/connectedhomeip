@@ -19,14 +19,15 @@ try:
 except ModuleNotFoundError:
     import os
     import sys
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    sys.path.append(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))
 
     from matter_idl.matter_idl_parser import CreateParser
 
 from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage, Bitmap,
-                                  Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint,
-                                  Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, ParseMetaData,
-                                  ServerClusterInstantiation, Struct, StructQuality, StructTag)
+                                         Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint,
+                                         Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, ParseMetaData,
+                                         ServerClusterInstantiation, Struct, StructQuality, StructTag)
 import unittest
 
 

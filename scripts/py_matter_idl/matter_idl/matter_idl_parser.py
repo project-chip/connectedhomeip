@@ -13,14 +13,15 @@ try:
 except ModuleNotFoundError:
     import os
     import sys
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    sys.path.append(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))
 
     from matter_idl.matter_idl_types import AccessPrivilege
 
 from matter_idl.matter_idl_types import (Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                  AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
-                                  DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                  ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
+                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
+                                         DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+                                         ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
