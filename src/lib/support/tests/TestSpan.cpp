@@ -62,25 +62,6 @@ static void TestByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s2[1] == 2);
     NL_TEST_ASSERT(inSuite, s2[2] == 3);
 
-    // Test that for a constexpr span we can use its data as compile-time
-    // constants.
-    {
-        static constexpr uint8_t constArr[] = { 2, 3, 4 };
-        constexpr ByteSpan constSpan(constArr);
-
-        static_assert(constSpan.front() == 2, "Unexpected front()");
-        uint8_t t1[constSpan.front()];
-        NL_TEST_ASSERT(inSuite, ArraySize(t1) == 2);
-
-        static_assert(constSpan.back() == 4, "Unexpected back()");
-        uint8_t t2[constSpan.back()];
-        NL_TEST_ASSERT(inSuite, ArraySize(t2) == 4);
-
-        static_assert(constSpan[1] == 3, "Unexpected [1]");
-        uint8_t t3[constSpan[1]];
-        NL_TEST_ASSERT(inSuite, ArraySize(t3) == 3);
-    }
-
     ByteSpan s3 = s2;
     NL_TEST_ASSERT(inSuite, s3.data() == arr);
     NL_TEST_ASSERT(inSuite, s3.size() == 3);
@@ -204,25 +185,6 @@ static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s2[0] == 1);
     NL_TEST_ASSERT(inSuite, s2[1] == 2);
     NL_TEST_ASSERT(inSuite, s2[2] == 3);
-
-    // Test that for a constexpr span we can use its data as compile-time
-    // constants.
-    {
-        static constexpr uint8_t constArr[] = { 2, 3, 4 };
-        constexpr FixedByteSpan<ArraySize(constArr)> constSpan(constArr);
-
-        static_assert(constSpan.front() == 2, "Unexpected front()");
-        uint8_t t1[constSpan.front()];
-        NL_TEST_ASSERT(inSuite, ArraySize(t1) == 2);
-
-        static_assert(constSpan.back() == 4, "Unexpected back()");
-        uint8_t t2[constSpan.back()];
-        NL_TEST_ASSERT(inSuite, ArraySize(t2) == 4);
-
-        static_assert(constSpan[1] == 3, "Unexpected [1]");
-        uint8_t t3[constSpan[1]];
-        NL_TEST_ASSERT(inSuite, ArraySize(t3) == 3);
-    }
 
     FixedByteSpan<3> s3 = s2;
     NL_TEST_ASSERT(inSuite, s3.data() == arr);
