@@ -62,6 +62,8 @@ qpg_executable("lock_app") {
   ]
 
   deps = [
+    "${chip_root}/third_party/qpg_sdk:qpg_lock_factorydata_lib",
+    "${chip_root}/third_party/qpg_sdk:qpg_lock_firmwaredata_lib",
     ":sdk",
     "${chip_root}/examples/lock-app/qpg/zap/",
     "${chip_root}/examples/providers:device_info_provider",

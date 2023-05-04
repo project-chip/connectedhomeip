@@ -64,6 +64,8 @@ qpg_executable("lighting_app") {
   ]
 
   deps = [
+    "${chip_root}/third_party/qpg_sdk:qpg_light_factorydata_lib",
+    "${chip_root}/third_party/qpg_sdk:qpg_light_firmwaredata_lib",
     ":sdk",
     "${chip_root}/examples/lighting-app/lighting-common:color-format",
     "${chip_root}/examples/lighting-app/qpg/zap/",
