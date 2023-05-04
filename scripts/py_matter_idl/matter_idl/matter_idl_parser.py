@@ -18,9 +18,9 @@ except ModuleNotFoundError:
 
     from matter_idl.matter_idl_types import AccessPrivilege
 
-from matter_idl.matter_idl_types import (Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
-                                         DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+from matter_idl.matter_idl_types import (Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality, AttributeStorage,
+                                         Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
+                                         Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
                                          ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
 
 
