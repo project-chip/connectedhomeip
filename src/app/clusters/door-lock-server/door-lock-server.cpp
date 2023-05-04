@@ -453,6 +453,20 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
         return;
     }
 
+    Commands::GetUserResponse::Type response;
+
+    // appclusters, 5.2.4.36.1: We need to add next occupied user after userIndex if any.
+    //
+    // We want to do this before we call emberAfPluginDoorLockGetUser, because this will
+    // make its own emberAfPluginDoorLockGetUser calls, and a
+    // EmberAfPluginDoorLockUserInfo might be pointing into some application-static
+    // buffers (for its credentials and whatnot).
+    uint16_t nextAvailableUserIndex = 0;
+    if (findOccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
+    {
+        response.nextUserIndex.SetNonNull(nextAvailableUserIndex);
+    }
+
     EmberAfPluginDoorLockUserInfo user;
     if (!emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user))
     {
@@ -461,7 +475,6 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
         return;
     }
 
-    Commands::GetUserResponse::Type response;
     response.userIndex = userIndex;
 
     // appclusters, 5.2.4.36: we should not set user-specific fields to non-null if the user status is set to Available
@@ -498,12 +511,6 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
         emberAfDoorLockClusterPrintln("[GetUser] User not found [userIndex=%d]", userIndex);
     }
 
-    // appclusters, 5.2.4.36.1: We need to add next occupied user after userIndex if any.
-    uint16_t nextAvailableUserIndex = 0;
-    if (findOccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
-    {
-        response.nextUserIndex.SetNonNull(nextAvailableUserIndex);
-    }
     commandObj->AddResponse(commandPath, response);
 }
 
