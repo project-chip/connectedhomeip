@@ -132,7 +132,7 @@ _KNOWN_DECODABLE_TYPES = {
 }
 
 
-def _CppType(field: Field, context: TypeLookupContext) -> Union[str, None]:
+def _CppType(field: Field, context: TypeLookupContext) -> str:
     if field.data_type.name.lower() in _KNOWN_DECODABLE_TYPES:
         return _KNOWN_DECODABLE_TYPES[field.data_type.name.lower()]
 

@@ -88,7 +88,7 @@ class Context:
         # Map of code -> attribute
         self._global_attributes = {}
 
-    def GetCurrentLocationMeta(self) -> ParseMetaData:
+    def GetCurrentLocationMeta(self) -> Optional[ParseMetaData]:
         if not self.locator:
             return None
 
