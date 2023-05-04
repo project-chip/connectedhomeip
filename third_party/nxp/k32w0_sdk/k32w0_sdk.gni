@@ -257,7 +257,6 @@ template("k32w0_sdk") {
     ]
 
     defines = [
-      "gPWR_CpuClk_48MHz=1",
       "gMainThreadPriority_c=5",
       "CPU_JN518X",
       "CPU_JN518X_REV=2",
@@ -335,9 +334,15 @@ template("k32w0_sdk") {
     }
 
     if (use_fro_32k == 1) {
-      defines += [ "gClkUseFro32K=1" ]
+      defines += [
+        "gClkUseFro32K=1",
+        "gPWR_CpuClk_48MHz=0"
+      ]
     } else {
-      defines += [ "gClkUseFro32K=0" ]
+      defines += [
+        "gClkUseFro32K=0",
+        "gPWR_CpuClk_48MHz=1"
+      ]
     }
 
     if (chip_with_pdm_encryption == 1) {
