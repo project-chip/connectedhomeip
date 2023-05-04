@@ -79,8 +79,11 @@ extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 #error "Unknown platform"
 #endif
 
+// variable to identify spi configured for expansion header
+// EUSART configuration available on the SPIDRV
+static bool spi_enabled = false;
+
 extern void rsi_gpio_irq_cb(uint8_t irqnum);
-// #define RS911X_USE_LDMA
 
 /********************************************************
  * @fn   sl_wfx_host_gpio_init(void)
@@ -115,6 +118,8 @@ void sl_wfx_host_gpio_init(void)
     // Change GPIO interrupt priority (FreeRTOS asserts unless this is done here!)
     NVIC_SetPriority(GPIO_EVEN_IRQn, WFX_SPI_NVIC_PRIORITY);
     NVIC_SetPriority(GPIO_ODD_IRQn, WFX_SPI_NVIC_PRIORITY);
+    spi_enabled = true;
+    SILABS_LOG("%s completed.", __func__)
 }
 
 /*****************************************************************
@@ -137,6 +142,7 @@ void sl_wfx_host_reset_chip(void)
 
     // Delay for 3ms
     vTaskDelay(pdMS_TO_TICKS(3));
+    SILABS_LOG("%s completed.", __func__)
 }
 
 /*****************************************************************
@@ -161,75 +167,118 @@ void rsi_hal_board_init(void)
 
     /* Reset of Wifi chip */
     sl_wfx_host_reset_chip();
+    SILABS_LOG("%s completed.", __func__)
 }
 
 #if defined(EFR32MG24)
 sl_status_t sl_wfx_host_spi_cs_assert()
 {
+    SILABS_LOG("%s started.", __func__)
     configASSERT(spi_sem_sync_hdl);
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
+        SILABS_LOG("%s errored.", __func__)
         return SL_STATUS_TIMEOUT;
     }
-    SPIDRV_DeInit(SL_SPIDRV_HANDLE);
-    SPIDRV_Init(SL_SPIDRV_HANDLE, &sl_spidrv_eusart_init_exp);
+    // if (spi_enabled)
+    // {
+    //     SPIDRV_DeInit(SL_SPIDRV_HANDLE);
+    //     SILABS_LOG("%s did deinit.", __func__)
+    //     spi_enabled = false;
+    // }
+    if (!spi_enabled) // Reduce SPIDRV_Init
+    {
+        SPIDRV_Init(SL_SPIDRV_HANDLE, &sl_spidrv_eusart_init_exp);
+        spi_enabled = true;
+    }
     GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
+    SILABS_LOG("%s completed.", __func__)
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_spi_cs_deassert()
 {
+    SILABS_LOG("%s started.", __func__)
+    if (spi_enabled)
+    {
+        SPIDRV_DeInit(SL_SPIDRV_HANDLE);
+        spi_enabled = false;
+    }
     GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
-    SPIDRV_DeInit(SL_SPIDRV_HANDLE);
+    // TODO: should be done by deinit, check once.
     GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = 0;
     xSemaphoreGive(spi_sem_sync_hdl);
+    SILABS_LOG("%s completed.", __func__)
     return SL_STATUS_OK;
 }
 
-void sl_wfx_host_spiflash_cs_assert(void)
+void sl_wfx_host_spiflash_cs_assert()
 {
+    SILABS_LOG("%s started.", __func__)
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    SILABS_LOG("%s completed.", __func__)
 }
 
-void sl_wfx_host_spiflash_cs_deassert(void)
+void sl_wfx_host_spiflash_cs_deassert()
 {
+    SILABS_LOG("%s started.", __func__)
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    SILABS_LOG("%s completed.", __func__)
 }
 
-void sl_wfx_host_pre_bootloader_spi_transfer(void)
+void sl_wfx_host_pre_bootloader_spi_transfer()
 {
+    SILABS_LOG("%s started.", __func__)
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
         return;
     }
+    if (spi_enabled)
+    {
+        SPIDRV_DeInit(SL_SPIDRV_HANDLE);
+        spi_enabled = false;
+    }
     bootloader_init();
+    // bootloader_init takes care of SPIDRV_Init()
     sl_wfx_host_spiflash_cs_assert();
+    SILABS_LOG("%s completed.", __func__)
 }
 
-void sl_wfx_host_post_bootloader_spi_transfer(void)
+void sl_wfx_host_post_bootloader_spi_transfer()
 {
+    SILABS_LOG("%s started.", __func__)
     bootloader_deinit();
     GPIO->USARTROUTE[0].ROUTEEN = 0;
     sl_wfx_host_spiflash_cs_deassert();
     xSemaphoreGive(spi_sem_sync_hdl);
+    SILABS_LOG("%s completed.", __func__)
 }
 
-void sl_wfx_host_pre_lcd_spi_transfer(void)
+void sl_wfx_host_pre_lcd_spi_transfer()
 {
+    SILABS_LOG("%s started.", __func__)
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
         return;
     }
-    SPIDRV_ReInit(SL_BIT_RATE_LCD);
+    if (spi_enabled)
+    {
+        SPIDRV_DeInit(SL_SPIDRV_HANDLE);
+        spi_enabled = false;
+    }
     sl_memlcd_refresh(sl_memlcd_get());
+    // sl_memlcd_refresh takes care of SPIDRV_Init()
+    SILABS_LOG("%s completed.", __func__)
 }
 
-void sl_wfx_host_post_lcd_spi_transfer(void)
+void sl_wfx_host_post_lcd_spi_transfer()
 {
+    SILABS_LOG("%s started.", __func__)
     USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
     GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = 0;
     xSemaphoreGive(spi_sem_sync_hdl);
+    SILABS_LOG("%s completed.", __func__)
 }
 
 #endif /* EFR32MG24 */
@@ -268,12 +317,16 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
  **************************************************************************/
 int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint8_t mode)
 {
+    SILABS_LOG("%s started.", __func__)
 #if defined(EFR32MG24)
     sl_wfx_host_spi_cs_assert();
 #endif /* EFR32MG24 */
-    // at least one buffer needs to be provided
+    /*
+        TODO: tx_buf and rx_buf needs to be replaced with a dummy buffer of length xlen to align with SDK of WiFi
+    */
     if (xlen <= MIN_XLEN || (tx_buf == NULL && rx_buf == NULL))
     {
+        SILABS_LOG("%s error.", __func__)
         return RSI_ERROR_INVALID_PARAM;
     }
 
@@ -331,5 +384,6 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
 #if defined(EFR32MG24)
     sl_wfx_host_spi_cs_deassert();
 #endif /* EFR32MG24 */
+    SILABS_LOG("%s completed.", __func__)
     return rsiError;
 }
