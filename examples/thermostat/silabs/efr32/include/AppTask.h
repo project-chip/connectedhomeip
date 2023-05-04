@@ -35,7 +35,6 @@
 #include "FreeRTOS.h"
 #include "SensorManager.h"
 #include "TemperatureManager.h"
-#include "sl_simple_button_instances.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>

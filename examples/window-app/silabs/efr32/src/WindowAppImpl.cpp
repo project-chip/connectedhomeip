@@ -31,7 +31,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #endif // QR_CODE_ENABLED
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include <sl_simple_button_instances.h>
+#endif
 
 #include <sl_system_kernel.h>
 
@@ -516,8 +518,8 @@ WindowAppImpl::Button::Button(WindowApp::Button::Id id, const char * name) : Win
 
 void WindowAppImpl::OnButtonChange(uint8_t button, uint8_t btnAction)
 {
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     WindowApp::Button * btn = static_cast<Button *>((button == 0) ? sInstance.mButtonUp : sInstance.mButtonDown);
-
     if (btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         btn->Press();
@@ -526,6 +528,7 @@ void WindowAppImpl::OnButtonChange(uint8_t button, uint8_t btnAction)
     {
         btn->Release();
     }
+#endif
 }
 
 // Silabs button callback from button event ISR

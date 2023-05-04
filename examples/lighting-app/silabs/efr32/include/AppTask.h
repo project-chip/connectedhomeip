@@ -30,9 +30,6 @@
 #include "BaseApplication.h"
 #include "FreeRTOS.h"
 #include "LightingManager.h"
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-#include "sl_simple_button_instances.h"
-#endif
 #include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>

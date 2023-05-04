@@ -281,7 +281,6 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         AppTask::GetAppTask().PostEvent(&button_event);
     }
 }
-
 #endif
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
