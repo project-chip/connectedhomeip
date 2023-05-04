@@ -178,6 +178,13 @@ void TestDnssdBrowse_DnssdInitCallback(void * context, CHIP_ERROR error)
                                    &ctx->mBrowseIdentifier) == CHIP_NO_ERROR);
 }
 
+// Verify that platform DNS-SD implementation can browse and resolve services.
+//
+// This test case uses platform-independent mDNS server implementation based on
+// minimal mdns library. The server is configured to respond to PTR, SRV, TXT,
+// A and AAAA queries without additional records. In order to pass this tests,
+// the platform DNS-SD client implementation must be able to browse and resolve
+// services by querying for all of these record separately.
 void TestDnssdBrowse(nlTestSuite * inSuite, void * inContext)
 {
     DnssdContext context;
@@ -277,6 +284,11 @@ static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR
                                    &ctx->mBrowseIdentifier) == CHIP_NO_ERROR);
 }
 
+// Verify that the platform DNS-SD implementation can publish services.
+//
+// This test uses platform implementation of DNS-SD server and client. Since
+// client implementation should be verified by the TestDnssdBrowse test case,
+// here we only verify that the server implementation can publish services.
 void TestDnssdPublishService(nlTestSuite * inSuite, void * inContext)
 {
     DnssdContext context;
