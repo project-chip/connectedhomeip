@@ -1565,6 +1565,7 @@ server cluster TimeSynchronization = 56 {
   readonly attribute TimeZoneDatabaseEnum timeZoneDatabase = 8;
   readonly attribute int8u timeZoneListMaxSize = 10;
   readonly attribute int8u DSTOffsetListMaxSize = 11;
+  readonly attribute boolean supportsDNSResolve = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2496,11 +2497,12 @@ endpoint 0 {
     ram      attribute timeZoneDatabase default = 0;
     ram      attribute timeZoneListMaxSize default = 3;
     ram      attribute DSTOffsetListMaxSize;
+    ram      attribute supportsDNSResolve default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 0x0B;
     ram      attribute clusterRevision default = 1;
   }
 
