@@ -49,7 +49,7 @@ if __name__ == '__main__':
         '--log-level',
         default='INFO',
         show_default=True,
-        type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
         help='Determines the verbosity of script output.')
     @ click.option(
         '--no-print',

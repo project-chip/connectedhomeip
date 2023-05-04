@@ -66,7 +66,7 @@ def AttrsToAttribute(attrs) -> Attribute:
     field = Field(
         data_type=data_type,
         code=ParseInt(attrs['code']),
-        name=None,
+        name=f"field-{attrs['code']}",
         is_list=(attrs['type'].lower() == 'array')
     )
 
