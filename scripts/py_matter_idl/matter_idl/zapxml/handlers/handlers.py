@@ -493,7 +493,7 @@ class ClusterHandler(BaseHandler):
         super().__init__(context)
         self._cluster = Cluster(
             side=ClusterSide.CLIENT,
-            name=f"NAME-MISSING",
+            name="NAME-MISSING",
             code=-1,
             parse_meta=context.GetCurrentLocationMeta()
         )

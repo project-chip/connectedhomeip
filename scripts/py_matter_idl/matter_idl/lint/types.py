@@ -21,7 +21,7 @@ from matter_idl.matter_idl_types import ClusterSide, Idl, ParseMetaData
 
 class MissingIdlError(Exception):
     def __init__(self):
-        super().__init__(f"Missing IDL data")
+        super().__init__("Missing IDL data")
 
 
 @dataclass
