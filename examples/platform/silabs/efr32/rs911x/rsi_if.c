@@ -441,6 +441,7 @@ static void wfx_rsi_save_ap_info() // translation
         wfx_rsi.ap_chan      = scan_results_array->res[0].channel_no;
         memcpy(&wfx_rsi.ap_mac.octet[0], &scan_results_array->res[0].bssid[0], BSSID_MAX_STR_LEN);
     }
+    //for (int i = 0; i < scan_results_array->num; i++) {
     switch (scan_results_array->res[0].security_mode)
     {
     case SME_OPEN:
@@ -467,6 +468,7 @@ static void wfx_rsi_save_ap_info() // translation
         wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
         break;
     }
+  //  }
 
     SILABS_LOG("%s: WLAN: connecting to %s==%s, sec=%d, status=%02x", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
                wfx_rsi.sec.security, status);
@@ -490,6 +492,8 @@ static void wfx_rsi_do_join(void)
     }
     else
     {
+
+      //  for (int i = 0; i < scan_results_array->num; i++) {
         switch (wfx_rsi.sec.security)
         {
         case WFX_SEC_WEP:
@@ -499,11 +503,11 @@ static void wfx_rsi_do_join(void)
             connect_security_mode = RSI_WPA_WPA2_MIXED;
             break;
         case WFX_SEC_WPA2:
-#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
-            connect_security_mode = RSI_WPA3_TRANSITION;
-#else
-            connect_security_mode = RSI_WPA_WPA2_MIXED;
-#endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
+//#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
+     //       connect_security_mode = RSI_WPA3_TRANSITION;
+//#else
+            connect_security_mode = RSI_WPA2;
+//#endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
             break;
 #ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
         case WFX_SEC_WPA3:
@@ -517,8 +521,9 @@ static void wfx_rsi_do_join(void)
             SILABS_LOG("%s: error: unknown security type.", __func__);
             return;
         }
+        }
 
-
+        //connect_security_mode = 2;
         SILABS_LOG("%s: WLAN: connecting to %s==%s, sec=%d", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
                  connect_security_mode);
 
@@ -543,13 +548,14 @@ static void wfx_rsi_do_join(void)
             /* Call rsi connect call with given ssid and password
              * And check there is a success
              */
+            
             if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.sec.ssid[0], connect_security_mode, &wfx_rsi.sec.passkey[0],
                                                  wfx_rsi_join_cb)) != RSI_SUCCESS)
             {
 
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
                 SILABS_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status, wfx_rsi.join_retries);
-
+         
                 wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries);
                 wfx_rsi.join_retries++;
             }
