@@ -18,6 +18,7 @@
 
 #include "NamedPipeCommands.h"
 
+#include <errno.h>
 #include <fcntl.h>
 #include <lib/support/CodeUtils.h>
 #include <pthread.h>
