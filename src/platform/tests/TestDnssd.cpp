@@ -182,9 +182,9 @@ void TestDnssdBrowse_DnssdInitCallback(void * context, CHIP_ERROR error)
 //
 // This test case uses platform-independent mDNS server implementation based on
 // minimal mdns library. The server is configured to respond to PTR, SRV, TXT,
-// A and AAAA queries without additional records. In order to pass this tests,
+// A and AAAA queries without additional records. In order to pass this test,
 // the platform DNS-SD client implementation must be able to browse and resolve
-// services by querying for all of these record separately.
+// services by querying for all of these records separately.
 void TestDnssdBrowse(nlTestSuite * inSuite, void * inContext)
 {
     DnssdContext context;
