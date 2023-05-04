@@ -37,7 +37,7 @@ use one of the following options:
 
     Documentation on how to build and use the lighting-app Matter Accessory
     Device is provided in this
-    [README.md](../../../examples/lighting-app/efr32/README.md)
+    [README.md](../../../examples/lighting-app/silabs/efr32/README.md)
 
     Please note that you only need to build a single device for the demo such as
     the lighting-app. If you wish to build other examples such as the sleepy end
