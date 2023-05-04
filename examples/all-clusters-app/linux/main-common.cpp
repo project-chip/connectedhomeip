@@ -173,7 +173,6 @@ namespace {
     };
     Clusters::ModeSelect::RvcRunDelegate RvcRunDelegate(rvcRunOptions);
     Clusters::ModeSelect::Instance rvcRunInstance(0x1, 0x54, &RvcRunDelegate);
-
 }
 
 void ApplicationInit()

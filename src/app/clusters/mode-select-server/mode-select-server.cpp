@@ -182,37 +182,28 @@ EmberAfStatus Instance::SetStartUpModeNull() const
                                  ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-std::map<uint32_t, Instance*> Instance::OnOffEnabledInstanceMap;
+std::map<uint32_t, Instance*> Instance::ModeSelectAliasesInstanceMap;
 
 CHIP_ERROR Instance::Init()
 {
     // Check that the cluster ID given is a valid mode select alias cluster ID.
-    bool isAModeSelectCluster = false;
-    for (uint32_t aliasedClusterId : AliasedClusters)
+    if (!std::any_of(AliasedClusters.begin(), AliasedClusters.end(), [this](ClusterId i){return i == clusterId;}))
     {
-        if (clusterId == aliasedClusterId)
-        {
-            isAModeSelectCluster = true;
-            break;
-        }
-    }
-    if (!isAModeSelectCluster)
-    {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster ID given is not a mode select alias.");
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster with ID %u is not a mode select alias.", clusterId);
         return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
     }
 
-    // todo do we need to check if the cluster has been selected in zap?
+    // Check if the cluster has been selected in zap
+    if (!emberAfContainsServer(endpointId, clusterId)) {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster with ID %u was not enabled in zap.", clusterId);
+        return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
+    }
+
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(msDelegate->Init());
 
-    // If this cluster instance has the on off feature enabled, add it to the map
-    // of mode select clusters to be modified by the OnOff cluster.
-    if (HasFeature(ModeSelectFeature::kDeponoff))
-    {
-        OnOffEnabledInstanceMap[clusterId] = this;
-    }
+    ModeSelectAliasesInstanceMap[clusterId] = this;
 
     // StartUp behavior relies on CurrentMode StartUpMode attributes being non-volatile.
     if (!emberAfIsKnownVolatileAttribute(endpointId, clusterId, Attributes::CurrentMode::Id) &&
@@ -228,7 +219,6 @@ CHIP_ERROR Instance::Init()
         EmberAfStatus status = GetStartUpMode(startUpMode);
         if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpMode.IsNull())
         {
-            // todo use the feature map to determine if the mode select instance depends on the on/off cluster.
 #ifdef EMBER_AF_PLUGIN_ON_OFF
             // OnMode with Power Up
             // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
@@ -236,7 +226,8 @@ CHIP_ERROR Instance::Init()
             // value when the server is supplied with power, except if the OnMode attribute is null.
             if (emberAfContainsServer(endpointId, OnOff::Id) &&
                 emberAfContainsAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-                emberAfContainsAttribute(endpointId, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
+                emberAfContainsAttribute(endpointId, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id) &&
+                HasFeature(ModeSelectFeature::kDeponoff))
             {
                 DataModel::Nullable<uint8_t> onMode;
                 bool onOffValueForStartUp = false;

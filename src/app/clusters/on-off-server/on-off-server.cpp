@@ -225,14 +225,18 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
 #endif
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT
         // If OnMode is not a null value, then change the current mode to it.
-        for (const auto& element : ModeSelect::Instance::OnOffEnabledInstanceMap)
+        for (const auto& element : ModeSelect::Instance::ModeSelectAliasesInstanceMap)
         {
-            ModeSelect::Instance *modeSelectInstance = element.second;
-            ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
-            if (modeSelectInstance->GetOnMode(onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
+            auto modeSelectAlias = element.second;
+            if (modeSelectAlias->HasFeature(ModeSelect::ModeSelectFeature::kDeponoff))
             {
-                emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
-                status = modeSelectInstance->SetCurrentMode(onMode.Value());
+                ModeSelect::Instance *modeSelectInstance = element.second;
+                ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
+                if (modeSelectInstance->GetOnMode(onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
+                {
+                    emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
+                    status = modeSelectInstance->SetCurrentMode(onMode.Value());
+                }
             }
         }
 #endif
