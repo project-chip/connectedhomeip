@@ -49,12 +49,14 @@
 
 #include <lib/support/CodeUtils.h>
 
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #include <platform/CHIPDeviceLayer.h>
 #define SYSTEM_STATE_LED 0
 #define LOCK_STATE_LED 1
 
-#define APP_FUNCTION_BUTTON &sl_button_btn0
-#define APP_LOCK_SWITCH &sl_button_btn1
+#define APP_FUNCTION_BUTTON 0
+#define APP_LOCK_SWITCH 1
 
 using chip::app::Clusters::DoorLock::DlLockState;
 using chip::app::Clusters::DoorLock::OperationErrorEnum;
@@ -140,6 +142,8 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Lock-App", true);
@@ -355,23 +359,18 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
-    if (buttonHandle == NULL)
-    {
-        return;
-    }
-
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_LOCK_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    if (button == APP_LOCK_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         button_event.Handler = LockActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (buttonHandle == APP_FUNCTION_BUTTON)
+    else if (button == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);

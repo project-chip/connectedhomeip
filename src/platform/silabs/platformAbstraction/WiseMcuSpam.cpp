@@ -18,6 +18,8 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #include "init_ccpPlatform.h"
+#include <FreeRTOS.h>
+#include <task.h>
 
 // TODO add includes ?
 extern "C" void RSI_Board_LED_Set(int, bool);
@@ -28,10 +30,13 @@ namespace DeviceLayer {
 namespace Silabs {
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
+SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
+    mButtonCallback = nullptr;
     init_ccpPlatform();
+    return CHIP_NO_ERROR;
 }
 
 #ifdef ENABLE_WSTK_LEDS
@@ -61,6 +66,23 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
+
+void SilabsPlatform::StartScheduler()
+{
+    vTaskStartScheduler();
+}
+
+extern "C" {
+void sl_button_on_change(uint8_t btn, uint8_t btnAction)
+{
+    if (Silabs::GetPlatform().mButtonCallback == nullptr)
+    {
+        return;
+    }
+
+    Silabs::GetPlatform().mButtonCallback(btn, btnAction);
+}
+}
 
 } // namespace Silabs
 } // namespace DeviceLayer

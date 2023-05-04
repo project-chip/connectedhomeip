@@ -172,7 +172,7 @@ client cluster Scenes = 5 {
   }
 
   response struct AddSceneResponse = 0 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -183,7 +183,7 @@ client cluster Scenes = 5 {
   }
 
   response struct ViewSceneResponse = 1 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
@@ -197,7 +197,7 @@ client cluster Scenes = 5 {
   }
 
   response struct RemoveSceneResponse = 2 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -207,7 +207,7 @@ client cluster Scenes = 5 {
   }
 
   response struct RemoveAllScenesResponse = 3 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
   }
 
@@ -217,7 +217,7 @@ client cluster Scenes = 5 {
   }
 
   response struct StoreSceneResponse = 4 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -233,7 +233,7 @@ client cluster Scenes = 5 {
   }
 
   response struct GetSceneMembershipResponse = 6 {
-    ENUM8 status = 0;
+    status status = 0;
     nullable INT8U capacity = 1;
     group_id groupID = 2;
     optional INT8U sceneList[] = 3;
@@ -248,7 +248,7 @@ client cluster Scenes = 5 {
   }
 
   response struct EnhancedAddSceneResponse = 64 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -259,7 +259,7 @@ client cluster Scenes = 5 {
   }
 
   response struct EnhancedViewSceneResponse = 65 {
-    ENUM8 status = 0;
+    status status = 0;
     group_Id groupID = 1;
     INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
@@ -276,7 +276,7 @@ client cluster Scenes = 5 {
   }
 
   response struct CopySceneResponse = 66 {
-    ENUM8 status = 0;
+    status status = 0;
     group_Id groupIdentifierFrom = 1;
     INT8U sceneIdentifierFrom = 2;
   }
@@ -4970,43 +4970,6 @@ client cluster ElectricalMeasurement = 2820 {
   command GetMeasurementProfileCommand(GetMeasurementProfileCommandRequest): DefaultSuccess = 1;
 }
 
-/** Client Monitoring allows for ensuring that listed clients meet the required monitoring conditions on the server. */
-client cluster ClientMonitoring = 4166 {
-  fabric_scoped struct MonitoringRegistration {
-    node_id clientNodeId = 1;
-    int64u ICid = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  readonly attribute int32u idleModeInterval = 0;
-  readonly attribute int32u activeModeInterval = 1;
-  readonly attribute int16u activeModeThreshold = 2;
-  readonly attribute MonitoringRegistration expectedClients[] = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct RegisterClientMonitoringRequest {
-    node_id clientNodeId = 0;
-    INT64U ICid = 1;
-  }
-
-  request struct UnregisterClientMonitoringRequest {
-    node_id clientNodeId = 0;
-    INT64U ICid = 1;
-  }
-
-  /** Register a client to the end device */
-  command access(invoke: manage) RegisterClientMonitoring(RegisterClientMonitoringRequest): DefaultSuccess = 0;
-  /** Unregister a client from an end device */
-  command access(invoke: manage) UnregisterClientMonitoring(UnregisterClientMonitoringRequest): DefaultSuccess = 1;
-  /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
-  command access(invoke: manage) StayAwakeRequest(): DefaultSuccess = 2;
-}
-
 /** The Test Cluster is meant to validate the generated code */
 client cluster UnitTesting = 4294048773 {
   enum SimpleEnum : ENUM8 {
@@ -5519,7 +5482,6 @@ endpoint 1 {
   binding cluster ApplicationBasic;
   binding cluster AccountLogin;
   binding cluster ElectricalMeasurement;
-  binding cluster ClientMonitoring;
   binding cluster UnitTesting;
 }
 

@@ -81,7 +81,7 @@ public:
      * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
-    void ButtonEventHandler(uint8_t button, uint8_t btnAction);
+    static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
     /**
      * @brief Callback called by the identify-server when an identify command is received
