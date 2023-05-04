@@ -182,9 +182,11 @@ EmberAfStatus Instance::SetStartUpModeNull() const
                                  ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
+std::map<uint32_t, Instance*> Instance::OnOffEnabledInstanceMap;
+
 CHIP_ERROR Instance::Init()
 {
-    // Check that the cluster ID given is a valid mode select cluster ID.
+    // Check that the cluster ID given is a valid mode select alias cluster ID.
     bool isAModeSelectCluster = false;
     for (uint32_t aliasedClusterId : AliasedClusters)
     {
@@ -204,6 +206,13 @@ CHIP_ERROR Instance::Init()
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(msDelegate->Init());
+
+    // If this cluster instance has the on off feature enabled, add it to the map
+    // of mode select clusters to be modified by the OnOff cluster.
+    if (HasFeature(ModeSelectFeature::kDeponoff))
+    {
+        OnOffEnabledInstanceMap[clusterId] = this;
+    }
 
     // StartUp behavior relies on CurrentMode StartUpMode attributes being non-volatile.
     if (!emberAfIsKnownVolatileAttribute(endpointId, clusterId, Attributes::CurrentMode::Id) &&
@@ -487,12 +496,3 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
 } // namespace app
 } // namespace chip
 
-void MatterModeSelectPluginServerInitCallback()
-{
-    // Nothing to do, the server init routine will be done in Instance::Init()
-}
-
-void MatterRvcRunPluginServerInitCallback()
-{
-    // Nothing to do, the server init routine will be done in Instance::Init()
-}

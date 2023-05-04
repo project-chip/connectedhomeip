@@ -2202,6 +2202,25 @@ server cluster BooleanState = 69 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 server cluster ModeSelect = 80 {
+  enum ChangeToModeResponseStatus : ENUM8 {
+    kSuccess = 0;
+    kUnsupportedMode = 1;
+    kGenericFailure = 2;
+  }
+
+  enum CommonSemanticTags : ENUM16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
+  }
+
   bitmap ModeSelectFeature : BITMAP32 {
     kDeponoff = 0x1;
     kExt = 0x2;
@@ -2218,7 +2237,7 @@ server cluster ModeSelect = 80 {
     SemanticTagStruct semanticTags[] = 2;
   }
 
-  readonly attribute char_string<32> description = 0;
+  readonly attribute char_string<64> description = 0;
   readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
@@ -2237,6 +2256,51 @@ server cluster ModeSelect = 80 {
   }
 
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+}
+
+/** This cluster is an alias of the Mode Select cluster which also defines a namespace for the running modes of the Robotic Vacuum Cleaner devices. */
+server cluster RvcRun = 84 {
+  enum RRChangeToModeResponseStatus : ENUM8 {
+    kBatteryLow = 64;
+    kRobotStuck = 65;
+    kBinMissing = 66;
+    kBinFull = 67;
+    kWaterTankMissing = 68;
+    kWaterTankLidOpen = 69;
+    kCleaningPadMissing = 70;
+  }
+
+  enum RRSemanticTags : ENUM16 {
+    kIdle = 16384;
+    kCleaning = 16385;
+  }
+
+  bitmap RRFeature : BITMAP32 {
+    kDeponoff = 0x1;
+    kExt = 0x2;
+  }
+
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    SemanticTagStruct semanticTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** An interface to a generic way to secure a door */
@@ -5075,9 +5139,22 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
     ram      attribute manufacturerExtension default = 255;
+  }
+
+  server cluster RvcRun {
+    ram      attribute description;
+    ram      attribute standardNamespace;
+    callback attribute supportedModes;
+    ram      attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster DoorLock {

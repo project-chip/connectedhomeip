@@ -1,5 +1,5 @@
 {
-  "featureLevel": 95,
+  "featureLevel": 96,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -12723,6 +12723,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "ChangeToModeWithStatus",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -12751,6 +12759,16 @@
           "define": "MODE_SELECT_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "commands": [
+            {
+              "name": "ChangeToModeResponse",
+              "code": 2,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "Description",
@@ -12906,7 +12924,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "3",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -12959,8 +12977,16 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "ChangeToModeWithStatus",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -13005,6 +13031,16 @@
           "define": "RVC_RUN_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "commands": [
+            {
+              "name": "ChangeToModeResponse",
+              "code": 2,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "Description",
@@ -13016,7 +13052,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "Robot run modes",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -13032,7 +13068,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -13045,10 +13081,10 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -13061,10 +13097,10 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -13076,11 +13112,11 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 0,
-              "storageOption": "RAM",
+              "included": 1,
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -13092,11 +13128,11 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 0,
-              "storageOption": "RAM",
+              "included": 1,
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -13109,7 +13145,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -13125,7 +13161,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -13140,8 +13176,8 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 1,
-              "storageOption": "RAM",
+              "included": 0,
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -13157,7 +13193,7 @@
               "side": "server",
               "type": "array",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",

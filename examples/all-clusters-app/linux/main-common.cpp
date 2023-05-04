@@ -231,9 +231,7 @@ void ApplicationInit()
     }
 
     modeSelectInstance.Init();
-    modeSelectInstance.SetFeatureMap(3);
     rvcRunInstance.Init();
-    rvcRunInstance.SetFeatureMap(3);
 
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 

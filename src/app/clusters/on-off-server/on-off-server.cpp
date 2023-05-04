@@ -36,6 +36,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <app/InteractionModelEngine.h>
+
+#include <app/clusters/mode-select-server/mode-select-server.h>
+
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
@@ -221,14 +225,14 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
 #endif
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT
         // If OnMode is not a null value, then change the current mode to it.
-        if (emberAfContainsServer(endpoint, ModeSelect::Id) &&
-            emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
+        for (const auto& element : ModeSelect::Instance::OnOffEnabledInstanceMap)
         {
+            ModeSelect::Instance *modeSelectInstance = element.second;
             ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
-            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
+            if (modeSelectInstance->GetOnMode(onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
             {
                 emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
-                status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
+                status = modeSelectInstance->SetCurrentMode(onMode.Value());
             }
         }
 #endif
