@@ -40,6 +40,7 @@
 #include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
 
 #include "PosixConfig.h"
+#include "SystemInfo.h"
 #include "platform/internal/GenericPlatformManagerImpl.h"
 #include "platform/internal/GenericPlatformManagerImpl.ipp"
 #include "platform/internal/GenericPlatformManagerImpl_POSIX.h"
@@ -118,6 +119,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+    Internal::PlatformVersion version;
+    ReturnErrorOnFailure(Internal::SystemInfo::GetPlatformVersion(version));
+    ChipLogProgress(DeviceLayer, "Tizen Version: %d.%d", version.mMajor, version.mMinor);
 
     return CHIP_NO_ERROR;
 }

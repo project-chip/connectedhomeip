@@ -70,10 +70,10 @@ silabs_executable("lock_app") {
   defines = []
 
   sources = [
+    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/LockManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
   ]
 
   if (chip_build_libshell) {

@@ -114,7 +114,7 @@ public:
 
     friend class FabricTable;
 
-protected:
+private:
     struct InitParams
     {
         NodeId nodeId                         = kUndefinedNodeId;
@@ -1098,7 +1098,7 @@ private:
      */
     const FabricInfo * GetShadowPendingFabricEntry() const { return HasPendingFabricUpdate() ? &mPendingFabric : nullptr; }
 
-    // Returns true if we have a shadow entry pending for a fabruc update.
+    // Returns true if we have a shadow entry pending for a fabric update.
     bool HasPendingFabricUpdate() const
     {
         return mPendingFabric.IsInitialized() &&
