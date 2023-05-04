@@ -102,6 +102,19 @@ class TlvReader(bytes: ByteArray) : Iterable<Element> {
   }
 
   /**
+   * Reads the next element from the TLV. Unlike nextElement() this method leaves the TLV reader
+   * positioned at the same element and doesn't advance it to the next element.
+   *
+   * @throws TlvParsingException if the TLV data was invalid
+   */
+  fun peekElement(): Element {
+    val currentIndex = index
+    val element = nextElement()
+    index = currentIndex
+    return element
+  }
+
+  /**
    * Reads the encoded Long value and advances to the next element.
    *
    * @throws TlvParsingException if the element is not of the expected type or tag

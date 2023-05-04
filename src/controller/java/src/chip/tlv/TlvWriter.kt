@@ -47,11 +47,13 @@ class TlvWriter(initialCapacity: Int = 32) {
         "Invalid use of context tag at index ${bytes.size()}: can only be used within a " +
           "structure or a list"
       }
-    }
-
-    if (containerDepth > 0 && containerType[containerDepth - 1] is ArrayType) {
+    } else if (containerType[containerDepth - 1] is ArrayType) {
       require(tag is AnonymousTag) {
         "Invalid element tag at index ${bytes.size()}: elements of an array SHALL be anonymous"
+      }
+    } else if (containerType[containerDepth - 1] is StructureType && type !is EndOfContainerType) {
+      require(tag !is AnonymousTag) {
+        "Invalid element tag at index ${bytes.size()}: elements of a structure cannot be anonymous"
       }
     }
 
@@ -326,6 +328,62 @@ class TlvWriter(initialCapacity: Int = 32) {
     return put(Element(AnonymousTag, EndOfContainerValue))
   }
 
+  /**
+   * Copies a TLV element from a reader object into the writer.
+   *
+   * This method encodes a new TLV element whose type, tag and value are taken from a TlvReader
+   * object. When the method is called, the supplied reader object is expected to be positioned on
+   * the source TLV element. The newly encoded element will have the same type, tag and contents as
+   * the input container. If the supplied element is a TLV container (structure, array or list), the
+   * entire contents of the container will be copied.
+   *
+   * @param reader a TlvReader object positioned at a Tlv element whose tag, type and value should
+   *   be copied. If this method is executed successfully, the reader will be positioned at the end
+   *   of the element that was copied.
+   */
+  fun copyElement(reader: TlvReader): TlvWriter {
+    return copyElement(reader.peekElement().tag, reader)
+  }
+
+  /**
+   * Copies a TLV element from a reader object into the writer.
+   *
+   * This method encodes a new TLV element whose type and value are taken from a TLVReader object.
+   * When the method is called, the supplied reader object is expected to be positioned on the
+   * source TLV element. The newly encoded element will have the same type and contents as the input
+   * container, however the tag will be set to the specified argument. If the supplied element is a
+   * TLV container (structure, array or list), the entire contents of the container will be copied.
+   *
+   * @param tag the TLV tag to be encoded with the element.
+   * @param reader a TlvReader object positioned at a Tlv element whose type and value should be
+   *   copied. If this method is executed successfully, the reader will be positioned at the end of
+   *   the element that was copied.
+   */
+  fun copyElement(tag: Tag, reader: TlvReader): TlvWriter {
+    var depth = 0
+    do {
+      val element = reader.nextElement()
+      val value = element.value
+
+      when (depth) {
+        0 -> {
+          require(value !is EndOfContainerValue) {
+            "The TlvReader is positioned at invalid element: EndOfContainer"
+          }
+          put(Element(tag, value))
+        }
+        else -> put(element)
+      }
+
+      if (value is EndOfContainerValue) {
+        depth--
+      } else if (value is StructureValue || value is ArrayValue || value is ListValue) {
+        depth++
+      }
+    } while (depth > 0)
+    return this
+  }
+
   /** Returns the total number of bytes written since the writer was initialized. */
   fun getLengthWritten(): Int {
     return bytes.size()
@@ -334,9 +392,7 @@ class TlvWriter(initialCapacity: Int = 32) {
   /** Verifies that all open containers are closed. */
   fun validateTlv(): TlvWriter {
     if (containerDepth > 0) {
-      throw TlvEncodingException(
-        "Invalid Tlv data at index ${bytes.size()}: $containerDepth containers are not closed"
-      )
+      throw TlvEncodingException("Invalid Tlv data: $containerDepth containers are not closed")
     }
     return this
   }
