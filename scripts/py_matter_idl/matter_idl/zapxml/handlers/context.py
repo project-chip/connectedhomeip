@@ -39,7 +39,7 @@ class ProcessingPath:
     and in general to report things like 'this path found but was not handled'.
     """
 
-    def __init__(self, paths: List[str] = None):
+    def __init__(self, paths: Optional[List[str]] = None):
         if paths is None:
             paths = []
         self.paths = paths

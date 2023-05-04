@@ -41,6 +41,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         # Context persists across all
         self._context = Context()
         self._include_meta_data = include_meta_data
+        self._locator = None
 
     def PrepareParsing(self, filename):
         # This is a bit ugly: filename keeps changing during parse
@@ -56,7 +57,7 @@ class ParseHandler(xml.sax.handler.ContentHandler):
         return self._idl
 
     def startDocument(self):
-        if self._include_meta_data:
+        if self._include_meta_data and self._locator:
             self._context.locator = self._locator
         self._processing_stack = [ZapXmlHandler(self._context, self._idl)]
 

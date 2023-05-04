@@ -14,16 +14,21 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import List, Mapping, Optional
+from typing import List, MutableMapping, Optional
 
 from matter_idl.matter_idl_types import ClusterSide, Idl, ParseMetaData
+
+
+class MissingIdlError(Exception):
+    def __init__(self):
+        super().__init__("Missing IDL data")
 
 
 @dataclass
 class LocationInFile:
     file_name: str
-    line: int
-    column: int
+    line: Optional[int]
+    column: Optional[int]
 
     def __init__(self, file_name: str, meta: ParseMetaData):
         self.file_name = file_name
@@ -91,7 +96,7 @@ class ErrorAccumulatingRule(LintRule):
 
     def _ParseLocation(self, meta: Optional[ParseMetaData]) -> Optional[LocationInFile]:
         """Create a location in the current file that is being parsed. """
-        if not meta or not self._idl.parse_file_name:
+        if not meta or not self._idl or not self._idl.parse_file_name:
             return None
         return LocationInFile(self._idl.parse_file_name, meta)
 
@@ -145,6 +150,9 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
 
         On error returns None and _lint_errors is updated internlly
         """
+        if not self._idl:
+            raise MissingIdlError()
+
         cluster_definition = [
             c for c in self._idl.clusters if c.name == name and c.side == ClusterSide.SERVER
         ]
@@ -161,6 +169,9 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         return cluster_definition[0]
 
     def _LintImpl(self):
+        if not self._idl:
+            raise MissingIdlError()
+
         for endpoint in self._idl.endpoints:
 
             cluster_codes = set()
@@ -223,8 +234,8 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
         super(RequiredCommandsRule, self).__init__(name)
 
         # Maps cluster id to mandatory cluster requirement
-        self._mandatory_commands: Mapping[int,
-                                          List[ClusterCommandRequirement]] = {}
+        self._mandatory_commands: MutableMapping[int,
+                                                 List[ClusterCommandRequirement]] = {}
 
     def __repr__(self):
         result = "RequiredCommandsRule{\n"
@@ -248,6 +259,9 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
             self._mandatory_commands[cmd.cluster_code] = [cmd]
 
     def _LintImpl(self):
+        if not self._idl:
+            raise MissingIdlError()
+
         for cluster in self._idl.clusters:
             if cluster.side != ClusterSide.SERVER:
                 continue  # only validate server-side:

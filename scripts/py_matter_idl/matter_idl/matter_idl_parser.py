@@ -9,19 +9,19 @@ from lark.lexer import Token
 from lark.visitors import Transformer, v_args
 
 try:
-    from .matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                   AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
-                                   DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                   ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
-except ImportError:
+    from matter_idl.matter_idl_types import AccessPrivilege
+except ModuleNotFoundError:
     import os
     import sys
-    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+    sys.path.append(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))
 
-    from matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                  AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
-                                  DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                  ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
+    from matter_idl.matter_idl_types import AccessPrivilege
+
+from matter_idl.matter_idl_types import (Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality, AttributeStorage,
+                                         Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
+                                         Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+                                         ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
@@ -48,7 +48,8 @@ class PrefixCppDocComment:
         # A doc comment will apply to any supported element assuming it immediately
         # preceeds id (skipping whitespace)
         for item in self.supported_types(idl):
-            if item.parse_meta and item.parse_meta.start_pos == actual_pos:
+            meta = item.parse_meta
+            if meta and meta.start_pos == actual_pos:
                 item.description = self.value
                 return
 
@@ -555,7 +556,7 @@ if __name__ == '__main__':
     @click.option(
         '--log-level',
         default='INFO',
-        type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
         help='Determines the verbosity of script output.')
     @click.argument('filename')
     def main(log_level, filename=None):
