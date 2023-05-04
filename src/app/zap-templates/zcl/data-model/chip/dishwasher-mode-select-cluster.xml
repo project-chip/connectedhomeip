@@ -17,35 +17,21 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="ChangeToModeResponseStatus" type="ENUM8">
-    <cluster code="0x0050"/>
-    <item value="0x0" name="Success"/>
-    <item value="0x1" name="UnsupportedMode"/>
-    <item value="0x2" name="GenericFailure"/>
-  </enum>
-
-  <enum name="SemanticTags" type="ENUM16">
-    <cluster code="0x0050"/>
-    <item value="0x0" name="Auto"/>
-    <item value="0x1" name="Quick"/>
-    <item value="0x2" name="Quiet"/>
-    <item value="0x3" name="LowNoise"/>
-    <item value="0x4" name="LowEnergy"/>
-    <item value="0x5" name="Vacation"/>
-    <item value="0x6" name="Min"/>
-    <item value="0x7" name="Max"/>
-    <item value="0x8" name="Night"/>
-    <item value="0x9" name="Day"/>
+  <enum name="CommonSemanticTags" type="ENUM16">
+    <cluster code="0x0059"/>
+    <item value="0x4000" name="Normal"/>
+    <item value="0x4001" name="Heavy"/>
+    <item value="0x4002" name="Light"/>
   </enum>
 
   <struct name="SemanticTagStruct">
-    <cluster code="0x0050"/>
+    <cluster code="0x0059"/>
     <item name="MfgCode" type="vendor_id" optional="false"/>
     <item name="Value" type="ENUM16" optional="false"/>
   </struct>
 
   <struct name="ModeOptionStruct">
-    <cluster code="0x0050"/>
+    <cluster code="0x0059"/>
     <item name="Label" type="CHAR_STRING" optional="false" length="64"/>
     <item name="Mode" type="INT8U" optional="false"/>
     <item name="SemanticTags" type="SemanticTagStruct" array="true" optional="false"/>
@@ -53,12 +39,13 @@ limitations under the License.
 
   <cluster>
     <domain>General</domain>
-    <name>Mode Select</name>
-    <code>0x0050</code>
-    <define>MODE_SELECT_CLUSTER</define>
+    <name>Dishwasher Mode Select</name>
+    <code>0x0059</code>
+    <define>DISHWASHER_MODE_SELECT</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <description>Attributes and commands for selecting a mode from a list of supported options.</description>
+    <description>This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for dishwasher devices.</description>
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false" isNullable="false" length="64">Description</attribute>
     <attribute side="server" code="0x0001" define="STANDARD_NAMESPACE" type="ENUM16"                                        writable="false" optional="false"  isNullable="true">StandardNamespace</attribute>
@@ -96,7 +83,7 @@ limitations under the License.
   </cluster>
 
   <bitmap name="ModeSelectFeature" type="BITMAP32">
-    <cluster code="0x0050"/>
+    <cluster code="0x0059"/>
     <field name="DEPONOFF" mask="0x1"/>
     <field name="EXT" mask="0x2"/>
   </bitmap>

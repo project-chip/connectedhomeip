@@ -114,10 +114,10 @@ jobs:
                     "./scripts/py_matter_idl/matter_idl/xml_parser.py \
                       --no-print \
                       --log-level info \
-                      src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
-                      src/app/zap-templates/zcl/data-model/chip/access-control-definitions.xml \
                       src/app/zap-templates/zcl/data-model/chip/access-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/access-control-definitions.xml \
                       src/app/zap-templates/zcl/data-model/chip/account-login-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/administrator-commissioning-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/application-basic-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/application-launcher-cluster.xml \
@@ -126,16 +126,16 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/basic-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information.xml \
+                      src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-ota.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-types.xml \
-                      src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml \
                       src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-select-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/fan-control-cluster.xml \
@@ -145,14 +145,17 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
-                      src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/laundry-washer-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/level-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/localization-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/matter-devices.xml \
                       src/app/zap-templates/zcl/data-model/chip/media-input-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/media-playback-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/mode-select-cluster.xml \
@@ -160,15 +163,17 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/occupancy-sensing-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/operational-credentials-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/pressure-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/power-source-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/power-source-configuration-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/pressure-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/proxy-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/proxy-discovery-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/proxy-valid-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pump-configuration-and-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pwm-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/refrigerator-and-temperature-controlled-cabinet-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/rvc-clean-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/rvc-run-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/scene.xml \
                       src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml \
@@ -176,17 +181,16 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/test-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thread-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
-                      src/app/zap-templates/zcl/data-model/chip/matter-devices.xml \
                       src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml \
