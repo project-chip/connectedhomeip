@@ -31,8 +31,8 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <lib/support/CHIPPlatformMemory.h>
 
