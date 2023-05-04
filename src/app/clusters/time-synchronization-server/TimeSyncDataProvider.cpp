@@ -18,13 +18,7 @@
 
 #include "TimeSyncDataProvider.h"
 
-#include <lib/core/CHIPConfig.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/TLV.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
-
-#include <limits>
-
 namespace chip {
 
 // Calculated with Python code:
@@ -99,7 +93,7 @@ CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const TimeZone & timeZoneList)
     writer.Init(buffer);
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
 
-    for (auto timeZoneIter : timeZoneList)
+    for (auto const & timeZoneIter : timeZoneList)
     {
         ReturnErrorOnFailure(timeZoneIter.Encode(writer, TLV::AnonymousTag()));
     }
@@ -161,9 +155,9 @@ CHIP_ERROR TimeSyncDataProvider::StoreDSTOffset(const DSTOffset & dstOffsetList)
     writer.Init(buffer);
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
 
-    for (auto dstIter = dstOffsetList.begin(); dstIter != dstOffsetList.end(); dstIter++)
+    for (auto const & dstIter : dstOffsetList)
     {
-        ReturnErrorOnFailure(dstIter->Encode(writer, TLV::AnonymousTag()));
+        ReturnErrorOnFailure(dstIter.Encode(writer, TLV::AnonymousTag()));
     }
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));

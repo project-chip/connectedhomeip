@@ -74,7 +74,7 @@ void SetDefaultDelegate(Delegate * delegate)
     gDelegate = delegate;
 }
 
-Delegate * GetDefaultDelegate(void)
+Delegate * GetDefaultDelegate()
 {
     return GetDelegate();
 }
@@ -86,7 +86,7 @@ Delegate * GetDefaultDelegate(void)
 
 TimeSynchronizationServer TimeSynchronizationServer::mTimeSyncInstance;
 
-TimeSynchronizationServer & TimeSynchronizationServer::Instance(void)
+TimeSynchronizationServer & TimeSynchronizationServer::Instance()
 {
     return mTimeSyncInstance;
 }
@@ -190,8 +190,7 @@ CHIP_ERROR TimeSynchronizationServer::ClearDSTOffset()
     return mTimeSyncDataProvider.ClearDSTOffset();
 }
 
-DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> &
-TimeSynchronizationServer::GetTrustedTimeSource(void)
+DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & TimeSynchronizationServer::GetTrustedTimeSource()
 {
     return mTrustedTimeSource;
 }
@@ -201,13 +200,13 @@ CHIP_ERROR TimeSynchronizationServer::GetDefaultNtp(MutableByteSpan & dntp)
     return mTimeSyncDataProvider.LoadDefaultNtp(dntp);
 }
 
-DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> & TimeSynchronizationServer::GetTimeZone(void)
+DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> & TimeSynchronizationServer::GetTimeZone()
 {
     mTimeZoneList = DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type>(mTz, mTimeZoneListSize);
     return mTimeZoneList;
 }
 
-DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & TimeSynchronizationServer::GetDSTOffset(void)
+DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & TimeSynchronizationServer::GetDSTOffset()
 {
     mDstOffsetList = DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDst, mDstOffsetListSize);
     return mDstOffsetList;

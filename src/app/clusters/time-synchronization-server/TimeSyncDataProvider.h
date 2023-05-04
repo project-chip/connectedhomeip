@@ -21,10 +21,7 @@
 
 #pragma once
 
-#include <app/util/af-types.h>
-#include <app/util/config.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
