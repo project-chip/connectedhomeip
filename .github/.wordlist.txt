@@ -88,6 +88,8 @@ armv
 ASAN
 asdk
 AssertionError
+ASR
+asr
 AST
 ASYNC
 atomics
@@ -443,6 +445,7 @@ DoorState
 doru
 DOTBR
 DOVERLAY
+DOGO
 downcasting
 DownloadProtocolEnum
 Doxygen
