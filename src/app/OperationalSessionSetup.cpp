@@ -193,7 +193,6 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
                   mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), peerAddrBuff, static_cast<int>(mState));
 #endif
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
     mDeviceAddress = addr;
 
     // Initialize CASE session state with any MRP parameters that DNS-SD has provided.
@@ -203,31 +202,46 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
         mCASEClient->SetRemoteMRPIntervals(config);
     }
 
-    if (mState == State::ResolvingAddress)
+    if (mState != State::ResolvingAddress)
     {
-        MoveToState(State::HasAddress);
-        mInitParams.sessionManager->UpdateAllSessionsPeerAddress(mPeerId, addr);
-        if (!mPerformingAddressUpdate)
-        {
-            err = EstablishConnection(config);
-            if (err != CHIP_NO_ERROR)
-            {
-                DequeueConnectionCallbacks(err);
-                // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
-                return;
-            }
-            // We expect to get a callback via OnSessionEstablished or OnSessionEstablishmentError to continue
-            // the state machine forward.
-            return;
-        }
+        ChipLogError(Discovery, "Received UpdateDeviceData in incorrect state");
+        DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
+        // Do not touch `this` instance anymore; it has been destroyed in
+        // DequeueConnectionCallbacks.
+        return;
+    }
 
+    MoveToState(State::HasAddress);
+    mInitParams.sessionManager->UpdateAllSessionsPeerAddress(mPeerId, addr);
+
+    if (mPerformingAddressUpdate)
+    {
+        // Nothing else to do here.
         DequeueConnectionCallbacks(CHIP_NO_ERROR);
         // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
         return;
     }
 
-    ChipLogError(Discovery, "Received UpdateDeviceData in incorrect state");
-    DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR err = EstablishConnection(config);
+    LogErrorOnFailure(err);
+    if (err == CHIP_NO_ERROR)
+    {
+        // We expect to get a callback via OnSessionEstablished or OnSessionEstablishmentError to continue
+        // the state machine forward.
+        return;
+    }
+
+    // Move to the ResolvingAddress state, in case we have more results,
+    // since we expect to receive results in that state.
+    MoveToState(State::ResolvingAddress);
+    if (CHIP_NO_ERROR == Resolver::Instance().TryNextResult(mAddressLookupHandle))
+    {
+        // No need to NotifyRetryHandlers, since we never actually
+        // spent any time trying the previous result.
+        return;
+    }
+
+    DequeueConnectionCallbacks(err);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
