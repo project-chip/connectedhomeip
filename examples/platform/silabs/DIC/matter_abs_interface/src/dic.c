@@ -87,9 +87,6 @@ static void dic_task_fn(void *args)
 {
   /* get MQTT client handle */
   err_t ret;
-
-  vTaskDelay(10000);
-
   mqtt_client = mqtt_client_new();
   if (!mqtt_client)
   {

@@ -171,7 +171,9 @@ void WindowAppImpl::OnTaskCallback(void * parameter)
     }
     SILABS_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     sWiFiNetworkCommissioningInstance.Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     /* added for commissioning with wifi */
 #endif
 
