@@ -37,12 +37,6 @@ import os
 import sys
 from jsonschema import validate
 
-import ota_image_tool
-from chip.tlv import TLVWriter
-from custom import CertDeclaration, DacCert, DacPKey, PaiCert
-from default import InputArgument
-from generate import set_logger
-
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../factory_data_generator'))
 sys.path.insert(0, os.path.join(
@@ -50,6 +44,12 @@ sys.path.insert(0, os.path.join(
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../../../../src/app/'))
 
+from custom import CertDeclaration, DacCert, DacPKey, PaiCert
+from default import InputArgument
+from generate import set_logger
+
+from chip.tlv import TLVWriter
+import ota_image_tool
 
 OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_app_tlv.bin")
 OTA_BOOTLOADER_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_ssbl_tlv.bin")
