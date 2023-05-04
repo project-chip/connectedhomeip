@@ -151,13 +151,13 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
     return 0;
 }
 
-extern struct netif* lwip_get_netif(void);
+extern struct netif * lwip_get_netif(void);
 
 int8_t asr_route_hook_init()
 {
     struct netif * lwip_netif = lwip_get_netif();
     ip_addr_t router_group    = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0x02);
-    asr_route_hook_t * hook    = NULL;
+    asr_route_hook_t * hook   = NULL;
     uint8_t ret               = 0;
 
     if (lwip_netif == NULL)

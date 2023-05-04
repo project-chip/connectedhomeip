@@ -34,17 +34,17 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/ASR/ASRUtils.h>
-#include <platform/internal/BLEManager.h>
-#include <platform/DiagnosticDataProvider.h>
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
+#include <platform/ASR/ASRUtils.h>
+#include <platform/DiagnosticDataProvider.h>
+#include <platform/internal/BLEManager.h>
 
 #include "lwip/opt.h"
 #include <platform/ASR/NetworkCommissioningDriver.h>
-//asr wifi
+// asr wifi
 #include "lega_wlan_api.h"
 #if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #error "WiFi Station support must be enabled when building for ASR"
@@ -55,9 +55,9 @@ using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::TLV;
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
-extern struct netif* lwip_get_netif(void);
+extern struct netif * lwip_get_netif(void);
 #ifdef __cplusplus
 }
 #endif
@@ -264,9 +264,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     return CHIP_NO_ERROR;
 }
 
-void ConnectivityManagerImpl::DriveAPState()
-{
-}
+void ConnectivityManagerImpl::DriveAPState() {}
 
 void ConnectivityManagerImpl::DriveStationState()
 {
@@ -382,7 +380,6 @@ exit:
     // of the WiFi station.
 }
 
-
 void ConnectivityManagerImpl::OnStationConnected()
 {
     NetworkCommissioning::ASRWiFiDriver::GetInstance().OnConnectWiFiNetwork();
@@ -435,8 +432,8 @@ void ConnectivityManagerImpl::OnStationDisconnected()
             break;
         case WLAN_STA_MODE_AUTH_FAIL:
         case WLAN_STA_MODE_PASSWORD_ERR:
-            associationFailureCause =
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
+            associationFailureCause = chip::to_underlying(
+                chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
         case WLAN_STA_MODE_DHCP_FAIL:
@@ -481,7 +478,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                     char addrStr[INET_ADDRSTRLEN];
                     ip4addr_ntoa_r(netif_ip4_addr(net_interface), addrStr, sizeof(addrStr));
 
-                    //ChipLogProgress(DeviceLayer, "IPv4 Address Assigned : %s", ip4addr_ntoa(netif_ip4_addr(net_interface)));
+                    // ChipLogProgress(DeviceLayer, "IPv4 Address Assigned : %s", ip4addr_ntoa(netif_ip4_addr(net_interface)));
 
                     IPAddress::FromString(addrStr, addr);
                 }
@@ -489,7 +486,8 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 // address (2000::/3) that is in the valid state.  If such an address is found...
                 for (uint8_t i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++)
                 {
-                    if (ip6_addr_isglobal(netif_ip6_addr(net_interface, i)) && ip6_addr_isvalid(netif_ip6_addr_state(net_interface, i)))
+                    if (ip6_addr_isglobal(netif_ip6_addr(net_interface, i)) &&
+                        ip6_addr_isvalid(netif_ip6_addr_state(net_interface, i)))
                     {
                         // Determine if there is a default IPv6 router that is currently reachable
                         // via the station interface.  If so, presume for now that the device has
@@ -498,7 +496,8 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                         if (found_if && net_interface->num == found_if->num)
                         {
                             haveIPv6Conn = true;
-                            //ChipLogProgress(DeviceLayer, "IPv6 Address Assigned : %s", ip6addr_ntoa(netif_ip6_addr(net_interface, i)));
+                            // ChipLogProgress(DeviceLayer, "IPv6 Address Assigned : %s", ip6addr_ntoa(netif_ip6_addr(net_interface,
+                            // i)));
                         }
                     }
                 }
@@ -514,9 +513,9 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 
         // Alert other components of the state change.
         ChipDeviceEvent event;
-        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-        event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
-        event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
+        event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4      = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
+        event.InternetConnectivityChange.IPv6      = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
         event.InternetConnectivityChange.ipAddress = addr;
 
         PlatformMgr().PostEventOrDie(&event);
@@ -535,54 +534,53 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 
 void ConnectivityManagerImpl::lega_wifi_connect_state(lega_wifi_event_e stat)
 {
-     switch (stat)
+    switch (stat)
     {
-        case EVENT_STATION_UP:
-            ChipLogProgress(DeviceLayer,"wifi_connect_done");
-            Internal::ASRUtils::SetStationConnected(true);
-            if (ConnectivityMgrImpl().mWiFiStationState == kWiFiStationState_Connecting)
-            {
-                ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-            }
-            ConnectivityMgrImpl().DriveStationState();
-            break;
-        case EVENT_STATION_DOWN:
-            ChipLogProgress(DeviceLayer,"wifi_disconnect_done");
-            Internal::ASRUtils::SetStationConnected(false);
-            if (ConnectivityMgrImpl().mWiFiStationState == kWiFiStationState_Connecting)
-            {
-                ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
-            }
-            ConnectivityMgrImpl().DriveStationState();
-            break;
-        case EVENT_AP_UP:
-            ChipLogProgress(DeviceLayer,"wifi_softap_open_done");
-            break;
-        case EVENT_AP_DOWN:
-            ChipLogProgress(DeviceLayer,"wifi_softap_close_done");
-            break;
-        case EVENT_STA_CLOSE:
-            ChipLogProgress(DeviceLayer,"wifi_sta_close_done");
-            Internal::ASRUtils::SetStationConnected(false);
-            ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_NotConnected);
-            NetworkCommissioning::ASRWiFiDriver::GetInstance().SetLastDisconnectReason(0);
-            ConnectivityMgrImpl().DriveStationState();
-            break;
-        default :
-            ChipLogProgress(DeviceLayer,"unsupport wifi_event_e");
-            break;
+    case EVENT_STATION_UP:
+        ChipLogProgress(DeviceLayer, "wifi_connect_done");
+        Internal::ASRUtils::SetStationConnected(true);
+        if (ConnectivityMgrImpl().mWiFiStationState == kWiFiStationState_Connecting)
+        {
+            ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+        }
+        ConnectivityMgrImpl().DriveStationState();
+        break;
+    case EVENT_STATION_DOWN:
+        ChipLogProgress(DeviceLayer, "wifi_disconnect_done");
+        Internal::ASRUtils::SetStationConnected(false);
+        if (ConnectivityMgrImpl().mWiFiStationState == kWiFiStationState_Connecting)
+        {
+            ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
+        }
+        ConnectivityMgrImpl().DriveStationState();
+        break;
+    case EVENT_AP_UP:
+        ChipLogProgress(DeviceLayer, "wifi_softap_open_done");
+        break;
+    case EVENT_AP_DOWN:
+        ChipLogProgress(DeviceLayer, "wifi_softap_close_done");
+        break;
+    case EVENT_STA_CLOSE:
+        ChipLogProgress(DeviceLayer, "wifi_sta_close_done");
+        Internal::ASRUtils::SetStationConnected(false);
+        ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_NotConnected);
+        NetworkCommissioning::ASRWiFiDriver::GetInstance().SetLastDisconnectReason(0);
+        ConnectivityMgrImpl().DriveStationState();
+        break;
+    default:
+        ChipLogProgress(DeviceLayer, "unsupport wifi_event_e");
+        break;
     }
 }
 
-void ConnectivityManagerImpl::lega_wifi_scan_ind(lega_wlan_scan_result_t *result)
+void ConnectivityManagerImpl::lega_wifi_scan_ind(lega_wlan_scan_result_t * result)
 {
     NetworkCommissioning::ASRWiFiDriver::GetInstance().OnScanWiFiNetworkDone(result);
 }
 
-void ConnectivityManagerImpl::lega_wifi_get_ip_ind(lega_wlan_ip_stat_t *pnet)
+void ConnectivityManagerImpl::lega_wifi_get_ip_ind(lega_wlan_ip_stat_t * pnet)
 {
-    ChipLogProgress(DeviceLayer, "Got ip : %s, gw : %s, mask : %s, mac : %s",
-        pnet->ip, pnet->gate, pnet->mask, pnet->macaddr);
+    ChipLogProgress(DeviceLayer, "Got ip : %s, gw : %s, mask : %s, mac : %s", pnet->ip, pnet->gate, pnet->mask, pnet->macaddr);
 
     ConnectivityMgrImpl().UpdateInternetConnectivityState();
 
@@ -592,19 +590,19 @@ void ConnectivityManagerImpl::lega_wifi_get_ip_ind(lega_wlan_ip_stat_t *pnet)
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void ConnectivityManagerImpl::lega_wifi_get_ip6_ind(lega_wlan_ip_stat_t *pnet)
+void ConnectivityManagerImpl::lega_wifi_get_ip6_ind(lega_wlan_ip_stat_t * pnet)
 {
-    int i = 0;
+    int i             = 0;
     int preferred_ip6 = 0;
-    for(i=0;i<3;i++)
+    for (i = 0; i < 3; i++)
     {
-        if(pnet->ip6[i].state == 0x30) /* IP6_ADDR_PREFERRED */
+        if (pnet->ip6[i].state == 0x30) /* IP6_ADDR_PREFERRED */
         {
-            ChipLogProgress(DeviceLayer, "Got ip v6 #%d : %s",i, pnet->ip6[i].addr);
-            preferred_ip6 ++;
+            ChipLogProgress(DeviceLayer, "Got ip v6 #%d : %s", i, pnet->ip6[i].addr);
+            preferred_ip6++;
         }
     }
-    if(preferred_ip6)
+    if (preferred_ip6)
     {
         ConnectivityMgrImpl().UpdateInternetConnectivityState();
 
@@ -615,14 +613,11 @@ void ConnectivityManagerImpl::lega_wifi_get_ip6_ind(lega_wlan_ip_stat_t *pnet)
     }
 }
 
-void ConnectivityManagerImpl::lega_wifi_ap_peer_change(lega_wlan_client_addr_info_t *peer_info, uint8_t connect)
-{
-
-}
+void ConnectivityManagerImpl::lega_wifi_ap_peer_change(lega_wlan_client_addr_info_t * peer_info, uint8_t connect) {}
 
 void ConnectivityManagerImpl::lega_wlan_err_stat_handler(lega_wlan_err_status_e err_info)
 {
-    ChipLogProgress(DeviceLayer, "lega wlan err stat:%d",err_info);
+    ChipLogProgress(DeviceLayer, "lega wlan err stat:%d", err_info);
     if (ConnectivityMgrImpl().mWiFiStationState == kWiFiStationState_Connecting)
     {
         ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);

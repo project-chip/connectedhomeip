@@ -17,14 +17,14 @@
  */
 
 #include "AppConfig.h"
-#include <init_Matter.h>
-#include <mbedtls/platform.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <DeviceInfoProviderImpl.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <DeviceInfoProviderImpl.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <init_Matter.h>
+#include <mbedtls/platform.h>
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <shell/launch_shell.h>
 #endif
@@ -42,7 +42,7 @@ ASRFactoryDataProvider sFactoryDataProvider;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
-CHIP_ERROR MatterInitializer::Matter_Task_Config(lega_task_config_t *cfg)
+CHIP_ERROR MatterInitializer::Matter_Task_Config(lega_task_config_t * cfg)
 {
     lega_rtos_get_chip_task_cfg(cfg);
 
@@ -51,7 +51,7 @@ CHIP_ERROR MatterInitializer::Matter_Task_Config(lega_task_config_t *cfg)
 
 CHIP_ERROR MatterInitializer::Init_Matter_Stack(const char * appName)
 {
-    //mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    // mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     ASR_LOG("==================================================\r\n");
     ASR_LOG("%s starting\r\n", appName);

@@ -28,10 +28,10 @@
  ****************************************************************************************
  */
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-#include "sonata_gatt_api.h"
 #include "sonata_ble_api.h"
+#include "sonata_gatt_api.h"
 
 /*
  * MACRO DEFINES
@@ -46,7 +46,7 @@
 enum csvc_att_db_handles
 {
     CSVC_IDX_SVC,
-    CSVC_IDX_RX_CHAR ,
+    CSVC_IDX_RX_CHAR,
     CSVC_IDX_RX_VAL,
     CSVC_IDX_TX_CHAR,
     CSVC_IDX_TX_VAL,
@@ -56,10 +56,9 @@ enum csvc_att_db_handles
 
 enum _matter_event_states
 {
-  MATTER_EVENT_DONE_CONTINUE ,
-  MATTER_EVENT_DONE_FINISHED ,
+    MATTER_EVENT_DONE_CONTINUE,
+    MATTER_EVENT_DONE_FINISHED,
 };
-
 
 /*
  * GLOBAL VARIABLE DECLARATIONS
@@ -80,11 +79,11 @@ void matter_ble_start_adv();
 
 void matter_set_connection_id(uint8_t conId);
 
-void matter_tx_CCCD_write_cb(uint8_t *data, uint16_t size);
-void matter_rx_char_write_cb(uint8_t *data, uint16_t size);
-void matter_tx_CCCD_read_cb(uint8_t *data, uint16_t *size);
+void matter_tx_CCCD_write_cb(uint8_t * data, uint16_t size);
+void matter_rx_char_write_cb(uint8_t * data, uint16_t size);
+void matter_tx_CCCD_read_cb(uint8_t * data, uint16_t * size);
 
-void matter_tx_char_send_indication(uint8_t conId, uint16_t size, uint8_t *data);
+void matter_tx_char_send_indication(uint8_t conId, uint16_t size, uint8_t * data);
 
 void matter_init_callback(void);
 void matter_ble_stack_open(void);
@@ -92,5 +91,4 @@ void matter_ble_stack_open(void);
 #ifdef __cplusplus
 }
 #endif
-#endif //BLE_SOC_APP_CUSTOM_SVC_H
-
+#endif // BLE_SOC_APP_CUSTOM_SVC_H

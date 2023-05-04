@@ -17,8 +17,8 @@
  */
 
 #include "ASROTAImageProcessor.h"
-#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 /// No error, operation OK
 #define LEGA_OTA_OK 0L
@@ -115,7 +115,7 @@ void ASROTAImageProcessor::HandlePrepareDownload(intptr_t context)
     }
 
     imageProcessor->ota_boot_para.off_bp = 0;
-    err = lega_ota_init(&imageProcessor->ota_boot_para);
+    err                                  = lega_ota_init(&imageProcessor->ota_boot_para);
 
     imageProcessor->mWriteOffset = nullptr;
 
@@ -149,11 +149,10 @@ void ASROTAImageProcessor::HandleApply(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "ASROTAImageProcessor::HandleApply()");
 
-
     imageProcessor->ota_boot_para.res_type = LEGA_OTA_FINISH;
     lega_ota_set_boot(&imageProcessor->ota_boot_para);
 
-   // reboot();
+    // reboot();
 }
 
 void ASROTAImageProcessor::HandleAbort(intptr_t context)

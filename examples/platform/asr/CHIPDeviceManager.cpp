@@ -59,15 +59,15 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 } // namespace DeviceManager
 } // namespace chip
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t type, uint16_t size, uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
 
-    ChipLogProgress(Zcl, "MatterPostAttributeChangeCallback - Cluster ID: " ChipLogFormatMEI
-           ", EndPoint ID: '0x%02x', Attribute ID: " ChipLogFormatMEI,
-           ChipLogValueMEI(path.mClusterId), path.mEndpointId, ChipLogValueMEI(path.mAttributeId));
+    ChipLogProgress(Zcl,
+                    "MatterPostAttributeChangeCallback - Cluster ID: " ChipLogFormatMEI
+                    ", EndPoint ID: '0x%02x', Attribute ID: " ChipLogFormatMEI,
+                    ChipLogValueMEI(path.mClusterId), path.mEndpointId, ChipLogValueMEI(path.mAttributeId));
 
     if (cb != nullptr)
     {

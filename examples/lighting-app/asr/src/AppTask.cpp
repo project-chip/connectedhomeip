@@ -23,9 +23,9 @@
 #include "DeviceCallbacks.h"
 #include "LEDWidget.h"
 #include "qrcodegen.h"
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -37,7 +37,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
-#define APP_TASK_STACK_SIZE (1024*4)
+#define APP_TASK_STACK_SIZE (1024 * 4)
 #define MATTER_DEVICE_NAME "ASR-Lighting"
 
 namespace {
@@ -76,8 +76,8 @@ static DeviceCallbacks EchoCallbacks;
 CHIP_ERROR AppTask::StartAppTask()
 {
     // Start App task.
-    OSStatus result = lega_rtos_create_thread(&sAppTaskHandle, 2, APP_TASK_NAME,
-                                    (lega_thread_function_t)AppTaskMain, APP_TASK_STACK_SIZE, (lega_thread_arg_t)this);
+    OSStatus result = lega_rtos_create_thread(&sAppTaskHandle, 2, APP_TASK_NAME, (lega_thread_function_t) AppTaskMain,
+                                              APP_TASK_STACK_SIZE, (lega_thread_arg_t) this);
     return (result == kNoErr) ? CHIP_NO_ERROR : CHIP_APPLICATION_ERROR(0x02);
 }
 
@@ -85,7 +85,7 @@ bool IsLightOn()
 {
     EmberAfStatus status;
     bool on = true;
-    status = app::Clusters::OnOff::Attributes::OnOff::Get(1, &on);
+    status  = app::Clusters::OnOff::Attributes::OnOff::Get(1, &on);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -121,7 +121,7 @@ void led_startup_status()
 {
     uint8_t currentLevel;
 
-    if(IsLightOn() == true)
+    if (IsLightOn() == true)
     {
         currentLevel = GetLightLevel();
         lightLED.Set(1);
@@ -154,7 +154,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
 #if (LIGHT_SELECT == LIGHT_SELECT_LED)
-    lightLED.Init(LIGHT_LED);    // embedded board light
+    lightLED.Init(LIGHT_LED); // embedded board light
 #elif (LIGHT_SELECT == LIGHT_SELECT_RGB)
     lightLED.RGB_init();
 #endif

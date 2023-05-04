@@ -97,9 +97,9 @@ private:
     void RunEventLoopInternal(void);
     static void TimerCallback(void * params);
     uint32_t kTaskRunningEventFlag;
-    static constexpr uint32_t kTaskStopEventFlag    = 1 << 0;
-    static constexpr uint32_t kPostEventFlag        = 1 << 1;
-    static constexpr uint32_t kTimerEventFlag       = 1 << 2;
+    static constexpr uint32_t kTaskStopEventFlag = 1 << 0;
+    static constexpr uint32_t kPostEventFlag     = 1 << 1;
+    static constexpr uint32_t kTimerEventFlag    = 1 << 2;
 #endif
 };
 

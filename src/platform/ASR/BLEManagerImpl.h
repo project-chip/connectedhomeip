@@ -114,20 +114,20 @@ public:
     char mDeviceName[32 + 1];
 
     void DriveBLEState(void);
-    void SetAdvertisingData(uint8_t* data,uint8_t *len);
-    void SetScanRspData(uint8_t* data,uint8_t *len);
+    void SetAdvertisingData(uint8_t * data, uint8_t * len);
+    void SetScanRspData(uint8_t * data, uint8_t * len);
     void SetAdvStartFlag(void);
     void SetAdvEndFlag(void);
     CHIPoBLEConState * AllocConnectionState(uint16_t conId);
     CHIPoBLEConState * GetConnectionState(uint16_t conId);
     bool ReleaseConnectionState(uint16_t conId);
-    void SetConnectionMtu(uint16_t conId,uint16_t  mtu);
+    void SetConnectionMtu(uint16_t conId, uint16_t mtu);
 
     static void DriveBLEState(intptr_t arg);
 
-    void HandleTXCharCCCDRead(uint8_t connection_id,uint16_t* length, uint8_t *value);
-    bool HandleRXCharWrite(uint8_t connection_id, uint16_t length, uint8_t *value);
-    bool HandleTXCharCCCDWrite(uint8_t connection_id,uint16_t length, uint8_t *value);
+    void HandleTXCharCCCDRead(uint8_t connection_id, uint16_t * length, uint8_t * value);
+    bool HandleRXCharWrite(uint8_t connection_id, uint16_t length, uint8_t * value);
+    bool HandleTXCharCCCDWrite(uint8_t connection_id, uint16_t length, uint8_t * value);
     void SendIndicationConfirm(uint16_t conId);
 };
 

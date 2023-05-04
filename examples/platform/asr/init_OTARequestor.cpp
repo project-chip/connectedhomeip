@@ -38,7 +38,7 @@ chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
 static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
 } // namespace
 
-#define OTA_PERIODIC_TIMEOUT 86400// 24 * 60 * 60
+#define OTA_PERIODIC_TIMEOUT 86400 // 24 * 60 * 60
 
 extern "C" void asrQueryImageCmdHandler()
 {
@@ -76,7 +76,7 @@ void OTAInitializer::InitOTARequestor(void)
 
 void OTAInitializer::ReloadQueryTimeout(uint32_t timeout)
 {
-    if(timeout > 0)
+    if (timeout > 0)
     {
         gRequestorUser.SetPeriodicQueryTimeout(timeout);
         gRequestorUser.RekickPeriodicQueryTimer();

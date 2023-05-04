@@ -27,8 +27,8 @@
 
 // #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <string.h>
 #include "asr_factory_config.h"
+#include <string.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -108,7 +108,8 @@ public:
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
 #if CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER
-    static CHIP_ERROR ReadFactoryConfigValue(asr_matter_partition_t matter_partition, uint8_t * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR ReadFactoryConfigValue(asr_matter_partition_t matter_partition, uint8_t * buf, size_t bufSize,
+                                             size_t & outLen);
     static CHIP_ERROR ReadFactoryConfigValue(asr_matter_partition_t matter_partition, uint32_t & val);
 #endif
     static CHIP_ERROR FactoryResetConfig(void);

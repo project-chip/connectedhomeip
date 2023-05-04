@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/DiagnosticDataProvider.h>
 #include <platform/ASR/DiagnosticDataProviderImpl.h>
+#include <platform/DiagnosticDataProvider.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #ifdef CFG_PLF_RV32
 #include "asr_alto_boot.h"
@@ -29,9 +29,9 @@
 #endif
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
-extern struct netif* lwip_get_netif(void);
+extern struct netif * lwip_get_netif(void);
 #ifdef __cplusplus
 }
 #endif
@@ -59,7 +59,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-    currentHeapHighWatermark = static_cast<uint64_t>(lega_rtos_get_total_size() -lega_rtos_get_minimum_free_heap_size());
+    currentHeapHighWatermark = static_cast<uint64_t>(lega_rtos_get_total_size() - lega_rtos_get_minimum_free_heap_size());
     return CHIP_NO_ERROR;
 }
 
@@ -230,7 +230,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
 {
     using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
 
-    lega_wlan_ap_info_adv_t *apinfo = lega_wlan_get_associated_apinfo();
+    lega_wlan_ap_info_adv_t * apinfo = lega_wlan_get_associated_apinfo();
 
     switch (apinfo->security)
     {

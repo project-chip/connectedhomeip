@@ -25,9 +25,11 @@
 #include "DeviceCallbacks.h"
 #include "AppConfig.h"
 #include "CHIPDeviceManager.h"
+#include "LEDWidget.h"
+#include "init_OTARequestor.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/util/af.h>
@@ -37,8 +39,6 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <support/logging/Constants.h>
-#include "init_OTARequestor.h"
-#include "LEDWidget.h"
 #if defined CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT || defined CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT
 #include "route_hook/asr_route_hook.h"
 #endif
@@ -126,8 +126,8 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     }
 }
 
-void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                                  uint8_t type, uint16_t size, uint8_t * value)
+void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t type,
+                                                  uint16_t size, uint8_t * value)
 {
     switch (clusterId)
     {
@@ -171,14 +171,15 @@ void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, 
                  ChipLogError(DeviceLayer, TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2,
                  ChipLogError(DeviceLayer, TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
-    
+
     lightLED.Set(*value);
 
 exit:
     return;
 }
 
-void DeviceCallbacks::OnLevelPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint16_t size, uint8_t * value)
+void DeviceCallbacks::OnLevelPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint16_t size,
+                                                         uint8_t * value)
 {
     VerifyOrExit(attributeId == app::Clusters::LevelControl::Attributes::CurrentLevel::Id,
                  ChipLogError(DeviceLayer, TAG, "Unhandled Attribute ID: '0x%04x", attributeId));

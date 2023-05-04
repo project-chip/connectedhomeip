@@ -95,8 +95,8 @@ else
 
     #print stats
     if [ "$ASR_IC" = "asr582x" ]; then
-        $ASR_TOOLCHAIN_PATH/arm-none-eabi-size -A "$OUTPUT_DIR"/*.out
+        "$ASR_TOOLCHAIN_PATH"/arm-none-eabi-size -A "$OUTPUT_DIR"/*.out
     elif [ "$ASR_IC" = "asr595x" ]; then
-        $ASR_TOOLCHAIN_PATH/riscv-asr-elf-size -A "$OUTPUT_DIR"/*.out
+        "$ASR_TOOLCHAIN_PATH"/riscv-asr-elf-size -A "$OUTPUT_DIR"/*.out
     fi
 fi

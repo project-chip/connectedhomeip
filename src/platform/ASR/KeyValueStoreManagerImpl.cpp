@@ -26,9 +26,9 @@
 #define duet_flash_kv_del alto_flash_kv_del
 #define duet_flash_erase asr_flash_erase
 #else
-#include "duet_flash_kv.h"
-#include "duet_flash.h"
 #include "duet_cm4.h"
+#include "duet_flash.h"
+#include "duet_flash_kv.h"
 #endif
 #include "string.h"
 
@@ -74,11 +74,13 @@ CHIP_ERROR KeyValueStoreManagerImpl::ConvertKVResultToChip(int32_t err) const
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes) const
 {
-    int32_t ret = 0;
+    int32_t ret        = 0;
     int32_t buffer_len = value_size;
-    ret = duet_flash_kv_get(key, value, (int32_t*)&buffer_len);
-    if (ret == 0) {
-        if (read_bytes_size) {
+    ret                = duet_flash_kv_get(key, value, (int32_t *) &buffer_len);
+    if (ret == 0)
+    {
+        if (read_bytes_size)
+        {
             *read_bytes_size = buffer_len;
         }
     }
@@ -89,7 +91,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
     int32_t ret = 0;
-    ret = duet_flash_kv_set(key, value, value_size, 1);
+    ret         = duet_flash_kv_set(key, value, value_size, 1);
 
     return ConvertKVResultToChip(ret);
 }
@@ -97,7 +99,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     int32_t ret = 0;
-    ret = duet_flash_kv_del(key);
+    ret         = duet_flash_kv_del(key);
     return ConvertKVResultToChip(ret);
 }
 

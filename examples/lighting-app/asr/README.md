@@ -4,18 +4,19 @@ This example demonstrates the Matter Lighting application on ASR platform.
 
 ---
 
-- [CHIP ASR Lighting Example](#chip-asr-lighting-example)
-  - [Supported Chips](#supported-chips)
-  - [Building the Example Application](#building-the-example-application)
-  - [Commissioning](#commissioning)
-    - [BLE mode](#ble-mode)
-    - [IP mode](#ip-mode)
+-   [CHIP ASR Lighting Example](#chip-asr-lighting-example)
+    -   [Supported Chips](#supported-chips)
+    -   [Building the Example Application](#building-the-example-application)
+    -   [Commissioning](#commissioning)
+        -   [BLE mode](#ble-mode)
+        -   [IP mode](#ip-mode)
 
 ---
 
 ## Supported Chips
 
 The CHIP demo application is supported on:
+
 -   ASR582X
 -   ASR595X
 
@@ -23,17 +24,17 @@ The CHIP demo application is supported on:
 
 -   [Setup CHIP Environment](../../../docs/guides/BUILDING.md)
 
--   Setup toolchain
-    for ASR582X,download gcc-arm-none-eabi-9-2019-q4-major,then export `ASR_TOOLCHAIN_PATH`:
+-   Setup toolchain for ASR582X,download gcc-arm-none-eabi-9-2019-q4-major,then
+    export `ASR_TOOLCHAIN_PATH`:
     ```
     export ASR_TOOLCHAIN_PATH={toolchain path}/gcc-arm-none-eabi-9-2019-q4-major/bin/
     ```
-    for ASR595X,download asr_riscv_gnu_toolchain_10.2_ubuntu,then export `ASR_TOOLCHAIN_PATH`:
+    for ASR595X,download asr_riscv_gnu_toolchain_10.2_ubuntu,then export
+    `ASR_TOOLCHAIN_PATH`:
     ```
     export ASR_TOOLCHAIN_PATH={toolchain path}/compiler/asr_riscv_gnu_toolchain_10.2_ubuntu-16.04/bin/
     ```
--   Setup environment
-    for ASR582X:
+-   Setup environment for ASR582X:
     ```
     export ASR_IC=asr582x
     ```
@@ -47,8 +48,8 @@ The CHIP demo application is supported on:
     ```
 -   The output image files are stored in `out/example_app` folder.
 
--   After building the application, **DOGO** tool is used to flash it to the board.
-
+-   After building the application, **DOGO** tool is used to flash it to the
+    board.
 
 ## Commissioning
 
@@ -67,7 +68,6 @@ There are two commissioning modes supported by ASR platform:
 1. Build and Flash
 2. The example will run automatically after booting the ASR board.
 3. Restore factory settings using command `recovery`
-4. Connect to AP using command `wifi_open sta [ssid] [password]` 
+4. Connect to AP using command `wifi_open sta [ssid] [password]`
 5. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
-

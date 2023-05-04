@@ -26,37 +26,37 @@ assert(asr_target_project != "", "asr_target_project must be specified")
 # Add includes, cflags, asmflags, etc in config
 config("asr_sdk_config") {
   _include_dirs = [
-      "${asr_sdk_build_root}/asr_sdk/config",
-      "${asr_sdk_build_root}/asr_sdk/config/lwip_if",
-      "${asr_sdk_build_root}/asr_sdk/matter",
-      "${asr_sdk_build_root}/asr_sdk/at_cmd",
-      "${asr_sdk_build_root}/asr_sdk/common/alto/inc",
-      "${asr_sdk_build_root}/asr_sdk/common/alto/easylogger",
-      "${asr_sdk_build_root}/asr_sdk/freertos",
-      "${asr_sdk_build_root}/asr_sdk/freertos/Source/include",
-      "${asr_sdk_build_root}/asr_sdk/freertos/Source/portable/GCC",
-      "${asr_sdk_build_root}/asr_sdk/legartos",
-      "${asr_sdk_build_root}/asr_sdk/lib/ble",
-      "${asr_sdk_build_root}/asr_sdk/lib/security",
-      "${asr_sdk_build_root}/asr_sdk/lib/sys",
-      "${asr_sdk_build_root}/asr_sdk/lib/wifi",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/lwip",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/lwip/prot",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/netif",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/port/include",
-      "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/include",
-      "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/asr_mbedtls",
-      "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/asr_mbedtls/alt",
-      "${asr_sdk_build_root}/asr_sdk/peripheral/asr/inc",
-      "${asr_sdk_build_root}/asr_sdk/peripheral/asr/inc/alto",
-      "${asr_sdk_build_root}/asr_sdk/peripheral/asr/inc/alto/alto",
-      "${asr_sdk_build_root}/asr_sdk/platform/alto/NMSIS/Core/Include",
-      "${asr_sdk_build_root}/asr_sdk/platform/alto/common",
-      "${asr_sdk_build_root}/asr_sdk/platform/alto/kv/include",
-      "${asr_sdk_build_root}/asr_sdk/platform/alto/system/include",
-      "${asr_sdk_build_root}/asr_sdk/projects/alto_demo/ble_demo/duet_hl_matter",
-      "${asr_sdk_build_root}/asr_sdk/version",
+    "${asr_sdk_build_root}/asr_sdk/config",
+    "${asr_sdk_build_root}/asr_sdk/config/lwip_if",
+    "${asr_sdk_build_root}/asr_sdk/matter",
+    "${asr_sdk_build_root}/asr_sdk/at_cmd",
+    "${asr_sdk_build_root}/asr_sdk/common/alto/inc",
+    "${asr_sdk_build_root}/asr_sdk/common/alto/easylogger",
+    "${asr_sdk_build_root}/asr_sdk/freertos",
+    "${asr_sdk_build_root}/asr_sdk/freertos/Source/include",
+    "${asr_sdk_build_root}/asr_sdk/freertos/Source/portable/GCC",
+    "${asr_sdk_build_root}/asr_sdk/legartos",
+    "${asr_sdk_build_root}/asr_sdk/lib/ble",
+    "${asr_sdk_build_root}/asr_sdk/lib/security",
+    "${asr_sdk_build_root}/asr_sdk/lib/sys",
+    "${asr_sdk_build_root}/asr_sdk/lib/wifi",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/lwip",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/lwip/prot",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/netif",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/port/include",
+    "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/include",
+    "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/asr_mbedtls",
+    "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/asr_mbedtls/alt",
+    "${asr_sdk_build_root}/asr_sdk/peripheral/asr/inc",
+    "${asr_sdk_build_root}/asr_sdk/peripheral/asr/inc/alto",
+    "${asr_sdk_build_root}/asr_sdk/peripheral/asr/inc/alto/alto",
+    "${asr_sdk_build_root}/asr_sdk/platform/alto/NMSIS/Core/Include",
+    "${asr_sdk_build_root}/asr_sdk/platform/alto/common",
+    "${asr_sdk_build_root}/asr_sdk/platform/alto/kv/include",
+    "${asr_sdk_build_root}/asr_sdk/platform/alto/system/include",
+    "${asr_sdk_build_root}/asr_sdk/projects/alto_demo/ble_demo/duet_hl_matter",
+    "${asr_sdk_build_root}/asr_sdk/version",
   ]
 
   # Also add project include path (passed in from project build)
@@ -145,10 +145,11 @@ config("asr_sdk_config") {
     "MBEDTLS_USER_CONFIG_FILE=<mbedtls_user_config.h>",
     "CFG_FLASH_MAX_SIZE=0x400000",
     "CONFIG_ENABLE_ASR_LEGA_RTOS=1",
-#    "CONFIG_ENABLE_ASR_APP_MESH=1",
+
+    #    "CONFIG_ENABLE_ASR_APP_MESH=1",
     "CFG_EASY_LOG_ENABLE=1",
     "CFG_EASY_LOG_MODULE_EN=1",
-    ]
+  ]
 
   cflags_c = [
     "-mcmodel=medany",
@@ -159,8 +160,8 @@ config("asr_sdk_config") {
     "-ffunction-sections",
     "-fdata-sections",
     "-g",
-    "-Wall"
-   ]
+    "-Wall",
+  ]
 
   cflags_cc = cflags_c
 
@@ -171,7 +172,7 @@ config("asr_sdk_config") {
     "-Wno-unused-function",
     "-Wno-pointer-sign",
     "-Wno-type-limits",
-   ]
+  ]
 
   ldflags = [
     "-mcmodel=medany",
@@ -181,15 +182,15 @@ config("asr_sdk_config") {
     "-lstdc++",
     "-nostartfiles",
     "-Wl,--gc-sections",
-   ]
-
-  libs = [
-     "${chip_root}/third_party/asr/${asr_ic_family}/asr_sdk/lib/libasr_wifi6_v6.a"
   ]
 
-  linker_script_flags = "${asr_sdk_build_root}/asr_sdk/platform/alto/linker/gcc_flashxip.ld"
+  libs = [ "${chip_root}/third_party/asr/${asr_ic_family}/asr_sdk/lib/libasr_wifi6_v6.a" ]
+
+  linker_script_flags =
+      "${asr_sdk_build_root}/asr_sdk/platform/alto/linker/gcc_flashxip.ld"
   ldflags += [ "-T" + rebase_path(linker_script_flags, root_build_dir) ]
-  ble_symbol_flags = "${asr_sdk_build_root}/asr_sdk/lib/ble/ble_rom_v10_0_8_asr_symbol.txt"
+  ble_symbol_flags =
+      "${asr_sdk_build_root}/asr_sdk/lib/ble/ble_rom_v10_0_8_asr_symbol.txt"
   ldflags += [ "-Wl,-R" + rebase_path(ble_symbol_flags, root_build_dir) ]
   ldflags += [ "-Wl,-z,max-page-size=4096" ]
 }

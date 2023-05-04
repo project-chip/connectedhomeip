@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
 import("//build_overrides/asr.gni")
+import("//build_overrides/chip.gni")
 
 import("${chip_root}/examples/platform/asr/args.gni")
 
 # architecture flags will be set based on asr_family.
 if (asr_ic_family == "asr582x") {
-    #arm_platform_config = "${asr_sdk_build_root}/asr_arm.gni"
+  #arm_platform_config = "${asr_sdk_build_root}/asr_arm.gni"
 }
 if (asr_ic_family == "asr595x") {
-    riscv_platform_config = "${asr_sdk_build_root}/asr_riscv.gni"
+  riscv_platform_config = "${asr_sdk_build_root}/asr_riscv.gni"
 }
 
 mbedtls_target = "${asr_sdk_build_root}:asr_build"
@@ -36,5 +36,4 @@ chip_build_tests = false
 chip_inet_config_enable_ipv4 = true
 chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_udp_endpoint = true
-
 #chip_system_config_locking = "legartos"

@@ -27,9 +27,9 @@ namespace DeviceLayer {
  * @brief This class provides Commissionable data and Device Attestation Credentials.
  */
 
-class ASRFactoryDataProvider  : public CommissionableDataProvider,
-                                public Credentials::DeviceAttestationCredentialsProvider,
-                                public Internal::GenericDeviceInstanceInfoProvider<Internal::ASRConfig>
+class ASRFactoryDataProvider : public CommissionableDataProvider,
+                               public Credentials::DeviceAttestationCredentialsProvider,
+                               public Internal::GenericDeviceInstanceInfoProvider<Internal::ASRConfig>
 {
 public:
     ASRFactoryDataProvider() :

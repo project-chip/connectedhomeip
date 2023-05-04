@@ -26,40 +26,40 @@ assert(asr_target_project != "", "asr_target_project must be specified")
 # Add includes, cflags, asmflags, etc in config
 config("asr_sdk_config") {
   _include_dirs = [
-      "${asr_sdk_build_root}/asr_sdk/config",
-      "${asr_sdk_build_root}/asr_sdk/config/lwip_if",
-      "${asr_sdk_build_root}/asr_sdk/matter",
-      "${asr_sdk_build_root}/asr_sdk/freertos/Source/include",
-      "${asr_sdk_build_root}/asr_sdk/freertos/Source/portable/MemMang",
-      "${asr_sdk_build_root}/asr_sdk/freertos/Source/portable/GCC/ARM_CM4F",
-      "${asr_sdk_build_root}/asr_sdk/lib/wifi",
-      "${asr_sdk_build_root}/asr_sdk/lib/ble",
-      "${asr_sdk_build_root}/asr_sdk/lib/sys",
-      "${asr_sdk_build_root}/asr_sdk/lib/security",
-      "${asr_sdk_build_root}/asr_sdk/version",
-      "${asr_sdk_build_root}/asr_sdk/peripheral/duet/inc",
-      "${asr_sdk_build_root}/asr_sdk/common/duet",
-      "${asr_sdk_build_root}/asr_sdk/common/duet/easylogger",
-      "${asr_sdk_build_root}/asr_sdk/security/duet/inc",
-      "${asr_sdk_build_root}/asr_sdk/platform/duet",
-      "${asr_sdk_build_root}/asr_sdk/platform/duet/CMSIS/Include",
-      "${asr_sdk_build_root}/asr_sdk/platform/duet/system/include",
-      "${asr_sdk_build_root}/asr_sdk/platform/duet/kv/include",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/port/include",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/lwip",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_app",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_app/lwip_app_ping",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/lwip/prot",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/netif",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_app/iperf",
-      "${asr_sdk_build_root}/asr_sdk/lwip/lwip_app/ota",
-      "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/include",
-      "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/include/mbedtls",
-      "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/asr_mbedtls/",
-      "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/asr_mbedtls/alt",
-      "${asr_sdk_build_root}/asr_sdk/demo/matter_demo/app/ble_demo/duet_hl_matter",
-      "${asr_sdk_build_root}/asr_sdk/platform/duet/kv/include",
+    "${asr_sdk_build_root}/asr_sdk/config",
+    "${asr_sdk_build_root}/asr_sdk/config/lwip_if",
+    "${asr_sdk_build_root}/asr_sdk/matter",
+    "${asr_sdk_build_root}/asr_sdk/freertos/Source/include",
+    "${asr_sdk_build_root}/asr_sdk/freertos/Source/portable/MemMang",
+    "${asr_sdk_build_root}/asr_sdk/freertos/Source/portable/GCC/ARM_CM4F",
+    "${asr_sdk_build_root}/asr_sdk/lib/wifi",
+    "${asr_sdk_build_root}/asr_sdk/lib/ble",
+    "${asr_sdk_build_root}/asr_sdk/lib/sys",
+    "${asr_sdk_build_root}/asr_sdk/lib/security",
+    "${asr_sdk_build_root}/asr_sdk/version",
+    "${asr_sdk_build_root}/asr_sdk/peripheral/duet/inc",
+    "${asr_sdk_build_root}/asr_sdk/common/duet",
+    "${asr_sdk_build_root}/asr_sdk/common/duet/easylogger",
+    "${asr_sdk_build_root}/asr_sdk/security/duet/inc",
+    "${asr_sdk_build_root}/asr_sdk/platform/duet",
+    "${asr_sdk_build_root}/asr_sdk/platform/duet/CMSIS/Include",
+    "${asr_sdk_build_root}/asr_sdk/platform/duet/system/include",
+    "${asr_sdk_build_root}/asr_sdk/platform/duet/kv/include",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/port/include",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/lwip",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_app",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_app/lwip_app_ping",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/lwip/prot",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_2.1.2/include/netif",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_app/iperf",
+    "${asr_sdk_build_root}/asr_sdk/lwip/lwip_app/ota",
+    "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/include",
+    "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/include/mbedtls",
+    "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/asr_mbedtls/",
+    "${asr_sdk_build_root}/asr_sdk/lwip/mbedtls-mbedtls-2.18/asr_mbedtls/alt",
+    "${asr_sdk_build_root}/asr_sdk/demo/matter_demo/app/ble_demo/duet_hl_matter",
+    "${asr_sdk_build_root}/asr_sdk/platform/duet/kv/include",
   ]
 
   # Also add project include path (passed in from project build)
@@ -134,10 +134,11 @@ config("asr_sdk_config") {
     "MBEDTLS_HW_HASH",
     "MBEDTLS_USER_CONFIG_FILE=<mbedtls_user_config.h>",
     "CONFIG_ENABLE_ASR_LEGA_RTOS=1",
-#    "CONFIG_ENABLE_ASR_APP_MESH=1",
+
+    #    "CONFIG_ENABLE_ASR_APP_MESH=1",
     "CFG_EASY_LOG_ENABLE=1",
     "CFG_EASY_LOG_MODULE_EN=1",
-    ]
+  ]
 
   cflags_c = [
     "-mcpu=cortex-m4",
@@ -148,8 +149,8 @@ config("asr_sdk_config") {
     "-ffunction-sections",
     "-fdata-sections",
     "-g",
-    "-Wall"
-   ]
+    "-Wall",
+  ]
 
   cflags_cc = cflags_c
 
@@ -161,18 +162,19 @@ config("asr_sdk_config") {
     "-Wno-sign-compare",
     "-Wno-unused-function",
     "-Wno-pointer-sign",
-    "-Wno-type-limits"
+    "-Wno-type-limits",
   ]
 
-  ldflags += ["-Wl,--gc-sections"]
+  ldflags += [ "-Wl,--gc-sections" ]
 
   libs = [
-     "${chip_root}/third_party/asr/${asr_ic_family}/asr_sdk/lib/5822s/libasr_combo_v6.a",
-     "${chip_root}/third_party/asr/${asr_ic_family}/asr_sdk/lib/ble/lib_ble_mesh.a",
-     "${chip_root}/third_party/asr/${asr_ic_family}/asr_sdk/lib/security/lib_security.a",
+    "${chip_root}/third_party/asr/${asr_ic_family}/asr_sdk/lib/5822s/libasr_combo_v6.a",
+    "${chip_root}/third_party/asr/${asr_ic_family}/asr_sdk/lib/ble/lib_ble_mesh.a",
+    "${chip_root}/third_party/asr/${asr_ic_family}/asr_sdk/lib/security/lib_security.a",
   ]
 
-  linker_script_flags = "${asr_sdk_build_root}/asr_sdk/demo/matter_demo/app/ld/5822t/gcc.ld"
+  linker_script_flags =
+      "${asr_sdk_build_root}/asr_sdk/demo/matter_demo/app/ld/5822t/gcc.ld"
   ldflags += [ "-T" + rebase_path(linker_script_flags, root_build_dir) ]
   ble_symbol_flags = "${asr_sdk_build_root}/asr_sdk/lib/ble/asr_ble_rom_symbol_v20200507204845.txt"
   ldflags += [ "-Wl,-R" + rebase_path(ble_symbol_flags, root_build_dir) ]

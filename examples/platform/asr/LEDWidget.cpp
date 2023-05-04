@@ -18,18 +18,18 @@
 
 #include "LEDWidget.h"
 #ifdef CFG_PLF_RV32
-#include "asr_pwm.h"
-#include "asr_pinmux.h"
 #include "asr_gpio.h"
+#include "asr_pinmux.h"
+#include "asr_pwm.h"
 #define duet_pwm_dev_t asr_pwm_dev_t
 #define duet_pwm_config_t asr_pwm_config_t
 #define duet_pwm_para_chg asr_pwm_para_chg
 #define duet_pwm_init asr_pwm_init
 #define duet_pwm_start asr_pwm_start
 #else
+#include "duet_gpio.h"
 #include "duet_pinmux.h"
 #include "duet_pwm.h"
-#include "duet_gpio.h"
 #endif
 #include "AppConfig.h"
 #include <platform/CHIPDeviceLayer.h>
@@ -51,24 +51,24 @@
 // PWM period in micro seconds
 #define LED_PWM_PERIOD_US (255u)
 
-static void show_pwm(duet_pwm_dev_t *pwm_dev, uint8_t val)
+static void show_pwm(duet_pwm_dev_t * pwm_dev, uint8_t val)
 {
     duet_pwm_config_t pwm_cfg;
 
-    if(val < LED_MIN_BRIGHTNESS)
-       val = LED_MIN_BRIGHTNESS;
-    pwm_cfg.duty_cycle = (float)(val) / LED_PWM_PERIOD_US;
-    pwm_cfg.freq = PWM_LED_FREQ_HZ;
+    if (val < LED_MIN_BRIGHTNESS)
+        val = LED_MIN_BRIGHTNESS;
+    pwm_cfg.duty_cycle = (float) (val) / LED_PWM_PERIOD_US;
+    pwm_cfg.freq       = PWM_LED_FREQ_HZ;
 
     duet_pwm_para_chg(pwm_dev, pwm_cfg);
 }
 
-static void init_pwm(duet_pwm_dev_t *pwm_dev, uint8_t ledNum, uint8_t val)
+static void init_pwm(duet_pwm_dev_t * pwm_dev, uint8_t ledNum, uint8_t val)
 {
-    pwm_dev->port = ledNum;
+    pwm_dev->port              = ledNum;
     pwm_dev->config.duty_cycle = val;
-    pwm_dev->config.freq = PWM_LED_FREQ_HZ;
-    pwm_dev->priv = NULL;
+    pwm_dev->config.freq       = PWM_LED_FREQ_HZ;
+    pwm_dev->priv              = NULL;
     duet_pwm_init(pwm_dev);
 }
 
@@ -85,23 +85,23 @@ void LEDWidget::Init(uint8_t ledNum)
     if (ledNum == LIGHT_RGB_GREEN)
     {
 #ifdef CFG_PLF_RV32
-        asr_pinmux_config(LIGHT_RGB_RED_PAD,PF_PWM);
+        asr_pinmux_config(LIGHT_RGB_RED_PAD, PF_PWM);
 #endif
-        init_pwm(&pwm_led_g, ledNum , LED_MIN_BRIGHTNESS);
+        init_pwm(&pwm_led_g, ledNum, LED_MIN_BRIGHTNESS);
     }
     else if (ledNum == LIGHT_RGB_BLUE)
     {
 #ifdef CFG_PLF_RV32
-        asr_pinmux_config(LIGHT_RGB_BLUE_PAD,PF_PWM);
+        asr_pinmux_config(LIGHT_RGB_BLUE_PAD, PF_PWM);
 #endif
-        init_pwm(&pwm_led_b, ledNum , LED_MIN_BRIGHTNESS);
+        init_pwm(&pwm_led_b, ledNum, LED_MIN_BRIGHTNESS);
     }
     else
     {
 #ifdef CFG_PLF_RV32
-        asr_pinmux_config(LIGHT_RGB_GREEN_PAD,PF_PWM);
+        asr_pinmux_config(LIGHT_RGB_GREEN_PAD, PF_PWM);
 #endif
-        init_pwm(&pwm_led, ledNum , LED_MIN_BRIGHTNESS);
+        init_pwm(&pwm_led, ledNum, LED_MIN_BRIGHTNESS);
     }
 }
 
@@ -147,7 +147,6 @@ void LEDWidget::Animate()
             mLastChangeTimeMS = nowMS;
         }
     }
-
 }
 
 void LEDWidget::DoSet(bool state)
@@ -196,8 +195,8 @@ void LEDWidget::PWM_start()
 void LEDWidget::PWM_stop()
 {
     SetBrightness(LED_MIN_BRIGHTNESS);
-    mbrightness  = LED_MIN_BRIGHTNESS;
-    mState = 0;
+    mbrightness = LED_MIN_BRIGHTNESS;
+    mState      = 0;
 }
 
 void LEDWidget::SetBrightness(uint8_t brightness)
@@ -214,13 +213,13 @@ void LEDWidget::SetColor(uint8_t Hue, uint8_t Saturation)
 
     sbrightness = (mState) ? mbrightness : 0;
 
-    sHue        = static_cast<uint16_t>(Hue) * 360 / 254;        // sHue [0, 360]
+    sHue        = static_cast<uint16_t>(Hue) * 360 / 254;       // sHue [0, 360]
     sSaturation = static_cast<uint8_t>(Saturation) * 100 / 254; // sSaturation [0 , 100]
 
     HSB2rgb(sHue, sSaturation, sbrightness, red, green, blue);
     ASR_LOG("brightness: %d, red: %d, green: %d, blue: %d", sbrightness, red, green, blue);
 
-    mHue = Hue;
+    mHue        = Hue;
     mSaturation = Saturation;
 
     showRGB(red, green, blue);

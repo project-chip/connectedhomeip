@@ -17,10 +17,10 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/ASR/NetworkCommissioningDriver.h>
 #include <platform/ASR/ASRConfig.h>
 #include <platform/ASR/ASRUtils.h>
+#include <platform/ASR/NetworkCommissioningDriver.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <limits>
 #include <string>
@@ -35,24 +35,24 @@ namespace NetworkCommissioning {
 CHIP_ERROR ASRWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
-    mpScanCallback        = nullptr;
-    mpConnectCallback     = nullptr;
+    mpScanCallback         = nullptr;
+    mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
 
     lega_wlan_wifi_conf config = { 0 };
-    err  = chip::DeviceLayer::Internal::ASRUtils::asr_wifi_get_config(&config);
+    err                        = chip::DeviceLayer::Internal::ASRUtils::asr_wifi_get_config(&config);
 
     if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         return CHIP_NO_ERROR;
     }
 
-    memcpy(mSavedNetwork.ssid, config.wifi_ssid, config.ssid_len+1);
-    memcpy(mSavedNetwork.credentials, config.wifi_key, config.key_len+1);
+    memcpy(mSavedNetwork.ssid, config.wifi_ssid, config.ssid_len + 1);
+    memcpy(mSavedNetwork.credentials, config.wifi_key, config.key_len + 1);
     mSavedNetwork.ssidLen        = config.ssid_len;
     mSavedNetwork.credentialsLen = config.key_len;
 
-    mStagingNetwork              = mSavedNetwork;
+    mStagingNetwork = mSavedNetwork;
 
     return err;
 }
@@ -68,7 +68,7 @@ CHIP_ERROR ASRWiFiDriver::CommitConfiguration()
     memcpy(config.wifi_ssid, mStagingNetwork.ssid, mStagingNetwork.ssidLen);
     memcpy(config.wifi_key, mStagingNetwork.credentials, mStagingNetwork.credentialsLen);
     config.ssid_len = mStagingNetwork.ssidLen;
-    config.key_len = mStagingNetwork.credentialsLen;
+    config.key_len  = mStagingNetwork.credentialsLen;
 
     ReturnErrorOnFailure(chip::DeviceLayer::Internal::ASRUtils::asr_wifi_set_config(&config));
 
@@ -88,7 +88,7 @@ bool ASRWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId
 }
 
 Status ASRWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
-                                        uint8_t & outNetworkIndex)
+                                         uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
@@ -139,7 +139,7 @@ CHIP_ERROR ASRWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
     memcpy(wifiConfig.wifi_ssid, ssid, ssidLen);
     memcpy(wifiConfig.wifi_key, key, keyLen);
     wifiConfig.ssid_len = ssidLen;
-    wifiConfig.key_len = keyLen;
+    wifiConfig.key_len  = keyLen;
 
     err = chip::DeviceLayer::Internal::ASRUtils::asr_wifi_set_config(&wifiConfig);
     SuccessOrExit(err);
@@ -184,11 +184,11 @@ exit:
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
 }
-//asr wifi
+// asr wifi
 #include "lega_wlan_api.h"
 CHIP_ERROR ASRWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
-    if(ASRUtils::EnableStationMode() != CHIP_NO_ERROR)
+    if (ASRUtils::EnableStationMode() != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks Failed");
         return CHIP_ERROR_INTERNAL;
@@ -207,7 +207,7 @@ CHIP_ERROR ASRWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     return CHIP_NO_ERROR;
 }
 
-void ASRWiFiDriver::OnScanWiFiNetworkDone(lega_wlan_scan_result_t *ScanResult)
+void ASRWiFiDriver::OnScanWiFiNetworkDone(lega_wlan_scan_result_t * ScanResult)
 {
     uint8_t ap_num = ScanResult->ap_num;
     if (!ap_num)
@@ -265,9 +265,9 @@ void ASRWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callb
 
 CHIP_ERROR GetConnectedNetwork(Network & network)
 {
-    lega_wlan_ap_info_adv_t *apinfo = lega_wlan_get_associated_apinfo();
+    lega_wlan_ap_info_adv_t * apinfo = lega_wlan_get_associated_apinfo();
 
-    if ((apinfo == NULL)||(apinfo->ssid[0] == 0))
+    if ((apinfo == NULL) || (apinfo->ssid[0] == 0))
     {
         return CHIP_ERROR_INTERNAL;
     }

@@ -25,11 +25,11 @@
 #include <stdint.h>
 
 #include <FreeRTOS.h>
-#include <task.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <task.h>
 
 #include <AppTask.h>
 

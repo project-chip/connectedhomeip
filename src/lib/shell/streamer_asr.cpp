@@ -18,10 +18,10 @@
 #include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 
-#include <stdio.h>
-#include <string.h>
 #include "lega_rtos_api.h"
 #include "printf_uart.h"
+#include <stdio.h>
+#include <string.h>
 #ifdef CFG_PLF_RV32
 #include "asr_uart.h"
 #define duet_uart_set_callback asr_uart_set_callback
@@ -52,15 +52,15 @@ int streamer_asr_init(streamer_t * streamer)
 ssize_t streamer_asr_read(streamer_t * streamer, char * buffer, size_t length)
 {
     (void) streamer;
-    uint16_t i = 0;
+    uint16_t i        = 0;
     uint32_t rx_count = 0;
     int32_t ret;
-    uint8_t *pdata = (uint8_t *)buffer;
-    for (i = 0; i < (uint16_t)length; i++)
+    uint8_t * pdata = (uint8_t *) buffer;
+    for (i = 0; i < (uint16_t) length; i++)
     {
         ret = lega_rtos_pop_from_queue(&hal_uart_buf_queue, &pdata[i], LEGA_NEVER_TIMEOUT);
 
-        if(!ret)
+        if (!ret)
         {
             rx_count++;
         }

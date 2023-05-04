@@ -37,7 +37,7 @@ ClockImpl gClockImpl;
 
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return Clock::Microseconds64(lega_rtos_get_time()*1000l);
+    return Clock::Microseconds64(lega_rtos_get_time() * 1000l);
 }
 
 Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)

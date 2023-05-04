@@ -15,8 +15,10 @@
 declare_args() {
   # ASR IC family.
   asr_ic_family = ""
+
   # Root directory for ASR SDK build files.
   asr_sdk_build_root = ""
+
   # Root directory for ASR toolchain.
   asr_toolchain_root = ""
 }

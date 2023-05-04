@@ -26,24 +26,24 @@
 #include "duet_pwm.h"
 #endif
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 void RGB_setup_HSB(uint8_t Hue, uint8_t Saturation);
 #ifdef __cplusplus
 }
 #endif
 
-#define LIGHT_SELECT_LED 1 // the embeded led
-#define LIGHT_SELECT_RGB 2 // the RGB led
+#define LIGHT_SELECT_LED 1
+#define LIGHT_SELECT_RGB 2
 #define LIGHT_SELECT LIGHT_SELECT_RGB
 
-#define LIGHT_RGB_RED   PWM_OUTPUT_CH6
+#define LIGHT_RGB_RED PWM_OUTPUT_CH6
 #define LIGHT_RGB_GREEN PWM_OUTPUT_CH4
-#define LIGHT_RGB_BLUE  PWM_OUTPUT_CH1
+#define LIGHT_RGB_BLUE PWM_OUTPUT_CH1
 
-#define LIGHT_RGB_RED_PAD   PAD7
+#define LIGHT_RGB_RED_PAD PAD7
 #define LIGHT_RGB_GREEN_PAD PAD6
-#define LIGHT_RGB_BLUE_PAD  PAD10
+#define LIGHT_RGB_BLUE_PAD PAD10
 
 class LEDWidget
 {
@@ -73,8 +73,8 @@ private:
 
     uint8_t mHue;
     uint8_t mSaturation;
-    duet_pwm_dev_t  pwm_led;
-    duet_pwm_dev_t  pwm_led_g;
-    duet_pwm_dev_t  pwm_led_b;
+    duet_pwm_dev_t pwm_led;
+    duet_pwm_dev_t pwm_led_g;
+    duet_pwm_dev_t pwm_led_b;
     void DoSet(bool state);
 };

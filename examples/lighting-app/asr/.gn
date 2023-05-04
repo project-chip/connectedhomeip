@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/asr.gni")
+import("//build_overrides/build.gni")
 
 # The location of the build configuration file.
 buildconfig = "${build_root}/config/BUILDCONFIG.gn"

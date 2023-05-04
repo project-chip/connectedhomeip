@@ -13,17 +13,22 @@ extern "C" void ShutdownChip();
 
 void asr_matter_reset(int type)
 {
-    if (type == 0) {
+    if (type == 0)
+    {
         ConnectivityMgr().ClearWiFiStationProvision();
         chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
         chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    } else if (type == 1) {
+    }
+    else if (type == 1)
+    {
         chip::Server::GetInstance().ScheduleFactoryReset();
-    } else if (type == 2) {
+    }
+    else if (type == 2)
+    {
         chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
         auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
         commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
-                                                    CommissioningWindowAdvertisement::kDnssdOnly);
+                                                   CommissioningWindowAdvertisement::kDnssdOnly);
     }
 }
 
@@ -60,15 +65,8 @@ extern "C" void vApplicationIdleHook(void)
     // FreeRTOS Idle callback
 }
 
+extern "C" void __attribute__((weak)) asr_matter_onoff(int cmd) {}
 
-extern "C" void __attribute__((weak)) asr_matter_onoff(int cmd)
-{
-}
+extern "C" void __attribute__((weak)) asr_matter_sensors(bool enable, int temp, int humi, int pressure) {}
 
-extern "C" void __attribute__((weak)) asr_matter_sensors(bool enable, int temp, int humi, int pressure)
-{
-}
-
-extern "C" void __attribute__((weak)) asr_matter_ota(uint32_t timeout)
-{
-}
+extern "C" void __attribute__((weak)) asr_matter_ota(uint32_t timeout) {}

@@ -23,11 +23,11 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/ASR/ASRUtils.h>
 #include <platform/ASR/ASRConfig.h>
+#include <platform/ASR/ASRUtils.h>
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 #include "lega_wlan_api.h"
 void lega_wlan_clear_pmk(void);
@@ -44,7 +44,7 @@ lega_wlan_wifi_conf wifi_conf;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 CHIP_ERROR ASRUtils::IsAPEnabled(bool & apEnabled)
 {
-    if(lega_wlan_get_wifi_mode()==SOFTAP)
+    if (lega_wlan_get_wifi_mode() == SOFTAP)
     {
         apEnabled = true;
     }
@@ -57,7 +57,7 @@ CHIP_ERROR ASRUtils::IsAPEnabled(bool & apEnabled)
 #endif
 CHIP_ERROR ASRUtils::IsStationEnabled(bool & staEnabled)
 {
-    if(lega_wlan_get_wifi_mode()==STA)
+    if (lega_wlan_get_wifi_mode() == STA)
     {
         staEnabled = true;
     }
@@ -73,7 +73,7 @@ bool ASRUtils::IsStationProvisioned(void)
     lega_wlan_wifi_conf stationConfig;
     bool stationConnected;
     Internal::ASRUtils::IsStationConnected(stationConnected);
-    return (asr_wifi_get_config(&stationConfig) == CHIP_NO_ERROR && stationConfig.ssid_len != 0)||stationConnected;
+    return (asr_wifi_get_config(&stationConfig) == CHIP_NO_ERROR && stationConfig.ssid_len != 0) || stationConnected;
 }
 
 static bool is_sta_connected = false;
@@ -96,7 +96,7 @@ CHIP_ERROR ASRUtils::EnableStationMode(void)
 {
     int curmode = lega_wlan_get_wifi_mode();
 
-    if(curmode == STA)
+    if (curmode == STA)
     {
         ChipLogError(DeviceLayer, "EnableStationMode, STA already");
     }
@@ -105,7 +105,7 @@ CHIP_ERROR ASRUtils::EnableStationMode(void)
         ChipLogProgress(DeviceLayer, "Changing ASR WiFi mode to STA");
         lega_wlan_init_type_t conf;
 
-        memset(&conf,0,sizeof(lega_wlan_init_type_t));
+        memset(&conf, 0, sizeof(lega_wlan_init_type_t));
         conf.wifi_mode = STA;
         conf.dhcp_mode = WLAN_DHCP_CLIENT;
 
@@ -186,7 +186,7 @@ exit:
 
 CHIP_ERROR ASRUtils::asr_wifi_get_config(lega_wlan_wifi_conf * conf)
 {
-    uint32_t code    = 0;
+    uint32_t code  = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (ASRConfig::ConfigValueExists(ASRConfig::kConfigKey_WiFiSSID) &&
@@ -261,7 +261,7 @@ CHIP_ERROR ASRUtils::ClearWiFiStationProvision(void)
 
 CHIP_ERROR ASRUtils::asr_wifi_disconnect(void)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "asr_wifi_disconnect");
 
     if (lega_wlan_close() != 0)
@@ -274,22 +274,22 @@ CHIP_ERROR ASRUtils::asr_wifi_disconnect(void)
 
 CHIP_ERROR ASRUtils::asr_wifi_connect(void)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     lega_wlan_wifi_conf stationConfig;
     lega_wlan_init_type_t conf;
 
-    memset(&conf,0,sizeof(lega_wlan_init_type_t));
+    memset(&conf, 0, sizeof(lega_wlan_init_type_t));
     conf.wifi_mode = STA;
     conf.dhcp_mode = WLAN_DHCP_CLIENT;
     asr_wifi_get_config(&stationConfig);
 
-    strncpy((char*)conf.wifi_ssid, (char *)stationConfig.wifi_ssid, stationConfig.ssid_len);
+    strncpy((char *) conf.wifi_ssid, (char *) stationConfig.wifi_ssid, stationConfig.ssid_len);
 
-    strncpy((char*)conf.wifi_key, (char *)stationConfig.wifi_key, stationConfig.key_len);
+    strncpy((char *) conf.wifi_key, (char *) stationConfig.wifi_key, stationConfig.key_len);
     conf.security = stationConfig.security;
 
     // before wlan open with sta mode, make sure the wlan is closed.
-    //lega_wlan_close();
+    // lega_wlan_close();
 
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]\r\n", StringOrNullMarker(conf.wifi_ssid));
 

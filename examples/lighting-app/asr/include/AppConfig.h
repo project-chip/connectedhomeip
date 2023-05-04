@@ -21,13 +21,13 @@
 
 // ---- Lighting Example App Config ----
 
-#if (CFG_EASY_LOG_ENABLE==1)
+#if (CFG_EASY_LOG_ENABLE == 1)
 #include "elog.h"
 #endif
 
 #define APP_TASK_NAME "APP"
 
-#define LIGHT_LED              PWM_OUTPUT_CH4
+#define LIGHT_LED PWM_OUTPUT_CH4
 
 // ASR Logging
 #ifdef __cplusplus

@@ -73,8 +73,8 @@ public:
     uint32_t mPacketUnicastRxCount   = 0;
     uint32_t mPacketUnicastTxCount   = 0;
     uint64_t mOverrunCount           = 0;
-    bool mipv4_offpremise = false;
-    bool mipv6_offpremise = false;
+    bool mipv4_offpremise            = false;
+    bool mipv6_offpremise            = false;
 };
 
 /**

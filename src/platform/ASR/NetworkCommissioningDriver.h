@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include <platform/NetworkCommissioning.h>
 #include "lega_wlan_api.h"
+#include <platform/NetworkCommissioning.h>
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 #ifdef __cplusplus
@@ -42,7 +42,9 @@ constexpr uint8_t kWiFiMaxNetworks                  = 15;
 class ASRScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    ASRScanResponseIterator(const size_t size, const lega_wlan_scan_result_t * scanResults) : mSize(size), mpScanResults(scanResults) {}
+    ASRScanResponseIterator(const size_t size, const lega_wlan_scan_result_t * scanResults) :
+        mSize(size), mpScanResults(scanResults)
+    {}
     size_t Count() override { return mSize; }
     bool Next(WiFiScanResponse & item) override
     {
@@ -53,8 +55,8 @@ public:
 
         // copy the available information into WiFiScanResponse struct, which will be copied to the result to be sent
         item.security.SetRaw(mpScanResults->ap_list[mIternum].security);
-        item.ssidLen  = static_cast<uint8_t>(
-            strnlen(reinterpret_cast<const char *>(mpScanResults->ap_list[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
+        item.ssidLen  = static_cast<uint8_t>(strnlen(reinterpret_cast<const char *>(mpScanResults->ap_list[mIternum].ssid),
+                                                    chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
         item.channel  = mpScanResults->ap_list[mIternum].channel;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mpScanResults->ap_list[mIternum].ap_power;
@@ -122,7 +124,7 @@ public:
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
     void OnConnectWiFiNetwork();
-    void OnScanWiFiNetworkDone(lega_wlan_scan_result_t *ScanResult);
+    void OnScanWiFiNetworkDone(lega_wlan_scan_result_t * ScanResult);
     void OnNetworkStatusChange();
 
     CHIP_ERROR SetLastDisconnectReason(int32_t reason);

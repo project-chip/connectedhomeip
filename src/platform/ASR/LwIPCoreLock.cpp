@@ -19,8 +19,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <lib/support/logging/CHIPLogging.h>
 #include <lega_rtos_api.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace {
 

@@ -23,22 +23,23 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 #include "lega_wlan_api.h"
 #ifdef __cplusplus
 }
 #endif
 
-typedef struct {
-    char    wifi_mode;              /* refer to hal_wifi_type_t*/
-    char    security;               /* security mode, refer to lega_wlan_security_e */
-    char    wifi_ssid[32];          /* in station mode, indicate SSID of the wlan needs to be connected.
-                                       in softap mode, indicate softap SSID*/
-    char    wifi_key[64];           /* in station mode, indicate Security key of the wlan needs to be connected,
-                                       in softap mode, indicate softap password.(ignored in an open system.) */
-    uint32_t  ssid_len;
-    uint32_t  key_len;
+typedef struct
+{
+    char wifi_mode;     /* refer to hal_wifi_type_t*/
+    char security;      /* security mode, refer to lega_wlan_security_e */
+    char wifi_ssid[32]; /* in station mode, indicate SSID of the wlan needs to be connected.
+                           in softap mode, indicate softap SSID*/
+    char wifi_key[64];  /* in station mode, indicate Security key of the wlan needs to be connected,
+                           in softap mode, indicate softap password.(ignored in an open system.) */
+    uint32_t ssid_len;
+    uint32_t key_len;
 } lega_wlan_wifi_conf;
 
 namespace chip {

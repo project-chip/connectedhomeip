@@ -44,14 +44,14 @@ const char ASRConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
 const char ASRConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the chip-factory namespace
-const ASRConfig::Key ASRConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
-const ASRConfig::Key ASRConfig::kConfigKey_MfrDeviceId           = { kConfigNamespace_ChipFactory, "device-id" };
-const ASRConfig::Key ASRConfig::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
-const ASRConfig::Key ASRConfig::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
-const ASRConfig::Key ASRConfig::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
-const ASRConfig::Key ASRConfig::kConfigKey_SoftwareVersion       = { kConfigNamespace_ChipFactory, "software-ver" };
-const ASRConfig::Key ASRConfig::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
-const ASRConfig::Key ASRConfig::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
+const ASRConfig::Key ASRConfig::kConfigKey_SerialNum           = { kConfigNamespace_ChipFactory, "serial-num" };
+const ASRConfig::Key ASRConfig::kConfigKey_MfrDeviceId         = { kConfigNamespace_ChipFactory, "device-id" };
+const ASRConfig::Key ASRConfig::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
+const ASRConfig::Key ASRConfig::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
+const ASRConfig::Key ASRConfig::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
+const ASRConfig::Key ASRConfig::kConfigKey_SoftwareVersion     = { kConfigNamespace_ChipFactory, "software-ver" };
+const ASRConfig::Key ASRConfig::kConfigKey_HardwareVersion     = { kConfigNamespace_ChipFactory, "hardware-ver" };
+const ASRConfig::Key ASRConfig::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
 #if !CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER
 const ASRConfig::Key ASRConfig::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
 const ASRConfig::Key ASRConfig::kConfigKey_SetupDiscriminator    = { kConfigNamespace_ChipFactory, "discriminator" };
@@ -85,7 +85,7 @@ const ASRConfig::Key ASRConfig::kCounterKey_RebootCount           = { kConfigNam
 const ASRConfig::Key ASRConfig::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
 const ASRConfig::Key ASRConfig::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters, "total-hours" };
 
-#define _KVSTORE_MAX_KEY_SIZE    64
+#define _KVSTORE_MAX_KEY_SIZE 64
 
 CHIP_ERROR ASRConfig::ReadConfigValue(Key key, bool & val)
 {
@@ -176,7 +176,7 @@ CHIP_ERROR ASRConfig::WriteConfigValue(Key key, uint64_t val)
 
 CHIP_ERROR ASRConfig::WriteConfigValueStr(Key key, const char * str)
 {
-    size_t size                            = strlen(str) + 1;
+    size_t size                         = strlen(str) + 1;
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, str, size);
@@ -218,11 +218,12 @@ bool ASRConfig::ConfigValueExists(Key key)
 }
 
 #if CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER
-CHIP_ERROR ASRConfig::ReadFactoryConfigValue(asr_matter_partition_t matter_partition, uint8_t * buf, size_t bufSize, size_t & outLen)
+CHIP_ERROR ASRConfig::ReadFactoryConfigValue(asr_matter_partition_t matter_partition, uint8_t * buf, size_t bufSize,
+                                             size_t & outLen)
 {
     int32_t ret = 0;
 
-    ret = asr_factory_config_read(matter_partition, buf, (uint32_t)bufSize, (uint32_t *)&outLen);
+    ret = asr_factory_config_read(matter_partition, buf, (uint32_t) bufSize, (uint32_t *) &outLen);
 
     if (ret != 0)
         ChipLogProgress(DeviceLayer, "asr_factory_config_read: %d failed, ret = %d\n", matter_partition, ret);
@@ -244,9 +245,9 @@ CHIP_ERROR ASRConfig::ReadFactoryConfigValue(asr_matter_partition_t matter_parti
     uint8_t buf[4];
     size_t outlen = 0;
 
-    ret = asr_factory_config_read(matter_partition, buf, sizeof(uint32_t), (uint32_t *)&outlen);
+    ret = asr_factory_config_read(matter_partition, buf, sizeof(uint32_t), (uint32_t *) &outlen);
 
-    if(outlen > sizeof(uint32_t))
+    if (outlen > sizeof(uint32_t))
         ret = -1;
 
     if (ret != 0)
@@ -254,7 +255,7 @@ CHIP_ERROR ASRConfig::ReadFactoryConfigValue(asr_matter_partition_t matter_parti
 
     if (ret == 0)
     {
-        val = *((uint32_t*)buf);
+        val = *((uint32_t *) buf);
         return CHIP_NO_ERROR;
     }
     else

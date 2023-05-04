@@ -25,7 +25,6 @@
 #include <lega_rtos_api.h>
 #include <platform/CHIPDeviceLayer.h>
 
-
 class AppTask
 {
 

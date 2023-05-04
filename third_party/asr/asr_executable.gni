@@ -27,11 +27,9 @@ template("asr_executable") {
 
   if (asr_ic_family == "asr595x") {
     objcopy = "${asr_toolchain_root}riscv-asr-elf-objcopy"
-  }
-  else if (asr_ic_family == "asr582x") {
+  } else if (asr_ic_family == "asr582x") {
     objcopy = "${asr_toolchain_root}arm-none-eabi-objcopy"
-  }
-  else{
+  } else {
     objcopy = "objcopy"
   }
 

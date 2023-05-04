@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/asr.gni")
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/asr.gni")
-import("${chip_root}/src/lib/lib.gni")
+import("${asr_sdk_build_root}/asr_sdk.gni")
 import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/asr/asr_executable.gni")
-import("${asr_sdk_build_root}/asr_sdk.gni")
 
 import("cfg.gni")
 
@@ -50,20 +50,21 @@ asr_sdk_sources("lighting_app_sdk_sources") {
   if (chip_use_factory) {
     defines += [
       "CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER=1",
-    # "CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER=1",
-      ]
+      # "CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER=1",
+    ]
   }
 
   if (chip_lwip_ip6_hook) {
     defines += [
       "CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT",
-      "CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT"
-      ]
+      "CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT",
+    ]
   }
 
   sources = [ "${asr_project_dir}/include/CHIPProjectConfig.h" ]
 
-  public_configs = [ "${chip_root}/third_party/asr/${asr_ic_family}:asr_sdk_config" ]
+  public_configs =
+      [ "${chip_root}/third_party/asr/${asr_ic_family}:asr_sdk_config" ]
 }
 
 asr_executable("lighting_app") {
@@ -72,11 +73,11 @@ asr_executable("lighting_app") {
   output_name = "chip-asr-lighting-example.out"
 
   sources = [
-    "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/ASRUtils.cpp",
-    "${examples_plat_dir}/init_asrPlatform.cpp",
-    "${examples_plat_dir}/init_Matter.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
+    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/init_Matter.cpp",
+    "${examples_plat_dir}/init_asrPlatform.cpp",
     "src/AppTask.cpp",
     "src/DeviceCallbacks.cpp",
     "src/main.cpp",
@@ -92,7 +93,7 @@ asr_executable("lighting_app") {
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload"
+    "${chip_root}/src/setup_payload",
   ]
 
   include_dirs += [
@@ -102,9 +103,7 @@ asr_executable("lighting_app") {
     "${chip_root}/src/lib",
   ]
 
-  defines = [
-    "ASR_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}"
-  ]
+  defines = [ "ASR_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}" ]
 
   if (chip_build_libshell) {
     defines += [ "CONFIG_ENABLE_CHIP_SHELL=1" ]

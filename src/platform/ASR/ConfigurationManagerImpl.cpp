@@ -22,9 +22,9 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
+#include <platform/ASR/ASRConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/KeyValueStoreManager.h>
-#include <platform/ASR/ASRConfig.h>
 #ifdef CFG_PLF_RV32
 #include "alto_common.h"
 #else

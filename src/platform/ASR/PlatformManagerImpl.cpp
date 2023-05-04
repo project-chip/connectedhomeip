@@ -60,7 +60,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     VerifyOrExit(result == kNoErr, err = CHIP_ERROR_NO_MEMORY);
 
     /* Initialize the timer. */
-    result = lega_rtos_init_timer(&mTimer, 1000, (timer_handler_t)TimerCallback, (void*)this);
+    result = lega_rtos_init_timer(&mTimer, 1000, (timer_handler_t) TimerCallback, (void *) this);
     VerifyOrExit(result == kNoErr, err = CHIP_ERROR_INTERNAL);
 
     /* Initialize the mutex. */
@@ -102,10 +102,10 @@ void PlatformManagerImpl::RunEventLoopInternal(void)
 {
     while (true)
     {
-        uint32_t flags_set          = 0;
+        uint32_t flags_set = 0;
 
-        OSStatus result = lega_rtos_wait_for_event_flags(&mEventFlags, kPostEventFlag | kTimerEventFlag | kTaskStopEventFlag, &flags_set,
-                                                            TRUE, WAIT_FOR_ANY_EVENT, LEGA_WAIT_FOREVER);
+        OSStatus result = lega_rtos_wait_for_event_flags(&mEventFlags, kPostEventFlag | kTimerEventFlag | kTaskStopEventFlag,
+                                                         &flags_set, TRUE, WAIT_FOR_ANY_EVENT, LEGA_WAIT_FOREVER);
 
         if (result != kNoErr)
         {
@@ -153,7 +153,7 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask(void)
     kTaskRunningEventFlag = 1;
 
     OSStatus result = lega_rtos_create_thread(&mThread, cfg.task_priority, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME,
-                                    (lega_thread_function_t)EventLoopTaskMain, cfg.stack_size, (lega_thread_arg_t)this);
+                                              (lega_thread_function_t) EventLoopTaskMain, cfg.stack_size, (lega_thread_arg_t) this);
 
     if (result != kNoErr)
     {
@@ -218,7 +218,7 @@ CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout durationM
     else
     {
         lega_rtos_deinit_timer(&mTimer);
-        lega_rtos_init_timer(&mTimer, durationMS.count(), (timer_handler_t)TimerCallback, (void*)this);
+        lega_rtos_init_timer(&mTimer, durationMS.count(), (timer_handler_t) TimerCallback, (void *) this);
         OSStatus result = lega_rtos_start_timer(&mTimer);
         if (kNoErr != result)
         {

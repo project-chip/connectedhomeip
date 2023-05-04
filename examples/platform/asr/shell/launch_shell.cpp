@@ -36,7 +36,7 @@ void LaunchShell()
 {
     chip::Shell::Engine::Root().Init();
 
-    lega_rtos_create_thread(NULL, 1, "matter_shell", (lega_thread_function_t)MatterShellTask, 2048, 0);
+    lega_rtos_create_thread(NULL, 1, "matter_shell", (lega_thread_function_t) MatterShellTask, 2048, 0);
 }
 
 } // namespace chip

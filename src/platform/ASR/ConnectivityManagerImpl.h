@@ -33,8 +33,8 @@
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 
-#include <lib/support/BitFlags.h>
 #include "lega_wlan_api.h"
+#include <lib/support/BitFlags.h>
 #include <platform/ASR/NetworkCommissioningDriver.h>
 
 namespace Inet {
@@ -70,6 +70,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 public:
     CHIP_ERROR ping_thread(void);
+
 private:
     using Flags = GenericConnectivityManagerImpl_WiFi::ConnectivityFlags;
     // ===== Members that implement the ConnectivityManager abstract interface.
@@ -131,11 +132,11 @@ private:
     CHIP_ERROR ConfigureWiFiAP(void);
     void ChangeWiFiAPState(WiFiAPState newState);
     void UpdateInternetConnectivityState(void);
-    static void lega_wifi_scan_ind(lega_wlan_scan_result_t *result);
+    static void lega_wifi_scan_ind(lega_wlan_scan_result_t * result);
     static void lega_wifi_connect_state(lega_wifi_event_e stat);
-    static void lega_wifi_get_ip_ind(lega_wlan_ip_stat_t *pnet);
-    static void lega_wifi_get_ip6_ind(lega_wlan_ip_stat_t *pnet);
-    static void lega_wifi_ap_peer_change(lega_wlan_client_addr_info_t *peer_info, uint8_t connect);
+    static void lega_wifi_get_ip_ind(lega_wlan_ip_stat_t * pnet);
+    static void lega_wifi_get_ip6_ind(lega_wlan_ip_stat_t * pnet);
+    static void lega_wifi_ap_peer_change(lega_wlan_client_addr_info_t * peer_info, uint8_t connect);
     static void lega_wlan_err_stat_handler(lega_wlan_err_status_e err_info);
     CHIP_ERROR WiFi_init(void);
 };
