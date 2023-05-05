@@ -79,22 +79,6 @@ jobs:
                       #       https://github.com/project-chip/connectedhomeip/issues/19169
                       #       https://github.com/project-chip/connectedhomeip/issues/22640
                       if [ "$idl_file" = './examples/all-clusters-app/all-clusters-common/all-clusters-app.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_contactsensor_lFAGG1bfRO.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_doorlock_aNKYAreMXE.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_extendedcolorlight_8lcaaYJVAa.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_flowsensor_1zVxHedlaV.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_heatingcoolingunit_ncdGai1E5a.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_humiditysensor_Xyj4gda6Hb.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_lightsensor_lZQycTFcJK.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_occupancysensor_iHyVgifZuo.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_onofflight_bbs1b7IaOV.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_onofflightswitch_FsPlMr090Q.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_onoffpluginunit_Wtf8ss5EBY.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_pressuresensor_s0qC9wLH4k.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_speaker_RpzeXdimqA.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_temperaturesensor_Qy1zkNW7c3.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_thermostat_bm3fb8dhYi.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_windowcovering_RLCxaGi9Yx.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/placeholder/linux/apps/app1/config.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
