@@ -62,10 +62,9 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
     #  - name (general name for this cluster)
     #  - code (unique identifier, may be hex or numeric)
     #  - attribute with side, code and optional attributes
-
     try:
         name = element.find('name')
-        if not name or not name.text:
+        if name is None or not name.text:
             raise ElementNotFoundError('name')
 
         name = name.text.replace(' ', '')
@@ -105,7 +104,7 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
                 name=cmd.attrib["name"], code=parseNumberString(cmd.attrib['code'])))
 
         code = element.find('code')
-        if not code:
+        if code is None:
             raise Exception("Failed to find cluster code")
 
         return DecodedCluster(
