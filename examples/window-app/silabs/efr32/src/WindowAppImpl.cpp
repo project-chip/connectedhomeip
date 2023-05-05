@@ -31,7 +31,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #endif // QR_CODE_ENABLED
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include <sl_simple_button_instances.h>
+#endif
 
 #include <sl_system_kernel.h>
 
@@ -45,6 +47,8 @@
 #include <LcdPainter.h>
 SilabsLCD slLCD;
 #endif
+
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
@@ -187,6 +191,8 @@ void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 
 CHIP_ERROR WindowAppImpl::Init()
 {
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(WindowAppImpl::ButtonEventHandler);
+
     WindowApp::Init();
 
     // Initialize App Task
@@ -510,11 +516,11 @@ void WindowAppImpl::OnMainLoop()
 //------------------------------------------------------------------------------
 WindowAppImpl::Button::Button(WindowApp::Button::Id id, const char * name) : WindowApp::Button(id, name) {}
 
-void WindowAppImpl::OnButtonChange(const sl_button_t * handle)
+void WindowAppImpl::OnButtonChange(uint8_t button, uint8_t btnAction)
 {
-    WindowApp::Button * btn = static_cast<Button *>((handle == &sl_button_btn0) ? sInstance.mButtonUp : sInstance.mButtonDown);
-
-    if (sl_button_get_state(handle) == SL_SIMPLE_BUTTON_PRESSED)
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+    WindowApp::Button * btn = static_cast<Button *>((button == 0) ? sInstance.mButtonUp : sInstance.mButtonDown);
+    if (btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         btn->Press();
     }
@@ -522,11 +528,12 @@ void WindowAppImpl::OnButtonChange(const sl_button_t * handle)
     {
         btn->Release();
     }
+#endif
 }
 
 // Silabs button callback from button event ISR
-void sl_button_on_change(const sl_button_t * handle)
+void WindowAppImpl::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     WindowAppImpl * app = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
-    app->OnButtonChange(handle);
+    app->OnButtonChange(button, btnAction);
 }

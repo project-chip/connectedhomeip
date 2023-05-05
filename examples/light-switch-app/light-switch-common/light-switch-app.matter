@@ -212,7 +212,7 @@ client cluster Scenes = 5 {
   }
 
   response struct AddSceneResponse = 0 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -223,7 +223,7 @@ client cluster Scenes = 5 {
   }
 
   response struct ViewSceneResponse = 1 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
@@ -237,7 +237,7 @@ client cluster Scenes = 5 {
   }
 
   response struct RemoveSceneResponse = 2 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -247,7 +247,7 @@ client cluster Scenes = 5 {
   }
 
   response struct RemoveAllScenesResponse = 3 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
   }
 
@@ -257,7 +257,7 @@ client cluster Scenes = 5 {
   }
 
   response struct StoreSceneResponse = 4 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -273,7 +273,7 @@ client cluster Scenes = 5 {
   }
 
   response struct GetSceneMembershipResponse = 6 {
-    ENUM8 status = 0;
+    status status = 0;
     nullable INT8U capacity = 1;
     group_id groupID = 2;
     optional INT8U sceneList[] = 3;
@@ -288,7 +288,7 @@ client cluster Scenes = 5 {
   }
 
   response struct EnhancedAddSceneResponse = 64 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -299,7 +299,7 @@ client cluster Scenes = 5 {
   }
 
   response struct EnhancedViewSceneResponse = 65 {
-    ENUM8 status = 0;
+    status status = 0;
     group_Id groupID = 1;
     INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
@@ -316,7 +316,7 @@ client cluster Scenes = 5 {
   }
 
   response struct CopySceneResponse = 66 {
-    ENUM8 status = 0;
+    status status = 0;
     group_Id groupIdentifierFrom = 1;
     INT8U sceneIdentifierFrom = 2;
   }
@@ -526,9 +526,47 @@ server cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 server cluster BasicInformation = 40 {
+  enum ColorEnum : ENUM8 {
+    kBlack = 0;
+    kNavy = 1;
+    kGreen = 2;
+    kTeal = 3;
+    kMaroon = 4;
+    kPurple = 5;
+    kOlive = 6;
+    kGray = 7;
+    kBlue = 8;
+    kLime = 9;
+    kAqua = 10;
+    kRed = 11;
+    kFuchsia = 12;
+    kYellow = 13;
+    kWhite = 14;
+    kNickel = 15;
+    kChrome = 16;
+    kBrass = 17;
+    kCopper = 18;
+    kSilver = 19;
+    kGold = 20;
+  }
+
+  enum ProductFinishEnum : ENUM8 {
+    kOther = 0;
+    kMatte = 1;
+    kSatin = 2;
+    kPolished = 3;
+    kRugged = 4;
+    kFabric = 5;
+  }
+
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
+  }
+
+  struct ProductAppearanceStruct {
+    ProductFinishEnum finish = 0;
+    nullable ColorEnum primaryColor = 1;
   }
 
   critical event StartUp = 0 {

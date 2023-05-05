@@ -185,7 +185,11 @@ public:
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
     Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
     Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
-    void SetTempFabricTable(FabricTable * tempFabricTable) { mTempFabricTable = tempFabricTable; }
+    void SetTempFabricTable(FabricTable * tempFabricTable, bool enableServerInteractions)
+    {
+        mTempFabricTable          = tempFabricTable;
+        mEnableServerInteractions = enableServerInteractions;
+    }
 
 private:
     DeviceControllerSystemState() {}
@@ -219,6 +223,8 @@ private:
     std::atomic<uint32_t> mRefCount{ 0 };
 
     bool mHaveShutDown = false;
+
+    bool mEnableServerInteractions = false;
 
     void Shutdown();
 };

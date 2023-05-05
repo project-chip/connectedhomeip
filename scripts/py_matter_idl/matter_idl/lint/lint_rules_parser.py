@@ -4,7 +4,7 @@ import logging
 import os
 import xml.etree.ElementTree
 from dataclasses import dataclass
-from typing import List, Mapping
+from typing import List, MutableMapping
 
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
@@ -21,7 +21,12 @@ except ImportError:
                                        RequiredCommandsRule)
 
 
-def parseNumberString(n):
+class ElementNotFoundError(Exception):
+    def __init__(self, name):
+        super().__init__(f"Could not find {name}")
+
+
+def parseNumberString(n: str) -> int:
     if n.startswith('0x'):
         return int(n[2:], 16)
     else:
@@ -59,7 +64,11 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
     #  - attribute with side, code and optional attributes
 
     try:
-        name = element.find('name').text.replace(' ', '')
+        name = element.find('name')
+        if not name or not name.text:
+            raise ElementNotFoundError('name')
+
+        name = name.text.replace(' ', '')
         required_attributes = []
         required_commands = []
 
@@ -75,8 +84,9 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             # or
             # <attribute ...><description>myName</description><access .../>...</attribute>
             attr_name = attr.text
-            if attr.find('description') is not None:
-                attr_name = attr.find('description').text
+            description = attr.find('description')
+            if description is not None:
+                attr_name = description.text
 
             required_attributes.append(
                 RequiredAttribute(
@@ -94,9 +104,13 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             required_commands.append(RequiredCommand(
                 name=cmd.attrib["name"], code=parseNumberString(cmd.attrib['code'])))
 
+        code = element.find('code')
+        if not code:
+            raise Exception("Failed to find cluster code")
+
         return DecodedCluster(
             name=name,
-            code=parseNumberString(element.find('code').text),
+            code=parseNumberString(code.text),
             required_attributes=required_attributes,
             required_commands=required_commands
         )
@@ -132,7 +146,7 @@ class LintRulesContext:
             "Required commands")
 
         # Map cluster names to the underlying code
-        self._cluster_codes: Mapping[str, int] = {}
+        self._cluster_codes: MutableMapping[str, int] = {}
 
     def GetLinterRules(self):
         return [self._required_attributes_rule, self._required_commands_rule]
@@ -300,7 +314,7 @@ if __name__ == '__main__':
     @click.option(
         '--log-level',
         default='INFO',
-        type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
         help='Determines the verbosity of script output.')
     @click.argument('filename')
     def main(log_level, filename=None):

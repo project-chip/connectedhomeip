@@ -76,14 +76,12 @@ limitations under the License.
       <description>ACL</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
-      <access modifier="fabric-scoped"/>
     </attribute>
 
     <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" entryType="AccessControlExtensionStruct" writable="true" optional="true">
       <description>Extension</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
-      <access modifier="fabric-scoped"/>
     </attribute>
 
     <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" writable="false">

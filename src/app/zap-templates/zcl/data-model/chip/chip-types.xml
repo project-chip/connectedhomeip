@@ -70,7 +70,7 @@ limitations under the License.
     <type id="0xF2" description="Device Type ID"           name="devtype_id"        size="4"  discrete="true" />
     <type id="0xF3" description="Fabric ID"                name="fabric_id"         size="8"  discrete="true" />
     <type id="0xF4" description="Group ID"                 name="group_id"          size="2"  discrete="true" />
-    <type id="0xF5" description="Status Code"              name="status"            size="2"  discrete="true" />
+    <type id="0xF5" description="Status Code"              name="status"            size="1"  discrete="true" />
     <type id="0xF6" description="Data Version"             name="data_ver"          size="4"  discrete="true" />
     <type id="0xF7" description="Event Number"             name="event_no"          size="8"  discrete="true" />
     <type id="0xF8" description="Endpoint Number"          name="endpoint_no"       size="2"  discrete="true" />

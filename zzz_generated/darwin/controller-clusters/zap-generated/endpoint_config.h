@@ -908,19 +908,6 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Client Monitoring (client) */ \
-      .clusterId = 0x00001046, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr, \
-      .generatedCommandList = nullptr, \
-      .eventList = nullptr, \
-      .eventCount = 0, \
-    },\
-  { \
       /* Endpoint: 1, Cluster: Unit Testing (client) */ \
       .clusterId = 0xFFF1FC05, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -942,7 +929,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 67, 0 },                                                                                           \
+        { ZAP_CLUSTER_INDEX(0), 66, 0 },                                                                                           \
     }
 
 // Largest attribute size is needed for various buffers

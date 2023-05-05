@@ -35,6 +35,13 @@ class HostCryptoLibrary(Enum):
             return 'chip_crypto="boringssl"'
 
 
+class HostFuzzingType(Enum):
+    """Defines fuzz target options available for host targets."""
+    NONE = auto()
+    LIB_FUZZER = auto()
+    OSS_FUZZ = auto()
+
+
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
@@ -239,14 +246,10 @@ class HostBuilder(GnBuilder):
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
-                 separate_event_loop=True, use_libfuzzer=False, use_clang=False,
-                 interactive_mode=True, extra_tests=False,
-                 use_platform_mdns=False, enable_rpcs=False,
-                 use_coverage=False, use_dmalloc=False,
-                 minmdns_address_policy=None,
-                 minmdns_high_verbosity=False,
-                 imgui_ui=False,
-                 crypto_library: HostCryptoLibrary = None):
+                 separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
+                 interactive_mode=True, extra_tests=False, use_platform_mdns=False, enable_rpcs=False,
+                 use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
+                 minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -296,8 +299,10 @@ class HostBuilder(GnBuilder):
         if not interactive_mode:
             self.extra_gn_options.append('config_use_interactive_mode=false')
 
-        if use_libfuzzer:
+        if fuzzing_type == HostFuzzingType.LIB_FUZZER:
             self.extra_gn_options.append('is_libfuzzer=true')
+        elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
+            self.extra_gn_options.append('oss_fuzz=true')
 
         if imgui_ui:
             self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
@@ -366,6 +371,9 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.SIMULATED_APP2:
             self.extra_gn_options.append('chip_tests_zap_config="app2"')
+
+        if self.app == HostApp.TESTS and fuzzing_type != HostFuzzingType.NONE:
+            self.build_command = 'fuzz_tests'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
