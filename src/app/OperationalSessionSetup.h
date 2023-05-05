@@ -152,16 +152,13 @@ typedef void (*OnDeviceConnectionRetry)(void * context, const ScopedNodeId & pee
  * It is possible to determine which of the two purposes the OperationalSessionSetup is for by calling
  * IsForAddressUpdate().
  */
-class DLL_EXPORT OperationalSessionSetup : public SessionDelegate,
-                                           public SessionEstablishmentDelegate,
-                                           public AddressResolve::NodeListener
+class DLL_EXPORT OperationalSessionSetup : public SessionEstablishmentDelegate, public AddressResolve::NodeListener
 {
 public:
     ~OperationalSessionSetup() override;
 
     OperationalSessionSetup(const CASEClientInitParams & params, CASEClientPoolDelegate * clientPool, ScopedNodeId peerId,
-                            OperationalSessionReleaseDelegate * releaseDelegate) :
-        mSecureSession(*this)
+                            OperationalSessionReleaseDelegate * releaseDelegate)
     {
         mInitParams = params;
         if (params.Validate() != CHIP_NO_ERROR || clientPool == nullptr || releaseDelegate == nullptr)
@@ -200,11 +197,6 @@ public:
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
-
-    //////////// SessionDelegate Implementation ///////////////
-
-    // Called when a connection is closing. The object releases all resources associated with the connection.
-    void OnSessionReleased() override;
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
 
@@ -268,7 +260,7 @@ private:
 
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
-    SessionHolderWithDelegate mSecureSession;
+    SessionHolder mSecureSession;
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;

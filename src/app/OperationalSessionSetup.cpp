@@ -396,12 +396,18 @@ void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session
                    ChipLogError(Discovery, "OnSessionEstablished was called while we were not connecting"));
 
     if (!mSecureSession.Grab(session))
-        return; // Got an invalid session, do not change any state
+    {
+        // Got an invalid session, just dispatch an error.  We have to do this
+        // so we don't leak.
+        DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
+
+        // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+        return;
+    }
 
     MoveToState(State::SecureConnected);
 
     DequeueConnectionCallbacks(CHIP_NO_ERROR);
-    // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
 void OperationalSessionSetup::CleanupCASEClient()
@@ -411,14 +417,6 @@ void OperationalSessionSetup::CleanupCASEClient()
         mClientPool->Release(mCASEClient);
         mCASEClient = nullptr;
     }
-}
-
-void OperationalSessionSetup::OnSessionReleased()
-{
-    // This is unlikely to be called since within the same call that we get SessionHandle we
-    // then call DequeueConnectionCallbacks which releases `this`. If this is called, and we
-    // we have any callbacks we will just send an error.
-    DequeueConnectionCallbacks(CHIP_ERROR_INCORRECT_STATE);
 }
 
 OperationalSessionSetup::~OperationalSessionSetup()
