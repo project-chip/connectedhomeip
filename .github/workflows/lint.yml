@@ -88,7 +88,6 @@ jobs:
                       if [ "$idl_file" = './examples/chef/devices/rootnode_occupancysensor_iHyVgifZuo.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_onofflight_bbs1b7IaOV.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_onofflightswitch_FsPlMr090Q.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_onoffpluginunit_Wtf8ss5EBY.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_pressuresensor_s0qC9wLH4k.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_speaker_RpzeXdimqA.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_temperaturesensor_Qy1zkNW7c3.matter' ]; then continue; fi
