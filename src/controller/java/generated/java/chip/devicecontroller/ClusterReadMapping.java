@@ -4871,10 +4871,10 @@ public class ClusterReadMapping {
         InteractionInfo readDishwasherControlAvailableOptionsForCurrentModeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.DishwasherControlCluster) cluster).readAvailableOptionsForCurrentModeAttribute(
-              (ChipClusters.DishwasherControlCluster.AvailableOptionsForCurrentModeAttributeCallback) callback
+              (ChipClusters.LongAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedDishwasherControlClusterAvailableOptionsForCurrentModeAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
           readDishwasherControlAvailableOptionsForCurrentModeCommandParams
         );
         readDishwasherControlInteractionInfo.put("readAvailableOptionsForCurrentModeAttribute", readDishwasherControlAvailableOptionsForCurrentModeAttributeInteractionInfo);Map<String, CommandParameterInfo> readDishwasherControlSteamWashCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
