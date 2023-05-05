@@ -415,8 +415,6 @@ typedef void (*ModeSelectEventListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DishwasherControlAvailableOptionsForCurrentModeListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<uint32_t> & data);
 typedef void (*DishwasherControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DishwasherControlAcceptedCommandListListAttributeCallback)(

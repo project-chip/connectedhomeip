@@ -894,8 +894,6 @@ typedef void (*ModeSelectAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DishwasherControlAvailableOptionsForCurrentModeListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<uint32_t> & data);
 typedef void (*DishwasherControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DishwasherControlAcceptedCommandListListAttributeCallback)(
@@ -6902,40 +6900,6 @@ public:
     void OnSubscriptionEstablished();
     using MTRModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRModeSelectAttributeListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge
-    : public MTRCallbackBridge<DishwasherControlAvailableOptionsForCurrentModeListAttributeCallback>
-{
-public:
-    MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DishwasherControlAvailableOptionsForCurrentModeListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<DishwasherControlAvailableOptionsForCurrentModeListAttributeCallback>(queue, handler, action,
-                                                                                                OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint32_t> & value);
-};
-
-class MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackSubscriptionBridge
-    : public MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge
-{
-public:
-    MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDishwasherControlAvailableOptionsForCurrentModeListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

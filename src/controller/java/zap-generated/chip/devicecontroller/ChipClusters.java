@@ -12313,11 +12313,6 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-      public interface AvailableOptionsForCurrentModeAttributeCallback {
-        void onSuccess( List<Long> valueList);
-        void onError(Exception ex);
-        default void onSubscriptionEstablished(long subscriptionId) {}
-      }
       public interface GeneratedCommandListAttributeCallback {
         void onSuccess( List<Long> valueList);
         void onError(Exception ex);
@@ -12340,13 +12335,13 @@ public class ChipClusters {
       }
 
     public void readAvailableOptionsForCurrentModeAttribute(
-      AvailableOptionsForCurrentModeAttributeCallback callback
+      LongAttributeCallback callback
     ) {
       readAvailableOptionsForCurrentModeAttribute(chipClusterPtr, callback);
     }
     public void subscribeAvailableOptionsForCurrentModeAttribute(
-        AvailableOptionsForCurrentModeAttributeCallback callback
-      ,
+        LongAttributeCallback callback
+,
       int minInterval, int maxInterval) {
       subscribeAvailableOptionsForCurrentModeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
@@ -12481,11 +12476,11 @@ public class ChipClusters {
     }
 
     private native void readAvailableOptionsForCurrentModeAttribute(long chipClusterPtr,
-        AvailableOptionsForCurrentModeAttributeCallback callback
+        LongAttributeCallback callback
     );
     private native void subscribeAvailableOptionsForCurrentModeAttribute(long chipClusterPtr,
-        AvailableOptionsForCurrentModeAttributeCallback callback
-      , int minInterval, int maxInterval);
+        LongAttributeCallback callback
+, int minInterval, int maxInterval);
 
     private native void readSteamWashAttribute(long chipClusterPtr,
         BooleanAttributeCallback callback

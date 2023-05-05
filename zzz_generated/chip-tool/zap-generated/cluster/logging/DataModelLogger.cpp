@@ -7019,7 +7019,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case DishwasherControl::Attributes::AvailableOptionsForCurrentMode::Id: {
-            chip::app::DataModel::DecodableList<uint32_t> value;
+            uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AvailableOptionsForCurrentMode", 1, value);
         }

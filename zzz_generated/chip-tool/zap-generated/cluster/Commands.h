@@ -11973,9 +11973,9 @@ void registerClusterDishwasherControl(Commands & commands, CredentialIssuerComma
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint32_t>>>(
-            Id, "available-options-for-current-mode", Attributes::AvailableOptionsForCurrentMode::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "available-options-for-current-mode", 0, UINT32_MAX,
+                                              Attributes::AvailableOptionsForCurrentMode::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "steam-wash", 0, 1, Attributes::SteamWash::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "heated-dry", 0, 1, Attributes::HeatedDry::Id, WriteCommandType::kWrite,

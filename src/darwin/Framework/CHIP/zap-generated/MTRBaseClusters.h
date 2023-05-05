@@ -7450,17 +7450,17 @@ MTR_NEWLY_AVAILABLE
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeAvailableOptionsForCurrentModeWithCompletion:(void (^)(NSArray * _Nullable value,
+- (void)readAttributeAvailableOptionsForCurrentModeWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                       NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeAvailableOptionsForCurrentModeWithParams:(MTRSubscribeParams *)params
                                            subscriptionEstablished:
                                                (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                                     reportHandler:(void (^)(NSArray * _Nullable value,
+                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void)readAttributeAvailableOptionsForCurrentModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                                 endpoint:(NSNumber *)endpoint
                                                                    queue:(dispatch_queue_t)queue
-                                                              completion:(void (^)(NSArray * _Nullable value,
+                                                              completion:(void (^)(NSNumber * _Nullable value,
                                                                              NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
@@ -20289,9 +20289,9 @@ typedef NS_OPTIONS(uint32_t, MTRModeSelectFeature) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRDishwasherControlFeature) {
-    MTRDishwasherControlFeatureSTEAMWASH MTR_NEWLY_AVAILABLE = 0x1,
-    MTRDishwasherControlFeatureHEATEDDRY MTR_NEWLY_AVAILABLE = 0x2,
-    MTRDishwasherControlFeatureEXTDRY MTR_NEWLY_AVAILABLE = 0x4,
+    MTRDishwasherControlFeatureSteamWash MTR_NEWLY_AVAILABLE = 0x1,
+    MTRDishwasherControlFeatureHeatedDry MTR_NEWLY_AVAILABLE = 0x2,
+    MTRDishwasherControlFeatureExtendedDry MTR_NEWLY_AVAILABLE = 0x4,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockAlarmCode) {

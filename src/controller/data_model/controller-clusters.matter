@@ -2539,12 +2539,12 @@ client cluster ModeSelect = 80 {
 /** This cluster provides a way to access options associated with the operation of a Dishwasher device type. */
 client cluster DishwasherControl = 88 {
   bitmap DishwasherControlFeature : BITMAP32 {
-    kSteamwash = 0x1;
-    kHeateddry = 0x2;
-    kExtdry = 0x4;
+    kSteamWash = 0x1;
+    kHeatedDry = 0x2;
+    kExtendedDry = 0x4;
   }
 
-  readonly attribute bitmap32 availableOptionsForCurrentMode[] = 0;
+  readonly attribute bitmap32 availableOptionsForCurrentMode = 0;
   attribute optional boolean steamWash = 1;
   attribute optional boolean heatedDry = 2;
   attribute optional boolean extendedDry = 3;

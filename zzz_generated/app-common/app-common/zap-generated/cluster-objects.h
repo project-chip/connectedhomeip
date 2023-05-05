@@ -13429,9 +13429,9 @@ namespace Attributes {
 namespace AvailableOptionsForCurrentMode {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const uint32_t>;
-    using DecodableType    = chip::app::DataModel::DecodableList<uint32_t>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<uint32_t> &;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AvailableOptionsForCurrentMode::Id; }
@@ -13519,7 +13519,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::AvailableOptionsForCurrentMode::TypeInfo::DecodableType availableOptionsForCurrentMode;
+        Attributes::AvailableOptionsForCurrentMode::TypeInfo::DecodableType availableOptionsForCurrentMode =
+            static_cast<uint32_t>(0);
         Attributes::SteamWash::TypeInfo::DecodableType steamWash     = static_cast<bool>(0);
         Attributes::HeatedDry::TypeInfo::DecodableType heatedDry     = static_cast<bool>(0);
         Attributes::ExtendedDry::TypeInfo::DecodableType extendedDry = static_cast<bool>(0);

@@ -1467,9 +1467,9 @@ namespace DishwasherControl {
 // Bitmap for DishwasherControlFeature
 enum class DishwasherControlFeature : uint32_t
 {
-    kSteamwash = 0x1,
-    kHeateddry = 0x2,
-    kExtdry    = 0x4,
+    kSteamWash   = 0x1,
+    kHeatedDry   = 0x2,
+    kExtendedDry = 0x4,
 };
 } // namespace DishwasherControl
 

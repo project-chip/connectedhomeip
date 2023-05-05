@@ -14512,7 +14512,7 @@ class DishwasherControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="availableOptionsForCurrentMode", Tag=0x00000000, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="availableOptionsForCurrentMode", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="steamWash", Tag=0x00000001, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="heatedDry", Tag=0x00000002, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="extendedDry", Tag=0x00000003, Type=typing.Optional[bool]),
@@ -14524,7 +14524,7 @@ class DishwasherControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    availableOptionsForCurrentMode: 'typing.List[uint]' = None
+    availableOptionsForCurrentMode: 'uint' = None
     steamWash: 'typing.Optional[bool]' = None
     heatedDry: 'typing.Optional[bool]' = None
     extendedDry: 'typing.Optional[bool]' = None
@@ -14537,9 +14537,9 @@ class DishwasherControl(Cluster):
 
     class Bitmaps:
         class DishwasherControlFeature(IntFlag):
-            kSteamwash = 0x1
-            kHeateddry = 0x2
-            kExtdry = 0x4
+            kSteamWash = 0x1
+            kHeatedDry = 0x2
+            kExtendedDry = 0x4
 
     class Attributes:
         @dataclass
@@ -14554,9 +14554,9 @@ class DishwasherControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+            value: 'uint' = 0
 
         @dataclass
         class SteamWash(ClusterAttributeDescriptor):
