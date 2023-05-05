@@ -307,9 +307,7 @@ void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_t
     new_att.property = val_prop;
 
     if (data != NULL)
-    {
         memcpy(new_att.data, data, RSI_MIN(sizeof(new_att.data), data_len));
-    }
 
     //! preparing the attribute value
     new_att.data_len = data_len;
