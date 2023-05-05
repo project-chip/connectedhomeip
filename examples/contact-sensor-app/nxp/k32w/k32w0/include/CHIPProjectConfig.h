@@ -223,6 +223,18 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 
 /**
+ * CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ
+ *
+ * This define enables/disables the Gap_LeSetPhy request to switch to 2M.
+ * It is disabled here for interoperability reasons just to be extra cautious.
+ * Both devices may send a Link Layer control procedure in parallel resulting in a
+ * LPM Error Transaction Collision.
+ * If the peer device doesn't accept our reject command, this can result in a BLE
+ * connection timeout.
+ */
+#define CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ 0
+
+/**
  * CHIP_DEVICE_CONFIG_INIT_OTA_DELAY
  *
  * The amount of time in miliseconds after which OTA initialization should be
