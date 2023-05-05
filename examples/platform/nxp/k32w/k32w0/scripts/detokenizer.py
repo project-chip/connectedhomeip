@@ -76,19 +76,18 @@ def decode_serial(serialport, outfile, database):
     if input:
 
         try:
-            while (True):
-                if (input.in_waiting > 0):
-                    # read line from serial port and ascii decode
-                    line = input.readline().decode('ascii').strip()
-                    # find token start and detokenize
-                    idx = line.rfind(']')
-                    dstr = decode_string(line[idx + 1:], detokenizer)
-                    if dstr:
-                        line = line[:idx+1] + dstr
-                    print(line, file=sys.stdout)
-                    if output:
-                        print(line, file=output)
-        except Exception:
+            while(True):
+                # read line from serial port and ascii decode
+                line = input.readline().decode('ascii').strip()
+                # find token start and detokenize
+                idx = line.rfind(']')
+                dstr = decode_string(line[idx + 1:], detokenizer)
+                if dstr:
+                    line = line[:idx+1] + dstr
+                print(line, file=sys.stdout)
+                if output:
+                    print(line, file=output)
+        except:
             print("Serial error or program closed", file=sys.stderr)
 
         if output:
