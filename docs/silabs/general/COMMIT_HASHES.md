@@ -15,6 +15,12 @@ in this release of the Silicon Labs Matter Out of Box Experience
 | --------------------------------------- | ------ | ---------------------------------------- |
 | https://github.com/SiliconLabs/ot-efr32 | main   | 7a567da02a078546eb34136c1c44170c8832dd55 |
 
+## Connectivity Standards Alliance (CSA) connectedhomeip (Matter)
+
+| Repo                                            | Branch | Commit Hash                              |
+| ----------------------------------------------- | ------ | ---------------------------------------- |
+| https://github.com/project-chip/connectedhomeip | v1.1-branch | 8f66f4215bc0708efc8cc73bda80620e67d8955f |
+
 ## Matter chip-tool
 
 | Repo                                            | Branch | Commit Hash                              |

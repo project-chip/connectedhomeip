@@ -11,7 +11,7 @@ Matter chip-tool. Note the image is ~10GB in size so depending on your internet
 connection this download may take some time. Start the Matter Hub Raspberry Pi
 image download here:
 
-https://www.silabs.com/documents/public/software/SilabsMatterPi_1.1.0-1.1.zip
+https://www.silabs.com/documents/public/software/SilabsMatterPi_2.0.0-1.1.zip
 
 ## Radio Co-Processor (RCP) Images
 
@@ -20,7 +20,7 @@ used with a Raspberry Pi to allow the Raspberry Pi's Open Thread Border Router
 to access the Thread network. Radio Co-Processor (RCP) images are available in
 the Assets section of this page:
 
-https://github.com/SiliconLabs/matter/releases/tag/v1.1.0-1.1
+https://github.com/SiliconLabs/matter/releases/tag/v2.0.0-1.1
 
 ## Matter Accessory Device Images
 
@@ -28,7 +28,7 @@ The Matter Accessory Device Images are used to turn an EFR into a Matter device.
 These are pre-built binary images for the Matter Demo. Matter Accessory Device
 Images are located in the Assets section of this page:
 
-https://github.com/SiliconLabs/matter/releases/tag/v1.1.0-1.1
+https://github.com/SiliconLabs/matter/releases/tag/v2.0.0-1.1
 
 For Matter over Thread, 3 different types of images are provided:
 
@@ -43,7 +43,7 @@ EFR32MG2x device, you will need to flash a bootloader binary on your device alon
 with the application image. Bootloader binaries for all of the Matter supported
 devices are available here:
 
-https://github.com/SiliconLabs/matter/releases/tag/v1.1.0-1.1
+https://github.com/SiliconLabs/matter/releases/tag/v2.0.0-1.1
 
 ## RS9116 Firmware
 
@@ -67,7 +67,7 @@ be configured for the SiWx917 SoC device by following the instructions on the [O
 The **JLinkDevices.xml** and **ELF** files referenced in the instructions may be found 
 in the Assets section of this page:
 
-https://github.com/SiliconLabs/matter/releases/tag/v1.1.0-1.1
+https://github.com/SiliconLabs/matter/releases/tag/v2.0.0-1.1
 
 
 ---

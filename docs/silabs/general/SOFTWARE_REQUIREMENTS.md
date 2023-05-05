@@ -163,7 +163,9 @@ Pre-Built SiWx917 firmware is available under `third_party/silabs/wisemcu-wifi-b
 
 1. [Setting up TeraTerm](https://docs.silabs.com/SiWx917/wiseconnect/2.0/tera-term-setup)
 2. For updating the SiWx917 NCP Firmware, refer [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware). Instructions are the same for both SiWx917 and RS9116.
-3. For updating the SiWx917 SoC Firmware, refer [Updating the SiWx917 SoC Firmware](../wifi/SiWx917_SoC_FWUpdate.md)
+3. For updating the SiWx917 SoC Firmware, you have several options outlined here:
+   - [Updating the SiWx917 SoC Firmware using Simplicity Commander](../wifi/RUN_DEMO_SiWx917_SoC.md)
+   - [Updating the SiWx917 SoC Firmware using Tera Term (Legacy Mode)](../wifi/SiWx917_SoC_FWUpdate.md)
 
 
 ---

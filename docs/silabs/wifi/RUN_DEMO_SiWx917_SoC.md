@@ -1,9 +1,9 @@
 # Running the Matter Demo over Wi-Fi for SiWx917 SoC
 
-## Flashing Images/Binaries on the SiWx917 SoC platform using Ozone
+## Flashing Images/Binaries on the SiWx917 SoC platform using Ozone or Simplicity Studio and Simplicity Commander
 
 > **Note:** 
->    1. SiWx917 SoC device support is available in the latest Simplicity Studio and Simplicity Commander(versions 1v14p5 and above). To flash the application on SiWx917 SoC,
+>    1. SiWx917 SoC device support is available in the latest Simplicity Studio and Simplicity Commander(versions 1v14p5 and above). To flash the TA Firmware/Matter application on SiWx917 SoC,
 >       - Convert the .s37 file into .rps file using the below command,
 >
 >           `commander rps create <file-name>.rps --app <file-name>.s37`
@@ -18,9 +18,9 @@
 
 ![SiWx917 soc Device](./images/SiWx917_Radio_WSTK.png)
  
-1.  Launch the Ozone Debugger.
+2.  Launch the Ozone Debugger.
  
-2.  In the **New Project Wizard**:
+3.  In the **New Project Wizard**:
 
     - Click the three dots (`...`) on the **Device** tab and select the **Manufacturer** as `Silicon Labs`.
     - Select the **Device** as `Si917DualFlash`.

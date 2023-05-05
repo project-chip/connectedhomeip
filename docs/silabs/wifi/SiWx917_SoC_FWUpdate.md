@@ -1,4 +1,6 @@
-# Updating SiWx917 SoC Firmware
+# Updating SiWx917 SoC Firmware using Tera Term
+
+> Please note that the method of updating the SiWx917 SoC firmware listed below is considered a legacy mode of operation. You may also update the SiWx917 SoC firmware using Simplicity Commander. For instructions on how to do this please consider [Running Demo on the SiWx917SoC](./RUN_DEMO_SiWx917_SoC.md)
 
 ## Steps to update the firmware on SiWx917 SoC radio board
 
