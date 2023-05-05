@@ -205,11 +205,12 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
     }
 
     auto & commandList = clusterIter->second.first;
+    auto * clusterHelp = clusterIter->second.second;
 
     if (argc <= 2)
     {
         ChipLogError(chipTool, "Missing command name");
-        ShowCluster(argv[0], argv[1], commandList);
+        ShowCluster(argv[0], argv[1], commandList, clusterHelp);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -220,7 +221,7 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
         if (command == nullptr)
         {
             ChipLogError(chipTool, "Unknown command: %s", argv[2]);
-            ShowCluster(argv[0], argv[1], commandList);
+            ShowCluster(argv[0], argv[1], commandList, clusterHelp);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
@@ -349,10 +350,16 @@ void Commands::ShowClusters(std::string executable)
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
 }
 
-void Commands::ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands)
+void Commands::ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands, const char * helpText)
 {
     fprintf(stderr, "Usage:\n");
     fprintf(stderr, "  %s %s command_name [param1 param2 ...]\n", executable.c_str(), clusterName.c_str());
+
+    if (helpText)
+    {
+        fprintf(stderr, "\n%s\n", helpText);
+    }
+
     fprintf(stderr, "\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Commands:                                                                           |\n");

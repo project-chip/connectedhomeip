@@ -47,7 +47,7 @@ private:
     bool IsGlobalCommand(std::string commandName) const;
 
     void ShowClusters(std::string executable);
-    void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands);
+    void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands, const char * helpText);
     void ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowClusterEvents(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
