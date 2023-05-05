@@ -133,6 +133,11 @@ CHIP_ERROR AmebaUtils::WiFiDisconnect(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(DeviceLayer, "matter_wifi_disconnect");
     err = (matter_wifi_disconnect() == RTW_SUCCESS) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "matter_lwip_releaseip");
+        matter_lwip_releaseip();
+    }
     return err;
 }
 
