@@ -24,7 +24,9 @@
     4. [Ozone Environment Setup for the SiWx917 SoC](wifi/SiWx917_Enablement_For_Ozone.md)
     5. [Flashing the SiWx917 SoC](general/FLASH_SILABS_SiWx917_SOC_DEVICE.md)
     6. [Running the Matter Demo on SiWx917 SoC](wifi/RUN_DEMO_SiWx917_SoC.md)
-    7. [Matter Wi-Fi Direct Internet Connectivity(DIC)](wifi/DIC_Wi-Fi.md)
+    7. [Matter Wi-Fi Sleepy End Devices](wifi/WIFI_SLEEPY_END_DEVICE.md)
+    8. [Matter Wi-Fi Sleepy End Device Power Measurement](wifi/WIFI_Sleepy_Device_Power_Measurement.md)
+    9. [Matter Wi-Fi Direct Internet Connectivity(DIC)](wifi/DIC_Wi-Fi.md)
 
 6. Matter Bridging to Zigbee/Z-Wave
 
