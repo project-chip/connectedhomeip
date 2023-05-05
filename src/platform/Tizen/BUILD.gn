@@ -57,6 +57,8 @@ static_library("Tizen") {
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
+    "SystemInfo.cpp",
+    "SystemInfo.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
   ]

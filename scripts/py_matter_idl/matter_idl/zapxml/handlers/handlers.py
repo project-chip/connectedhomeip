@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
 from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
                                          Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality,
@@ -489,12 +489,12 @@ class ClusterGlobalAttributeHandler(BaseHandler):
 class ClusterHandler(BaseHandler):
     """Handles /configurator/cluster elements."""
 
-    def __init__(self, context: Context, idl: Idl):
+    def __init__(self, context: Context, idl: Optional[Idl]):
         super().__init__(context)
         self._cluster = Cluster(
             side=ClusterSide.CLIENT,
-            name=None,
-            code=None,
+            name="NAME-MISSING",
+            code=-1,
             parse_meta=context.GetCurrentLocationMeta()
         )
         self._idl = idl
@@ -524,9 +524,11 @@ class ClusterHandler(BaseHandler):
             return BaseHandler(self.context)
 
     def EndProcessing(self):
-        if self._cluster.name is None:
+        if not self._idl:
+            raise Exception("Missing idl")
+        if self._cluster.name == "NAME-MISSING":
             raise Exception("Missing cluster name")
-        elif self._cluster.code is None:
+        elif self._cluster.code == -1:
             raise Exception("Missing cluster code")
 
         self._idl.clusters.append(self._cluster)

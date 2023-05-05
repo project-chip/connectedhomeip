@@ -155,6 +155,11 @@ MTR_DEPRECATED("Please use MTRBasicInformationClusterCapabilityMinimaStruct", io
     tvos(16.1, 16.4))
 @interface MTRBasicClusterCapabilityMinimaStruct : MTRBasicInformationClusterCapabilityMinimaStruct
 @end
+MTR_NEWLY_AVAILABLE
+@interface MTRBasicInformationClusterProductAppearanceStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull finish MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable primaryColor MTR_NEWLY_AVAILABLE;
+@end
 
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRBasicInformationClusterStartUpEvent : NSObject <NSCopying>
@@ -494,6 +499,12 @@ API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
 MTR_DEPRECATED("Please use MTRTimeSynchronizationClusterTimeZoneStruct", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
     tvos(16.1, 16.5))
 @interface MTRTimeSynchronizationClusterTimeZoneType : MTRTimeSynchronizationClusterTimeZoneStruct
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull finish MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable primaryColor MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))

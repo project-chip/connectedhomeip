@@ -44,18 +44,9 @@
     {}
 
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 6
+#define GENERATED_ATTRIBUTE_COUNT 0
 #define GENERATED_ATTRIBUTES                                                                                                       \
-    {                                                                                                                              \
-                                                                                                                                   \
-        /* Endpoint: 1, Cluster: RVC Run (server) */                                                                               \
-        { ZAP_EMPTY_DEFAULT(), 0x00000000, 65, ZAP_TYPE(CHAR_STRING), 0 },                                 /* Description */       \
-            { ZAP_EMPTY_DEFAULT(), 0x00000001, 2, ZAP_TYPE(ENUM16), ZAP_ATTRIBUTE_MASK(NULLABLE) },        /* StandardNamespace */ \
-            { ZAP_EMPTY_DEFAULT(), 0x00000002, 0, ZAP_TYPE(ARRAY), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* SupportedModes */    \
-            { ZAP_EMPTY_DEFAULT(), 0x00000003, 1, ZAP_TYPE(INT8U), 0 },                                    /* CurrentMode */       \
-            { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 },                               /* FeatureMap */        \
-            { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },                                 /* ClusterRevision */   \
-    }
+    {}
 
 // clang-format off
 #define GENERATED_EVENT_COUNT 0
@@ -68,7 +59,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 // This is an array of EmberAfCluster structures.
-#define GENERATED_CLUSTER_COUNT 67
+#define GENERATED_CLUSTER_COUNT 65
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
@@ -540,22 +531,9 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: RVC Run (server) */ \
-      .clusterId = 0x00000054, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
-      .attributeCount = 6, \
-      .clusterSize = 74, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr, \
-      .generatedCommandList = nullptr, \
-      .eventList = nullptr, \
-      .eventCount = 0, \
-    },\
-  { \
       /* Endpoint: 1, Cluster: Door Lock (client) */ \
       .clusterId = 0x00000101, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -568,7 +546,7 @@
   { \
       /* Endpoint: 1, Cluster: Window Covering (client) */ \
       .clusterId = 0x00000102, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -581,7 +559,7 @@
   { \
       /* Endpoint: 1, Cluster: Barrier Control (client) */ \
       .clusterId = 0x00000103, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -594,7 +572,7 @@
   { \
       /* Endpoint: 1, Cluster: Pump Configuration and Control (client) */ \
       .clusterId = 0x00000200, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -607,7 +585,7 @@
   { \
       /* Endpoint: 1, Cluster: Thermostat (client) */ \
       .clusterId = 0x00000201, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -620,7 +598,7 @@
   { \
       /* Endpoint: 1, Cluster: Fan Control (client) */ \
       .clusterId = 0x00000202, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -633,7 +611,7 @@
   { \
       /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (client) */ \
       .clusterId = 0x00000204, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -646,7 +624,7 @@
   { \
       /* Endpoint: 1, Cluster: Color Control (client) */ \
       .clusterId = 0x00000300, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -659,7 +637,7 @@
   { \
       /* Endpoint: 1, Cluster: Ballast Configuration (client) */ \
       .clusterId = 0x00000301, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -672,7 +650,7 @@
   { \
       /* Endpoint: 1, Cluster: Illuminance Measurement (client) */ \
       .clusterId = 0x00000400, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -685,7 +663,7 @@
   { \
       /* Endpoint: 1, Cluster: Temperature Measurement (client) */ \
       .clusterId = 0x00000402, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -698,7 +676,7 @@
   { \
       /* Endpoint: 1, Cluster: Pressure Measurement (client) */ \
       .clusterId = 0x00000403, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -711,7 +689,7 @@
   { \
       /* Endpoint: 1, Cluster: Flow Measurement (client) */ \
       .clusterId = 0x00000404, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -724,7 +702,7 @@
   { \
       /* Endpoint: 1, Cluster: Relative Humidity Measurement (client) */ \
       .clusterId = 0x00000405, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -737,7 +715,7 @@
   { \
       /* Endpoint: 1, Cluster: Occupancy Sensing (client) */ \
       .clusterId = 0x00000406, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -750,7 +728,7 @@
   { \
       /* Endpoint: 1, Cluster: Wake on LAN (client) */ \
       .clusterId = 0x00000503, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -763,7 +741,7 @@
   { \
       /* Endpoint: 1, Cluster: Channel (client) */ \
       .clusterId = 0x00000504, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -776,7 +754,7 @@
   { \
       /* Endpoint: 1, Cluster: Target Navigator (client) */ \
       .clusterId = 0x00000505, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -789,7 +767,7 @@
   { \
       /* Endpoint: 1, Cluster: Media Playback (client) */ \
       .clusterId = 0x00000506, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -802,7 +780,7 @@
   { \
       /* Endpoint: 1, Cluster: Media Input (client) */ \
       .clusterId = 0x00000507, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -815,7 +793,7 @@
   { \
       /* Endpoint: 1, Cluster: Low Power (client) */ \
       .clusterId = 0x00000508, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -828,7 +806,7 @@
   { \
       /* Endpoint: 1, Cluster: Keypad Input (client) */ \
       .clusterId = 0x00000509, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -841,7 +819,7 @@
   { \
       /* Endpoint: 1, Cluster: Content Launcher (client) */ \
       .clusterId = 0x0000050A, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -854,7 +832,7 @@
   { \
       /* Endpoint: 1, Cluster: Audio Output (client) */ \
       .clusterId = 0x0000050B, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -867,7 +845,7 @@
   { \
       /* Endpoint: 1, Cluster: Application Launcher (client) */ \
       .clusterId = 0x0000050C, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -880,7 +858,7 @@
   { \
       /* Endpoint: 1, Cluster: Application Basic (client) */ \
       .clusterId = 0x0000050D, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -893,7 +871,7 @@
   { \
       /* Endpoint: 1, Cluster: Account Login (client) */ \
       .clusterId = 0x0000050E, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -906,20 +884,7 @@
   { \
       /* Endpoint: 1, Cluster: Electrical Measurement (client) */ \
       .clusterId = 0x00000B04, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr, \
-      .generatedCommandList = nullptr, \
-      .eventList = nullptr, \
-      .eventCount = 0, \
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Client Monitoring (client) */ \
-      .clusterId = 0x00001046, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -932,7 +897,7 @@
   { \
       /* Endpoint: 1, Cluster: Unit Testing (client) */ \
       .clusterId = 0xFFF1FC05, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(6), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(CLIENT), \
@@ -946,16 +911,16 @@
 
 // clang-format on
 
-#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 1
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 0
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 67, 74 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 65, 0 },                                                                                           \
     }
 
 // Largest attribute size is needed for various buffers
-#define ATTRIBUTE_LARGEST (66)
+#define ATTRIBUTE_LARGEST (1)
 
 static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE, "ATTRIBUTE_LARGEST larger than expected");
 
@@ -963,7 +928,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (74)
+#define ATTRIBUTE_MAX_SIZE (0)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)

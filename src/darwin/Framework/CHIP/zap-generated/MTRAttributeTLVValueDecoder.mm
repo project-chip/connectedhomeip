@@ -2307,6 +2307,23 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value.subscriptionsPerFabric = [NSNumber numberWithUnsignedShort:cppValue.subscriptionsPerFabric];
             return value;
         }
+        case Attributes::ProductAppearance::Id: {
+            using TypeInfo = Attributes::ProductAppearance::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            MTRBasicInformationClusterProductAppearanceStruct * _Nonnull value;
+            value = [MTRBasicInformationClusterProductAppearanceStruct new];
+            value.finish = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.finish)];
+            if (cppValue.primaryColor.IsNull()) {
+                value.primaryColor = nil;
+            } else {
+                value.primaryColor = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.primaryColor.Value())];
+            }
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -6448,6 +6465,23 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             }
             NSString * _Nonnull value;
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::ProductAppearance::Id: {
+            using TypeInfo = Attributes::ProductAppearance::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct * _Nonnull value;
+            value = [MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct new];
+            value.finish = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.finish)];
+            if (cppValue.primaryColor.IsNull()) {
+                value.primaryColor = nil;
+            } else {
+                value.primaryColor = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.primaryColor.Value())];
+            }
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

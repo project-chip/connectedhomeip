@@ -46,6 +46,7 @@
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -53,8 +54,8 @@
  * Defines and Constants
  *********************************************************/
 
-#define APP_FUNCTION_BUTTON &sl_button_btn0
-#define APP_THERMOSTAT &sl_button_btn1
+#define APP_FUNCTION_BUTTON 0
+#define APP_THERMOSTAT 1
 
 #define MODE_TIMER 1000 // 1s timer period
 
@@ -141,6 +142,9 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Thermostat-App");
@@ -242,20 +246,17 @@ void AppTask::UpdateThermoStatUI()
 #endif // DISPLAY_ENABLED
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
-    if (buttonHandle == nullptr)
-    {
-        return;
-    }
-
     AppEvent aEvent           = {};
     aEvent.Type               = AppEvent::kEventType_Button;
     aEvent.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_FUNCTION_BUTTON)
+    if (button == APP_FUNCTION_BUTTON)
     {
         aEvent.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&aEvent);
     }
 }
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT

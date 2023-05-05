@@ -94,18 +94,6 @@ public:
      */
     static SilabsLCD & GetLCD(void);
 #endif
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    /**
-     * @brief Event handler when a button is pressed
-     * Function posts an event for button processing
-     *
-     * @param buttonHandle APP_LIGHT_SWITCH or APP_FUNCTION_BUTTON
-     * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
-     *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
-     */
-    virtual void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction) = 0;
-
-#endif
 
     /**
      * @brief Function called to start the LED light timer

@@ -74,6 +74,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_MESSAGE_TOO_LONG.AsInteger():
         desc = "Message too long";
         break;
+    case CHIP_ERROR_RECURSION_DEPTH_LIMIT.AsInteger():
+        desc = "Recursion depth limit reached";
+        break;
     case CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS.AsInteger():
         desc = "Too many unsolicited message handlers";
         break;

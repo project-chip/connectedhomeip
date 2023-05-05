@@ -76,7 +76,7 @@
 #define SYSTEM_STATE_LED 0
 #endif // ENABLE_WSTK_LEDS
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-#define APP_FUNCTION_BUTTON &sl_button_btn0
+#define APP_FUNCTION_BUTTON 0
 #endif
 
 using namespace chip;
@@ -173,7 +173,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
     SILABS_LOG("APP: Wait WiFi Init");
     while (!wfx_hw_ready())
     {
-        vTaskDelay(10);
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
     SILABS_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */

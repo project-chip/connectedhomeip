@@ -15,22 +15,21 @@
 # limitations under the License.
 
 try:
-    from .matter_idl_parser import CreateParser
-    from .matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage, Bitmap,
-                                   Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint,
-                                   Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, ParseMetaData,
-                                   ServerClusterInstantiation, Struct, StructQuality, StructTag)
-except ImportError:
+    from matter_idl.matter_idl_parser import CreateParser
+except ModuleNotFoundError:
     import os
     import sys
-    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+    sys.path.append(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))
 
-    from matter_idl_parser import CreateParser
-    from matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage, Bitmap,
-                                  Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint,
-                                  Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, ParseMetaData,
-                                  ServerClusterInstantiation, Struct, StructQuality, StructTag)
+    from matter_idl.matter_idl_parser import CreateParser
+
 import unittest
+
+from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage,
+                                         Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
+                                         Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+                                         ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
 
 
 def parseText(txt, skip_meta=True):

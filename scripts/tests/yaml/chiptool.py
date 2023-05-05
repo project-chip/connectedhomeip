@@ -85,6 +85,7 @@ def chiptool_runner_options(f):
 
 
 CONTEXT_SETTINGS['ignore_unknown_options'] = True
+CONTEXT_SETTINGS['default_map']['chiptool']['use_test_harness_log_format'] = True
 
 
 @click.command(context_settings=CONTEXT_SETTINGS)

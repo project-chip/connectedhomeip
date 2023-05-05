@@ -21,7 +21,6 @@
 #include <WindowApp.h>
 
 #include "init_efrPlatform.h"
-#include "sl_simple_button_instances.h"
 #include "sl_system_kernel.h"
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/Server.h>

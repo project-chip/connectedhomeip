@@ -259,6 +259,7 @@ config("strict_warnings") {
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
+  configs = []
   ldflags = []
 
   if (is_clang) {
@@ -268,6 +269,8 @@ config("strict_warnings") {
       "-Wshorten-64-to-32",
       "-Wformat-type-confusion",
     ]
+
+    configs += [ "$dir_pw_build:clang_thread_safety_warnings" ]
 
     # TODO: can make this back fatal in once pigweed updates can be taken again.
     #       See https://github.com/project-chip/connectedhomeip/pull/22079

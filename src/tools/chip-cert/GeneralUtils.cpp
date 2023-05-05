@@ -27,6 +27,7 @@
 
 #include "chip-cert.h"
 
+#include <errno.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
