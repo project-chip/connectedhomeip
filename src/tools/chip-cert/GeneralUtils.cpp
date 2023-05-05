@@ -27,10 +27,10 @@
 
 #include "chip-cert.h"
 
+#include <errno.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
-#include <errno.h>
 
 using namespace chip;
 using namespace chip::Credentials;
