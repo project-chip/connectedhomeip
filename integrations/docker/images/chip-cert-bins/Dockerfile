@@ -201,7 +201,7 @@ RUN git clone https://github.com/project-chip/connectedhomeip.git /root/connecte
 WORKDIR /root/connectedhomeip/
 RUN git checkout ${COMMITHASH}
 RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-RUN scripts/build/gn_bootstrap.sh
+RUN bash scripts/bootstrap.sh
 SHELL ["/bin/bash", "-c"]
 RUN set -x && \
     source scripts/activate.sh \

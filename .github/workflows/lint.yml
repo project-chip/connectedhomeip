@@ -65,7 +65,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
 
             - name: Check for matter lint errors
               if: always()

@@ -90,7 +90,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
@@ -346,7 +346,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
@@ -468,7 +468,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
@@ -555,7 +555,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
@@ -728,7 +728,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}

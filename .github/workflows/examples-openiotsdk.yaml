@@ -69,7 +69,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
 
             - name: Build and install Python controller
               timeout-minutes: 10

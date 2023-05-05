@@ -61,7 +61,7 @@ jobs:
                       .environment
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
 
             - name: Build Tizen examples
               run: |
