@@ -278,9 +278,8 @@ combination with JLinkRTTClient as follows:
 
     Here is an example with the CHIPTool:
 
-    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
-
-    chip-tool onoff on 1 1
+          $ chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
+          $ chip-tool onoff on 1 1
 
 ### Notes
 
