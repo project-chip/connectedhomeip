@@ -504,9 +504,9 @@ static void wfx_rsi_do_join(void)
             break;
         case WFX_SEC_WPA2:
 //#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
-     //       connect_security_mode = RSI_WPA3_TRANSITION;
+    //        connect_security_mode = RSI_WPA3_TRANSITION;
 //#else
-            connect_security_mode = RSI_WPA2;
+            connect_security_mode = RSI_WPA3_TRANSITION;
 //#endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
             break;
 #ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
@@ -521,7 +521,7 @@ static void wfx_rsi_do_join(void)
             SILABS_LOG("%s: error: unknown security type.", __func__);
             return;
         }
-        }
+    }
 
         //connect_security_mode = 2;
         SILABS_LOG("%s: WLAN: connecting to %s==%s, sec=%d", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
@@ -566,7 +566,7 @@ static void wfx_rsi_do_join(void)
                 break; // exit while loop
             }
         }
-    }
+    
 }
 
 /*********************************************************************************
