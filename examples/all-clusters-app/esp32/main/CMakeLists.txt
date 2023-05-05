@@ -32,7 +32,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/lock"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/mode-support"
+#                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/mode-support"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
