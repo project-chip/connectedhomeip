@@ -27,6 +27,7 @@ declare_args() {
   chip_enable_chipoble = true
   chip_bt_nimble_enabled = false
   chip_bt_bluedroid_enabled = false
+  chip_enable_ble_controller = false
   chip_use_secure_cert_dac_provider = false
 }
 
@@ -90,20 +91,22 @@ static_library("ESP32") {
   }
 
   if (chip_bt_nimble_enabled) {
-    sources += [
-      "nimble/BLEManagerImpl.cpp",
-      "nimble/ChipDeviceScanner.cpp",
-      "nimble/blecent.h",
-      "nimble/misc.c",
-      "nimble/peer.c",
-    ]
+    sources += [ "nimble/BLEManagerImpl.cpp" ]
+    if (chip_enable_ble_controller) {
+      sources += [
+        "nimble/ChipDeviceScanner.cpp",
+        "nimble/blecent.h",
+        "nimble/misc.c",
+        "nimble/peer.c",
+      ]
+    }
   }
 
   if (chip_bt_bluedroid_enabled) {
-    sources += [
-      "bluedroid/BLEManagerImpl.cpp",
-      "bluedroid/ChipDeviceScanner.cpp",
-    ]
+    sources += [ "bluedroid/BLEManagerImpl.cpp" ]
+    if (chip_enable_ble_controller) {
+      sources += [ "bluedroid/ChipDeviceScanner.cpp" ]
+    }
   }
 
   if (chip_enable_wifi) {

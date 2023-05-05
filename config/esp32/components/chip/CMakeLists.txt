@@ -155,6 +155,10 @@ if ((CONFIG_BT_ENABLED) AND (CONFIG_ENABLE_CHIPOBLE))
         endif()
 endif()
 
+if (CONFIG_ENABLE_ESP32_BLE_CONTROLLER)
+    chip_gn_arg_append("chip_enable_ble_controller"             "true")
+endif()
+
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
 else()
