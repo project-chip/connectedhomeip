@@ -57,6 +57,7 @@
 #define EMBER_AF_USER_LABEL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_BOOLEAN_STATE_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_MODE_SELECT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_AIR_QUALITY_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_DOOR_LOCK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WINDOW_COVERING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_BARRIER_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -232,6 +233,10 @@
 // Use this macro to check if the client side of the Mode Select cluster is included
 #define ZCL_USING_MODE_SELECT_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_MODE_SELECT_CLIENT
+
+// Use this macro to check if the client side of the Air Quality cluster is included
+#define ZCL_USING_AIR_QUALITY_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_AIR_QUALITY_CLIENT
 
 // Use this macro to check if the client side of the Door Lock cluster is included
 #define ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT

@@ -2536,6 +2536,33 @@ client cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** Attributes for reporting air quality classification */
+client cluster AirQuality = 91 {
+  enum AirQualityEnum : ENUM8 {
+    kUnknown = 0;
+    kGood = 1;
+    kFair = 2;
+    kPoor = 3;
+    kVeryPoor = 4;
+    kExtremelyPoor = 5;
+  }
+
+  bitmap AirQualityFeature : BITMAP32 {
+    kFair = 0x1;
+    kModerate = 0x2;
+    kVeryPoor = 0x4;
+    kExtremelyPoor = 0x8;
+  }
+
+  readonly attribute AirQualityEnum airQuality = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** An interface to a generic way to secure a door */
 client cluster DoorLock = 257 {
   enum AlarmCodeEnum : ENUM8 {
@@ -5454,6 +5481,7 @@ endpoint 1 {
   binding cluster UserLabel;
   binding cluster BooleanState;
   binding cluster ModeSelect;
+  binding cluster AirQuality;
   binding cluster DoorLock;
   binding cluster WindowCovering;
   binding cluster BarrierControl;

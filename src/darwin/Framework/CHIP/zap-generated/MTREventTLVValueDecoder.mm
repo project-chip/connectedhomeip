@@ -1505,6 +1505,16 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
+    case Clusters::AirQuality::Id: {
+        using namespace Clusters::AirQuality;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case Clusters::DoorLock::Id: {
         using namespace Clusters::DoorLock;
         switch (aPath.mEventId) {

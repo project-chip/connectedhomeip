@@ -1260,6 +1260,23 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(AirQuality::AirQualityEnum val)
+{
+    using EnumType = AirQuality::AirQualityEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kGood:
+    case EnumType::kFair:
+    case EnumType::kPoor:
+    case EnumType::kVeryPoor:
+    case EnumType::kExtremelyPoor:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;

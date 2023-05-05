@@ -148,6 +148,9 @@ static constexpr ClusterId Id = 0x00000045;
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
+namespace AirQuality {
+static constexpr ClusterId Id = 0x0000005B;
+} // namespace AirQuality
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

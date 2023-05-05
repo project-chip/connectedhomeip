@@ -3872,6 +3872,56 @@ class ChipClusters:
             },
         },
     }
+    _AIR_QUALITY_CLUSTER_INFO = {
+        "clusterName": "AirQuality",
+        "clusterId": 0x0000005B,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "AirQuality",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _DOOR_LOCK_CLUSTER_INFO = {
         "clusterName": "DoorLock",
         "clusterId": 0x00000101,
@@ -9195,6 +9245,7 @@ class ChipClusters:
         0x00000041: _USER_LABEL_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
+        0x0000005B: _AIR_QUALITY_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
         0x00000103: _BARRIER_CONTROL_CLUSTER_INFO,
@@ -9263,6 +9314,7 @@ class ChipClusters:
         "UserLabel": _USER_LABEL_CLUSTER_INFO,
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
+        "AirQuality": _AIR_QUALITY_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
         "BarrierControl": _BARRIER_CONTROL_CLUSTER_INFO,
