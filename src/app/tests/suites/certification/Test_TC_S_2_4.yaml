@@ -1,0 +1,252 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 123.2.4. [TC-S-2.4] Secondary functionality with server as DUT
+
+PICS:
+    - S.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Scenes"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH sends a RemoveAllGroups command to DUT."
+      PICS: G.S.C04.Rsp
+      cluster: "Groups"
+      endpoint: "1"
+      command: "RemoveAllGroups"
+
+    - label:
+          "TH sends a AddGroup command to DUT with the GroupID field set to
+          0x0001."
+      PICS: G.S.C00.Rsp
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "GroupName"
+                value: "Group1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0001
+
+    - label:
+          "TH sends a RemoveAllScenes command to DUT with the GroupID field set
+          to 0x0001."
+      PICS: S.S.C03.Rsp
+      command: "RemoveAllScenes"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+      response:
+          values:
+              - name: "Status"
+                value: 0
+
+    - label:
+          "TH sends a AddScene command to DUT with the GroupID field set to
+          0x0001, the SceneID field set to 0x01, the TransitionTime field set to
+          0x0001 and a set of extension fields appropriate to AC1."
+      PICS: S.S.C00.Rsp
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x0001
+              - name: "TransitionTime"
+                value: 0x0014
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value:
+                    [
+                        {
+                            ClusterID: 0x0006,
+                            AttributeValueList:
+                                [
+                                    {
+                                        AttributeID: 0x0000,
+                                        AttributeValue: [0x01],
+                                    },
+                                ],
+                        },
+                        {
+                            ClusterID: 0x0008,
+                            AttributeValueList:
+                                [
+                                    {
+                                        AttributeID: 0x0000,
+                                        AttributeValue: [0x64],
+                                    },
+                                    {
+                                        AttributeID: 0x0001,
+                                        AttributeValue: [0x00, 0x00],
+                                    },
+                                ],
+                        },
+                    ]
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "TH configures AC1 on DUT for all implemented application clusters
+          supporting scenes."
+      cluster: "Level Control"
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 100
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "TH sends a StoreScene command to DUT with the GroupID field set to
+          0x0001 and the SceneID field set to 0x01."
+      PICS: S.S.C04.Rsp
+      command: "StoreScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      cluster: "Level Control"
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "TH sends a RecallScene command to DUT with the GroupID field set to
+          0x0001 and the SceneID field set to 0x01 and the TransitionTime field
+          omitted."
+      PICS: S.S.C05.Rsp
+      command: "RecallScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      cluster: "Level Control"
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "TH sends a RecallScene command to DUT with the GroupID field set to
+          0x0001 and the SceneID field set to 0x01 and the TransitionTime field
+          omitted."
+      PICS: S.S.C05.Rsp
+      command: "RecallScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: null
+
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      cluster: "Level Control"
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "Level"
+                value: 200
+              - name: "TransitionTime"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label:
+          "TH sends a RecallScene command to DUT with the GroupID field set to
+          0x0001 and the SceneID field set to 0x01 and the TransitionTime field
+          omitted."
+      PICS: S.S.C05.Rsp
+      command: "RecallScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: null

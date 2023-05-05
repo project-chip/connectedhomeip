@@ -945,6 +945,24 @@ public class ChipClusters {
       subscribeLastConfiguredByAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readSceneTableSizeAttribute(IntegerAttributeCallback callback) {
+      readSceneTableSizeAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSceneTableSizeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSceneTableSizeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readRemainingCapacityAttribute(IntegerAttributeCallback callback) {
+      readRemainingCapacityAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeRemainingCapacityAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeRemainingCapacityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -1037,6 +1055,18 @@ public class ChipClusters {
         LastConfiguredByAttributeCallback callback,
         int minInterval,
         int maxInterval);
+
+    private native void readSceneTableSizeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeSceneTableSizeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readRemainingCapacityAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeRemainingCapacityAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);

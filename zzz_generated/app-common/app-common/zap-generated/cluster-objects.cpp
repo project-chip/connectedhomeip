@@ -1665,6 +1665,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::LastConfiguredBy::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, lastConfiguredBy));
         break;
+    case Attributes::SceneTableSize::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, sceneTableSize));
+        break;
+    case Attributes::RemainingCapacity::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, remainingCapacity));
+        break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
@@ -10666,7 +10672,7 @@ namespace Events {} // namespace Events
 
 } // namespace GroupKeyManagement
 namespace FixedLabel {
-namespace Structs {} // namespace Structs
+namespace Structs {}  // namespace Structs
 
 namespace Commands {} // namespace Commands
 
@@ -10708,7 +10714,7 @@ namespace Events {} // namespace Events
 
 } // namespace FixedLabel
 namespace UserLabel {
-namespace Structs {} // namespace Structs
+namespace Structs {}  // namespace Structs
 
 namespace Commands {} // namespace Commands
 
@@ -20538,7 +20544,7 @@ namespace Events {} // namespace Events
 
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
-namespace Structs {} // namespace Structs
+namespace Structs {}  // namespace Structs
 
 namespace Commands {} // namespace Commands
 
