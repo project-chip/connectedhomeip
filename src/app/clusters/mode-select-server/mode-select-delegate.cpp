@@ -46,7 +46,7 @@ Status Delegate::IsSupportedMode(uint8_t modeValue)
         }
     }
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", modeValue);
-    return Status::InvalidCommand;
+    return Status::InvalidValue;
 }
 
 Status Delegate::GetMode(uint8_t modeValue, ModeOptionStructType &modeOption)
@@ -60,5 +60,5 @@ Status Delegate::GetMode(uint8_t modeValue, ModeOptionStructType &modeOption)
         }
     }
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", modeValue);
-    return Status::InvalidCommand;
+    return Status::InvalidValue;
 }

@@ -60,6 +60,67 @@ public:
     ~RvcRunDelegate() override = default;
 };
 
+/// This is an application level delegate to handle RvcClean commands according to the specific business logic.
+class RvcCleanDelegate : public Delegate
+{
+private:
+    CHIP_ERROR Init() override;
+    Status HandleChangeToMode(uint8_t mode) override;
+    void HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type &response) override;
+
+public:
+    explicit RvcCleanDelegate(std::vector<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type> modes) :
+        Delegate(std::move(modes)) {}
+
+    ~RvcCleanDelegate() override = default;
+};
+
+/// This is an application level delegate to handle DishwasherControl commands according to the specific business logic.
+class DishwasherControlDelegate : public Delegate
+{
+private:
+    CHIP_ERROR Init() override;
+    Status HandleChangeToMode(uint8_t mode) override;
+    void HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type &response) override;
+
+public:
+    explicit DishwasherControlDelegate(std::vector<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type> modes) :
+        Delegate(std::move(modes)) {}
+
+    ~DishwasherControlDelegate() override = default;
+};
+
+/// This is an application level delegate to handle LaundryWasher commands according to the specific business logic.
+class LaundryWasherDelegate : public Delegate
+{
+private:
+    CHIP_ERROR Init() override;
+    Status HandleChangeToMode(uint8_t mode) override;
+    void HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type &response) override;
+
+public:
+    explicit LaundryWasherDelegate(std::vector<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type> modes) :
+        Delegate(std::move(modes)) {}
+
+    ~LaundryWasherDelegate() override = default;
+};
+
+/// This is an application level delegate to handle Refrigerator And Temperature Controlled Cabinet (TCC) commands
+/// according to the specific business logic.
+class TccDelegate : public Delegate
+{
+private:
+    CHIP_ERROR Init() override;
+    Status HandleChangeToMode(uint8_t mode) override;
+    void HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type &response) override;
+
+public:
+    explicit TccDelegate(std::vector<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type> modes) :
+        Delegate(std::move(modes)) {}
+
+    ~TccDelegate() override = default;
+};
+
 } // namespace ModeSelect
 } // namespace Clusters
 } // namespace app

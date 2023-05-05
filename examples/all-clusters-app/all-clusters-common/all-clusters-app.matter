@@ -2200,6 +2200,184 @@ server cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options. */
+server cluster ModeSelect = 80 {
+  enum ChangeToModeResponseStatus : ENUM8 {
+    kSuccess = 0;
+    kUnsupportedMode = 1;
+    kGenericFailure = 2;
+  }
+
+  enum SemanticTags : ENUM16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
+  }
+
+  bitmap ModeSelectFeature : BITMAP32 {
+    kDeponoff = 0x1;
+    kExt = 0x2;
+  }
+
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    SemanticTagStruct semanticTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute nullable int8u startUpMode = 4;
+  attribute nullable int8u onMode = 5;
+  readonly attribute int8u manufacturerExtension = 4293984257;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): DefaultSuccess = 1;
+}
+
+/** This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for laundry washer devices. */
+server cluster LaundryWasher = 81 {
+  enum SemanticTags : ENUM16 {
+    kNormal = 16384;
+    kDelicate = 16385;
+    kHeavy = 16386;
+    kWhites = 16387;
+  }
+
+  bitmap ModeSelectFeature : BITMAP32 {
+    kDeponoff = 0x1;
+    kExt = 0x2;
+  }
+
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    SemanticTagStruct semanticTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute nullable int8u startUpMode = 4;
+  attribute nullable int8u onMode = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): DefaultSuccess = 1;
+}
+
+/** This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for refrigerator and temperature controlled cabinet devices. */
+server cluster RefrigeratorAndTemperatureControlledCabinet = 82 {
+  enum SemanticTags : ENUM16 {
+    kRapidCool = 16384;
+    kRapidFreeze = 16385;
+  }
+
+  bitmap ModeSelectFeature : BITMAP32 {
+    kDeponoff = 0x1;
+    kExt = 0x2;
+  }
+
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    SemanticTagStruct semanticTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute nullable int8u startUpMode = 4;
+  attribute nullable int8u onMode = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): DefaultSuccess = 1;
+}
+
 /** This cluster is an alias of the Mode Select cluster which also defines a namespace for the running modes of the Robotic Vacuum Cleaner devices. */
 server cluster RvcRun = 84 {
   enum ChangeToModeResponseStatus : ENUM8 {
@@ -2218,6 +2396,120 @@ server cluster RvcRun = 84 {
   }
 
   bitmap Feature : BITMAP32 {
+    kDeponoff = 0x1;
+    kExt = 0x2;
+  }
+
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    SemanticTagStruct semanticTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute nullable int8u startUpMode = 4;
+  attribute nullable int8u onMode = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): DefaultSuccess = 1;
+}
+
+/** This cluster is an alias of the Mode Select cluster which also defines a namespace for the
+      cleaning type of the Robotic Vacuum Cleaner devices. */
+server cluster RvcClean = 85 {
+  enum ChangeToModeResponseStatus : ENUM8 {
+    kCleaningInProgress = 64;
+  }
+
+  enum SemanticTags : ENUM16 {
+    kDeepClean = 16384;
+    kVacuum = 16385;
+    kMop = 16386;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kDeponoff = 0x1;
+    kExt = 0x2;
+  }
+
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    SemanticTagStruct semanticTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute nullable int8u startUpMode = 4;
+  attribute nullable int8u onMode = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): DefaultSuccess = 1;
+}
+
+/** This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for dishwasher devices. */
+server cluster DishwasherModeSelect = 89 {
+  enum SemanticTags : ENUM16 {
+    kNormal = 16384;
+    kHeavy = 16385;
+    kLight = 16386;
+  }
+
+  bitmap ModeSelectFeature : BITMAP32 {
     kDeponoff = 0x1;
     kExt = 0x2;
   }
@@ -5089,6 +5381,50 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster ModeSelect {
+    ram      attribute description default = "Coffee";
+    ram      attribute standardNamespace default = 0;
+    callback attribute supportedModes default = 0;
+    persist  attribute currentMode default = 0;
+    persist  attribute startUpMode default = 0;
+    persist  attribute onMode default = 255;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+    ram      attribute manufacturerExtension default = 255;
+  }
+
+  server cluster LaundryWasher {
+    ram      attribute description;
+    ram      attribute standardNamespace;
+    callback attribute supportedModes;
+    ram      attribute currentMode default = 0;
+    ram      attribute startUpMode default = 0;
+    ram      attribute onMode default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster RefrigeratorAndTemperatureControlledCabinet {
+    ram      attribute description;
+    ram      attribute standardNamespace;
+    callback attribute supportedModes;
+    ram      attribute currentMode default = 0;
+    ram      attribute startUpMode default = 0;
+    ram      attribute onMode default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster RvcRun {
     ram      attribute description default = "Robot run modes";
     ram      attribute standardNamespace default = 0;
@@ -5096,6 +5432,34 @@ endpoint 1 {
     persist  attribute currentMode default = 0;
     persist  attribute startUpMode default = 0;
     persist  attribute onMode default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster RvcClean {
+    ram      attribute description default = "cleaning modes";
+    ram      attribute standardNamespace;
+    callback attribute supportedModes;
+    ram      attribute currentMode default = 0;
+    ram      attribute startUpMode default = 0;
+    ram      attribute onMode default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster DishwasherModeSelect {
+    ram      attribute description;
+    ram      attribute standardNamespace;
+    callback attribute supportedModes;
+    ram      attribute currentMode default = 0;
+    ram      attribute startUpMode default = 0;
+    ram      attribute onMode default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

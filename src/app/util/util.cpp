@@ -140,6 +140,10 @@ void MatterFanControlPluginServerInitCallback() {}
 
 void MatterModeSelectPluginServerInitCallback() {}
 void MatterRvcRunPluginServerInitCallback() {}
+void MatterRvcCleanPluginServerInitCallback() {}
+void MatterDishwasherModeSelectPluginServerInitCallback() {}
+void MatterLaundryWasherPluginServerInitCallback() {}
+void MatterRefrigeratorAndTemperatureControlledCabinetPluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************

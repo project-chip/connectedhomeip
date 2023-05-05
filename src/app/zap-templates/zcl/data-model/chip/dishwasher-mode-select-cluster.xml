@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="CommonSemanticTags" type="ENUM16">
+  <enum name="SemanticTags" type="ENUM16">
     <cluster code="0x0059"/>
     <item value="0x4000" name="Normal"/>
     <item value="0x4001" name="Heavy"/>
@@ -41,7 +41,7 @@ limitations under the License.
     <domain>General</domain>
     <name>Dishwasher Mode Select</name>
     <code>0x0059</code>
-    <define>DISHWASHER_MODE_SELECT</define>
+    <define>DISHWASHER_MODE_SELECT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster is an alias of the Mode Select cluster, defining additional semantics and
