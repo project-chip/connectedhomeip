@@ -5,7 +5,7 @@ ifeq ($(OS),Windows_NT)
 	POSIX_TOOL_PATH := /usr/bin/
 endif
 TOOLCHAIN_DIR := 
-SDK_PATH := /res/git/gsdk
+SDK_PATH := /git/gsdk
 
 ARM_GCC_DIR_WIN = 
 ARM_GCC_DIR_OSX = 

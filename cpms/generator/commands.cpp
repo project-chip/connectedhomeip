@@ -1,10 +1,7 @@
 #include "commands.h"
 #include "credentials.h"
+#include "platform.h"
 #include "assert.h"
-#include <em_msc.h>
-#include <nvm3.h>
-#include <nvm3_default.h>
-#include <nvm3_hal_flash.h>
 #include <string.h>
 
 using namespace chip::DeviceLayer::Internal;
@@ -52,7 +49,6 @@ void VoidCommand::encode(Encoder & out) const
 static uint8_t _credentials_page[FLASH_PAGE_SIZE] = { 0 };
 uint32_t _creds_base_addr = 0;
 
-extern "C" void setNvm3End(uint32_t addr);
 
 int InitCommand::decode(Encoder & in)
 {
@@ -68,8 +64,7 @@ int InitCommand::decode(Encoder & in)
 int InitCommand::execute()
 {
     _creds_base_addr = _flash_addr + _flash_size - FLASH_PAGE_SIZE;
-    setNvm3End(_creds_base_addr);
-    psa_crypto_init();
+    platform_init(_creds_base_addr);
     return 0;
 }
 
@@ -179,7 +174,7 @@ void ImportCommand::encode(Encoder & out) const
 int ImportCommand::writeKey(const uint8_t *data, size_t size)
 {
     Credentials creds = Credentials(_key_id);
-    int err = creds.importKey(data, size);
+    int err = creds.importDerKey(data, size);
     _key_id = creds.getKeyId();
     return err;
 }
@@ -214,7 +209,7 @@ int ImportCommand::writeCD(const uint8_t *data, size_t size)
 
 int ImportCommand::writeFile(Key offset_key, Key size_key, uint32_t offset, const uint8_t *data, size_t size)
 {
-    // Write file 
+    // Write file
     memcpy(&_credentials_page[offset], data, size);
 
     // Store file offset
@@ -227,14 +222,12 @@ int ImportCommand::writeFile(Key offset_key, Key size_key, uint32_t offset, cons
 
     if(_flash)
     {
-        MSC_ErasePage((uint32_t *)_creds_base_addr);
-
         // Read page address
         err = Config::Write(SilabsConfig::kConfigKey_Creds_Base_Addr, _creds_base_addr);
         ASSERT(!err, return err, "write read error");
 
         // Write to flash
-        MSC_WriteWord((uint32_t *)_creds_base_addr, _credentials_page, FLASH_PAGE_SIZE);
+        platform_flash((uint32_t *)_creds_base_addr, _credentials_page, FLASH_PAGE_SIZE);
     }
 
     _offset = offset;
@@ -257,6 +250,9 @@ int SetupCommand::decode(Encoder & in)
     err = in.getUint32(_vendor_id);
     ASSERT(!err, goto exit, "Decode error");
 
+    err = Config::Write(SilabsConfig::kConfigKey_VendorId, _vendor_id);
+    ASSERT(!err, goto exit, "Write error");
+
     // vendor_name
     err = in.getArray(temp, sizeof(temp), size);
     ASSERT(!err, goto exit, "Decode error");
@@ -269,6 +265,9 @@ int SetupCommand::decode(Encoder & in)
     // product_id
     err = in.getUint32(_product_id);
     ASSERT(!err, goto exit, "Decode error");
+
+    err = Config::Write(SilabsConfig::kConfigKey_ProductId, _product_id);
+    ASSERT(!err, goto exit, "Write error");
 
     // product_name
     err = in.getArray(temp, sizeof(temp), size);
@@ -309,20 +308,25 @@ int SetupCommand::decode(Encoder & in)
     // hw_version
     err = in.getArray(temp, sizeof(temp), size);
     ASSERT(!err, goto exit, "Decode error");
-    if(size > 0)
+    if(0 == size)
     {
-        err = Config::WriteBin(SilabsConfig::kConfigKey_HardwareVersion, temp, size);
-        ASSERT(!err, goto exit, "Write error");
+        // 0x0000
+        temp[size++] = 0;
+        temp[size++] = 0;
     }
+    err = Config::WriteBin(SilabsConfig::kConfigKey_HardwareVersion, temp, size);
+    ASSERT(!err, goto exit, "Write error");
 
     // hw_version_str
     err = in.getArray(temp, sizeof(temp), size);
     ASSERT(!err, goto exit, "Decode error");
-    if(size > 0)
+    if(0 == size)
     {
-        err = Config::WriteBin(SilabsConfig::kConfigKey_HardwareVersionString, temp, size);
-        ASSERT(!err, goto exit, "Write error");
+        // Empty string
+        temp[size++] = 0;
     }
+    err = Config::WriteBin(SilabsConfig::kConfigKey_HardwareVersionString, temp, size);
+    ASSERT(!err, goto exit, "Write error");
 
     // manufacturing_date
     err = in.getArray(temp, sizeof(temp), size);
@@ -378,14 +382,6 @@ exit:
 int SetupCommand::execute()
 {
     int err = 0;
-
-    // vendor_id
-    err = Config::Write(SilabsConfig::kConfigKey_VendorId, _vendor_id);
-    ASSERT(!err, goto exit, "Write error");
-
-    // product_id
-    err = Config::Write(SilabsConfig::kConfigKey_ProductId, _product_id);
-    ASSERT(!err, goto exit, "Write error");
 
     // unique_id
     if(0 == _unique_size)
@@ -473,7 +469,7 @@ int SetupCommand::computeHash(uint8_t *hash, size_t & hash_size)
         int err = Config::ReadBin(SilabsConfig::kConfigKey_SerialNum, serial_num, sizeof(serial_num), serial_size);
         ASSERT(!err, return err, "Read error");
 
-        err = psa_hash_compute(PSA_ALG_SHA_256, serial_num, serial_size, hash, PSA_HASH_LENGTH(PSA_ALG_SHA_256), &hash_size);
+        err = platform_sha256(serial_num, serial_size, hash, &hash_size);
         ASSERT(!err, return err, "Read error");
     }
     return 0;

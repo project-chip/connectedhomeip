@@ -130,7 +130,7 @@ class SetupCommand(Command):
         super().__init__(Command.SETUP)
 
         # Vendor
-        
+
         self.vendor_id = args.vendor_id
         if args.vendor_name:
             self.vendor_name = bytes(args.vendor_name, 'utf-8')
@@ -139,47 +139,46 @@ class SetupCommand(Command):
 
         # Product
         self.product_id = args.product_id
-        if args.product_name:
-            self.product_name = bytes(args.product_name, 'utf-8')
-        else:
+        if args.product_name is None:
             self.product_name = None
-
-        if args.product_label:
-            self.product_label = bytes(args.product_label, 'utf-8')
         else:
+            self.product_name = bytes(args.product_name, 'utf-8')
+
+        if args.product_label is None:
             self.product_label = None
-
-        if args.product_url:
-            self.product_url = bytes(args.product_url, 'utf-8')
         else:
+            self.product_label = bytes(args.product_label, 'utf-8')
+
+        if args.product_url is None:
             self.product_url = None
-
-        if args.part_number:
-            self.part_number = bytes(args.part_number, 'utf-8')
         else:
+            self.product_url = bytes(args.product_url, 'utf-8')
+
+        if args.part_number is None:
             self.part_number = None
-
-        if args.hw_version:
-            self.hw_version = args.hw_version.to_bytes(2, "little")
         else:
+            self.part_number = bytes(args.part_number, 'utf-8')
+
+        if args.hw_version is None:
             self.hw_version = None
-
-        if args.hw_version_str:
-            self.hw_version_str = bytes(args.hw_version_str, 'utf-8')
         else:
+            self.hw_version = args.hw_version.to_bytes(2, "little")
+
+        if args.hw_version_str is None:
             self.hw_version_str = None
-
-        if args.manufacturing_date:
-            self.manufacturing_date = bytes(args.manufacturing_date, 'utf-8')
         else:
+            self.hw_version_str = bytes(args.hw_version_str, 'utf-8')
+
+        if args.manufacturing_date is None:
             self.manufacturing_date = None
+        else:
+            self.manufacturing_date = bytes(args.manufacturing_date, 'utf-8')
 
         # Commissioning
-        if args.unique_id:
-            self.unique_id = bytearray.fromhex(args.unique_id)
-        else:
+        if args.unique_id is None:
             self.unique_id = None
-
+        else:
+            self.unique_id = bytearray.fromhex(args.unique_id)
         self.commissioning_flow = args.commissioning_flow
         self.rendezvous_flags = args.rendezvous_flags
         self.discriminator = args.discriminator or 0

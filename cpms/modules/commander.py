@@ -6,6 +6,7 @@ from .util import *
 socs = {
   'mg12': { 'ram_addr': 0x20000000, 'stacksize': 0x1000, 'flash_addr': 0x0000000 },
   'mg24': { 'ram_addr': 0x20000000, 'stacksize': 0x1000, 'flash_addr': 0x8000000 },
+  'Si917': { 'ram_addr': 0xC, 'stacksize': 0x4FC00 },
 }
 
 

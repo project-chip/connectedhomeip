@@ -19,17 +19,17 @@
 #include "commands.h"
 #include "encoding.h"
 #include "credentials.h"
+#include "platform.h"
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
-#include <em_msc.h>
-#include <nvm3.h>
-#include <sl_iostream_rtt.h>
+
 
 #define BUFFER_SIZE          2048
 
 static uint8_t _buffer[BUFFER_SIZE] = { 0 };
+
 
 static VoidCommand _void_command;
 static InitCommand _init_command;
@@ -43,15 +43,15 @@ Command & select_command(uint8_t id)
     switch(id)
     {
     case kCommand_Init:
-        return _init_command; 
+        return _init_command;
     case kCommand_CSR:
-        return _csr_command; 
+        return _csr_command;
     case kCommand_Import:
-        return _import_command; 
+        return _import_command;
     case kCommand_Setup:
-        return _setup_command; 
+        return _setup_command;
     default:
-        return _void_command; 
+        return _void_command;
     }
 }
 
@@ -72,7 +72,7 @@ void execute_command(uint8_t id, Encoder & input)
         cmd.encode(output);
     }
 
-    sl_iostream_write(sl_iostream_rtt_handle, output.data(), output.offset());
+    platform_write(output.data(), output.offset());
 }
 
 void reject_command(uint8_t id, int err)
@@ -80,7 +80,7 @@ void reject_command(uint8_t id, int err)
     Encoder out(_buffer, sizeof(_buffer));
     out.addUint8(id);
     out.addInt32(err);
-    sl_iostream_write(sl_iostream_rtt_handle, out.data(), out.offset());
+    platform_write(out.data(), out.offset());
 }
 
 /*******************************************************************************
@@ -89,7 +89,6 @@ void reject_command(uint8_t id, int err)
 
 void app_init(void)
 {
-    MSC_Init();
 }
 
 /*******************************************************************************
@@ -100,11 +99,11 @@ void app_process_action(void)
 {
     uint8_t command_id = kCommand_None;
     size_t in_size = 0;
-    sl_status_t status = SL_STATUS_OK;
+    int status = 0;
 
     // Read input
-    status = sl_iostream_read(sl_iostream_rtt_handle, (void *)_buffer, sizeof(_buffer), &in_size);
-    ASSERT((SL_STATUS_OK == status) && (in_size > 0), return, "RX error");
+    status = platform_read((void *)_buffer, sizeof(_buffer), &in_size);
+    ASSERT((0 == status) && (in_size > 0), return, "RX error");
 
     // Decode header
     Encoder input(_buffer, in_size);

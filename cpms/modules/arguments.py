@@ -286,6 +286,8 @@ class Arguments(BaseArguments):
             assert (len(args.part_number) <= Arguments.kMaxPartNumberLength), "Part number exceeds the size limit"
         self.part_number = args.part_number
 
+        self.hw_version = args.hw_version or 0
+
         if args.hw_version_str:
             assert (len(args.hw_version_str) <= Arguments.kMaxHardwareVersionStringLength), "Hardware version string exceeds the size limit"
         self.hw_version_str = args.hw_version_str

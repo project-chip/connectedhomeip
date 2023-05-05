@@ -1,0 +1,51 @@
+project_name: generator
+package: platform
+quality: production
+label: Matter CPMS Generator
+description: >
+  Generates the key-pair, and CSR for the DAC
+category: Example|Platform
+filter:
+  - name: "Device Type"
+    value: ["SoC"]
+  - name: "MCU"
+    value: ["32-bit MCU"]
+  - name: "Project Difficulty"
+    value: ["Beginner"]
+source:
+  - path: app.cpp
+  - path: commands.cpp
+  - path: config.cpp
+  - path: credentials_efr32.cpp
+  - path: encoding.cpp
+  - path: main.cpp
+  - path: nvm3.c
+  - path: platform_efr32.c
+include:
+  - path: .
+    file_list:
+    - path: app.h
+    - path: commands.h
+    - path: config.h
+    - path: credentials.h
+    - path: encoding.h
+    - path: platform.h
+  - path: ../../examples/
+    file_list:
+    - path: lib/support/Base64.h
+  - path: ../../src/
+    file_list:
+    - path: platform/silabs/SilabsConfig.h
+component:
+  - id: sl_system
+  - id: cpp_support
+  - id: iostream_rtt
+  - id: psa_its
+  - id: psa_driver
+  - id: psa_crypto
+  - id: psa_crypto_ecc_secp256r1
+  - id: psa_crypto_sha256
+  - id: psa_crypto_ecdsa
+  - id: mbedtls_pkcs5
+  - id: mbedtls_ecc
+  - id: mbedtls_x509
