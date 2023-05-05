@@ -19,9 +19,9 @@ limitations under the License.
 
   <bitmap name="DishwasherControlFeature" type="BITMAP32">
     <cluster code="0x0058" />
-    <field name="STEAMWASH" mask="0x01" />
-    <field name="HEATEDDRY" mask="0x02" />
-    <field name="EXTDRY" mask="0x04" />
+    <field name="SteamWash" mask="0x01" />
+    <field name="HeatedDry" mask="0x02" />
+    <field name="ExtendedDry" mask="0x04" />
   </bitmap>
 
   <cluster>
@@ -35,7 +35,7 @@ limitations under the License.
 
     <globalAttribute side="server" code="0xFFFD" value="1" />
 
-    <attribute side="server" code="0x0000" define="AVAILABLE_OPTIONS_FOR_CURRENT_MODE" type="BITMAP32" entryType="INT32U" min="0x00" max="0x07"      writable="false" isNullable="false" optional="false">AvailableOptionsForCurrentMode</attribute>
+    <attribute side="server" code="0x0000" define="AVAILABLE_OPTIONS_FOR_CURRENT_MODE" type="BITMAP32" min="0x00" max="0x07"      writable="false" isNullable="false" optional="false">AvailableOptionsForCurrentMode</attribute>
     <attribute side="server" code="0x0001" define="STEAM_WASH"                         type="boolean"                                                writable="true"  isNullable="false" optional="true">SteamWash</attribute>
     <attribute side="server" code="0x0002" define="HEATED_DRY"                         type="boolean"                                                writable="true"  isNullable="false" optional="true">HeatedDry</attribute>
     <attribute side="server" code="0x0003" define="EXTENDED_DRY"                       type="boolean"                                                writable="true"  isNullable="false" optional="true">ExtendedDry</attribute>
