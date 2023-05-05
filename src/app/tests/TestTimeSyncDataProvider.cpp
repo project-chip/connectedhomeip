@@ -24,46 +24,249 @@
 
 using namespace chip;
 using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters::TimeSynchronization;
+
+using TrustedTimeSource = app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type;
+using TimeZoneList      = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
+using TimeZone          = app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type;
+using DSTOffsetList     = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>;
+using DSTOffset         = app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type;
 
 namespace {
 
-void TestTrustedTimeSource(nlTestSuite * inSuite, void * inContext)
+void TestTrustedTimeSourceStoreLoad(nlTestSuite * inSuite, void * inContext)
 {
     TestPersistentStorageDelegate persistentStorage;
     TimeSyncDataProvider timeSyncDataProv;
     timeSyncDataProv.Init(persistentStorage);
 
-    NL_TEST_ASSERT(inSuite, true);
+    TrustedTimeSource tts = { chip::FabricIndex(1), chip::NodeId(20), chip::EndpointId(0) };
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.StoreTrustedTimeSource(tts));
+
+    TrustedTimeSource retrievedTrustedTimeSource;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadTrustedTimeSource(retrievedTrustedTimeSource));
+    NL_TEST_ASSERT(inSuite, retrievedTrustedTimeSource.fabricIndex == chip::FabricIndex(1));
+    NL_TEST_ASSERT(inSuite, retrievedTrustedTimeSource.nodeID == chip::NodeId(20));
+    NL_TEST_ASSERT(inSuite, retrievedTrustedTimeSource.endpoint == chip::EndpointId(0));
 }
 
-void TestDefaultNtp(nlTestSuite * inSuite, void * inContext)
+void TestTrustedTimeSourceEmpty(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, true);
+    TestPersistentStorageDelegate persistentStorage;
+    TimeSyncDataProvider timeSyncDataProv;
+    timeSyncDataProv.Init(persistentStorage);
+
+    TrustedTimeSource tts;
+
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadTrustedTimeSource(tts));
 }
 
-void TestTimeZone(nlTestSuite * inSuite, void * inContext)
+void TestDefaultNTPStoreLoad(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, true);
+    TestPersistentStorageDelegate persistentStorage;
+    TimeSyncDataProvider timeSyncDataProv;
+    timeSyncDataProv.Init(persistentStorage);
+
+    char ntp[10] = "localhost";
+    chip::CharSpan defaultNTP(ntp);
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.StoreDefaultNtp(defaultNTP));
+
+    uint8_t buf[5];
+    chip::MutableByteSpan getDefaultNtp(buf);
+
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_BUFFER_TOO_SMALL == timeSyncDataProv.LoadDefaultNtp(getDefaultNtp));
+    NL_TEST_ASSERT(inSuite, getDefaultNtp.size() == 5);
+
+    uint8_t buf1[20];
+    chip::MutableByteSpan getDefaultNtp1(buf1);
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadDefaultNtp(getDefaultNtp1));
+    NL_TEST_ASSERT(inSuite, getDefaultNtp1.size() == 10);
+}
+
+void TestDefaultNTPEmpty(nlTestSuite * inSuite, void * inContext)
+{
+    TestPersistentStorageDelegate persistentStorage;
+    TimeSyncDataProvider timeSyncDataProv;
+    timeSyncDataProv.Init(persistentStorage);
+
+    chip::MutableByteSpan defaultNTP;
+
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadDefaultNtp(defaultNTP));
+}
+
+void TestTimeZoneStoreLoad(nlTestSuite * inSuite, void * inContext)
+{
+    TestPersistentStorageDelegate persistentStorage;
+    TimeSyncDataProvider timeSyncDataProv;
+    timeSyncDataProv.Init(persistentStorage);
+
+    const auto makeTimeZone = [](int32_t offset, uint64_t validAt, char * name, uint8_t len = 0) {
+        TimeZone tz;
+        tz.offset  = offset;
+        tz.validAt = validAt;
+        if (len)
+            tz.name.SetValue(chip::CharSpan(name, len));
+        return tz;
+    };
+    char tzCET[4]   = "CET";
+    char tzCST[64]  = "CST";
+    char tzCDT[65]  = "CDT";
+    TimeZone tzS[3] = { makeTimeZone(1, 1, tzCET, sizeof(tzCET)), makeTimeZone(2, 2, tzCST, sizeof(tzCST)),
+                        makeTimeZone(3, 3, tzCDT, sizeof(tzCDT)) };
+    TimeZoneList tzL(tzS);
+    NL_TEST_ASSERT(inSuite, tzL.size() == 3);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.StoreTimeZone(tzL));
+
+    char tzA[10];
+    char tzB[64];
+    char tzC[10];
+    TimeZone emptyTzS[3] = { makeTimeZone(0, 0, tzA, sizeof(tzA)), makeTimeZone(0, 0, tzB, sizeof(tzB)),
+                             makeTimeZone(0, 0, tzC, sizeof(tzC)) };
+
+    tzL = TimeZoneList(emptyTzS);
+    uint8_t size;
+    NL_TEST_ASSERT(inSuite, tzL.size() == 3);
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_BUFFER_TOO_SMALL == timeSyncDataProv.LoadTimeZone(tzL, size));
+    NL_TEST_ASSERT(inSuite, size == 3);
+
+    NL_TEST_ASSERT(inSuite, !tzL.empty());
+
+    if (!tzL.empty())
+    {
+        auto & tz = tzL.data()[0];
+        NL_TEST_ASSERT(inSuite, tz.offset == 1);
+        NL_TEST_ASSERT(inSuite, tz.validAt == 1);
+        NL_TEST_ASSERT(inSuite, tz.name.HasValue());
+        NL_TEST_ASSERT(inSuite, tz.name.Value().size() == 4);
+
+        tzL = tzL.SubSpan(1);
+    }
+
+    if (!tzL.empty())
+    {
+        auto & tz = tzL.data()[0];
+        NL_TEST_ASSERT(inSuite, tz.offset == 2);
+        NL_TEST_ASSERT(inSuite, tz.validAt == 2);
+        NL_TEST_ASSERT(inSuite, tz.name.HasValue());
+        NL_TEST_ASSERT(inSuite, tz.name.Value().size() == 64);
+
+        tzL = tzL.SubSpan(1);
+    }
+
+    if (!tzL.empty())
+    {
+        auto & tz = tzL.data()[0];
+        NL_TEST_ASSERT(inSuite, tz.offset == 3);
+        NL_TEST_ASSERT(inSuite, tz.validAt == 3);
+        NL_TEST_ASSERT(inSuite, tz.name.HasValue());
+        NL_TEST_ASSERT(inSuite, tz.name.Value().size() == 10);
+
+        tzL = tzL.SubSpan(1);
+    }
+
+    NL_TEST_ASSERT(inSuite, tzL.empty());
 }
 
 void TestTimeZoneEmpty(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, true);
+    TestPersistentStorageDelegate persistentStorage;
+    TimeSyncDataProvider timeSyncDataProv;
+    timeSyncDataProv.Init(persistentStorage);
+
+    TimeZoneList timeZoneList;
+    uint8_t size = 0;
+
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadTimeZone(timeZoneList, size));
+    NL_TEST_ASSERT(inSuite, !timeZoneList.begin());
+    NL_TEST_ASSERT(inSuite, size == 0);
 }
 
 void TestDSTOffset(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, true);
+    TestPersistentStorageDelegate persistentStorage;
+    TimeSyncDataProvider timeSyncDataProv;
+    timeSyncDataProv.Init(persistentStorage);
+
+    const auto makeDSTOffset = [](int32_t offset = 0, uint64_t validStarting = 0, uint64_t validUntil = 0) {
+        DSTOffset dst;
+        dst.offset        = offset;
+        dst.validStarting = validStarting;
+        if (validUntil)
+            dst.validUntil.SetNonNull(validUntil);
+        return dst;
+    };
+    DSTOffset dstS[3] = { makeDSTOffset(1, 1, 2), makeDSTOffset(2, 2, 3), makeDSTOffset(3, 3) };
+    DSTOffsetList dstL(dstS);
+    NL_TEST_ASSERT(inSuite, dstL.size() == 3);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.StoreDSTOffset(dstL));
+
+    DSTOffset emtpyDstS[3] = { makeDSTOffset(), makeDSTOffset(), makeDSTOffset() };
+
+    dstL = DSTOffsetList(emtpyDstS);
+    uint8_t size;
+    NL_TEST_ASSERT(inSuite, dstL.size() == 3);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadDSTOffset(dstL, size));
+    NL_TEST_ASSERT(inSuite, size == 3);
+
+    NL_TEST_ASSERT(inSuite, !dstL.empty());
+
+    if (!dstL.empty())
+    {
+        auto & dst = dstL.data()[0];
+        NL_TEST_ASSERT(inSuite, dst.offset == 1);
+        NL_TEST_ASSERT(inSuite, dst.validStarting == 1);
+        NL_TEST_ASSERT(inSuite, !dst.validUntil.IsNull());
+        NL_TEST_ASSERT(inSuite, dst.validUntil.Value() == 2);
+
+        dstL = dstL.SubSpan(1);
+    }
+
+    if (!dstL.empty())
+    {
+        auto & dst = dstL.data()[0];
+        NL_TEST_ASSERT(inSuite, dst.offset == 2);
+        NL_TEST_ASSERT(inSuite, dst.validStarting == 2);
+        NL_TEST_ASSERT(inSuite, !dst.validUntil.IsNull());
+        NL_TEST_ASSERT(inSuite, dst.validUntil.Value() == 3);
+
+        dstL = dstL.SubSpan(1);
+    }
+
+    if (!dstL.empty())
+    {
+        auto & dst = dstL.data()[0];
+        NL_TEST_ASSERT(inSuite, dst.offset == 3);
+        NL_TEST_ASSERT(inSuite, dst.validStarting == 3);
+        NL_TEST_ASSERT(inSuite, dst.validUntil.IsNull());
+
+        dstL = dstL.SubSpan(1);
+    }
+
+    NL_TEST_ASSERT(inSuite, dstL.empty());
 }
 
 void TestDSTOffsetEmpty(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, true);
+    TestPersistentStorageDelegate persistentStorage;
+    TimeSyncDataProvider timeSyncDataProv;
+    timeSyncDataProv.Init(persistentStorage);
+
+    DSTOffsetList dstOffset;
+    uint8_t size = 0;
+
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadDSTOffset(dstOffset, size));
+    NL_TEST_ASSERT(inSuite, !dstOffset.begin());
+    NL_TEST_ASSERT(inSuite, size == 0);
 }
 
-const nlTest sTests[] = { NL_TEST_DEF("Test TrustedTimeSource", TestTrustedTimeSource),
-                          NL_TEST_DEF("Test default NTP", TestDefaultNtp),
-                          NL_TEST_DEF("Test time zone", TestTimeZone),
+const nlTest sTests[] = { NL_TEST_DEF("Test TrustedTimeSource store load", TestTrustedTimeSourceStoreLoad),
+                          NL_TEST_DEF("Test TrustedTimeSource empty", TestTrustedTimeSourceEmpty),
+                          NL_TEST_DEF("Test default NTP store load", TestDefaultNTPStoreLoad),
+                          NL_TEST_DEF("Test default NTP empty", TestDefaultNTPEmpty),
+                          NL_TEST_DEF("Test time zone store load", TestTimeZoneStoreLoad),
                           NL_TEST_DEF("Test time zone (empty list)", TestTimeZoneEmpty),
                           NL_TEST_DEF("Test DSTOffset", TestDSTOffset),
                           NL_TEST_DEF("Test DSTOffset (empty list)", TestDSTOffsetEmpty),
@@ -71,11 +274,13 @@ const nlTest sTests[] = { NL_TEST_DEF("Test TrustedTimeSource", TestTrustedTimeS
 
 int TestSetup(void * inContext)
 {
+    VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
     return SUCCESS;
 }
 
 int TestTearDown(void * inContext)
 {
+    chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
 

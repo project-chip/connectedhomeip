@@ -79,6 +79,17 @@ source_set("ota-requestor-test-srcs") {
   ]
 }
 
+source_set("time-sync-data-provider-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/time-synchronization-server/TimeSyncDataProvider.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 source_set("scenes-table-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/scenes/ExtensionFieldSets.h",
@@ -168,6 +179,7 @@ chip_test_suite("tests") {
     #https://github.com/project-chip/connectedhomeip/issues/24425
     # ":client-monitoring-test-srcs",
     ":ota-requestor-test-srcs",
+    ":time-sync-data-provider-test-srcs",
     ":scenes-table-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",

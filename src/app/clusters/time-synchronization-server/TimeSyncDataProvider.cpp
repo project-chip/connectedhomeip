@@ -108,6 +108,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZone & timeZoneList, uint8_t &
     uint8_t buffer[kTimeZoneListMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     size = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::TSTimeZone().KeyName(), bufferSpan));
 
@@ -128,9 +129,18 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZone & timeZoneList, uint8_t &
         tz[i].validAt = timeZone.validAt;
         if (timeZone.name.HasValue())
         {
-            char * dest = const_cast<char *>(tz[i].name.Value().data());
-            size_t len  = timeZone.name.Value().size();
-            Platform::CopyString(dest, len, timeZone.name.Value().data());
+            if (timeZone.name.Value().size() <= tz[i].name.Value().size())
+            {
+
+                char * dest = const_cast<char *>(tz[i].name.Value().data());
+                size_t len  = timeZone.name.Value().size();
+                Platform::CopyString(dest, len, timeZone.name.Value().data());
+                tz[i].name.SetValue(chip::CharSpan(tz[i].name.Value().data(), len));
+            }
+            else
+            {
+                err = CHIP_ERROR_BUFFER_TOO_SMALL;
+            }
         }
         i++;
     }
@@ -138,7 +148,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZone & timeZoneList, uint8_t &
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
     size = i;
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR TimeSyncDataProvider::ClearTimeZone()
