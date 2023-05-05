@@ -49,7 +49,7 @@ int16_t SensorManager::SensorEventHandler()
 #ifdef TEMPERATURE_SIMULATION_IS_USED
     static uint8_t nbOfRepetition = 0;
     static uint8_t simulatedIndex = 0;
-    if (simulatedIndex >= sizeof(mSimulatedTemp) - 1)
+    if (simulatedIndex >= ArraySize(mSimulatedTemp))
     {
         simulatedIndex = 0;
     }
