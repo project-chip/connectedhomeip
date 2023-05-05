@@ -299,7 +299,6 @@ if __name__ == '__main__':
     # This Parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
     import click
-    import coloredlogs
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -318,8 +317,10 @@ if __name__ == '__main__':
         help='Determines the verbosity of script output.')
     @click.argument('filename')
     def main(log_level, filename=None):
-        coloredlogs.install(level=__LOG_LEVELS__[
-                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+        logging.basicConfig(
+            level=__LOG_LEVELS__[log_level],
+            format='%(asctime)s %(levelname)-7s %(message)s',
+        )
 
         logging.info("Starting to parse ...")
         data = CreateParser(filename).parse()

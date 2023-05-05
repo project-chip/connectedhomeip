@@ -223,7 +223,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 #if APP_SET_NETWORK_COMM_ENDPOINT_SEC
     // We only have network commissioning on endpoint 0.
     // Set up a valid Network Commissioning cluster on endpoint 0 is done in
-    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
+    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif
 
