@@ -1273,9 +1273,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::ChangeToMod
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::CommonSemanticTags val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::SemanticTags val)
 {
-    using EnumType = ModeSelect::CommonSemanticTags;
+    using EnumType = ModeSelect::SemanticTags;
     switch (val)
     {
     case EnumType::kAuto:
@@ -1291,6 +1291,34 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::CommonSeman
         return val;
     default:
         return static_cast<EnumType>(10);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasher::SemanticTags val)
+{
+    using EnumType = LaundryWasher::SemanticTags;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kDelicate:
+    case EnumType::kHeavy:
+    case EnumType::kWhites:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(RefrigeratorAndTemperatureControlledCabinet::SemanticTags val)
+{
+    using EnumType = RefrigeratorAndTemperatureControlledCabinet::SemanticTags;
+    switch (val)
+    {
+    case EnumType::kRapidCool:
+    case EnumType::kRapidFreeze:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
     }
 }
 
@@ -1318,6 +1346,45 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRun::SemanticTags va
     {
     case EnumType::kIdle:
     case EnumType::kCleaning:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcClean::ChangeToModeResponseStatus val)
+{
+    using EnumType = RvcClean::ChangeToModeResponseStatus;
+    switch (val)
+    {
+    case EnumType::kCleaningInProgress:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcClean::SemanticTags val)
+{
+    using EnumType = RvcClean::SemanticTags;
+    switch (val)
+    {
+    case EnumType::kDeepClean:
+    case EnumType::kVacuum:
+    case EnumType::kMop:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(DishwasherModeSelect::SemanticTags val)
+{
+    using EnumType = DishwasherModeSelect::SemanticTags;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kHeavy:
+    case EnumType::kLight:
         return val;
     default:
         return static_cast<EnumType>(0);

@@ -1505,6 +1505,56 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
+    case Clusters::LaundryWasher::Id: {
+        using namespace Clusters::LaundryWasher;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::RefrigeratorAndTemperatureControlledCabinet::Id: {
+        using namespace Clusters::RefrigeratorAndTemperatureControlledCabinet;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::RvcRun::Id: {
+        using namespace Clusters::RvcRun;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::RvcClean::Id: {
+        using namespace Clusters::RvcClean;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::DishwasherModeSelect::Id: {
+        using namespace Clusters::DishwasherModeSelect;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case Clusters::DoorLock::Id: {
         using namespace Clusters::DoorLock;
         switch (aPath.mEventId) {

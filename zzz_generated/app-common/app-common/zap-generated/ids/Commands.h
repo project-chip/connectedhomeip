@@ -607,6 +607,42 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace Commands
 } // namespace ModeSelect
 
+namespace LaundryWasher {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace LaundryWasher
+
+namespace RefrigeratorAndTemperatureControlledCabinet {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace RefrigeratorAndTemperatureControlledCabinet
+
 namespace RvcRun {
 namespace Commands {
 
@@ -624,6 +660,42 @@ static constexpr CommandId Id = 0x00000002;
 
 } // namespace Commands
 } // namespace RvcRun
+
+namespace RvcClean {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace RvcClean
+
+namespace DishwasherModeSelect {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace DishwasherModeSelect
 
 namespace DoorLock {
 namespace Commands {

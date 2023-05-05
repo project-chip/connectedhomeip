@@ -286,10 +286,37 @@
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_LAUNDRY_WASHER_CLUSTER_SERVER) || defined(ZCL_USING_LAUNDRY_WASHER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_LAUNDRY_WASHER_CLUSTER { chip::app::Clusters::LaundryWasher::Id, "Laundry Washer" },
+#else
+#define CHIP_PRINTCLUSTER_LAUNDRY_WASHER_CLUSTER
+#endif
+
+#if defined(ZCL_USING_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER_SERVER) ||                                           \
+    defined(ZCL_USING_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER                                                  \
+    { chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Id, "Refrigerator And Temperature Controlled Cabinet" },
+#else
+#define CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER
+#endif
+
 #if defined(ZCL_USING_RVC_RUN_CLUSTER_SERVER) || defined(ZCL_USING_RVC_RUN_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_RVC_RUN_CLUSTER { chip::app::Clusters::RvcRun::Id, "RVC Run" },
 #else
 #define CHIP_PRINTCLUSTER_RVC_RUN_CLUSTER
+#endif
+
+#if defined(ZCL_USING_RVC_CLEAN_CLUSTER_SERVER) || defined(ZCL_USING_RVC_CLEAN_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_RVC_CLEAN_CLUSTER { chip::app::Clusters::RvcClean::Id, "RVC Clean" },
+#else
+#define CHIP_PRINTCLUSTER_RVC_CLEAN_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DISHWASHER_MODE_SELECT_CLUSTER_SERVER) || defined(ZCL_USING_DISHWASHER_MODE_SELECT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DISHWASHER_MODE_SELECT_CLUSTER                                                                           \
+    { chip::app::Clusters::DishwasherModeSelect::Id, "Dishwasher Mode Select" },
+#else
+#define CHIP_PRINTCLUSTER_DISHWASHER_MODE_SELECT_CLUSTER
 #endif
 
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
@@ -529,7 +556,11 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_LAUNDRY_WASHER_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER                                                      \
     CHIP_PRINTCLUSTER_RVC_RUN_CLUSTER                                                                                              \
+    CHIP_PRINTCLUSTER_RVC_CLEAN_CLUSTER                                                                                            \
+    CHIP_PRINTCLUSTER_DISHWASHER_MODE_SELECT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \
@@ -562,4 +593,4 @@
     CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER
 
-#define MAX_CLUSTER_NAME_LENGTH 39
+#define MAX_CLUSTER_NAME_LENGTH 47

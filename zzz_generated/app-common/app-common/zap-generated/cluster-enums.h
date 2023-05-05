@@ -1468,8 +1468,8 @@ enum class ChangeToModeResponseStatus : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for CommonSemanticTags
-enum class CommonSemanticTags : uint16_t
+// Enum for SemanticTags
+enum class SemanticTags : uint16_t
 {
     kAuto      = 0x00,
     kQuick     = 0x01,
@@ -1495,6 +1495,52 @@ enum class ModeSelectFeature : uint32_t
     kExt      = 0x2,
 };
 } // namespace ModeSelect
+
+namespace LaundryWasher {
+
+// Enum for SemanticTags
+enum class SemanticTags : uint16_t
+{
+    kNormal   = 0x4000,
+    kDelicate = 0x4001,
+    kHeavy    = 0x4002,
+    kWhites   = 0x4003,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for ModeSelectFeature
+enum class ModeSelectFeature : uint32_t
+{
+    kDeponoff = 0x1,
+    kExt      = 0x2,
+};
+} // namespace LaundryWasher
+
+namespace RefrigeratorAndTemperatureControlledCabinet {
+
+// Enum for SemanticTags
+enum class SemanticTags : uint16_t
+{
+    kRapidCool   = 0x4000,
+    kRapidFreeze = 0x4001,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for ModeSelectFeature
+enum class ModeSelectFeature : uint32_t
+{
+    kDeponoff = 0x1,
+    kExt      = 0x2,
+};
+} // namespace RefrigeratorAndTemperatureControlledCabinet
 
 namespace RvcRun {
 
@@ -1534,6 +1580,63 @@ enum class Feature : uint32_t
     kExt      = 0x2,
 };
 } // namespace RvcRun
+
+namespace RvcClean {
+
+// Enum for ChangeToModeResponseStatus
+enum class ChangeToModeResponseStatus : uint8_t
+{
+    kCleaningInProgress = 0x40,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for SemanticTags
+enum class SemanticTags : uint16_t
+{
+    kDeepClean = 0x4000,
+    kVacuum    = 0x4001,
+    kMop       = 0x4002,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kDeponoff = 0x1,
+    kExt      = 0x2,
+};
+} // namespace RvcClean
+
+namespace DishwasherModeSelect {
+
+// Enum for SemanticTags
+enum class SemanticTags : uint16_t
+{
+    kNormal = 0x4000,
+    kHeavy  = 0x4001,
+    kLight  = 0x4002,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for ModeSelectFeature
+enum class ModeSelectFeature : uint32_t
+{
+    kDeponoff = 0x1,
+    kExt      = 0x2,
+};
+} // namespace DishwasherModeSelect
 
 namespace DoorLock {
 

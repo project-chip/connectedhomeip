@@ -113,7 +113,7 @@ void RvcCleanDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::Cha
         return;
     }
 
-    if (mode == 1)
+    if (currentMode == 1)
     {
         response.status = int8_t(RvcClean::ChangeToModeResponseStatus::kCleaningInProgress);
         response.statusText.SetValue(chip::CharSpan("Cannot change the cleaning mode during a clean", 60));
