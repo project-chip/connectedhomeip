@@ -20,3 +20,5 @@ DeviceScannedCallback = CFUNCTYPE(None, py_object, c_char_p, c_uint16,
                                   c_uint16, c_uint16)
 
 ScanDoneCallback = CFUNCTYPE(None, py_object)
+
+ScanErrorCallback = CFUNCTYPE(None, py_object, c_uint16)
