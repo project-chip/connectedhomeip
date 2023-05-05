@@ -45,6 +45,72 @@
     XCTAssertEqualObjects(rootCert, derCert);
 }
 
+- (void)testGenerateRootCertWithValidityPeriod
+{
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:100];
+    // Round down to the nearest second, since the certificate bits will do that
+    // when it computes validity dates.
+    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
+    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate duration:200];
+
+    __auto_type * rootCert = [MTRCertificates createRootCertificate:testKeys
+                                                           issuerID:nil
+                                                           fabricID:nil
+                                                     validityPeriod:validityPeriod
+                                                              error:nil];
+    XCTAssertNotNil(rootCert);
+
+    // Test round-trip through TLV format.
+    __auto_type * tlvCert = [MTRCertificates convertX509Certificate:rootCert];
+    XCTAssertNotNil(tlvCert);
+
+    __auto_type * derCert = [MTRCertificates convertMatterCertificate:tlvCert];
+    XCTAssertNotNil(derCert);
+
+    XCTAssertEqualObjects(rootCert, derCert);
+
+    __auto_type * certInfo = [[MTRCertificateInfo alloc] initWithTLVBytes:tlvCert];
+    XCTAssertEqualObjects(validityPeriod.startDate, certInfo.notBefore);
+    XCTAssertEqualObjects(validityPeriod.endDate, certInfo.notAfter);
+}
+
+- (void)testGenerateRootCertWithInfiniteValidity
+{
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:100];
+    // Round down to the nearest second, since the certificate bits will do that
+    // when it computes validity dates.
+    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
+    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate endDate:[NSDate distantFuture]];
+
+    __auto_type * rootCert = [MTRCertificates createRootCertificate:testKeys
+                                                           issuerID:nil
+                                                           fabricID:nil
+                                                     validityPeriod:validityPeriod
+                                                              error:nil];
+    XCTAssertNotNil(rootCert);
+
+    // Test round-trip through TLV format.
+    __auto_type * tlvCert = [MTRCertificates convertX509Certificate:rootCert];
+    XCTAssertNotNil(tlvCert);
+
+    __auto_type * derCert = [MTRCertificates convertMatterCertificate:tlvCert];
+    XCTAssertNotNil(derCert);
+
+    XCTAssertEqualObjects(rootCert, derCert);
+
+    __auto_type * certInfo = [[MTRCertificateInfo alloc] initWithTLVBytes:tlvCert];
+    XCTAssertEqualObjects(validityPeriod.startDate, certInfo.notBefore);
+    XCTAssertEqualObjects(validityPeriod.endDate, certInfo.notAfter);
+}
+
 - (void)testGenerateIntermediateCert
 {
     __auto_type * rootKeys = [[MTRTestKeys alloc] init];
@@ -72,6 +138,88 @@
     XCTAssertNotNil(derCert);
 
     XCTAssertEqualObjects(intermediateCert, derCert);
+}
+
+- (void)testGenerateIntermediateCertWithValidityPeriod
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * rootCert = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    XCTAssertNotNil(rootCert);
+
+    __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(intermediateKeys);
+
+    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:300];
+    // Round down to the nearest second, since the certificate bits will do that
+    // when it computes validity dates.
+    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
+    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate duration:400];
+
+    __auto_type * intermediateCert = [MTRCertificates createIntermediateCertificate:rootKeys
+                                                                    rootCertificate:rootCert
+                                                              intermediatePublicKey:intermediateKeys.publicKey
+                                                                           issuerID:nil
+                                                                           fabricID:nil
+                                                                     validityPeriod:validityPeriod
+                                                                              error:nil];
+    XCTAssertNotNil(intermediateCert);
+
+    // Test round-trip through TLV format.
+    __auto_type * tlvCert = [MTRCertificates convertX509Certificate:intermediateCert];
+    XCTAssertNotNil(tlvCert);
+
+    __auto_type * derCert = [MTRCertificates convertMatterCertificate:tlvCert];
+    XCTAssertNotNil(derCert);
+
+    XCTAssertEqualObjects(intermediateCert, derCert);
+
+    __auto_type * certInfo = [[MTRCertificateInfo alloc] initWithTLVBytes:tlvCert];
+    XCTAssertEqualObjects(validityPeriod.startDate, certInfo.notBefore);
+    XCTAssertEqualObjects(validityPeriod.endDate, certInfo.notAfter);
+}
+
+- (void)testGenerateIntermediateCertWithInfiniteValidity
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * rootCert = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    XCTAssertNotNil(rootCert);
+
+    __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(intermediateKeys);
+
+    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:300];
+    // Round down to the nearest second, since the certificate bits will do that
+    // when it computes validity dates.
+    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
+    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate endDate:[NSDate distantFuture]];
+
+    __auto_type * intermediateCert = [MTRCertificates createIntermediateCertificate:rootKeys
+                                                                    rootCertificate:rootCert
+                                                              intermediatePublicKey:intermediateKeys.publicKey
+                                                                           issuerID:nil
+                                                                           fabricID:nil
+                                                                     validityPeriod:validityPeriod
+                                                                              error:nil];
+    XCTAssertNotNil(intermediateCert);
+
+    // Test round-trip through TLV format.
+    __auto_type * tlvCert = [MTRCertificates convertX509Certificate:intermediateCert];
+    XCTAssertNotNil(tlvCert);
+
+    __auto_type * derCert = [MTRCertificates convertMatterCertificate:tlvCert];
+    XCTAssertNotNil(derCert);
+
+    XCTAssertEqualObjects(intermediateCert, derCert);
+
+    __auto_type * certInfo = [[MTRCertificateInfo alloc] initWithTLVBytes:tlvCert];
+    XCTAssertEqualObjects(validityPeriod.startDate, certInfo.notBefore);
+    XCTAssertEqualObjects(validityPeriod.endDate, certInfo.notAfter);
 }
 
 - (void)testGenerateOperationalCertNoIntermediate
@@ -108,6 +256,102 @@
     XCTAssertNotNil(derCert);
 
     XCTAssertEqualObjects(operationalCert, derCert);
+}
+
+- (void)testGenerateOperationalCertNoIntermediateWithValidityPeriod
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * rootCert = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    XCTAssertNotNil(rootCert);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * cats = [[NSMutableSet alloc] initWithCapacity:3];
+    // High bits are identifier, low bits are version.
+    [cats addObject:@0x00010001];
+    [cats addObject:@0x00020001];
+    [cats addObject:@0x0003FFFF];
+
+    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:1000];
+    // Round down to the nearest second, since the certificate bits will do that
+    // when it computes validity dates.
+    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
+    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate duration:500];
+
+    __auto_type * operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
+                                                               signingCertificate:rootCert
+                                                             operationalPublicKey:operationalKeys.publicKey
+                                                                         fabricID:@1
+                                                                           nodeID:@1
+                                                            caseAuthenticatedTags:cats
+                                                                   validityPeriod:validityPeriod
+                                                                            error:nil];
+    XCTAssertNotNil(operationalCert);
+
+    // Test round-trip through TLV format.
+    __auto_type * tlvCert = [MTRCertificates convertX509Certificate:operationalCert];
+    XCTAssertNotNil(tlvCert);
+
+    __auto_type * derCert = [MTRCertificates convertMatterCertificate:tlvCert];
+    XCTAssertNotNil(derCert);
+
+    XCTAssertEqualObjects(operationalCert, derCert);
+
+    __auto_type * certInfo = [[MTRCertificateInfo alloc] initWithTLVBytes:tlvCert];
+    XCTAssertEqualObjects(validityPeriod.startDate, certInfo.notBefore);
+    XCTAssertEqualObjects(validityPeriod.endDate, certInfo.notAfter);
+}
+
+- (void)testGenerateOperationalCertNoIntermediateWithInfiniteValidity
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * rootCert = [MTRCertificates createRootCertificate:rootKeys issuerID:nil fabricID:nil error:nil];
+    XCTAssertNotNil(rootCert);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * cats = [[NSMutableSet alloc] initWithCapacity:3];
+    // High bits are identifier, low bits are version.
+    [cats addObject:@0x00010001];
+    [cats addObject:@0x00020001];
+    [cats addObject:@0x0003FFFF];
+
+    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:1000];
+    // Round down to the nearest second, since the certificate bits will do that
+    // when it computes validity dates.
+    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
+    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate endDate:[NSDate distantFuture]];
+
+    __auto_type * operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
+                                                               signingCertificate:rootCert
+                                                             operationalPublicKey:operationalKeys.publicKey
+                                                                         fabricID:@1
+                                                                           nodeID:@1
+                                                            caseAuthenticatedTags:cats
+                                                                   validityPeriod:validityPeriod
+                                                                            error:nil];
+    XCTAssertNotNil(operationalCert);
+
+    // Test round-trip through TLV format.
+    __auto_type * tlvCert = [MTRCertificates convertX509Certificate:operationalCert];
+    XCTAssertNotNil(tlvCert);
+
+    __auto_type * derCert = [MTRCertificates convertMatterCertificate:tlvCert];
+    XCTAssertNotNil(derCert);
+
+    XCTAssertEqualObjects(operationalCert, derCert);
+
+    __auto_type * certInfo = [[MTRCertificateInfo alloc] initWithTLVBytes:tlvCert];
+    XCTAssertEqualObjects(validityPeriod.startDate, certInfo.notBefore);
+    XCTAssertEqualObjects(validityPeriod.endDate, certInfo.notAfter);
 }
 
 - (void)testGenerateOperationalCertWithIntermediate
