@@ -25,6 +25,15 @@ from typing import Tuple
 #
 MIN_ZAP_VERSION = '2023.4.27'
 
+ZAP_INSTALL_BANNER = '*'*80 + """
+* You may need to install zap from https://github.com/project-chip/zap/releases
+* Please ensure one of these applies (see docs/guides/BUILDING.md for details):
+* - `zap-cli` is in your Python venv or $PATH.
+* - `zap-cli` is in $ZAP_INSTALL_PATH
+*   Use this option if you installed zap but do not want to update $PATH.
+* - Point $ZAP_DEVELOPMENT_PATH to your local copy of zap that you develop on.
+""" + '*'*80
+
 
 class ZapTool:
     def __init__(self):
@@ -47,11 +56,15 @@ class ZapTool:
             os.environ['ZAP_SKIP_REAL_VERSION'] = '1'
             self.check_version = False  # cannot check versions without dirtying tree
         elif 'ZAP_INSTALL_PATH' in os.environ:
-            self.zap_start = [os.path.join(
-                os.environ['ZAP_INSTALL_PATH'], 'zap-cli')]
+            self.zap_start = [os.path.join(os.environ['ZAP_INSTALL_PATH'], 'zap-cli')]
             self.working_directory = None
         else:
-            self.zap_start = ['zap-cli']
+            # If we're running within a Python venv, check for a zap-cli binary there
+            venv_zap_cli = os.path.join(sys.prefix, 'bin', 'zap-cli')
+            if sys.prefix != sys.base_prefix and os.path.isfile(venv_zap_cli):
+                self.zap_start = [venv_zap_cli]
+            else:
+                self.zap_start = ['zap-cli']
             self.working_directory = None
 
     def version_check(self, min_version=None):
@@ -81,18 +94,8 @@ class ZapTool:
                     f"Failed to find `Version: ....` line from {self.zap_start} --version")
                 sys.exit(1)
         except FileNotFoundError as e:
-            print(
-                f'FAILED TO EXECUTE ZAP GENERATION: {e.strerror} - "{e.filename}"')
-            print('*'*80)
-            print('* You may need to install zap. Please ensure one of these applies:')
-            print(
-                '* - `zap-cli` is in $PATH. Install from https://github.com/project-chip/zap/releases')
-            print('*   see docs/guides/BUILDING.md for details')
-            print('* - `zap-cli` is in $ZAP_INSTALL_PATH. Use this option if you')
-            print('*   installed zap but do not want to update $PATH')
-            print('* - Point $ZAP_DEVELOPMENT_PATH to your local copy of zap that you')
-            print('*   develop on (to use a developer build of zap)')
-            print('*'*80)
+            print(f'FAILED TO EXECUTE ZAP GENERATION: {e.strerror} - "{e.filename}"')
+            print(ZAP_INSTALL_BANNER)
             sys.exit(1)
 
         def parse_version_string(str):
@@ -109,16 +112,6 @@ class ZapTool:
             subprocess.check_call(
                 self.zap_start + [cmd] + list(extra_args), cwd=self.working_directory)
         except FileNotFoundError as e:
-            print(
-                f'FAILED TO EXECUTE ZAP GENERATION: {e.strerror} - "{e.filename}"')
-            print('*'*80)
-            print('* You may need to install zap. Please ensure one of these applies:')
-            print(
-                '* - `zap-cli` is in $PATH. Install from https://github.com/project-chip/zap/releases')
-            print('*   see docs/guides/BUILDING.md for details')
-            print('* - `zap-cli` is in $ZAP_INSTALL_PATH. Use this option if you')
-            print('*   installed zap but do not want to update $PATH')
-            print('* - Point $ZAP_DEVELOPMENT_PATH to your local copy of zap that you')
-            print('*   develop on (to use a developer build of zap)')
-            print('*'*80)
+            print(f'FAILED TO EXECUTE ZAP GENERATION: {e.strerror} - "{e.filename}"')
+            print(ZAP_INSTALL_BANNER)
             sys.exit(1)
