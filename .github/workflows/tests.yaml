@@ -190,6 +190,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml \
                       src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/draft/air-quality-cluster.xml \
                     "
             - name: Build Apps
               timeout-minutes: 60
