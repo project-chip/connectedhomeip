@@ -189,13 +189,13 @@ CHIP_ERROR Instance::Init()
     // Check that the cluster ID given is a valid mode select alias cluster ID.
     if (!std::any_of(AliasedClusters.begin(), AliasedClusters.end(), [this](ClusterId i){return i == clusterId;}))
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster with ID %u is not a mode select alias.", clusterId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster with ID %lu is not a mode select alias.", long(clusterId));
         return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
     }
 
     // Check if the cluster has been selected in zap
     if (!emberAfContainsServer(endpointId, clusterId)) {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster with ID %u was not enabled in zap.", clusterId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster with ID %lu was not enabled in zap.", long(clusterId));
         return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
     }
 
