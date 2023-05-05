@@ -27,11 +27,12 @@ import sys
 import typing
 import uuid
 from binascii import hexlify, unhexlify
-from chip.tlv import uint, float32
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import List, Optional, Tuple
+
+from chip.tlv import float32, uint
 
 # isort: off
 

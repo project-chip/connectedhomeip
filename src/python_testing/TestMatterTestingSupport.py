@@ -16,13 +16,13 @@
 #
 
 import typing
+from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint
-
-from datetime import datetime, timezone, timedelta
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, utc_time_in_matter_epoch, type_matches, parse_pics
+from matter_testing_support import (MatterBaseTest, async_test_body, default_matter_test_main, parse_pics, type_matches,
+                                    utc_time_in_matter_epoch)
 from mobly import asserts
 
 
