@@ -1,4 +1,10 @@
-/*
+/*******************************************************************************
+ * @file  wfx_sl_ble_init.h
+ * @brief
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2021 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
  *
  *    Copyright (c) 2022 Project CHIP Authors
  *
@@ -14,6 +20,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+/**
+ * Include files
+ * */
 
 #ifndef WFX_SL_BLE_INIT
 #define WFX_SL_BLE_INIT

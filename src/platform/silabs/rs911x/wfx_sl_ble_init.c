@@ -1,4 +1,10 @@
-/*
+/*******************************************************************************
+ * @file  wfx_sl_ble_init.c
+ * @brief
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2021 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
  *
  *    Copyright (c) 2022 Project CHIP Authors
  *
@@ -301,9 +307,7 @@ void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_t
     new_att.property = val_prop;
 
     if (data != NULL)
-    {
         memcpy(new_att.data, data, RSI_MIN(sizeof(new_att.data), data_len));
-    }
 
     //! preparing the attribute value
     new_att.data_len = data_len;
