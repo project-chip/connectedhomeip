@@ -59,7 +59,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 // This is an array of EmberAfCluster structures.
-#define GENERATED_CLUSTER_COUNT 67
+#define GENERATED_CLUSTER_COUNT 66
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
