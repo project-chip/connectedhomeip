@@ -108,7 +108,7 @@ $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32 out/
 Build command for SiWx917 SoC processor:
 
 ```shell
-./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/SiWx917 out/SiWx917_lighting BRD4325B --wifi SiWx917 |& tee out/rs911x_lighting.out
+./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/SiWx917 out/SiWx917_lighting BRD4325B |& tee out/soc_lighting.out
 ```
 >    **Note:**
 >    1. LED and button features are enabled for SiWx917 SoC.

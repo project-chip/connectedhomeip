@@ -1,8 +1,6 @@
 # How to Flash a SiWx917 SoC Device
 
-Once you have an image built, you can flash it onto your SiWx917 SoC device over USB connected to your development machine. This can be done using the Ozone Debugger.
-
-> Note: Flashing using Simplicity Studio and Simplicity Commander is not yet supported for the SiWx917 SoC.
+Once you have an image built, you can flash it onto your SiWx917 SoC device over USB connected to your development machine. This can be done using the Simplicity Commander or Ozone Debugger.
 
 ## Ozone J-Link Debugger:
 

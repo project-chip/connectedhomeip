@@ -155,6 +155,8 @@ update the SiWx917 firmware.
 
 The WiseMCU Combo SDK package is only available to Alpha customers. Please contact Silicon Labs support.
 
+The WiseMCU Combo SDK package version used in this release is **A.1.0.0.0.23**.
+
 On obtaining the package, extract it, rename the folder as `wisemcu-wifi-bt-sdk` and copy it in the github repository under `third_party/silabs`.
 
 Pre-Built SiWx917 firmware is available under `third_party/silabs/wisemcu-wifi-bt-sdk/connectivity_firmware`

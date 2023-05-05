@@ -3,7 +3,14 @@
 ## Flashing Images/Binaries on the SiWx917 SoC platform using Ozone
 
 > **Note:** 
->    1. SiWx917 SoC device support is not yet available in Simplicity Studio and Commander.
+>    1. SiWx917 SoC device support is available in the latest Simplicity Studio and Simplicity Commander(versions 1v14p5 and above). To flash the application on SiWx917 SoC,
+>       - Convert the .s37 file into .rps file using the below command,
+>
+>           `commander rps create <file-name>.rps --app <file-name>.s37`
+>       - Flash to the device using,
+>
+>           `commander rps load <file-name>.rps`
+
 >    2. Official support for SiWx917 SoC device is not yet available in the Ozone Debugger, but can be configured - [Ozone Environment Setup for SiWx917 SoC](SiWx917_Enablement_For_Ozone.md).
 >    3. 917 SoC switch positions: Left switch should be on the **OFF/LOW**, and right switch should be on the **NORMAL** side.
 
@@ -11,9 +18,9 @@
 
 ![SiWx917 soc Device](./images/SiWx917_Radio_WSTK.png)
  
-2.  Launch the Ozone Debugger (Recommended version: 3.26).
+1.  Launch the Ozone Debugger.
  
-3.  In the **New Project Wizard**:
+2.  In the **New Project Wizard**:
 
     - Click the three dots (`...`) on the **Device** tab and select the **Manufacturer** as `Silicon Labs`.
     - Select the **Device** as `Si917DualFlash`.

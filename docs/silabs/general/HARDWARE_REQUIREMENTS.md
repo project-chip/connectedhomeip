@@ -118,10 +118,10 @@ The following boards are supported for the Matter over Wi-Fi demos and developme
 
 -   **MG24 boards:**
 
-    -   BRD4186C / Wireless Starter Kit / 2.4GHz@10dBm
+    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
         -   [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
         -   MG24 with WSTK : [xG24-PK6009A](https://www.silabs.com/development-tools/wireless/efr32xg24-pro-kit-10-dbm?tab=overview)
-    -   BRD4187C / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
         - [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
         - MG24 with WSTK : [xG24-PK6010A](https://www.silabs.com/development-tools/wireless/efr32xg24-pro-kit-20-dbm?tab=overview)
 
@@ -157,7 +157,7 @@ following boards are supported for the Matter over Wi-Fi demos and development:
 
 -   **Wi-Fi SoC boards**
 
-    -   SiWx917
+    -   SiWx917 / SLWSTK6006A / Wireless Starter Kit
         -   [SiWx917](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs)
 
 
