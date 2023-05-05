@@ -917,13 +917,6 @@ menu "CHIP Device Layer"
             help
                 Enable esp32 as a BLE Commissioner.
 
-        config ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-            bool "Enable Commissionee and Commissioner mode"
-            default n
-            depends on ENABLE_ESP32_BLE_Controller
-            help
-                Enable including commissioner code (CHIPDeviceController.cpp) in the commissionee (Server.cpp) code.
-
     endmenu
 
 endmenu
