@@ -274,6 +274,7 @@ class TestDefinition:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
 
+            print(paths)
             for path in paths.items():
                 # Do not add chip-tool or chip-repl-yaml-tester-cmd to the register
                 if path == paths.chip_tool or path == paths.chip_repl_yaml_tester_cmd or path == paths.chip_tool_with_python_cmd:

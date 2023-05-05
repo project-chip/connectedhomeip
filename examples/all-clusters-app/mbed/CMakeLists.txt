@@ -60,7 +60,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${MBED_COMMON}/util/DFUManager.cpp
                ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
-               ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
+               ${ALL_CLUSTERS_COMMON}/src/mode-select-delegates.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}
