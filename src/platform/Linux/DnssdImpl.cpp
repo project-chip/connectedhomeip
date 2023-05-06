@@ -491,8 +491,11 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
                 chip::Inet::IPAddress addr;
                 if ((addr_it.GetAddress(addr) == CHIP_NO_ERROR) &&
                     ((service.mAddressType == chip::Inet::IPAddressType::kAny) ||
-                     (addr.IsIPv6() && service.mAddressType == chip::Inet::IPAddressType::kIPv6) ||
-                     (addr.IsIPv4() && service.mAddressType == chip::Inet::IPAddressType::kIPv4)))
+                     (addr.IsIPv6() && service.mAddressType == chip::Inet::IPAddressType::kIPv6)
+#if INET_CONFIG_ENABLE_IPV4
+                     || (addr.IsIPv4() && service.mAddressType == chip::Inet::IPAddressType::kIPv4)
+#endif
+                         ))
                 {
                     VerifyOrExit(addr.ToString(b) != nullptr, error = CHIP_ERROR_INTERNAL);
                     AvahiAddress a;
