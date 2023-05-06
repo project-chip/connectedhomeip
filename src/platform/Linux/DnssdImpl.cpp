@@ -441,17 +441,17 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     keyBuilder << service.mName << "." << type << service.mPort << "." << interface;
     key = keyBuilder.str();
     ChipLogProgress(DeviceLayer, "PublishService %s", key.c_str());
-    auto it = mPublishedGroups.find(key);
-    if (it != mPublishedGroups.end())
+    auto publishedgroups_it = mPublishedGroups.find(key);
+    if (publishedgroups_it != mPublishedGroups.end())
     {
         // same service was already published, we need to de-publish it first
-        int avahiRet = avahi_entry_group_free(it->second);
+        int avahiRet = avahi_entry_group_free(publishedgroups_it->second);
         if (avahiRet != AVAHI_OK)
         {
             ChipLogError(DeviceLayer, "Cannot remove avahi group: %s", avahi_strerror(avahiRet));
             ExitNow(error = CHIP_ERROR_INTERNAL);
         }
-        mPublishedGroups.erase(it);
+        mPublishedGroups.erase(publishedgroups_it);
     }
 
     // create fresh group
@@ -474,22 +474,22 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
         ChipLogDetail(DeviceLayer, "Using addresses from interface id=%d name=%s", service.mInterface.GetPlatformInterface(), b);
         matterHostname = std::string(service.mHostName) + ".local";
         // find addresses to publish
-        for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+        for (chip::Inet::InterfaceAddressIterator addr_it; addr_it.HasCurrent(); addr_it.Next())
         {
             // only specific interface?
-            if (service.mInterface.IsPresent() && it.GetInterfaceId() != service.mInterface)
+            if (service.mInterface.IsPresent() && addr_it.GetInterfaceId() != service.mInterface)
             {
                 continue;
             }
-            if (it.IsUp())
+            if (addr_it.IsUp())
             {
-                if (it.IsLoopback())
+                if (addr_it.IsLoopback())
                 {
                     // do not advertise loopback interface addresses
                     continue;
                 }
                 chip::Inet::IPAddress addr;
-                if ((it.GetAddress(addr) == CHIP_NO_ERROR) &&
+                if ((addr_it.GetAddress(addr) == CHIP_NO_ERROR) &&
                     ((service.mAddressType == chip::Inet::IPAddressType::kAny) ||
                      (addr.IsIPv6() && service.mAddressType == chip::Inet::IPAddressType::kIPv6) ||
                      (addr.IsIPv4() && service.mAddressType == chip::Inet::IPAddressType::kIPv4)))
@@ -497,11 +497,11 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
                     VerifyOrExit(addr.ToString(b) != nullptr, error = CHIP_ERROR_INTERNAL);
                     AvahiAddress a;
                     VerifyOrExit(avahi_address_parse(b, AVAHI_PROTO_UNSPEC, &a) != nullptr, error = CHIP_ERROR_INTERNAL);
-                    AvahiIfIndex interface = static_cast<AvahiIfIndex>(it.GetInterfaceId().GetPlatformInterface());
+                    AvahiIfIndex thisinterface = static_cast<AvahiIfIndex>(addr_it.GetInterfaceId().GetPlatformInterface());
                     // Note: NO_REVERSE publish flag is needed because otherwise we can't have more than one hostname
                     //   for reverse resolving IP addresses back to hostnames
                     VerifyOrExit(avahi_entry_group_add_address(group,                        // group
-                                                               interface,                    // interface
+                                                               thisinterface,                // interface
                                                                ToAvahiProtocol(addr.Type()), // protocol
                                                                AVAHI_PUBLISH_NO_REVERSE,     // publish flags
                                                                matterHostname.c_str(),       // hostname
