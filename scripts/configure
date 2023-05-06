@@ -226,8 +226,14 @@ function check_build_env() {
 
 function configure_python_env() {
     progress "Setting up Python venv"
-    "$PYTHON" -m venv "$BUILD_ENV_PATH"
+    "$PYTHON" -m venv --clear "$BUILD_ENV_PATH"
     info "$BUILD_ENV_PATH"
+
+    # Install our auto-loading venvactivate module so that running scripts via
+    # the venv python has the side-effect of fully activating the environment.
+    local sitepkgs=("${BUILD_ENV_PATH}/lib/python"*"/site-packages")
+    [[ -d "$sitepkgs" ]] || fail "Failed to locate venv site-packages"
+    cp "${CHIP_ROOT}/scripts/configure.venv/venvactivate".{pth,py} "${sitepkgs}/"
 
     progress "Installing Python build dependencies"
     "${BUILD_ENV_PATH}/bin/pip" install --require-virtualenv --quiet --upgrade pip wheel
