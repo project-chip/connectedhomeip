@@ -276,7 +276,7 @@ combination with JLinkRTTClient as follows:
 
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
 
-    Here is an example with the CHIPTool:
+    Here is an example with the chip-tool:
 
           $ chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
           $ chip-tool onoff on 1 1
