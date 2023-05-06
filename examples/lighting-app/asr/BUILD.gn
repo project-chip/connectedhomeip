@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ asr_sdk_sources("lighting_app_sdk_sources") {
   ]
 
   defines = [
-    "BOARD_ID=${asr_board}",
     "ASR_LOG_ENABLED=1",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
@@ -50,7 +49,7 @@ asr_sdk_sources("lighting_app_sdk_sources") {
   if (chip_use_factory) {
     defines += [
       "CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER=1",
-      # "CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER=1",
+      "CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER=1",
     ]
   }
 
@@ -63,8 +62,7 @@ asr_sdk_sources("lighting_app_sdk_sources") {
 
   sources = [ "${asr_project_dir}/include/CHIPProjectConfig.h" ]
 
-  public_configs =
-      [ "${chip_root}/third_party/asr/${asr_ic_family}:asr_sdk_config" ]
+  public_configs = [ "${asr_sdk_build_root}:asr_sdk_config" ]
 }
 
 asr_executable("lighting_app") {

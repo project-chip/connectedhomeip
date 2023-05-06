@@ -27,28 +27,37 @@ The CHIP demo application is supported on:
 -   Setup toolchain for ASR582X,download gcc-arm-none-eabi-9-2019-q4-major,then
     export `ASR_TOOLCHAIN_PATH`:
     ```
-    export ASR_TOOLCHAIN_PATH={toolchain path}/gcc-arm-none-eabi-9-2019-q4-major/bin/
+    export ASR_TOOLCHAIN_PATH={path-to-toolchain}/gcc-arm-none-eabi-9-2019-q4-major/bin/
     ```
     for ASR595X,download asr_riscv_gnu_toolchain_10.2_ubuntu,then export
     `ASR_TOOLCHAIN_PATH`:
     ```
-    export ASR_TOOLCHAIN_PATH={toolchain path}/compiler/asr_riscv_gnu_toolchain_10.2_ubuntu-16.04/bin/
+    export ASR_TOOLCHAIN_PATH={path-to-toolchain}/asr_riscv_gnu_toolchain_10.2_ubuntu-16.04/bin/
     ```
 -   Setup environment for ASR582X:
     ```
     export ASR_IC=asr582x
+    export ASR_ARCH=arm
     ```
     for ASR595X:
     ```
     export ASR_IC=asr595x
+    export ASR_ARCH=riscv
+    ```
+-   Setup ASR SDK:
+    ```
+    export ASR_SDK_ROOT=//third_party/connectedhomeip/third_party/asr/$ASR_IC
     ```
 -   To build the demo application:
     ```
-    ./scripts/examples/gn_asr_example.sh ./examples/lighting-app/asr out/example_app
+    ./scripts/examples/gn_build_example.sh ./examples/lighting-app/asr out/example_app \
+    custom_toolchain=\"//../../../config/asr/toolchain:asrtoolchain\" target_cpu=\"$ASR_ARCH\" \
+    asr_ic_family=\"$ASR_IC\" asr_sdk_build_root=\"$ASR_SDK_ROOT\" \
+    mbedtls_target=\"$ASR_SDK_ROOT:asr_build\" asr_toolchain_root=\"$ASR_TOOLCHAIN_PATH\"
     ```
 -   The output image files are stored in `out/example_app` folder.
 
--   After building the application, **DOGO** tool is used to flash it to the
+-   After building the application, `DOGO` tool is used to flash it to the
     board.
 
 ## Commissioning

@@ -424,7 +424,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 CHIP_ERROR ASRFactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
     ChipError err = CHIP_NO_ERROR;
-    ;
+
     size_t serialNumLen = 0; // without counting null-terminator
 
 #ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER

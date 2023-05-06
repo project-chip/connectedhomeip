@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -145,13 +145,13 @@ config("asr_sdk_config") {
     "MBEDTLS_USER_CONFIG_FILE=<mbedtls_user_config.h>",
     "CFG_FLASH_MAX_SIZE=0x400000",
     "CONFIG_ENABLE_ASR_LEGA_RTOS=1",
-
-    #    "CONFIG_ENABLE_ASR_APP_MESH=1",
     "CFG_EASY_LOG_ENABLE=1",
     "CFG_EASY_LOG_MODULE_EN=1",
   ]
 
   cflags_c = [
+    "-march=rv32imafc",
+    "-mabi=ilp32f",
     "-mcmodel=medany",
     "-Os",
     "-fno-omit-frame-pointer",
@@ -175,6 +175,8 @@ config("asr_sdk_config") {
   ]
 
   ldflags = [
+    "-march=rv32imafc",
+    "-mabi=ilp32f",
     "-mcmodel=medany",
     "-lm",
     "-g",

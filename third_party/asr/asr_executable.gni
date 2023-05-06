@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@ import("//build_overrides/asr.gni")
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${build_root}/toolchain/flashable_executable.gni")
-
-import("asr_board.gni")
 
 template("asr_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")

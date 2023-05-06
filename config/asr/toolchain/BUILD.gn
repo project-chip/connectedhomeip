@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
 import("//build_overrides/asr.gni")
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+
+assert(asr_ic_family == "asr582x" || asr_ic_family == "asr595x",
+       "Unsupported ASR IC: ${asr_ic_family}")
 
 if (asr_ic_family == "asr582x") {
   import("${build_root}/toolchain/arm_gcc/arm_toolchain.gni")

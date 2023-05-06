@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,32 +13,11 @@
 # limitations under the License.
 
 declare_args() {
-  # ASR IC family.
-  asr_ic_family = ""
+  asr_ic_family = "asr582x"
 
   # Root directory for ASR SDK build files.
-  asr_sdk_build_root = ""
+  asr_sdk_build_root = "//third_party/connectedhomeip/third_party/asr/asr582x"
 
   # Root directory for ASR toolchain.
   asr_toolchain_root = ""
 }
-
-if (asr_ic_family == "") {
-  asr_ic_family = getenv("ASR_IC")
-}
-
-assert(asr_ic_family != "", "ASR_IC must be specified")
-
-if (asr_ic_family == "asr582x") {
-  asr_sdk_build_root = "//third_party/connectedhomeip/third_party/asr/asr582x"
-}
-
-if (asr_ic_family == "asr595x") {
-  asr_sdk_build_root = "//third_party/connectedhomeip/third_party/asr/asr595x"
-}
-
-if (asr_toolchain_root == "") {
-  asr_toolchain_root = getenv("ASR_TOOLCHAIN_PATH")
-}
-
-assert(asr_toolchain_root != "", "ASR_TOOLCHAIN_PATH must be specified")

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -134,8 +134,6 @@ config("asr_sdk_config") {
     "MBEDTLS_HW_HASH",
     "MBEDTLS_USER_CONFIG_FILE=<mbedtls_user_config.h>",
     "CONFIG_ENABLE_ASR_LEGA_RTOS=1",
-
-    #    "CONFIG_ENABLE_ASR_APP_MESH=1",
     "CFG_EASY_LOG_ENABLE=1",
     "CFG_EASY_LOG_MODULE_EN=1",
   ]
