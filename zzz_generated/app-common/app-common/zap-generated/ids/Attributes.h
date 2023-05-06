@@ -2393,6 +2393,88 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ModeSelect
 
+namespace SmokeCoAlarm {
+namespace Attributes {
+
+namespace ExpressedState {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace ExpressedState
+
+namespace SmokeState {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SmokeState
+
+namespace COState {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace COState
+
+namespace BatteryAlert {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace BatteryAlert
+
+namespace DeviceMuted {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace DeviceMuted
+
+namespace TestInProgress {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace TestInProgress
+
+namespace HardwareFaultAlert {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace HardwareFaultAlert
+
+namespace EndOfServiceAlert {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace EndOfServiceAlert
+
+namespace InterconnectSmokeAlarm {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace InterconnectSmokeAlarm
+
+namespace InterconnectCOAlarm {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace InterconnectCOAlarm
+
+namespace ContaminationState {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace ContaminationState
+
+namespace SensitivityLevel {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace SensitivityLevel
+
+namespace ExpiryDate {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace ExpiryDate
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace SmokeCoAlarm
+
 namespace DoorLock {
 namespace Attributes {
 
@@ -3874,6 +3956,52 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace OccupancySensing
+
+namespace ConcentrationMeasurement {
+namespace Attributes {
+
+namespace MeasuredValue {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeasuredValue
+
+namespace MinMeasuredValue {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinMeasuredValue
+
+namespace MaxMeasuredValue {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxMeasuredValue
+
+namespace Tolerance {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Tolerance
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ConcentrationMeasurement
 
 namespace WakeOnLan {
 namespace Attributes {

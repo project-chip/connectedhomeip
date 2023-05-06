@@ -4470,6 +4470,33 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRSmokeCOAlarmClusterSelfTestRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRSmokeCOAlarmClusterSelfTestRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
 @implementation MTRDoorLockClusterLockDoorParams
 - (instancetype)init
 {

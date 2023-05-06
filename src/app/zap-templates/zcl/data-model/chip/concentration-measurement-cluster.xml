@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP" />
+  <cluster>
+    <name>Concentration Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes and commands for configuring the measurement of concentration, and
+      reporting concentration measurements.</description>
+    <code>0x040C</code>
+    <define>CONCENTRATION_MEASUREMENT_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="1" />
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0"
+      max="1" writable="false" isNullable="true" optional="false">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0"
+      max="1" writable="false" isNullable="true" optional="false">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0"
+      max="1" writable="false" isNullable="true" optional="false">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="TOLERANCE" type="single" writable="false"
+      isNullable="true" optional="true">Tolerance</attribute>
+  </cluster>
+</configurator>

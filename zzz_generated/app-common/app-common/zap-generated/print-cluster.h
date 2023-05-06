@@ -286,6 +286,12 @@
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_SMOKE_CO_ALARM_CLUSTER_SERVER) || defined(ZCL_USING_SMOKE_CO_ALARM_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER { chip::app::Clusters::SmokeCoAlarm::Id, "Smoke CO Alarm" },
+#else
+#define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER
+#endif
+
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER { chip::app::Clusters::DoorLock::Id, "Door Lock" },
 #else
@@ -382,6 +388,13 @@
 #define CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER { chip::app::Clusters::OccupancySensing::Id, "Occupancy Sensing" },
 #else
 #define CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CONCENTRATION_MEASUREMENT_CLUSTER                                                                        \
+    { chip::app::Clusters::ConcentrationMeasurement::Id, "Concentration Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_CONCENTRATION_MEASUREMENT_CLUSTER
 #endif
 
 #if defined(ZCL_USING_WAKE_ON_LAN_CLUSTER_SERVER) || defined(ZCL_USING_WAKE_ON_LAN_CLUSTER_CLIENT)
@@ -523,6 +536,7 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \
@@ -538,6 +552,7 @@
     CHIP_PRINTCLUSTER_FLOW_MEASUREMENT_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_CONCENTRATION_MEASUREMENT_CLUSTER                                                                            \
     CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_CHANNEL_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_TARGET_NAVIGATOR_CLUSTER                                                                                     \

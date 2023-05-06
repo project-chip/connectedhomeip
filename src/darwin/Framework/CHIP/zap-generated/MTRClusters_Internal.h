@@ -203,6 +203,11 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
+@interface MTRClusterSmokeCOAlarm ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
 @interface MTRClusterDoorLock ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
@@ -274,6 +279,11 @@
 @end
 
 @interface MTRClusterOccupancySensing ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end

@@ -35,6 +35,7 @@
         "light-switch-app": "examples/light-switch-app/light-switch-common/light-switch-app.zap",
         "ota-provider-app": "examples/ota-provider-app/ota-provider-common/ota-provider-app.zap",
         "pump-app": "examples/pump-app/pump-common/pump-app.zap",
+        "smoke-co-alarm-app": "examples/smoke-co-alarm-app/smoke-co-alarm-common/smoke-co-alarm-app.zap",
         "ota-requestor-app": "examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.zap",
         "tv-casting-app": "examples/tv-casting-app/tv-casting-common/tv-casting-app.zap",
         "window-app": "examples/window-app/common/window-app.zap",
@@ -253,6 +254,12 @@
         {
             "zapFile": "pump-controller-app",
             "output": "zzz_generated/pump-controller-app/zap-generated",
+            "zcl": "main",
+            "template": "app-zap"
+        },
+        {
+            "zapFile": "smoke-co-alarm-app",
+            "output": "zzz_generated/smoke-co-alarm-app/zap-generated",
             "zcl": "main",
             "template": "app-zap"
         },
