@@ -38,8 +38,8 @@ MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID
 {{#zcl_attributes_server}}
 {{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#unless clusterRef}}
-{{#if (isSupported "" globalAttribute=(asUpperCamelCase label) isForIds=true)}}
-MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID {{availability "" globalAttribute=(asUpperCamelCase label) minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
+{{#if (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID {{availability "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
 {{/if}}
 {{/unless}}
 {{/zcl_attributes_server}}
@@ -86,7 +86,9 @@ MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
 // Cluster {{> cluster}} attributes
 {{/if}}
 {{/first}}
-{{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+{{#if (and (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)
+           (or clusterRef
+               (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)))}}
 MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} =
 {{#if clusterRef}}
 {{asMEI manufacturerCode code}},
