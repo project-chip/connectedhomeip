@@ -96,6 +96,8 @@ Silicon Labs platform.
     -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD2703A / MG24 Explorer Kit
+    -   BRD2704A / SparkFun Thing Plus MGM240P board
 
 *   Build the example application:
 
