@@ -80,7 +80,7 @@ class EvictLocalCASESessionsCommand : public detail::SessionManagementCommand
 {
 public:
     EvictLocalCASESessionsCommand(CredentialIssuerCommands * credIssuerCommands) :
-        detail::SessionManagementCommand("expire-CASE-sessions", credIssuerCommands,
+        detail::SessionManagementCommand("expire-case-sessions", credIssuerCommands,
                                          "Expires (evicts) all local CASE sessions to the given node id.")
     {}
 
