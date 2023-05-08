@@ -11,6 +11,8 @@ target_compile_options(suppress_zephyr_warnings INTERFACE
 pw_add_library(pw_sys_io.telink STATIC
     SOURCES
       sys_io_telink.cc
+    PUBLIC_INCLUDES
+      public
     PRIVATE_DEPS
       pw_sys_io
       suppress_zephyr_warnings

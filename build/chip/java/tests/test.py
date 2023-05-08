@@ -18,7 +18,6 @@ Test for GN Java build rules. This test should be executed using ninja.
 
 import json
 import os
-import subprocess
 import unittest
 from os import path
 

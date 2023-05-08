@@ -24,10 +24,7 @@
 #include "EventHandlerLibShell.h"
 #endif // ENABLE_CHIP_SHELL
 
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
@@ -36,9 +33,6 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
@@ -55,15 +49,14 @@
 
 #include <lib/support/CodeUtils.h>
 
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #include <platform/CHIPDeviceLayer.h>
+#define SYSTEM_STATE_LED 0
+#define LOCK_STATE_LED 1
 
-#ifdef ENABLE_WSTK_LEDS
-#define SYSTEM_STATE_LED &sl_led_led0
-#define LOCK_STATE_LED &sl_led_led1
-#endif // ENABLE_WSTK_LEDS
-
-#define APP_FUNCTION_BUTTON &sl_button_btn0
-#define APP_LOCK_SWITCH &sl_button_btn1
+#define APP_FUNCTION_BUTTON 0
+#define APP_LOCK_SWITCH 1
 
 using chip::app::Clusters::DoorLock::DlLockState;
 using chip::app::Clusters::DoorLock::OperationErrorEnum;
@@ -75,9 +68,7 @@ using namespace ::chip::DeviceLayer::Internal;
 using namespace EFR32DoorLock::LockInitParams;
 
 namespace {
-#ifdef ENABLE_WSTK_LEDS
 LEDWidget sLockLED;
-#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 } // namespace
@@ -151,6 +142,10 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Lock-App", true);
@@ -246,11 +241,23 @@ CHIP_ERROR AppTask::Init()
 
     LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-#ifdef ENABLE_WSTK_LEDS
-    // Initialize LEDs
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(state.Value() == DlLockState::kUnlocked);
-#endif // ENABLE_WSTK_LEDS
+
+    // Update the LCD with the Stored value. Show QR Code if not provisioned
+#ifdef DISPLAY_ENABLED
+    GetLCD().WriteDemoUI(state.Value() != DlLockState::kUnlocked);
+#ifdef QR_CODE_ENABLED
+#ifdef SL_WIFI
+    if (!ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (!ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+    {
+        GetLCD().ShowQRCode(true, true);
+    }
+#endif // QR_CODE_ENABLED
+#endif
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
@@ -354,28 +361,25 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
-    if (buttonHandle == NULL)
-    {
-        return;
-    }
-
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_LOCK_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    if (button == APP_LOCK_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         button_event.Handler = LockActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (buttonHandle == APP_FUNCTION_BUTTON)
+    else if (button == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);
     }
 }
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
 {
@@ -383,9 +387,7 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
     {
         bool locked = (aAction == LockManager::LOCK_ACTION);
         SILABS_LOG("%s Action has been initiated", (locked) ? "Lock" : "Unlock");
-#ifdef ENABLE_WSTK_LEDS
         sLockLED.Set(!locked);
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
         sAppTask.GetLCD().WriteDemoUI(locked);

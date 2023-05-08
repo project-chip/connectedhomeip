@@ -36,7 +36,10 @@ config("darwin_config") {
     ]
   }
 
-  cflags = [ "-fobjc-arc" ]
+  cflags = [
+    "-fobjc-arc",
+    "-Wconversion",
+  ]
 }
 
 static_library("Darwin") {
@@ -140,6 +143,9 @@ static_library("logging") {
   ]
 
   configs += [ "${chip_root}/src:includes" ]
-  cflags = [ "-fobjc-arc" ]
+  cflags = [
+    "-fobjc-arc",
+    "-Wconversion",
+  ]
   frameworks = [ "Foundation.framework" ]
 }

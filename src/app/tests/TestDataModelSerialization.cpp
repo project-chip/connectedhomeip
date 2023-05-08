@@ -581,12 +581,11 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
 
         // Encode every field manually except a.
         {
-            err = EncodeStruct(
-                _this->mWriter, TLV::AnonymousTag(),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB)), t.b),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC)), t.c),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD)), t.d),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE)), t.e));
+            err = EncodeStruct(_this->mWriter, TLV::AnonymousTag(),
+                               MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB), t.b),
+                               MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC), t.c),
+                               MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD), t.d),
+                               MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e));
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         }
 
@@ -654,11 +653,11 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
         {
             err = EncodeStruct(
                 _this->mWriter, TLV::AnonymousTag(),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kA)), t.a),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB)), t.b),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC)), t.c),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD)), t.d),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE)), t.e),
+                MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kA), t.a),
+                MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB), t.b),
+                MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC), t.c),
+                MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD), t.d),
+                MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e),
                 MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE) + 1),
                                  t.a));
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -726,14 +725,13 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
 
             // Encode every field manually except a.
             {
-                err = EncodeStruct(
-                    _this->mWriter, TLV::AnonymousTag(),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kA)), t.b),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB)), t.b),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC)), t.c),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD)), t.d),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE)),
-                                     t.e));
+                err =
+                    EncodeStruct(_this->mWriter, TLV::AnonymousTag(),
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kA), t.b),
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB), t.b),
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC), t.c),
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD), t.d),
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e));
                 NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
             }
 
@@ -779,14 +777,13 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
 
             // Encode every field manually except a.
             {
-                err = EncodeStruct(
-                    _this->mWriter, TLV::AnonymousTag(),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kA)), t.a),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB)), t.b),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC)), t.c),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD)), t.e),
-                    MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE)),
-                                     t.e));
+                err =
+                    EncodeStruct(_this->mWriter, TLV::AnonymousTag(),
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kA), t.a),
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kB), t.b),
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kC), t.c),
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kD), t.e),
+                                 MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::SimpleStruct::Fields::kE), t.e));
                 NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
             }
 
@@ -829,10 +826,9 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
 
         // Encode a list of integers for field d instead of a list of structs.
         {
-            err = EncodeStruct(
-                _this->mWriter, TLV::AnonymousTag(),
-                MakeTagValuePair(TLV::ContextTag(to_underlying(Clusters::UnitTesting::Structs::NestedStructList::Fields::kD)),
-                                 t.e));
+            err =
+                EncodeStruct(_this->mWriter, TLV::AnonymousTag(),
+                             MakeTagValuePair(TLV::ContextTag(Clusters::UnitTesting::Structs::NestedStructList::Fields::kD), t.e));
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         }
 

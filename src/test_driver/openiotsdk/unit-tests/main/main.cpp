@@ -19,8 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/UnitTestRegistration.h>
 
 #include <NlTestLogger.h>
 

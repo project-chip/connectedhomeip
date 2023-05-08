@@ -372,7 +372,7 @@ public:
         if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
             CHIP_NO_ERROR)
         {
-            return pw::Status::Internal();
+            response.serial_number[0] = '\0'; // optional serial field not set.
         }
 
         // Create buffer for QR code that can fit max size and null terminator.

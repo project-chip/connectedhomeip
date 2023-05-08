@@ -2461,6 +2461,35 @@ void MTRBasicInformationCapabilityMinimaStructAttributeCallbackSubscriptionBridg
     }
 }
 
+void MTRBasicInformationProductAppearanceStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::DecodableType & value)
+{
+    MTRBasicInformationClusterProductAppearanceStruct * _Nonnull objCValue;
+    objCValue = [MTRBasicInformationClusterProductAppearanceStruct new];
+    objCValue.finish = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.finish)];
+    if (value.primaryColor.IsNull()) {
+        objCValue.primaryColor = nil;
+    } else {
+        objCValue.primaryColor = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.primaryColor.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBasicInformationProductAppearanceStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
 void MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -2997,8 +3026,8 @@ void MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3416,7 +3445,7 @@ void MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBr
 }
 
 void MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3454,7 +3483,7 @@ void MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3492,7 +3521,7 @@ void MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge::OnSub
 }
 
 void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5091,6 +5120,35 @@ void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSu
 };
 
 void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRBridgedDeviceBasicInformationProductAppearanceStructAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::DecodableType & value)
+{
+    MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct * _Nonnull objCValue;
+    objCValue = [MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct new];
+    objCValue.finish = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.finish)];
+    if (value.primaryColor.IsNull()) {
+        objCValue.primaryColor = nil;
+    } else {
+        objCValue.primaryColor = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.primaryColor.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBridgedDeviceBasicInformationProductAppearanceStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -7043,7 +7101,7 @@ void MTRBarrierControlAttributeListListAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value)
+    void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -8305,6 +8363,52 @@ void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::OnS
 };
 
 void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTROccupancySensingOccupancyAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTROccupancySensingOccupancyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -11918,10 +12022,18 @@ void MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
         response.logContent = [NSData dataWithBytes:data.logContent.data() length:data.logContent.size()];
     }
     {
-        response.utcTimeStamp = [NSNumber numberWithUnsignedInt:data.UTCTimeStamp];
+        if (data.UTCTimeStamp.HasValue()) {
+            response.utcTimeStamp = [NSNumber numberWithUnsignedLongLong:data.UTCTimeStamp.Value()];
+        } else {
+            response.utcTimeStamp = nil;
+        }
     }
     {
-        response.timeSinceBoot = [NSNumber numberWithUnsignedInt:data.timeSinceBoot];
+        if (data.timeSinceBoot.HasValue()) {
+            response.timeSinceBoot = [NSNumber numberWithUnsignedLongLong:data.timeSinceBoot.Value()];
+        } else {
+            response.timeSinceBoot = nil;
+        }
     }
     DispatchSuccess(context, response);
 };
@@ -13865,6 +13977,106 @@ void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionB
     }
 }
 
+void MTRBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BasicInformation::ColorEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBasicInformationClusterColorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::ColorEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableBasicInformationClusterColorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BasicInformation::ProductFinishEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBasicInformationClusterProductFinishEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::ProductFinishEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableBasicInformationClusterProductFinishEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
 void MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value)
 {
@@ -14166,15 +14378,15 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCall
     }
 }
 
-void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
+void MTRTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14189,8 +14401,8 @@ void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+void MTRNullableTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14201,7 +14413,7 @@ void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14216,15 +14428,15 @@ void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscr
     }
 }
 
-void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
+void MTRTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TimeFormatLocalization::HourFormatEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14239,8 +14451,8 @@ void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormat> & value)
+void MTRNullableTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14251,7 +14463,7 @@ void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14266,15 +14478,15 @@ void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscrip
     }
 }
 
-void MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::UnitLocalization::TempUnit value)
+void MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::UnitLocalization::TempUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14289,8 +14501,8 @@ void MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> & value)
+void MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14301,7 +14513,7 @@ void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14316,15 +14528,65 @@ void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeFault value)
+void MTRPowerSourceClusterBatApprovedChemistryEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRPowerSourceClusterBatApprovedChemistryEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullablePowerSourceClusterBatApprovedChemistryEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullablePowerSourceClusterBatApprovedChemistryEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRPowerSourceClusterBatChargeFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatChargeFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterBatChargeFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14339,8 +14601,8 @@ void MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFault> & value)
+void MTRNullablePowerSourceClusterBatChargeFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14351,7 +14613,7 @@ void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterBatChargeFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14366,15 +14628,15 @@ void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeLevel value)
+void MTRPowerSourceClusterBatChargeLevelEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatChargeLevelEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterBatChargeLevelEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14389,8 +14651,8 @@ void MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevel> & value)
+void MTRNullablePowerSourceClusterBatChargeLevelEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevelEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14401,7 +14663,7 @@ void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterBatChargeLevelEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14416,15 +14678,15 @@ void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeState value)
+void MTRPowerSourceClusterBatChargeStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatChargeStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterBatChargeStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14439,8 +14701,8 @@ void MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeState> & value)
+void MTRNullablePowerSourceClusterBatChargeStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14451,7 +14713,7 @@ void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterBatChargeStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14466,15 +14728,65 @@ void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRPowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatFault value)
+void MTRPowerSourceClusterBatCommonDesignationEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRPowerSourceClusterBatCommonDesignationEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullablePowerSourceClusterBatCommonDesignationEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatCommonDesignationEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullablePowerSourceClusterBatCommonDesignationEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRPowerSourceClusterBatFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterBatFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14489,8 +14801,8 @@ void MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFault> & value)
+void MTRNullablePowerSourceClusterBatFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14501,7 +14813,7 @@ void MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterBatFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14516,15 +14828,15 @@ void MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatReplaceability value)
+void MTRPowerSourceClusterBatReplaceabilityEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterBatReplaceabilityEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14539,8 +14851,8 @@ void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceability> & value)
+void MTRNullablePowerSourceClusterBatReplaceabilityEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceabilityEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14551,7 +14863,7 @@ void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterBatReplaceabilityEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14566,15 +14878,15 @@ void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscription
     }
 }
 
-void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::PowerSourceStatus value)
+void MTRPowerSourceClusterPowerSourceStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterPowerSourceStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14589,8 +14901,8 @@ void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatus> & value)
+void MTRNullablePowerSourceClusterPowerSourceStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14601,7 +14913,7 @@ void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterPowerSourceStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14616,15 +14928,15 @@ void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscription
     }
 }
 
-void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::WiredCurrentType value)
+void MTRPowerSourceClusterWiredCurrentTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterWiredCurrentTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14639,8 +14951,8 @@ void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentType> & value)
+void MTRNullablePowerSourceClusterWiredCurrentTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14651,7 +14963,7 @@ void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterWiredCurrentTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14666,15 +14978,15 @@ void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionB
     }
 }
 
-void MTRPowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::WiredFault value)
+void MTRPowerSourceClusterWiredFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::WiredFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterWiredFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14689,8 +15001,8 @@ void MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFault> & value)
+void MTRNullablePowerSourceClusterWiredFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14701,7 +15013,7 @@ void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterWiredFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14917,15 +15229,15 @@ void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscription
     }
 }
 
-void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::LogsIntent value)
+void MTRDiagnosticLogsClusterIntentEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DiagnosticLogs::IntentEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDiagnosticLogsClusterIntentEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14940,8 +15252,8 @@ void MTRDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsIntent> & value)
+void MTRNullableDiagnosticLogsClusterIntentEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::IntentEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14952,7 +15264,7 @@ void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDiagnosticLogsClusterIntentEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14967,15 +15279,15 @@ void MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::LogsStatus value)
+void MTRDiagnosticLogsClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DiagnosticLogs::StatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDiagnosticLogsClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14990,8 +15302,8 @@ void MTRDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsStatus> & value)
+void MTRNullableDiagnosticLogsClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::StatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15002,7 +15314,7 @@ void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDiagnosticLogsClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15017,15 +15329,15 @@ void MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol value)
+void MTRDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15040,8 +15352,8 @@ void MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol> & value)
+void MTRNullableDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15052,7 +15364,7 @@ void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15467,15 +15779,15 @@ void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubsc
     }
 }
 
-void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause value)
+void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15490,8 +15802,8 @@ void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSub
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause> & value)
+void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15502,7 +15814,8 @@ void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15517,15 +15830,15 @@ void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCal
     }
 }
 
-void MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType value)
+void MTRWiFiNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRWiFiNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15540,8 +15853,8 @@ void MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> & value)
+void MTRNullableWiFiNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15552,7 +15865,7 @@ void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableWiFiNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15567,15 +15880,15 @@ void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscr
     }
 }
 
-void MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus value)
+void MTRWiFiNetworkDiagnosticsClusterSecurityTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRWiFiNetworkDiagnosticsClusterSecurityTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15590,8 +15903,8 @@ void MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscr
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus> & value)
+void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15602,7 +15915,7 @@ void MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15617,15 +15930,15 @@ void MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallba
     }
 }
 
-void MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType value)
+void MTRWiFiNetworkDiagnosticsClusterWiFiVersionEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRWiFiNetworkDiagnosticsClusterWiFiVersionEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15640,8 +15953,8 @@ void MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> & value)
+void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15652,7 +15965,7 @@ void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15803,6 +16116,107 @@ void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge:
 };
 
 void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRBridgedDeviceBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BridgedDeviceBasicInformation::ColorEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBridgedDeviceBasicInformationClusterColorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableBridgedDeviceBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedDeviceBasicInformation::ColorEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableBridgedDeviceBasicInformationClusterColorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BridgedDeviceBasicInformation::ProductFinishEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedDeviceBasicInformation::ProductFinishEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16021,15 +16435,15 @@ void MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttrib
     }
 }
 
-void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy value)
+void MTRGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16044,8 +16458,8 @@ void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy> & value)
+void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16056,7 +16470,7 @@ void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17070,15 +17484,15 @@ void MTRNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value)
+void MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17093,8 +17507,8 @@ void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscr
     }
 }
 
-void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode> & value)
+void MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17105,7 +17519,7 @@ void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17120,15 +17534,15 @@ void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallba
     }
 }
 
-void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value)
+void MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17143,8 +17557,8 @@ void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubs
     }
 }
 
-void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode> & value)
+void MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17155,7 +17569,7 @@ void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17906,6 +18320,56 @@ void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBri
 };
 
 void MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

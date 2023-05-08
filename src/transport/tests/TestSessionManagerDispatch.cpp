@@ -26,6 +26,7 @@
 
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -417,6 +418,7 @@ constexpr uint16_t kMaxGroupsPerFabric    = 5;
 constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 
 static chip::TestPersistentStorageDelegate sStorageDelegate;
+static chip::Crypto::DefaultSessionKeystore sSessionKeystore;
 static GroupDataProviderImpl sProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 class FabricTableHolder
 {
@@ -436,6 +438,7 @@ public:
 
         // Initialize Group Data Provider
         sProvider.SetStorageDelegate(&sStorageDelegate);
+        sProvider.SetSessionKeystore(&sSessionKeystore);
         // sProvider.SetListener(&chip::app::TestGroups::sListener);
         ReturnErrorOnFailure(sProvider.Init());
         Credentials::SetGroupDataProvider(&sProvider);
@@ -507,12 +510,13 @@ void TestSessionManagerInit(nlTestSuite * inSuite, TestContext & ctx, SessionMan
     static FabricTableHolder fabricTableHolder;
     static secure_channel::MessageCounterManager gMessageCounterManager;
     static chip::TestPersistentStorageDelegate deviceStorage;
+    static chip::Crypto::DefaultSessionKeystore sessionKeystore;
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTableHolder.GetFabricTable()));
+                                           &fabricTableHolder.GetFabricTable(), sessionKeystore));
 }
 
 // constexpr chip::FabricId kFabricId1               = 0x2906C908D115D362;

@@ -21,7 +21,6 @@
 #include "WindowCoveringManager.h"
 #include "include/tv-callbacks.h"
 #include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -30,9 +29,9 @@
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
-#include <signal.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
@@ -62,51 +61,7 @@ NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
 chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
-// TODO(#20664) REPL test will fail if signal SIGINT is not caught, temporarily keep following logic.
-
-// when the shell is enabled, don't intercept signals since it prevents the user from
-// using expected commands like CTRL-C to quit the application. (see issue #17845)
-// We should stop using signals for those faults, and move to a different notification
-// means, like a pipe. (see issue #19114)
-#if !defined(ENABLE_CHIP_SHELL)
-void OnRebootSignalHandler(int signum)
-{
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
-
-    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
-    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
-    // running process to terminate with different reasons.
-    BootReasonType bootReason = BootReasonType::kUnspecified;
-    switch (signum)
-    {
-    case SIGINT:
-        bootReason = BootReasonType::kSoftwareReset;
-        break;
-    default:
-        IgnoreUnusedVariable(bootReason);
-        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
-        chipDie();
-        break;
-    }
-
-    Server::GetInstance().DispatchShutDownAndStopEventLoop();
-}
-
-void SetupSignalHandlers()
-{
-    // sigaction is not used here because Tsan interceptors seems to
-    // never dispatch the signals on darwin.
-    signal(SIGINT, OnRebootSignalHandler);
-}
-#endif // !defined(ENABLE_CHIP_SHELL)
-
 } // namespace
-
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
-{
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
 
 void OnIdentifyStart(::Identify *)
 {
@@ -184,14 +139,65 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetw
 #endif
 
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
+
+class ExampleDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
+{
+public:
+    void Init(DeviceInstanceInfoProvider * defaultProvider) { mDefaultProvider = defaultProvider; }
+
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return mDefaultProvider->GetVendorName(buf, bufSize); }
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return mDefaultProvider->GetVendorId(vendorId); }
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductName(buf, bufSize); }
+    CHIP_ERROR GetProductId(uint16_t & productId) override { return mDefaultProvider->GetProductId(productId); }
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductLabel(buf, bufSize); }
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetSerialNumber(buf, bufSize); }
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override
+    {
+        return mDefaultProvider->GetManufacturingDate(year, month, day);
+    }
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override
+    {
+        return mDefaultProvider->GetHardwareVersion(hardwareVersion);
+    }
+    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override
+    {
+        return mDefaultProvider->GetHardwareVersionString(buf, bufSize);
+    }
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
+    {
+        return mDefaultProvider->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
+    }
+    CHIP_ERROR GetProductFinish(Clusters::BasicInformation::ProductFinishEnum * finish) override;
+    CHIP_ERROR GetProductPrimaryColor(Clusters::BasicInformation::ColorEnum * primaryColor) override;
+
+private:
+    DeviceInstanceInfoProvider * mDefaultProvider;
+};
+
+CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductFinish(Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    // Our example device claims to have a Satin finish for now.  We can make
+    // this configurable as needed.
+    *finish = Clusters::BasicInformation::ProductFinishEnum::kSatin;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    // Our example device claims to have a nice purple color for now.  We can
+    // make this configurable as needed.
+    *primaryColor = Clusters::BasicInformation::ColorEnum::kPurple;
+    return CHIP_NO_ERROR;
+}
+
+ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
+
 } // namespace
 
 void ApplicationInit()
 {
-#if !defined(ENABLE_CHIP_SHELL)
-    SetupSignalHandlers();
-#endif // !defined(ENABLE_CHIP_SHELL)
-
     (void) kNetworkCommissioningEndpointMain;
     // Enable secondary endpoint only when we need it, this should be applied to all platforms.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
@@ -250,6 +256,13 @@ void ApplicationInit()
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
+    }
+
+    auto * defaultProvider = GetDeviceInstanceInfoProvider();
+    if (defaultProvider != &gExampleDeviceInstanceInfoProvider)
+    {
+        gExampleDeviceInstanceInfoProvider.Init(defaultProvider);
+        SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
     }
 }
 

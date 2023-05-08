@@ -18,12 +18,9 @@
 #
 
 import argparse
-import asyncio
 import logging
-import os
 import queue
 import subprocess
-import sys
 import threading
 import typing
 

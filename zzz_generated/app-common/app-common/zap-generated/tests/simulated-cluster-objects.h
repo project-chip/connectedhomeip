@@ -28,6 +28,7 @@ struct PairWithCodeCommand
 {
     chip::NodeId nodeId;
     chip::CharSpan payload;
+    Optional<bool> discoverOnce;
 
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
     {
@@ -35,6 +36,7 @@ struct PairWithCodeCommand
         ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), nodeId));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), payload));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(2), discoverOnce));
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
@@ -57,6 +59,9 @@ struct PairWithCodeCommand
             case 1:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, payload));
                 break;
+            case 2:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, discoverOnce));
+                break;
             default:
                 break;
             }
@@ -70,6 +75,81 @@ struct PairWithCodeCommand
 };
 
 struct UnpairCommand
+{
+    chip::NodeId nodeId;
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+    {
+        chip::TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), nodeId));
+        ReturnErrorOnFailure(writer.EndContainer(outer));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVType outer;
+        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+            {
+            case 0:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, nodeId));
+                break;
+            default:
+                break;
+            }
+        }
+
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+struct GetCommissionerNodeIdCommand
+{
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+    {
+        chip::TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(writer.EndContainer(outer));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVType outer;
+        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+            {
+            default:
+                break;
+            }
+        }
+
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+struct GetCommissionerNodeIdResponse
 {
     chip::NodeId nodeId;
 
@@ -668,7 +748,7 @@ struct DiscoveryCommandResponse
     uint16_t vendorId;
     uint16_t productId;
     uint8_t commissioningMode;
-    uint16_t deviceType;
+    uint32_t deviceType;
     chip::CharSpan deviceName;
     chip::ByteSpan rotatingId;
     uint64_t rotatingIdLen;
@@ -1164,6 +1244,12 @@ using Type = struct PairWithCodeCommand;
 }
 namespace Unpair {
 using Type = struct UnpairCommand;
+}
+namespace GetCommissionerNodeId {
+using Type = struct GetCommissionerNodeIdCommand;
+}
+namespace GetCommissionerNodeIdResponse {
+using DecodableType = struct GetCommissionerNodeIdResponse;
 }
 } // namespace Commands
 } // namespace CommissionerCommands

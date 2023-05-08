@@ -173,6 +173,12 @@ private:
         void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override
         {
             ChipLogError(BDX, "exchange timed out");
+            // Null out mExchangeCtx before calling OnDownloadTimeout, in case
+            // the downloader decides to call Reset() on us.  If we don't, we
+            // will end up closing the exchange from Reset and then the caller
+            // will close it _again_ (see API documentation for
+            // OnResponseTimeout), which will lead to refcount underflow.
+            mExchangeCtx = nullptr;
             if (mDownloader != nullptr)
             {
                 mDownloader->OnDownloadTimeout();

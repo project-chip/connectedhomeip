@@ -25,10 +25,16 @@
 
 #if CONFIG_CHIP_FACTORY_DATA
 #include <platform/nrfconnect/FactoryDataProvider.h>
+#else
+#include <platform/nrfconnect/DeviceInstanceInfoProviderImpl.h>
 #endif
 
 #ifdef CONFIG_MCUMGR_SMP_BT
 #include "DFUOverSMP.h"
+#endif
+
+#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
+#include "ICDUtil.h"
 #endif
 
 #include <cstdint>
@@ -83,10 +89,6 @@ private:
 
     static void StartTimer(Timer, uint32_t);
     static void CancelTimer(Timer);
-
-#ifdef CONFIG_MCUMGR_SMP_BT
-    static void RequestSMPAdvertisingStart(void);
-#endif
 
     FunctionEvent mFunction = FunctionEvent::NoneSelected;
 

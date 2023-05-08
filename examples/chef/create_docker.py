@@ -44,7 +44,7 @@ for device_file_name in os.listdir(args.tar_path):
         continue
 
     # Clean up the out directory before extracting device files
-    shutil.rmtree(out_directory)
+    shutil.rmtree(out_directory, ignore_errors=True)
     os.mkdir(out_directory)
 
     device = device.replace('.tar.gz', '')

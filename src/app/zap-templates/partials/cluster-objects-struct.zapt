@@ -1,6 +1,6 @@
 {{#if header}}
 namespace {{asUpperCamelCase name}} {
-    enum class Fields {
+    enum class Fields : uint8_t {
     {{#zcl_struct_items}}
     k{{asUpperCamelCase label}} = {{fieldIdentifier}},
     {{/zcl_struct_items}}
@@ -86,14 +86,14 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter &writer, TLV::Tag tag, const Optional<F
     {{#zcl_struct_items}}
     {{#if (is_num_equal fieldIdentifier 254)}}
     if (accessingFabricIndex.HasValue()) {
-      ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+      ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}}));
     }
     {{else if isFabricSensitive}}
     if (includeSensitive) {
-       ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+       ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}}));
     }
     {{else}}
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}}));
     {{/if}}
     {{/zcl_struct_items}}
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -105,7 +105,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     {{#zcl_struct_items}}
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})), {{asLowerCamelCase label}}));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}}));
     {{/zcl_struct_items}}
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;

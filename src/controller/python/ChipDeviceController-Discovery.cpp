@@ -139,6 +139,11 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
             }
             jsonVal["addresses"] = addresses;
         }
+        if (dnsSdInfo->commissionData.rotatingIdLen > 0)
+        {
+            jsonVal["rotatingId"] = std::string(reinterpret_cast<const char *>(dnsSdInfo->commissionData.rotatingId),
+                                                dnsSdInfo->commissionData.rotatingIdLen);
+        }
 
         {
             auto str = jsonVal.toStyledString();

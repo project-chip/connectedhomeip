@@ -37,6 +37,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ThreadNetworkDiagnostics;
 using namespace chip::app::Clusters::ThreadNetworkDiagnostics::Attributes;
 using namespace chip::DeviceLayer;
+using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
@@ -139,7 +140,7 @@ bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandl
                                                                const Commands::ResetCounts::DecodableType & commandData)
 {
     ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 

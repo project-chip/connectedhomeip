@@ -94,7 +94,7 @@ CHIP_ERROR InvokeResponseMessage::Parser::GetSuppressResponse(bool * const apSup
 CHIP_ERROR InvokeResponseMessage::Parser::GetInvokeResponses(InvokeResponseIBs::Parser * const apStatus) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kInvokeResponses)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kInvokeResponses), reader));
     return apStatus->Init(reader);
 }
 
@@ -102,7 +102,7 @@ InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::SuppressRespons
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kSuppressResponse)), aSuppressResponse);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kSuppressResponse), aSuppressResponse);
     }
     return *this;
 }

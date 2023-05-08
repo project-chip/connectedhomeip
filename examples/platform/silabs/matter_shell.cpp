@@ -42,7 +42,7 @@ void MatterShellTask(void * args)
 
 extern "C" unsigned int sleep(unsigned int seconds)
 {
-    const TickType_t xDelay = 1000 * seconds / portTICK_PERIOD_MS;
+    const TickType_t xDelay = pdMS_TO_TICKS(1000 * seconds);
     vTaskDelay(xDelay);
     return 0;
 }

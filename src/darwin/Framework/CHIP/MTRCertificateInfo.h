@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Note: This class does not support parsing certificates related to Device Attestation.
  */
 NS_SWIFT_SENDABLE
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRCertificateInfo : NSObject <NSCopying>
 
 + (instancetype)new NS_UNAVAILABLE;
@@ -35,10 +35,30 @@ MTR_NEWLY_AVAILABLE
 
 /**
  * Initializes the receiver with an operational certificate in Matter TLV format.
+ *
+ * This can be a node operational certificate, a Matter intermediate
+ * certificate, or a Matter root certificate.
  */
 - (nullable instancetype)initWithTLVBytes:(MTRCertificateTLVBytes)bytes;
 
+/**
+ * The Distinguished Name of the issuer of the certificate.
+ *
+ * For a node operational certificate, the issuer will match the subject of the
+ * root certificate or intermediate certificate that represents the entity that
+ * issued the node operational certificate.
+ *
+ * For an intermediate certificate, the issuer will match the subject of the
+ * root certificate.
+ *
+ * Matter root certificates are self-signed, i.e. the issuer and the subject are
+ * the same.
+ */
 @property (readonly) MTRDistinguishedNameInfo * issuer;
+
+/**
+ * The Distinguished Name of the entity represented by the certificate.
+ */
 @property (readonly) MTRDistinguishedNameInfo * subject;
 
 @property (readonly) NSDate * notBefore;
@@ -50,36 +70,42 @@ MTR_NEWLY_AVAILABLE
  * Represents the Matter-specific components of an X.509 Distinguished Name.
  */
 NS_SWIFT_SENDABLE
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDistinguishedNameInfo : NSObject <NSCopying>
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
- * The Node ID contained in the DN, if any.
+ * The Node ID contained in the DN, if any.  Will be non-nil for the subject of
+ * a valid node operational certificate.
  */
 @property (readonly, nullable) NSNumber * nodeID;
 
 /**
- * The Fabric ID contained in the DN, if any.
+ * The Fabric ID contained in the DN, if any.  Will be non-nil for the subject
+ * of a valid node operational certificate, and may be non-nil for the subject
+ * of a valid intermediate or root certificate.
  */
 @property (readonly, nullable) NSNumber * fabricID;
 
 /**
- * The `RCAC` ID contained in the DN, if any.
+ * The `RCAC` ID contained in the DN, if any.  Will be non-nil for the subject
+ * of a valid root certificate.
  */
 @property (readonly, nullable) NSNumber * rootCACertificateID;
 
 /**
- * The `ICAC` ID contained in the DN, if any.
+ * The `ICAC` ID contained in the DN, if any.  Will be non-nil for the subject
+ * of a valid intermediate certificate.
  */
 @property (readonly, nullable) NSNumber * intermediateCACertificateID;
 
 /**
- * The set of CASE Authenticated Tags contained in the DN.
+ * The set of CASE Authenticated Tags contained in the DN.  Maybe be non-empty for
+ * the subject of a valid node operational certificate.
  */
-@property (readonly) NSSet<NSNumber *> * tags;
+@property (readonly) NSSet<NSNumber *> * caseAuthenticatedTags;
 
 @end
 

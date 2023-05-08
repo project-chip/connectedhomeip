@@ -38,7 +38,7 @@ tests:
       PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Reads the CurrentState attribute"
@@ -53,7 +53,7 @@ tests:
       command: "Play"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media state is playing"
@@ -79,7 +79,7 @@ tests:
       command: "Pause"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media is paused"
@@ -105,7 +105,7 @@ tests:
       command: "Stop"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media is stoped"

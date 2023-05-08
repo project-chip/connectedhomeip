@@ -23,7 +23,6 @@
 #include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 
-#include "app_config.h"
 #include <stdio.h>
 #include <string.h>
 

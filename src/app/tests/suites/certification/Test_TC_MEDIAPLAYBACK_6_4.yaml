@@ -38,7 +38,7 @@ tests:
       PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Reads the CurrentState attribute from the DUT"
@@ -60,7 +60,7 @@ tests:
       command: "FastForward"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "verify that the media state is playing"
@@ -93,7 +93,7 @@ tests:
       command: "FastForward"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "verify that the media play speed has increased."
@@ -119,7 +119,7 @@ tests:
       command: "Rewind"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "verify that the media play has reversed direction."
@@ -162,7 +162,7 @@ tests:
       command: "Rewind"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label:
@@ -202,7 +202,7 @@ tests:
       command: "Play"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label:

@@ -21,6 +21,7 @@
 extern "C" {
 #endif
 
+esp_err_t openthread_init_stack(void);
 esp_err_t openthread_launch_task(void);
 
 #ifdef __cplusplus

@@ -78,6 +78,7 @@ exclude:
     - "scripts/run_codegen_targets.sh" # shellharden breaks for loops over command outputs
     - "src/darwin/Framework/CHIP/zap-generated/*" # already clang-formatted by our zap tooling
     - "zzz_generated/**/*" # already clang-formatted by our zap tooling
+    - "src/controller/java/generated/java/**/*" # not formatted: generated files
 
 
 changed_paths:

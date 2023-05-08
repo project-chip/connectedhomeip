@@ -1,0 +1,1 @@
+1.0 - Reason for bootstrap refresh: changes to IDL parser to support emitted events.

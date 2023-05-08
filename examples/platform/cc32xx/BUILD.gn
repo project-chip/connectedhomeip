@@ -17,3 +17,23 @@ import("//build_overrides/chip.gni")
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
 }
+
+config("attestation-credentials-config") {
+  include_dirs = [ "${chip_root}" ]
+
+  defines = [ "CC32XX_ATTESTATION_CREDENTIALS" ]
+}
+
+source_set("cc32xx-attestation-credentials") {
+  sources = [
+    "CC32XXDeviceAttestationCreds.cpp",
+    "CC32XXDeviceAttestationCreds.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/platform:platform_base",
+  ]
+
+  public_configs = [ ":attestation-credentials-config" ]
+}

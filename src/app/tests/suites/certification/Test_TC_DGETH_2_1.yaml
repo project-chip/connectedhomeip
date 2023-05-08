@@ -64,7 +64,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
 
-          Verify the value of PacketRxCount is in range uint64 in TH(chip-tool) log
+          Verify the value of PacketRxCount is in range uint64 on TH(chip-tool) log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0002 DataVersion: 3872576452
           [1649663623.009973][8103:8108] CHIP:TOO:   PacketRxCount: 3322
@@ -92,7 +92,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
 
-          Verify the value of PacketTxCount is in range uint64 in TH(chip-tool) Log
+          Verify the value of PacketTxCount is in range uint64 on TH(chip-tool) Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0003 DataVersion: 3872576452
           [1649663793.192934][8117:8122] CHIP:TOO:   PacketTxCount: 3220
@@ -120,7 +120,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 0
 
-          Verify the value of TxErrCount is in range uint64 in TH(chip-tool) Log
+          Verify the value of TxErrCount is in range uint64 on TH(chip-tool) Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0004 DataVersion: 3872576452
           [1649663843.295395][8123:8128] CHIP:TOO:   TxErrCount: 0
@@ -149,7 +149,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read collision-count 1 0
 
-          Verify the value of  CollisionCount is in range uint64 in TH(chip-tool) Log
+          Verify the value of  CollisionCount is in range uint64 on TH(chip-tool) Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0005 DataVersion: 3872576452
           [1649663870.221742][8133:8138] CHIP:TOO:   CollisionCount: 0
@@ -178,7 +178,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 0
 
-          Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot in TH(chip-tool) Log
+          Verify the value of OverrunCount is in range uint64 on TH(chip-tool) Log
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0006 DataVersion: 3872576452
           [1649663948.738274][8142:8147] CHIP:TOO:   OverrunCount: 0
@@ -207,7 +207,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read carrier-detect 1 0
 
-          Verify the value of CarrierDetect is either bool or null in TH(chip-tool) Log:
+          Verify the value of CarrierDetect is either bool or if the interface is not configured or operational, NULL should be read,  this is optional attribute implemented in RPI, may vary based on DUT implementation  on TH(chip-tool) Log:
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0007 DataVersion: 3872576452
           [1649663972.829304][8149:8154] CHIP:TOO:   CarrierDetect: null
@@ -235,8 +235,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read  time-since-reset 1 0
 
-          Verify the value of TimeSinceReset is in range uint64 in TH(chip-tool) log:
-
+          Verify the value of TimeSinceReset is in range uint64, If the interface is not configured or operational, NULL should be read, this is optional attribute implemented in RPI, may vary based on DUT implementation  on TH(chip-tool) Log:
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0008 DataVersion: 3872576452
           [1649664046.010810][8158:8163] CHIP:TOO:   TimeSinceReset: 5219

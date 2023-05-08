@@ -92,6 +92,8 @@ static_library("default_policy") {
     ":address_policy",
     "${chip_root}/src/inet",
   ]
+
+  cflags = [ "-Wconversion" ]
 }
 
 if (current_os == "linux" && chip_minmdns_default_policy == "libnl") {
@@ -156,4 +158,6 @@ static_library("minimal_mdns") {
   }
 
   public_configs = [ ":config" ]
+
+  cflags = [ "-Wconversion" ]
 }

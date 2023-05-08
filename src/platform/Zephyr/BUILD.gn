@@ -24,6 +24,8 @@ assert(chip_device_platform == "zephyr")
 static_library("Zephyr") {
   sources = [
     "../SingletonConfigurationManager.cpp",
+    "BLEAdvertisingArbiter.cpp",
+    "BLEAdvertisingArbiter.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
@@ -74,4 +76,6 @@ static_library("Zephyr") {
   if (chip_malloc_sys_heap) {
     sources += [ "SysHeapMalloc.cpp" ]
   }
+
+  cflags = [ "-Wconversion" ]
 }

@@ -790,13 +790,17 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
     }
     else
     {
-        // Internal consistency eerror
+        // Internal consistency error
         ChipLogError(Ble, "Unknown discovery type. Ignoring scanned device.");
         return;
     }
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, mpEndpoint);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
     mDeviceScanner->StopScan();
 
     ConnectDevice(device, mpEndpoint);
@@ -804,15 +808,24 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
 
 void BLEManagerImpl::OnScanComplete()
 {
-    if (mBLEScanConfig.mBleScanState != BleScanState::kScanForDiscriminator &&
-        mBLEScanConfig.mBleScanState != BleScanState::kScanForAddress)
+    switch (mBLEScanConfig.mBleScanState)
     {
+    case BleScanState::kNotScanning:
         ChipLogProgress(Ble, "Scan complete notification without an active scan.");
-        return;
+        break;
+    case BleScanState::kScanForAddress:
+    case BleScanState::kScanForDiscriminator:
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+        ChipLogProgress(Ble, "Scan complete. No matching device found.");
+        break;
+    case BleScanState::kConnecting:
+        break;
     }
+}
 
-    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
-    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+void BLEManagerImpl::OnScanError(CHIP_ERROR err)
+{
+    ChipLogError(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 } // namespace Internal

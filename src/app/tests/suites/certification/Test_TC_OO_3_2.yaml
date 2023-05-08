@@ -36,7 +36,8 @@ tests:
 
           ./chip-tool onoff off 1 1
 
-          verify the " Off command response" on the TH (all-cluster-app) log:
+
+          Verify  TH recieves " Off command" on the TH (all-cluster-app) log:
 
           [1650537121.464763][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650537121.464818][3678:3678] CHIP:DMG: {
@@ -77,7 +78,7 @@ tests:
           ./chip-tool onoff on 1 1
 
 
-          verify the " On command response" on the TH (all-cluster-app) log:
+          Verify TH recieves " On command " on the TH (all-cluster-app) log:
 
           [1650537309.217556][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650537309.217647][3678:3678] CHIP:DMG: {
@@ -118,7 +119,7 @@ tests:
           ./chip-tool onoff toggle 1 1
 
 
-          verify the " Toggle command response" on the TH (all-cluster-app) log:
+          Verify  TH recieves" Toggle command response" on the TH (all-cluster-app) log:
 
           [1650537502.260837][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650537502.260877][3678:3678] CHIP:DMG: {
@@ -156,10 +157,11 @@ tests:
       PICS: OO.C.C40.Tx
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
           ./chip-tool onoff off-with-effect 1 0 1 1
 
 
-          verify the " OffWithEffect command response" on the TH (all-cluster-app) log:
+          Verify  TH recieves " OffWithEffect command response" on the TH (all-cluster-app) log:
 
           [1650538107.639049][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650538107.639115][3678:3678] CHIP:DMG: {
@@ -209,7 +211,7 @@ tests:
           ./chip-tool onoff on-with-recall-global-scene 1 1
 
 
-          verify the " OnWithRecallGlobalScene command response" on the TH (all-cluster-app) log:
+          Verify  TH recieves " OnWithRecallGlobalScene command response" on the TH (all-cluster-app) log:
 
           [1650537790.690122][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650537790.690188][3678:3678] CHIP:DMG: {
@@ -253,7 +255,7 @@ tests:
           ./chip-tool onoff on-with-timed-off 0 120 5 1 1
 
 
-          verify the " OnWithTimedOff command response" on the TH (all-cluster-app) log:
+          Verify  TH recieves " OnWithTimedOff command response" on the TH (all-cluster-app) log:
 
           [1650538315.673606][3678:3678] CHIP:DMG: InvokeRequestMessage =
           [1650538315.673697][3678:3678] CHIP:DMG: {

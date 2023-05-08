@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
-
 #include <app/AttributeAccessInterface.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 #include <jni.h>

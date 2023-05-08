@@ -97,14 +97,14 @@ CHIP_ERROR CommandStatusIB::Parser::PrettyPrint() const
 CHIP_ERROR CommandStatusIB::Parser::GetPath(CommandPathIB::Parser * const apPath) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kPath), reader));
     return apPath->Init(reader);
 }
 
 CHIP_ERROR CommandStatusIB::Parser::GetErrorStatus(StatusIB::Parser * const apErrorStatus) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kErrorStatus)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kErrorStatus), reader));
     return apErrorStatus->Init(reader);
 }
 

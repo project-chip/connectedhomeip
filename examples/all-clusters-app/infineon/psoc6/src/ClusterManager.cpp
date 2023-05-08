@@ -24,8 +24,8 @@
 #include "ClusterManager.h"
 #include "AppConfig.h"
 #include "LEDWidget.h"
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/CommandHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/util/basic-types.h>
@@ -49,7 +49,7 @@ ClusterManager ClusterManager::sCluster;
 
 void ClusterManager::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID,
+    VerifyOrExit(attributeId == OnOff::Attributes::OnOff::Id,
                  P6_LOG("Unhandled Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(attributeId)));
     VerifyOrExit(endpointId == ENDPOINT_FIRST_IDX || endpointId == ENDPOINT_SECOND_IDX,
                  P6_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
@@ -69,7 +69,7 @@ void ClusterManager::OnLevelControlAttributeChangeCallback(EndpointId endpointId
     bool onOffState    = mEndpointOnOffState[endpointId - 1];
     uint8_t brightness = onOffState ? *value : 0;
 
-    VerifyOrExit(attributeId == ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
+    VerifyOrExit(attributeId == LevelControl::Attributes::CurrentLevel::Id,
                  P6_LOG("Unhandled Attribute ID: '" ChipLogFormatMEI "'", ChipLogValueMEI(attributeId)));
     VerifyOrExit(endpointId == ENDPOINT_FIRST_IDX || endpointId == ENDPOINT_SECOND_IDX,
                  P6_LOG("Unexpected EndPoint ID: `0x%02x'", endpointId));
@@ -90,7 +90,7 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
     if (endpointId == 1)
     {
         uint8_t hue, saturation;
-        /* If the Current Attribute is ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, read the saturation value and
+        /* If the Current Attribute is CurrentHue, read the saturation value and
          * set the color on Cluster LED using both Saturation and Hue.
          */
         if (attributeId == ColorControl::Attributes::CurrentHue::Id)
@@ -101,7 +101,7 @@ void ClusterManager::OnColorControlAttributeChangeCallback(EndpointId endpointId
         }
         else
         {
-            /* If the Current Attribute is ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, read the Hue value and
+            /* If the Current Attribute is CurrentSaturation, read the Hue value and
              * set the color on Cluster LED using both Saturation and Hue.
              */
             saturation = *value;

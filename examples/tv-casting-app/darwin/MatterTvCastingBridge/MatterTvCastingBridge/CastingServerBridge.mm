@@ -19,6 +19,7 @@
 #import "CastingServer.h"
 
 #import "CommissionableDataProviderImpl.hpp"
+#import "CommissionerDiscoveryDelegateImpl.h"
 #import "ConversionUtils.hpp"
 #import "DeviceAttestationCredentialsProviderImpl.hpp"
 #import "MatterCallbacks.h"
@@ -27,10 +28,17 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/CHIPListUtils.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
+
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+#endif
 
 @interface CastingServerBridge ()
 
@@ -43,6 +51,8 @@
 @property chip::Credentials::DeviceAttestationCredentialsProvider * deviceAttestationCredentialsProvider;
 
 @property chip::CommonCaseDeviceServerInitParams * serverInitParams;
+
+@property CommissionerDiscoveryDelegateImpl * commissionerDiscoveryDelegate;
 
 @property TargetVideoPlayerInfo * previouslyConnectedVideoPlayer;
 
@@ -98,6 +108,8 @@
             return nil;
         }
 
+        _commissionerDiscoveryDelegate = new CommissionerDiscoveryDelegateImpl();
+
         _commandResponseCallbacks = [NSMutableDictionary dictionary];
         _subscriptionEstablishedCallbacks = [NSMutableDictionary dictionary];
         _subscriptionReadSuccessCallbacks = [NSMutableDictionary dictionary];
@@ -116,7 +128,6 @@
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     _commissionableDataProvider = new CommissionableDataProviderImpl();
-    _deviceAttestationCredentialsProvider = chip::Credentials::Examples::GetExampleDACProvider();
 
     _appParameters = appParameters;
     AppParams cppAppParams;
@@ -158,54 +169,12 @@
             ChipLogError(AppServer, "Failed to initialize CommissionableDataProvider: %s", ErrorStr(err));
             return [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]];
         }
-
-        if (_appParameters.deviceAttestationCredentials != nil) {
-            NSData * certificationDeclarationNsData = _appParameters.deviceAttestationCredentials.getCertificationDeclaration;
-            chip::MutableByteSpan certificationDeclaration
-                = chip::MutableByteSpan(const_cast<uint8_t *>(static_cast<const uint8_t *>(certificationDeclarationNsData.bytes)),
-                    certificationDeclarationNsData.length);
-
-            NSData * firmwareInformationNsData = _appParameters.deviceAttestationCredentials.getFirmwareInformation;
-            chip::MutableByteSpan firmwareInformation
-                = chip::MutableByteSpan(const_cast<uint8_t *>(static_cast<const uint8_t *>(firmwareInformationNsData.bytes)),
-                    firmwareInformationNsData.length);
-
-            NSData * deviceAttestationCertNsData = _appParameters.deviceAttestationCredentials.getDeviceAttestationCert;
-            chip::MutableByteSpan deviceAttestationCert
-                = chip::MutableByteSpan(const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertNsData.bytes)),
-                    deviceAttestationCertNsData.length);
-
-            NSData * productAttestationIntermediateCertNsData
-                = _appParameters.deviceAttestationCredentials.getProductAttestationIntermediateCert;
-            chip::MutableByteSpan productAttestationIntermediateCert = chip::MutableByteSpan(
-                const_cast<uint8_t *>(static_cast<const uint8_t *>(productAttestationIntermediateCertNsData.bytes)),
-                productAttestationIntermediateCertNsData.length);
-
-            NSData * deviceAttestationCertPrivateKeyNsData
-                = _appParameters.deviceAttestationCredentials.getDeviceAttestationCertPrivateKey;
-            chip::MutableByteSpan deviceAttestationCertPrivateKey = chip::MutableByteSpan(
-                const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertPrivateKeyNsData.bytes)),
-                deviceAttestationCertPrivateKeyNsData.length);
-
-            NSData * deviceAttestationCertPublicKeyKeyNsData
-                = _appParameters.deviceAttestationCredentials.getDeviceAttestationCertPublicKeyKey;
-            chip::MutableByteSpan deviceAttestationCertPublicKeyKey = chip::MutableByteSpan(
-                const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertPublicKeyKeyNsData.bytes)),
-                deviceAttestationCertPublicKeyKeyNsData.length);
-
-            _deviceAttestationCredentialsProvider = new DeviceAttestationCredentialsProviderImpl(&certificationDeclaration,
-                &firmwareInformation, &deviceAttestationCert, &productAttestationIntermediateCert, &deviceAttestationCertPrivateKey,
-                &deviceAttestationCertPublicKeyKey);
-        }
     }
     chip::DeviceLayer::SetCommissionableDataProvider(_commissionableDataProvider);
 
     _commissionableDataProvider->GetSetupPasscode(setupPasscode);
     _commissionableDataProvider->GetSetupDiscriminator(setupDiscriminator);
     _onboardingPayload = [[OnboardingPayload alloc] initWithSetupPasscode:setupPasscode setupDiscriminator:setupDiscriminator];
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(_deviceAttestationCredentialsProvider);
 
     // Initialize device attestation verifier from a constant version
     {
@@ -267,13 +236,57 @@
                                      message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]];
 }
 
+- (void)setDacHolder:(DeviceAttestationCredentialsHolder * _Nonnull)deviceAttestationCredentials
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    setDacHolderStatus:(void (^_Nonnull)(MatterError * _Nonnull))setDacHolderStatus
+{
+    dispatch_sync(_chipWorkQueue, ^{
+        NSData * certificationDeclarationNsData = deviceAttestationCredentials.getCertificationDeclaration;
+        chip::MutableByteSpan certificationDeclaration
+            = chip::MutableByteSpan(const_cast<uint8_t *>(static_cast<const uint8_t *>(certificationDeclarationNsData.bytes)),
+                certificationDeclarationNsData.length);
+
+        NSData * firmwareInformationNsData = deviceAttestationCredentials.getFirmwareInformation;
+        chip::MutableByteSpan firmwareInformation = chip::MutableByteSpan(
+            const_cast<uint8_t *>(static_cast<const uint8_t *>(firmwareInformationNsData.bytes)), firmwareInformationNsData.length);
+
+        NSData * deviceAttestationCertNsData = deviceAttestationCredentials.getDeviceAttestationCert;
+        chip::MutableByteSpan deviceAttestationCert
+            = chip::MutableByteSpan(const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertNsData.bytes)),
+                deviceAttestationCertNsData.length);
+
+        NSData * productAttestationIntermediateCertNsData = deviceAttestationCredentials.getProductAttestationIntermediateCert;
+        chip::MutableByteSpan productAttestationIntermediateCert = chip::MutableByteSpan(
+            const_cast<uint8_t *>(static_cast<const uint8_t *>(productAttestationIntermediateCertNsData.bytes)),
+            productAttestationIntermediateCertNsData.length);
+
+        self->_deviceAttestationCredentialsProvider
+            = new DeviceAttestationCredentialsProviderImpl(&certificationDeclaration, &firmwareInformation, &deviceAttestationCert,
+                &productAttestationIntermediateCert, deviceAttestationCredentials.getDeviceAttestationCertPrivateKeyRef);
+
+        SetDeviceAttestationCredentialsProvider(self->_deviceAttestationCredentialsProvider);
+
+        dispatch_async(clientQueue, ^{
+            setDacHolderStatus([[MatterError alloc] initWithCode:CHIP_NO_ERROR.AsInteger()
+                                                         message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]]);
+        });
+    });
+}
+
 - (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
-    discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler
+      discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler
+    discoveredCommissionerHandler:(nullable void (^)(DiscoveredNodeData *))discoveredCommissionerHandler
 {
     ChipLogProgress(AppServer, "CastingServerBridge().discoverCommissioners() called");
     dispatch_async(_chipWorkQueue, ^{
         bool discoveryRequestStatus = true;
-        CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners();
+
+        if (discoveredCommissionerHandler != nil) {
+            TargetVideoPlayerInfo * cachedTargetVideoPlayerInfos = CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
+            self->_commissionerDiscoveryDelegate->SetUp(clientQueue, discoveredCommissionerHandler, cachedTargetVideoPlayerInfos);
+        }
+        CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners(
+            discoveredCommissionerHandler != nil ? self->_commissionerDiscoveryDelegate : nullptr);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "CastingServerBridge().discoverCommissioners() failed: %" CHIP_ERROR_FORMAT, err.Format());
             discoveryRequestStatus = false;
@@ -602,7 +615,8 @@
             self->_previouslyConnectedVideoPlayer->Initialize(currentTargetVideoPlayerInfo->GetNodeId(),
                 currentTargetVideoPlayerInfo->GetFabricIndex(), nullptr, nullptr, currentTargetVideoPlayerInfo->GetVendorId(),
                 currentTargetVideoPlayerInfo->GetProductId(), currentTargetVideoPlayerInfo->GetDeviceType(),
-                currentTargetVideoPlayerInfo->GetDeviceName(), currentTargetVideoPlayerInfo->GetNumIPs(),
+                currentTargetVideoPlayerInfo->GetDeviceName(), currentTargetVideoPlayerInfo->GetHostName(),
+                currentTargetVideoPlayerInfo->GetNumIPs(),
                 const_cast<chip::Inet::IPAddress *>(currentTargetVideoPlayerInfo->GetIpAddresses()));
 
             TargetEndpointInfo * prevEndpoints = self->_previouslyConnectedVideoPlayer->GetEndpoints();
@@ -640,6 +654,17 @@
         CastingServer::GetInstance()->Disconnect();
         dispatch_async(clientQueue, ^{
             requestSentHandler();
+        });
+    });
+}
+
+- (void)purgeCache:(dispatch_queue_t _Nonnull)clientQueue responseHandler:(void (^)(MatterError * _Nonnull))responseHandler
+{
+    dispatch_sync(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->PurgeCache();
+        dispatch_async(clientQueue, ^{
+            responseHandler([[MatterError alloc] initWithCode:err.AsInteger()
+                                                      message:[NSString stringWithUTF8String:err.AsString()]]);
         });
     });
 }
@@ -784,7 +809,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
                 callback();
@@ -891,7 +916,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"levelControl_subscribeCurrentLevel"];
                 callback();
@@ -936,7 +961,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"levelControl_subscribeMinLevel"];
                 callback();
@@ -981,7 +1006,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"levelControl_subscribeMaxLevel"];
                 callback();
@@ -1166,6 +1191,102 @@
     });
 }
 
+- (void)mediaPlayback_previous:(ContentApp * _Nonnull)contentApp
+              responseCallback:(void (^_Nonnull)(bool))responseCallback
+                   clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+            requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_previous() called on Content App with endpoint ID %d",
+        contentApp.endpointId);
+
+    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_previous"];
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Previous(&endpoint, [](CHIP_ERROR err) {
+            void (^responseCallback)(bool) =
+                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_previous"];
+            responseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)mediaPlayback_rewind:(ContentApp * _Nonnull)contentApp
+            responseCallback:(void (^_Nonnull)(bool))responseCallback
+                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+          requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(
+        AppServer, "CastingServerBridge().mediaPlayback_rewind() called on Content App with endpoint ID %d", contentApp.endpointId);
+
+    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_rewind"];
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Rewind(&endpoint, [](CHIP_ERROR err) {
+            void (^responseCallback)(bool) =
+                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_rewind"];
+            responseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)mediaPlayback_fastForward:(ContentApp * _Nonnull)contentApp
+                 responseCallback:(void (^_Nonnull)(bool))responseCallback
+                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+               requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_fastForward() called on Content App with endpoint ID %d",
+        contentApp.endpointId);
+
+    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_fastForward"];
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_FastForward(&endpoint, [](CHIP_ERROR err) {
+            void (^responseCallback)(bool) =
+                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_fastForward"];
+            responseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)mediaPlayback_startOver:(ContentApp * _Nonnull)contentApp
+               responseCallback:(void (^_Nonnull)(bool))responseCallback
+                    clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+             requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_startOver() called on Content App with endpoint ID %d",
+        contentApp.endpointId);
+
+    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_startOver"];
+    dispatch_async(_chipWorkQueue, ^{
+        TargetEndpointInfo endpoint;
+        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_StartOver(&endpoint, [](CHIP_ERROR err) {
+            void (^responseCallback)(bool) =
+                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_startOver"];
+            responseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
 - (void)mediaPlayback_subscribeCurrentState:(ContentApp * _Nonnull)contentApp
                                 minInterval:(uint16_t)minInterval
                                 maxInterval:(uint16_t)maxInterval
@@ -1202,7 +1323,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeCurrentState"];
                 callback();
@@ -1247,7 +1368,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeStartTime"];
                 callback();
@@ -1292,7 +1413,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeDuration"];
                 callback();
@@ -1352,7 +1473,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeSampledPosition"];
                 callback();
@@ -1399,7 +1520,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribePlaybackSpeed"];
                 callback();
@@ -1446,7 +1567,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeSeekRangeEnd"];
                 callback();
@@ -1493,7 +1614,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeSeekRangeStart"];
                 callback();
@@ -1664,7 +1785,7 @@
                     while (iter.Next()) {
                         const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & targetInfo
                             = iter.GetValue();
-                        TargetNavigator_TargetInfoStruct * objCTargetInfo = [[TargetNavigator_TargetInfoStruct alloc]
+                        TargetNavigator_TargetInfoStruct * objCTargetInfoStruct = [[TargetNavigator_TargetInfoStruct alloc]
                             initWithIdentifier:@(targetInfo.identifier)
                                           name:[NSString stringWithUTF8String:targetInfo.name.data()]];
                         [objCTargetList addObject:objCTargetInfoStruct];
@@ -1678,7 +1799,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"targetNavigator_subscribeTargetList"];
                 callback();
@@ -1725,7 +1846,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"targetNavigator_subscribeCurrentTarget"];
                 callback();
@@ -1799,7 +1920,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeVendorName"];
                 callback();
@@ -1845,7 +1966,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeVendorID"];
                 callback();
@@ -1893,7 +2014,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeApplicationName"];
                 callback();
@@ -1939,7 +2060,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeProductID"];
                 callback();
@@ -1988,7 +2109,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeApplicationVersion"];
                 callback();

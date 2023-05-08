@@ -79,7 +79,7 @@ CHIP_ERROR WriteResponseMessage::Parser::PrettyPrint() const
 CHIP_ERROR WriteResponseMessage::Parser::GetWriteResponses(AttributeStatusIBs::Parser * const apWriteResponses) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kWriteResponses)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kWriteResponses), reader));
     return apWriteResponses->Init(reader);
 }
 

@@ -27,14 +27,18 @@ get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH
 set(CONF_FILE prj.conf)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_DEVICE_PRODUCT_ID}")
 set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${CONFIG_DEVICE_VENDOR_ID}")
+set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_DEVICE_PRODUCT_ID}")
+if(NOT ${CONFIG_DEVICE_PRODUCT_NAME} STREQUAL "")
+    set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\"${CONFIG_DEVICE_PRODUCT_NAME}\"")
+endif()
 set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_PLATFORM_NRFCONNECT=1")
 if(NOT ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING} STREQUAL "")
   set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING}\"")
 endif()
-message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
 message(STATUS "Vendor ID " ${CONFIG_DEVICE_VENDOR_ID})
+message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
+message(STATUS "Product Name " ${CONFIG_DEVICE_PRODUCT_NAME})
 message(STATUS "SW Version String" ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING})
 
 # Set Kconfig root files that will be processed as a first Kconfig for used child images.
@@ -67,6 +71,7 @@ target_include_directories(app PRIVATE
                            ${CHEF}
                            ${GEN_DIR}/../
                            ${CHIP_ROOT}/src
+                           ${CHIP_ROOT}/examples/shell/shell_common/include
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include
 )

@@ -35,4 +35,16 @@ class StartFromCacheViewModel: ObservableObject {
             })
         }
     }
+    
+    func purgeAndReReadCache() {
+        if let castingServerBridge = CastingServerBridge.getSharedInstance()
+        {
+            castingServerBridge.purgeCache(DispatchQueue.main, responseHandler: { (error: MatterError) -> () in
+                DispatchQueue.main.async {
+                    self.Log.info("purgeCache returned \(error)")
+                    self.readFromCache()
+                }
+            })
+        }
+    }
 }

@@ -17,11 +17,8 @@
 
 #include <app/util/af.h>
 
-#include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -395,7 +392,7 @@ int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoin
     // min/max are user imposed min/max
 
     // Note that the limits are initialized above per the spec limits
-    // if they are not present emberAfReadAttribute() will not update the value so the defaults are used
+    // if they are not present Get() will not update the value so the defaults are used
     EmberAfStatus status;
 
     // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
@@ -466,7 +463,7 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
     // min/max are user imposed min/max
 
     // Note that the limits are initialized above per the spec limits
-    // if they are not present emberAfReadAttribute() will not update the value so the defaults are used
+    // if they are not present Get() will not update the value so the defaults are used
     EmberAfStatus status;
 
     // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
@@ -753,7 +750,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
         break;
     }
 
-    emberAfSendImmediateDefaultResponse(status);
+    commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
     return true;
 }
 

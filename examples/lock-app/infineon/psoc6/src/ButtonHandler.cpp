@@ -99,11 +99,7 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
     timerId = (uint32_t) pvTimerGetTimerID(xTimer);
     if (timerId)
     {
-        buttonevent = cyhal_gpio_read(APP_FUNCTION_BUTTON);
-        if (buttonevent)
-        {
-            GetAppTask().ButtonEventHandler(timerId, APP_BUTTON_PRESSED);
-        }
+        GetAppTask().ButtonEventHandler(timerId, APP_BUTTON_PRESSED);
     }
     else
     {

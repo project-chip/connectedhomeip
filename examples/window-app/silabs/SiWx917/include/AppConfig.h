@@ -35,7 +35,7 @@ extern "C" {
 #define LIFT_OPEN_LIMIT 0
 #define LIFT_CLOSED_LIMIT (LCD_COVER_SIZE - 1)
 #define LIFT_DELTA 1000 // 10%
-#define TILT_OPEN_LIMIT 1
+#define TILT_OPEN_LIMIT 0
 #define TILT_CLOSED_LIMIT (LCD_COVER_SIZE / 10 - 1)
 #define TILT_DELTA 1000 // 10%
 

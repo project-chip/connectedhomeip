@@ -29,7 +29,6 @@
 #include "AppEvent.h"
 #include "BaseApplication.h"
 #include "FreeRTOS.h"
-#include "sl_simple_button_instances.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>
@@ -77,7 +76,7 @@ public:
      * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
-    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction) override;
+    static void ButtonEventHandler(uint8_t button, uint8_t btnAction) override;
 
     /**
      * @brief Callback called by the identify-server when an identify command is received

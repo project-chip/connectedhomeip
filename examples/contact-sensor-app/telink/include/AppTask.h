@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,32 +18,16 @@
 
 #pragma once
 
-#include "AppEvent.h"
+#include "AppTaskCommon.h"
 #include "ContactSensorManager.h"
-#include "LEDWidget.h"
-
-#include <zephyr/drivers/gpio.h>
-
-#include <platform/CHIPDeviceLayer.h>
-
-#if CONFIG_CHIP_FACTORY_DATA
-#include <platform/telink/FactoryDataProvider.h>
-#endif
-
-#include <cstdint>
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
 
-struct k_timer;
-
-class AppTask
+class AppTask : public AppTaskCommon
 {
 public:
-    CHIP_ERROR StartApp(void);
-
     void PostContactActionRequest(ContactSensorManager::Action aAction);
-    void PostEvent(AppEvent * event);
     void UpdateClusterState(void);
     void UpdateDeviceState(void);
 
@@ -52,43 +36,20 @@ public:
 
 private:
     friend AppTask & GetAppTask(void);
-    CHIP_ERROR Init(void);
+    friend class AppTaskCommon;
 
-    void DispatchEvent(AppEvent * event);
+    CHIP_ERROR Init(void);
 
     static void OnStateChanged(ContactSensorManager::State aState);
 
     static void UpdateClusterStateInternal(intptr_t arg);
     static void UpdateDeviceStateInternal(intptr_t arg);
 
-    static void UpdateStatusLED(void);
-    static void LEDStateUpdateHandler(LEDWidget * ledWidget);
-    static void FactoryResetButtonEventHandler(void);
-    static void StartBleAdvButtonEventHandler(void);
-    static void ToggleContactStateButtonEventHandler(void);
-
-    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
-    static void FactoryResetTimerTimeoutCallback(k_timer * timer);
-
-    static void FactoryResetTimerEventHandler(AppEvent * aEvent);
-    static void FactoryResetHandler(AppEvent * aEvent);
-    static void StartBleAdvHandler(AppEvent * aEvent);
     static void ContactActionEventHandler(AppEvent * aEvent);
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
-
-    static void InitButtons(void);
-
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     bool mSyncClusterToButtonAction = false;
 
     static AppTask sAppTask;
-
-#if CONFIG_CHIP_FACTORY_DATA
-    // chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
-    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
-#endif
 };
 
 inline AppTask & GetAppTask(void)

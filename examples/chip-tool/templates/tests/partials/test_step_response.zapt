@@ -15,16 +15,6 @@ switch(mTestSubStepIndex)
 {{/if}}
 {{/inline~}}
 
-{{~#*inline "maybeReturnOnUnsupported"}}
-{{~#if optional}}
-    if (IsUnsupported(status.mStatus))
-    {
-        {{>maybeContinueWithoutWaitingOnDone}}
-        return;
-    }
-{{/if~}}
-{{/inline~}}
-
 {{! --- Test Step Response Content --}}
 {{#if ../expectMultipleResponses}}
   case {{index}}:
@@ -33,14 +23,13 @@ switch(mTestSubStepIndex)
     VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{error}}));
     {{>maybeCheckClusterError}}
 {{else}}
-    {{>maybeReturnOnUnsupported}}
     VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{error}}));
     {{#if hasSpecificResponse}}
     {
         {{asDecodableType}} value;
         VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
         {{#chip_tests_item_response_parameters}}
-            {{>maybeCheckExpectedValue}}
+            {{>maybeCheckExpectedValue cluster=../cluster}}
             {{>maybeCheckExpectedConstraints}}
             {{>maybeSaveAs}}
         {{/chip_tests_item_response_parameters}}

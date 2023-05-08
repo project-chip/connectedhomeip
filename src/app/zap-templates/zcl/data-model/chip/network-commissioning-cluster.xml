@@ -87,7 +87,7 @@ limitations under the License.
             <description>MaxNetworks</description>
             <access op="read" privilege="administer"/>
         </attribute>
-        <attribute side="server" code="0x0001" define="NETWORKS" type="ARRAY" entryType="NetworkInfo" length="12" writable="false" optional="false">
+        <attribute side="server" code="0x0001" define="NETWORKS" type="ARRAY" entryType="NetworkInfo" writable="false" optional="false">
             <description>Networks</description>
             <access op="read" privilege="administer"/>
         </attribute>

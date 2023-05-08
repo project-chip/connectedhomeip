@@ -52,7 +52,8 @@ public:
         std::function<void(const app::ConcreteDataAttributePath & aPath, const DecodableAttributeType & aData)>;
     using OnErrorCallbackType = std::function<void(const app::ConcreteDataAttributePath * aPath, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(TypedReadAttributeCallback * callback)>;
-    using OnSubscriptionEstablishedCallbackType = std::function<void(const app::ReadClient & readClient)>;
+    using OnSubscriptionEstablishedCallbackType =
+        std::function<void(const app::ReadClient & readClient, SubscriptionId aSubscriptionId)>;
     using OnResubscriptionAttemptCallbackType =
         std::function<void(const app::ReadClient & readClient, CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec)>;
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
@@ -127,7 +128,7 @@ private:
     {
         if (mOnSubscriptionEstablished)
         {
-            mOnSubscriptionEstablished(*mReadClient.get());
+            mOnSubscriptionEstablished(*mReadClient.get(), aSubscriptionId);
         }
     }
 
@@ -175,7 +176,8 @@ public:
     using OnSuccessCallbackType = std::function<void(const app::EventHeader & aEventHeader, const DecodableEventType & aData)>;
     using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader, CHIP_ERROR aError)>;
     using OnDoneCallbackType    = std::function<void(app::ReadClient * apReadClient)>;
-    using OnSubscriptionEstablishedCallbackType = std::function<void(const app::ReadClient & aReadClient)>;
+    using OnSubscriptionEstablishedCallbackType =
+        std::function<void(const app::ReadClient & aReadClient, SubscriptionId aSubscriptionId)>;
     using OnResubscriptionAttemptCallbackType =
         std::function<void(const app::ReadClient & aReadClient, CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec)>;
 
@@ -260,7 +262,7 @@ private:
     {
         if (mOnSubscriptionEstablished)
         {
-            mOnSubscriptionEstablished(*mReadClient.get());
+            mOnSubscriptionEstablished(*mReadClient.get(), aSubscriptionId);
         }
     }
 

@@ -1,0 +1,80 @@
+/ {
+	aliases {
+		pwm-led0 = &pwm_led0;
+		pwm-led1 = &pwm_led1;
+		pwm-led2 = &pwm_led2;
+		pwm-led3 = &pwm_led3;
+	};
+
+	pwm_leds {
+		/delete-node/ pwm_led_0;
+		pwm_led0: pwm_led_0 {
+			pwms = <&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			label = "PWM LED Blue";
+		};
+		pwm_led1: pwm_led_1 {
+			pwms = <&pwm0 3 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			label = "PWM LED Green";
+		};
+		pwm_led2: pwm_led_2 {
+			pwms = <&pwm0 2 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			label = "PWM LED Red";
+		};
+		pwm_led3: pwm_led_3 {
+			pwms = <&pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			label = "PWM IDENTIFY LED Green";
+	    };
+    };
+};
+
+&pinctrl {
+	pwm_ch0_pb4_default: pwm_ch0_pb4_default {
+		pinmux = <B91_PINMUX_SET(B91_PORT_B, B91_PIN_4, B91_FUNC_B)>;
+	};
+	pwm_ch1_pb5_default: pwm_ch1_pb5_default {
+		pinmux = <B91_PINMUX_SET(B91_PORT_B, B91_PIN_5, B91_FUNC_C)>;
+	};
+	pwm_ch2_pe2_default: pwm_ch2_pe2_default {
+		pinmux = <B91_PINMUX_SET(B91_PORT_E, B91_PIN_2, B91_FUNC_C)>;
+	};
+	pwm_ch3_pe0_default: pwm_ch3_pe0_default {
+		pinmux = <B91_PINMUX_SET(B91_PORT_E, B91_PIN_0, B91_FUNC_C)>;
+	};
+};
+
+&pwm0 {
+	pinctrl-0 = <&pwm_ch0_pb4_default &pwm_ch1_pb5_default &pwm_ch2_pe2_default &pwm_ch3_pe0_default>;
+};
+
+&flash {
+	reg = <0x20000000 0x200000>;
+
+	partitions {
+		/delete-node/ partition@0;
+		/delete-node/ partition@18000;
+		/delete-node/ partition@84000;
+		/delete-node/ partition@f0000;
+		/delete-node/ partition@f4000;
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x13000>;
+		};
+		slot0_partition: partition@13000 {
+			label = "image-0";
+			reg = <0x13000 0xf1000>;
+		};
+		factory_partition: partition@104000 {
+			label = "factory-data";
+			reg = <0x104000 0x1000>;
+		};
+		storage_partition: partition@105000 {
+			label = "storage";
+			reg = <0x105000 0x8000>;
+		};
+		slot1_partition: partition@10d000 {
+			label = "image-1";
+			reg = <0x10d000 0xf1000>;
+		};
+		/* region <0x1fe000 0x2000> is reserved for Telink B91 SDK's data */
+	};
+};

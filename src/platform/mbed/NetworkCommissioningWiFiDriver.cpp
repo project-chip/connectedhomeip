@@ -69,14 +69,16 @@ CHIP_ERROR WiFiDriverImpl::Init(NetworkStatusChangeCallback * networkStatusChang
     auto err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid), &ssidLen);
     if (err == CHIP_NO_ERROR)
     {
-        mSavedNetwork.ssidLen = ssidLen;
+        static_assert(sizeof(mSavedNetwork.ssid) <= UINT8_MAX, "Our length might not fit in mSavedNetwork.ssidLen");
+        mSavedNetwork.ssidLen = static_cast<uint8_t>(ssidLen);
     }
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
     if (err == CHIP_NO_ERROR)
     {
-        mSavedNetwork.credentialsLen = credentialsLen;
+        static_assert(sizeof(mSavedNetwork.credentials) <= UINT8_MAX, "Our length might not fit in mSavedNetwork.credentialsLen");
+        mSavedNetwork.credentialsLen = static_cast<uint8_t>(credentialsLen);
     }
 
     if (mSavedNetwork.ssidLen != 0 && mSavedNetwork.credentialsLen != 0)
@@ -291,16 +293,25 @@ void WiFiDriverImpl::ExecuteScanNetwork()
     MbedScanResponseIterator * scan_resp_iter;
 
     // Get APs number
-    ap_number = mWiFiInterface->scan(nullptr, 0);
-    if (!ap_number)
+    auto scan_result = mWiFiInterface->scan(nullptr, 0);
+    if (scan_result <= 0)
     {
-        ChipLogProgress(DeviceLayer, "No AP found");
+        if (scan_result == 0)
+        {
+            ChipLogProgress(DeviceLayer, "No AP found");
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Error scanning for APs: %d", scan_result);
+        }
         if (mScanCallback)
         {
             mScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         }
         goto exit;
     }
+
+    ap_number = static_cast<uint16_t>(scan_result);
 
     ap_buffer = new WiFiAccessPoint[ap_number];
     if (ap_buffer == nullptr)

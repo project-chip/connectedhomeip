@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -108,8 +108,8 @@ public:
     // signing certificate and operational public key, using the given fabric
     // id, node id, and CATs.
     static CHIP_ERROR GenerateOperationalCertificate(id<MTRKeypair> signingKeypair, NSData * signingCertificate,
-        SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId,
-        NSArray<NSNumber *> * _Nullable caseAuthenticatedTags, NSData * _Nullable __autoreleasing * _Nonnull operationalCert);
+        SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId, NSSet<NSNumber *> * _Nullable caseAuthenticatedTags,
+        NSData * _Nullable __autoreleasing * _Nonnull operationalCert);
 
 private:
     static bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
@@ -121,7 +121,7 @@ private:
     // Called asynchronously in response to the MTROperationalCertificateIssuer
     // calling the completion we passed it when asking it to generate a NOC
     // chain.
-    void ExternalNOCChainGenerated(MTROperationalCertificateInfo * _Nullable info, NSError * _Nullable error);
+    void ExternalNOCChainGenerated(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error);
 
     CHIP_ERROR ExternalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,

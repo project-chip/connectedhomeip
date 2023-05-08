@@ -41,6 +41,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::app::Clusters::UnitTesting::Commands;
 using namespace chip::app::Clusters::UnitTesting::Attributes;
+using chip::Protocols::InteractionModel::Status;
 
 // The number of elements in the test attribute list
 constexpr uint8_t kAttributeListLength = 4;
@@ -674,7 +675,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
 
 } // namespace
 
-bool emberAfUnitTestingClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                            const Clusters::UnitTesting::Commands::Test::DecodableType & commandData)
 {
     // Setup the test variables
@@ -696,7 +697,7 @@ bool emberAfUnitTestingClusterTestCallback(app::CommandHandler *, const app::Con
 
     gNullablesAndOptionalsStruct = Structs::NullablesAndOptionalsStruct::Type();
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 
@@ -720,7 +721,8 @@ bool emberAfUnitTestingClusterTestAddArgumentsCallback(CommandHandler * apComman
 {
     if (commandData.arg1 > UINT8_MAX - commandData.arg2)
     {
-        return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        apCommandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
     }
 
     TestAddArgumentsResponse::Type responseData;
@@ -766,7 +768,7 @@ bool emberAfUnitTestingClusterTestListStructArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
@@ -787,7 +789,7 @@ bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
 
     if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
     commandObj->AddResponse(commandPath, responseData);
@@ -803,7 +805,7 @@ bool emberAfUnitTestingClusterTestEmitTestFabricScopedEventRequestCallback(
     event.fabricIndex = commandData.arg1;
     if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
     commandObj->AddResponse(commandPath, responseData);
@@ -825,7 +827,7 @@ bool emberAfUnitTestingClusterTestListInt8UArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != uint8Iterator.GetStatus())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
@@ -847,7 +849,7 @@ bool emberAfUnitTestingClusterTestNestedStructListArgumentRequestCallback(
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
@@ -875,14 +877,14 @@ bool emberAfUnitTestingClusterTestListNestedStructListArgumentRequestCallback(
 
         if (CHIP_NO_ERROR != subStructIterator.GetStatus())
         {
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            commandObj->AddStatus(commandPath, Status::Failure);
             return true;
         }
     }
 
     if (CHIP_NO_ERROR != structIterator.GetStatus())
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
@@ -921,7 +923,7 @@ bool emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(
     }
 
 exit:
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    commandObj->AddStatus(commandPath, Status::Failure);
     return true;
 }
 

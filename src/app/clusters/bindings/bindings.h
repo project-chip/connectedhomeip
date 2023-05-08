@@ -28,4 +28,4 @@
  *
  * @param entry binding to add
  */
-void AddBindingEntry(const EmberBindingTableEntry & entry);
+CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry);

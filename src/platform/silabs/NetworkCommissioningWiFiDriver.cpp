@@ -38,27 +38,28 @@ SlScanResponseIterator<NetworkCommissioning::WiFiScanResponse> mScanResponseIter
 CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
-    size_t ssidLen        = 0;
-    size_t credentialsLen = 0;
-    mpScanCallback        = nullptr;
-    mpConnectCallback     = nullptr;
+    size_t ssidLen         = 0;
+    size_t credentialsLen  = 0;
+    mpScanCallback         = nullptr;
+    mpConnectCallback      = nullptr;
+    mpStatusChangeCallback = networkStatusChangeCallback;
 
-#ifdef CHIP_ONNETWORK_PAIRING
-    memcpy(&mSavedNetwork.ssid[0], CHIP_WIFI_SSID, sizeof(CHIP_WIFI_SSID));
-    memcpy(&mSavedNetwork.credentials[0], CHIP_WIFI_PSK, sizeof(CHIP_WIFI_PSK));
-    credentialsLen               = sizeof(CHIP_WIFI_PSK);
-    ssidLen                      = sizeof(CHIP_WIFI_SSID);
+#ifdef SL_ONNETWORK_PAIRING
+    memcpy(&mSavedNetwork.ssid[0], SL_WIFI_SSID, sizeof(SL_WIFI_SSID));
+    memcpy(&mSavedNetwork.credentials[0], SL_WIFI_PSK, sizeof(SL_WIFI_PSK));
+    credentialsLen               = sizeof(SL_WIFI_PSK);
+    ssidLen                      = sizeof(SL_WIFI_SSID);
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;
     err                          = CHIP_NO_ERROR;
 #else
     // If reading fails, wifi is not provisioned, no need to go further.
-    err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
+    err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
                                            ssidLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_WiFiPSK, mSavedNetwork.credentials,
+    err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mSavedNetwork.credentials,
                                            sizeof(mSavedNetwork.credentials), credentialsLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
@@ -74,9 +75,9 @@ CHIP_ERROR SlWiFiDriver::CommitConfiguration()
 {
     uint8_t securityType = WFX_SEC_WPA2;
 
-    ReturnErrorOnFailure(SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
-    ReturnErrorOnFailure(SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
-    ReturnErrorOnFailure(SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
 
     mSavedNetwork = mStagingNetwork;
     return CHIP_NO_ERROR;
@@ -135,11 +136,12 @@ Status SlWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCh
 
 CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
+    int32_t status = SL_STATUS_OK;
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Disconecting for current wifi");
-        int32_t status = wfx_sta_discon();
-        if (status != 0)
+        status = wfx_sta_discon();
+        if (status != SL_STATUS_OK)
         {
             return CHIP_ERROR_INTERNAL;
         }
@@ -149,7 +151,7 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     wfx_wifi_provision_t wifiConfig = {};
     memcpy(wifiConfig.ssid, ssid, ssidLen);
     memcpy(wifiConfig.passkey, key, keyLen);
-    wifiConfig.security = WFX_SEC_WPA_WPA2_MIXED;
+    wifiConfig.security = WFX_SEC_WPA2;
 
     ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s", static_cast<int>(ssidLen), ssid);
     // Configure the WFX WiFi interface.
@@ -157,6 +159,32 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
     return CHIP_NO_ERROR;
+}
+
+// TODO: Re-write implementation with proper driver based callback
+void SlWiFiDriver::UpdateNetworkingStatus()
+{
+    if (mpStatusChangeCallback == nullptr)
+    {
+        ChipLogError(NetworkProvisioning, "networkStatusChangeCallback is nil");
+        return;
+    }
+
+    if (mStagingNetwork.ssidLen == 0)
+    {
+        ChipLogError(NetworkProvisioning, "ssidLen is 0");
+        return;
+    }
+
+    ByteSpan networkId = ByteSpan((const unsigned char *) mStagingNetwork.ssid, mStagingNetwork.ssidLen);
+    if (!wfx_is_sta_connected())
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId),
+                                                         MakeOptional((int32_t) SL_STATUS_FAIL));
+        return;
+    }
+    mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(networkId),
+                                                     MakeOptional((int32_t) SL_STATUS_OK));
 }
 
 void SlWiFiDriver::OnConnectWiFiNetwork()
@@ -194,22 +222,22 @@ exit:
     }
 }
 
-chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(uint8_t security)
+chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(wfx_sec_t security)
 {
     chip::BitFlags<WiFiSecurity> securityType;
     if (security == WFX_SEC_NONE)
     {
         securityType = WiFiSecurity::kUnencrypted;
     }
-    else if (security & WFX_SEC_WEP)
+    else if (security == WFX_SEC_WEP)
     {
         securityType = WiFiSecurity::kWep;
     }
-    else if (security & WFX_SEC_WPA)
+    else if (security == WFX_SEC_WPA)
     {
         securityType = WiFiSecurity::kWpaPersonal;
     }
-    else if (security & WFX_SEC_WPA2)
+    else if (security == WFX_SEC_WPA2)
     {
         securityType = WiFiSecurity::kWpa2Personal;
     }

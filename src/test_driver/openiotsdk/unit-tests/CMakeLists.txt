@@ -22,6 +22,13 @@ get_filename_component(OPEN_IOT_SDK_EXAMPLE_COMMON ${CHIP_ROOT}/examples/platfor
 
 list(APPEND CMAKE_MODULE_PATH ${OPEN_IOT_SDK_CONFIG}/cmake)
 
+# Application CHIP build configuration 
+set(CONFIG_CHIP_LIB_TESTS YES)
+set(CONFIG_CHIP_DETAIL_LOGGING NO)
+set(CONFIG_CHIP_PROGRESS_LOGGING NO)
+set(CONFIG_CHIP_AUTOMATION_LOGGING YES)
+set(CONFIG_CHIP_ERROR_LOGGING NO)
+
 # Toolchain files need to exist before first call to project
 include(toolchain)
 
@@ -38,13 +45,6 @@ if(TARGET lwip-cmsis-port)
             lwip-config
     )
 endif()
-
-# Application CHIP build configuration 
-set(CONFIG_CHIP_LIB_TESTS YES)
-set(CONFIG_CHIP_DETAIL_LOGGING NO)
-set(CONFIG_CHIP_PROGRESS_LOGGING NO)
-set(CONFIG_CHIP_AUTOMATION_LOGGING YES)
-set(CONFIG_CHIP_ERROR_LOGGING NO)
 
 include(chip)
 
@@ -74,7 +74,6 @@ foreach(TEST_NAME IN LISTS TEST_NAMES_FROM_FILE)
     target_link_options(${TEST_NAME}
         PUBLIC
             -Wl,--whole-archive "${CMAKE_CURRENT_BINARY_DIR}/chip_build/lib/lib${TEST_NAME}.a"
-            -Wl,--no-whole-archive "${CMAKE_CURRENT_BINARY_DIR}/chip_build/lib/libCHIP_tests.a"
             -Wl,--no-whole-archive)
 
     # set_target_link requires APP_TARGET to be defined

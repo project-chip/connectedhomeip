@@ -9,16 +9,19 @@ from lark.tree import Meta
 # Helpful when referencing data items in logs when processing
 @dataclass
 class ParseMetaData:
-    line: int
-    column: int
+    line: Optional[int]
+    column: Optional[int]
+    start_pos: Optional[int]
 
-    def __init__(self, meta: Meta = None, line: int = None, column: int = None):
+    def __init__(self, meta: Optional[Meta] = None, line: Optional[int] = None, column: Optional[int] = None, start_pos: Optional[int] = None):
         if meta:
-            self.line = meta.line
-            self.column = meta.column
+            self.line = getattr(meta, 'line', None)
+            self.column = getattr(meta, 'column', None)
+            self.start_pos = getattr(meta, 'start_pos', None)
         else:
             self.line = line
             self.column = column
+            self.start_pos = start_pos
 
 
 class StructQuality(enum.Flag):
@@ -44,6 +47,7 @@ class AttributeQuality(enum.Flag):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
+    TIMED_WRITE = enum.auto()
 
 
 class AttributeStorage(enum.Enum):
@@ -135,6 +139,10 @@ class Attribute:
     def is_subscribable(self):
         return not (AttributeQuality.NOSUBSCRIBE & self.qualities)
 
+    @property
+    def requires_timed_write(self):
+        return AttributeQuality.TIMED_WRITE & self.qualities
+
 
 @dataclass
 class Struct:
@@ -187,6 +195,10 @@ class Command:
     output_param: str
     qualities: CommandQuality = CommandQuality.NONE
     invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None)
 
     @property
     def is_timed_invoke(self):
@@ -204,6 +216,7 @@ class Cluster:
     attributes: List[Attribute] = field(default_factory=list)
     structs: List[Struct] = field(default_factory=list)
     commands: List[Command] = field(default_factory=list)
+    description: Optional[str] = None
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)
@@ -223,6 +236,7 @@ class AttributeInstantiation:
 class ServerClusterInstantiation:
     name: str
     attributes: List[AttributeInstantiation] = field(default_factory=list)
+    events_emitted: Set[str] = field(default_factory=set)
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)
@@ -239,7 +253,8 @@ class DeviceType:
 class Endpoint:
     number: int
     device_types: List[DeviceType] = field(default_factory=list)
-    server_clusters: List[ServerClusterInstantiation] = field(default_factory=list)
+    server_clusters: List[ServerClusterInstantiation] = field(
+        default_factory=list)
     client_bindings: List[str] = field(default_factory=list)
 
 

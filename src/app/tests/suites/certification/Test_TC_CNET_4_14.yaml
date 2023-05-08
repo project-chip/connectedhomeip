@@ -148,7 +148,7 @@ tests:
           should be repeated RemainingNetwor kSlots times using DIFFERENT
           OperationalDatase t values and Breadcrumb set to 1. Note that these
           credentials are NOT required to be connectable."
-      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      PICS: CNET.S.C03.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning add-or-update-thread-network hex:1011101122222229 1 0 --Breadcrumb 1
 
@@ -274,7 +274,7 @@ tests:
           should be repeated RemainingNetwor kSlots times using DIFFERENT
           OperationalDatase t values and Breadcrumb set to 1. Note that these
           credentials are NOT required to be connectable"
-      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      PICS: CNET.S.C03.Rsp && CNET.S.C05.Tx
       verification: |
           The test case is not verifiable in RPI platform. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)

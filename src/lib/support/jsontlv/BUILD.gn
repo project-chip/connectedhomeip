@@ -27,4 +27,6 @@ static_library("jsontlv") {
     "${chip_root}/src/lib/core",
     jsoncpp_root,
   ]
+
+  cflags = [ "-Wconversion" ]
 }

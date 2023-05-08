@@ -5,7 +5,38 @@ package com.matter.tv.app.api;
  * the rest of the media clusters TODO : Maybe generate using ZAP tool
  */
 public class Clusters {
+
   // Clusters
+  public static class AccountLogin {
+    public static final int Id = 0x050E;
+
+    public static class Commands {
+      public static class GetSetupPIN {
+        public static final int ID = 0x00;
+
+        public static class Fields {
+          public static final int TempAccountIdentifier = 0x00;
+        }
+      }
+
+      public static class GetSetupPINResponse {
+        public static final int ID = 0x01;
+
+        public static class Fields {
+          public static final int SetupPIN = 0x00;
+        }
+      }
+
+      public static class Login {
+        public static final int ID = 0x02;
+      }
+
+      public static class Logout {
+        public static final int ID = 0x03;
+      }
+    }
+  }
+
   public static class MediaPlayback {
     public static final int Id = 0x0506;
 

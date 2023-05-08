@@ -17,6 +17,7 @@
 
 #include <app/clusters/bindings/PendingNotificationMap.h>
 #include <app/util/binding-table.h>
+#include <app/util/config.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>

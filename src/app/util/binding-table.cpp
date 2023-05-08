@@ -20,6 +20,7 @@
  */
 
 #include <app/util/binding-table.h>
+#include <app/util/config.h>
 
 namespace chip {
 

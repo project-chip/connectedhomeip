@@ -40,7 +40,6 @@
 
 #include "rsi_board_configuration.h"
 #include "rsi_driver.h"
-
 /*===========================================================*/
 /**
  * @fn            void rsi_hal_config_gpio(uint8_t gpio_number,uint8_t mode,uint8_t value)
@@ -61,9 +60,19 @@ void rsi_hal_config_gpio(uint8_t gpio_number, uint8_t mode, uint8_t value)
 
     CMU_ClockEnable(cmuClock_GPIO, true);
 
-    // WFX_RSI_LOG ("RSI: CFG GPIO: 0x%x", gpio_number);
     switch (gpio_number)
     {
+    case RSI_HAL_SLEEP_CONFIRM_PIN:
+    case RSI_HAL_LP_SLEEP_CONFIRM_PIN:
+        GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModeWiredOrPullDown, PINOUT_SET);
+        break;
+    case RSI_HAL_WAKEUP_INDICATION_PIN:
+#ifndef LOGGING_STATS
+        GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, PINOUT_CLEAR);
+#else
+        GPIO_PinModeSet(LOGGING_WAKE_INDICATOR_PIN.port, LOGGING_WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, PINOUT_CLEAR);
+#endif
+        break;
     case RSI_HAL_RESET_PIN:
         GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, PINOUT_SET);
         break;
@@ -83,9 +92,19 @@ void rsi_hal_config_gpio(uint8_t gpio_number, uint8_t mode, uint8_t value)
  */
 void rsi_hal_set_gpio(uint8_t gpio_number)
 {
-    // WFX_RSI_LOG ("RSI: SET GPIO: 0x%x", gpio_number);
     switch (gpio_number)
     {
+    case RSI_HAL_SLEEP_CONFIRM_PIN:
+    case RSI_HAL_LP_SLEEP_CONFIRM_PIN:
+        GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModeWiredOrPullDown, PINOUT_SET);
+        break;
+    case RSI_HAL_WAKEUP_INDICATION_PIN:
+#ifndef LOGGING_STATS
+        GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeInput, PINOUT_SET);
+#else
+        GPIO_PinModeSet(LOGGING_WAKE_INDICATOR_PIN.port, LOGGING_WAKE_INDICATOR_PIN.pin, gpioModeInput, PINOUT_SET);
+#endif
+        break;
     case RSI_HAL_RESET_PIN:
         GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModeWiredOrPullDown, PINOUT_SET);
         break;
@@ -93,7 +112,6 @@ void rsi_hal_set_gpio(uint8_t gpio_number)
         break;
     }
 }
-
 /*===========================================================*/
 /**
  * @fn          uint8_t rsi_hal_get_gpio(void)
@@ -105,9 +123,17 @@ void rsi_hal_set_gpio(uint8_t gpio_number)
  */
 uint8_t rsi_hal_get_gpio(uint8_t gpio_number)
 {
-    // WFX_RSI_LOG ("RSI: GET GPIO: 0x%x", gpio_number);
     switch (gpio_number)
     {
+    case RSI_HAL_SLEEP_CONFIRM_PIN:
+    case RSI_HAL_LP_SLEEP_CONFIRM_PIN:
+        return GPIO_PinInGet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin);
+    case RSI_HAL_WAKEUP_INDICATION_PIN:
+#ifndef LOGGING_STATS
+        return GPIO_PinInGet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin);
+#else
+        return GPIO_PinInGet(LOGGING_WAKE_INDICATOR_PIN.port, LOGGING_WAKE_INDICATOR_PIN.pin);
+#endif
     case RSI_HAL_RESET_PIN:
         return GPIO_PinInGet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin);
     case RSI_HAL_MODULE_INTERRUPT_PIN:
@@ -115,10 +141,8 @@ uint8_t rsi_hal_get_gpio(uint8_t gpio_number)
     default:
         break;
     }
-
     return 0;
 }
-
 /*===========================================================*/
 /**
  * @fn            void rsi_hal_set_gpio(uint8_t gpio_number)
@@ -130,11 +154,22 @@ uint8_t rsi_hal_get_gpio(uint8_t gpio_number)
  */
 void rsi_hal_clear_gpio(uint8_t gpio_number)
 {
-    // WFX_RSI_LOG ("RSI: CLR GPIO: 0x%x", gpio_number);
     switch (gpio_number)
     {
+    case RSI_HAL_SLEEP_CONFIRM_PIN:
+    case RSI_HAL_LP_SLEEP_CONFIRM_PIN:
+        GPIO_PinOutClear(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin);
+        break;
+    case RSI_HAL_WAKEUP_INDICATION_PIN:
+#ifndef LOGGING_STATS
+        GPIO_PinOutClear(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin);
+#else
+        GPIO_PinOutClear(LOGGING_WAKE_INDICATOR_PIN.port, LOGGING_WAKE_INDICATOR_PIN.pin);
+#endif
+        break;
     case RSI_HAL_RESET_PIN:
-        return GPIO_PinOutClear(WFX_RESET_PIN.port, WFX_RESET_PIN.pin);
+        GPIO_PinOutClear(WFX_RESET_PIN.port, WFX_RESET_PIN.pin);
+        break;
     default:
         break;
     }

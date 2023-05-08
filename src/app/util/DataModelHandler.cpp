@@ -31,11 +31,11 @@
 
 using namespace ::chip;
 
-void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
+void InitDataModelHandler()
 {
 #ifdef USE_ZAP_CONFIG
     ChipLogProgress(Zcl, "Using ZAP configuration...");
     emberAfEndpointConfigure();
-    emberAfInit(exchangeManager);
+    emberAfInit();
 #endif
 }

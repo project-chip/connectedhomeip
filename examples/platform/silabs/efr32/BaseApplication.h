@@ -35,6 +35,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>
 #include <lib/core/CHIPError.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef DISPLAY_ENABLED
@@ -92,18 +93,6 @@ public:
      * @brief Return LCD object
      */
     static SilabsLCD & GetLCD(void);
-#endif
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    /**
-     * @brief Event handler when a button is pressed
-     * Function posts an event for button processing
-     *
-     * @param buttonHandle APP_LIGHT_SWITCH or APP_FUNCTION_BUTTON
-     * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
-     *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
-     */
-    virtual void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction) = 0;
-
 #endif
 
     /**
@@ -187,6 +176,16 @@ protected:
      */
     static void LightEventHandler();
 
+    /**
+     * @brief Start the factory Reset process
+     *  Almost identical to Server::ScheduleFactoryReset()
+     *  but doesn't call GetFabricTable().DeleteAllFabrics(); which deletes Key per key.
+     *  With our KVS platform implementation this is a lot slower than deleting the whole kvs section
+     *  our silabs nvm3 driver which end up being doing in ConfigurationManagerImpl::DoFactoryReset(intptr_t arg).
+     */
+    static void ScheduleFactoryReset();
+
+    static void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t);
     /**********************************************************
      * Protected Attributes declaration
      *********************************************************/

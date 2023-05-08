@@ -89,6 +89,9 @@ server cluster AccessControl = 31 {
   attribute AccessControlEntry acl[] = 0;    // attributes are read-write by default
   attribute ExtensionEntry extension[] = 1;  // and require a (spec defined) number
 
+  // attributes may require timed writes
+  timedwrite attribute int16u require_timed_writes = 3;
+
   // Access control privileges on attributes default to:
   //
   // access(read: view, write: operate)

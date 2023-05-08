@@ -69,7 +69,7 @@ static void WifiStaDisconect(void)
 
     uint16_t reason = NetworkCommissioning::BLWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
-        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kUnknown);
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
 
     if (ConnectivityManagerImpl::mWiFiStationState == ConnectivityManager::kWiFiStationState_Disconnecting)
@@ -85,7 +85,7 @@ static void WifiStaDisconect(void)
     case WLAN_FW_ASSOCIATE_FAIILURE:
     case WLAN_FW_4WAY_HANDSHAKE_ERROR_PSK_TIMEOUT_FAILURE:
         associationFailureCause =
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAssociationFailed);
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAssociationFailed);
         if (delegate)
         {
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
@@ -102,7 +102,7 @@ static void WifiStaDisconect(void)
     case WLAN_FW_DISCONNECT_BY_USER_WITH_DEAUTH:
     case WLAN_FW_DISCONNECT_BY_USER_NO_DEAUTH:
         associationFailureCause =
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAuthenticationFailed);
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
         if (delegate)
         {
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
@@ -110,7 +110,7 @@ static void WifiStaDisconect(void)
         break;
     case WLAN_FW_SCAN_NO_BSSID_AND_CHANNEL:
         associationFailureCause =
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kSsidNotFound);
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kSsidNotFound);
         if (delegate)
         {
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
@@ -137,7 +137,7 @@ static void WifiStaDisconect(void)
     {
         delegate->OnDisconnectionDetected(reason);
         delegate->OnConnectionStatusChanged(
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kNotConnected));
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
     }
 
     ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Disconnecting);
@@ -164,7 +164,7 @@ static void WifiStaConnected(void)
     if (delegate)
     {
         delegate->OnConnectionStatusChanged(
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kConnected));
     }
 }
 typedef void (*aos_event_cb)(input_event_t * event, void * private_data);

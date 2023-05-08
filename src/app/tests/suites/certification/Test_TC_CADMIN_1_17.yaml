@@ -242,21 +242,17 @@ tests:
 
           Verify read/write commands fail as expected since the TH_CR2 is no longer on the network on TH_CE (all-clusters-app)
 
-          ./chip-tool  basicinformation write node-label te5new 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation write node-label te5new 1 0 --commissioner-name beta
 
-          [1663571657.500021][3463:3463] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
-          [1663571657.500077][3463:3463] CHIP:DL: Inet Layer shutdown
-          [1663571657.500123][3463:3463] CHIP:DL: BLE shutdown
-          [1663571657.500168][3463:3463] CHIP:DL: System Layer shutdown
-          [1663571657.500383][3463:3463] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/common/CHIPCommand.cpp:454: CHIP Error 0x00000032: Timeout
+          [1678876803.495007][714337:714339] CHIP:SC: Received error (protocol code 1) during pairing process: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root
+          [1678876803.495018][714337:714339] CHIP:IN: SecureSession[0x7f2764026220]: Released - Type:2 LSID:16528
+          [1678876803.495040][714337:714339] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root at ../../commands/clusters/ModelCommand.cpp:62
 
-          ./chip-tool  basicinformation read node-label 2 0 --commissioner-name beta
+          ./chip-tool  basicinformation read node-label 1 0 --commissioner-name beta
 
-          [1663571960.877702][3488:3488] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
-          [1663571960.877766][3488:3488] CHIP:DL: Inet Layer shutdown
-          [1663571960.877820][3488:3488] CHIP:DL: BLE shutdown
-          [1663571960.877873][3488:3488] CHIP:DL: System Layer shutdown
-          [1663571960.878116][3488:3488] CHIP:TOO: Run command failure: ../../src/lib/address_resolve/AddressResolve_DefaultImpl.cpp:174: CHIP Error 0x00000032: Timeout
+          [1678876803.495007][714337:714339] CHIP:SC: Received error (protocol code 1) during pairing process: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root
+          [1678876803.495018][714337:714339] CHIP:IN: SecureSession[0x7f2764026220]: Released - Type:2 LSID:16528
+          [1678876803.495040][714337:714339] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root at ../../commands/clusters/ModelCommand.cpp:62
       disabled: true
 
     - label:
@@ -361,7 +357,7 @@ tests:
       verification: |
           On any Linux platform execute this command or in TH_CR2
 
-          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          avahi-browse -rt _matter._tcp
 
 
           + wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local

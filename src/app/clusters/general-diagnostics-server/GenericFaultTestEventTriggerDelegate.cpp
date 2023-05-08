@@ -38,13 +38,14 @@ CHIP_ERROR GenericFaultTestEventTriggerDelegate::HandleEventTrigger(uint64_t eve
         // Fault injection
         GeneralFaults<kMaxHardwareFaults> hwFaultsPrevious;
         GeneralFaults<kMaxHardwareFaults> hwFaultsCurrent;
-        ReturnErrorOnFailure(hwFaultsPrevious.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_RADIO));
-        ReturnErrorOnFailure(hwFaultsPrevious.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_POWER_SOURCE));
+        using app::Clusters::GeneralDiagnostics::HardwareFaultEnum;
+        ReturnErrorOnFailure(hwFaultsPrevious.add(to_underlying(HardwareFaultEnum::kRadio)));
+        ReturnErrorOnFailure(hwFaultsPrevious.add(to_underlying(HardwareFaultEnum::kPowerSource)));
 
-        ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_RADIO));
-        ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_SENSOR));
-        ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_POWER_SOURCE));
-        ReturnErrorOnFailure(hwFaultsCurrent.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_USER_INTERFACE_FAULT));
+        ReturnErrorOnFailure(hwFaultsCurrent.add(to_underlying(HardwareFaultEnum::kRadio)));
+        ReturnErrorOnFailure(hwFaultsCurrent.add(to_underlying(HardwareFaultEnum::kSensor)));
+        ReturnErrorOnFailure(hwFaultsCurrent.add(to_underlying(HardwareFaultEnum::kPowerSource)));
+        ReturnErrorOnFailure(hwFaultsCurrent.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
 
         app::Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(hwFaultsPrevious, hwFaultsCurrent);
 

@@ -216,18 +216,56 @@ void GenericPlatformManagerImpl<ImplClass>::_HandleServerShuttingDown()
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
-    ChipDeviceEvent event;
-    event.Type                    = DeviceEventType::kCallWorkFunct;
-    event.CallWorkFunct.WorkFunct = workFunct;
-    event.CallWorkFunct.Arg       = arg;
-
-    CHIP_ERROR status = Impl()->PostEvent(&event);
-    if (status != CHIP_NO_ERROR)
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCallWorkFunct };
+    event.CallWorkFunct = { .WorkFunct = workFunct, .Arg = arg };
+    CHIP_ERROR err      = Impl()->PostEvent(&event);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, status.Format());
+        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
     }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg)
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCallWorkFunct };
+    event.CallWorkFunct = { .WorkFunct = workFunct, .Arg = arg };
+    CHIP_ERROR err      = Impl()->PostBackgroundEvent(&event);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to schedule background work: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_PostBackgroundEvent(const ChipDeviceEvent * event)
+{
+    // Impl class must override to implement background event processing
+    return Impl()->PostEvent(event);
+}
+
+template <class ImplClass>
+void GenericPlatformManagerImpl<ImplClass>::_RunBackgroundEventLoop(void)
+{
+    // Impl class must override to implement background event processing
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_StartBackgroundEventLoopTask(void)
+{
+    // Impl class must override to implement background event processing
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_StopBackgroundEventLoopTask(void)
+{
+    // Impl class must override to implement background event processing
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>

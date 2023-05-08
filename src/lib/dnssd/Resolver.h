@@ -38,8 +38,7 @@ namespace Dnssd {
 /// Node resolution data common to both operational and commissionable discovery
 struct CommonResolutionData
 {
-    // TODO: is this count OK? Sufficient space for IPv6 LL, GUA, ULA (and maybe IPv4 if enabled)
-    static constexpr unsigned kMaxIPAddresses = 5;
+    static constexpr unsigned kMaxIPAddresses = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES;
 
     Inet::InterfaceId interfaceId;
 
@@ -149,13 +148,12 @@ struct CommissionNodeData
     uint16_t vendorId                                         = 0;
     uint16_t productId                                        = 0;
     uint8_t commissioningMode                                 = 0;
-    // TODO: possibly 32-bit - see spec issue #3226
-    uint16_t deviceType                                    = 0;
-    char deviceName[kMaxDeviceNameLen + 1]                 = {};
-    uint8_t rotatingId[kMaxRotatingIdLen]                  = {};
-    size_t rotatingIdLen                                   = 0;
-    uint16_t pairingHint                                   = 0;
-    char pairingInstruction[kMaxPairingInstructionLen + 1] = {};
+    uint32_t deviceType                                       = 0;
+    char deviceName[kMaxDeviceNameLen + 1]                    = {};
+    uint8_t rotatingId[kMaxRotatingIdLen]                     = {};
+    size_t rotatingIdLen                                      = 0;
+    uint16_t pairingHint                                      = 0;
+    char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
 
     CommissionNodeData() {}
 
@@ -190,7 +188,7 @@ struct CommissionNodeData
         }
         if (deviceType > 0)
         {
-            ChipLogDetail(Discovery, "\tDevice Type: %u", deviceType);
+            ChipLogDetail(Discovery, "\tDevice Type: %" PRIu32, deviceType);
         }
         if (longDiscriminator > 0)
         {
@@ -346,7 +344,14 @@ public:
      * The method must be called before other methods of this class.
      * If the resolver has already been initialized, the method exits immediately with no error.
      */
-    virtual CHIP_ERROR Init(chip::Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) = 0;
+    virtual CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) = 0;
+
+    /**
+     * Returns whether the resolver has completed the initialization.
+     *
+     * Returns true if the resolver is ready to take node resolution and discovery requests.
+     */
+    virtual bool IsInitialized() = 0;
 
     /**
      * Shuts down the resolver if it has been initialized before.

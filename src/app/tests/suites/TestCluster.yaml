@@ -995,16 +995,16 @@ tests:
     - label: "Read attribute UNSUPPORTED"
       command: "readAttribute"
       attribute: "unsupported"
-      optional: true
       response:
-          value: 0
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Writeattribute UNSUPPORTED"
       command: "writeAttribute"
       attribute: "unsupported"
-      optional: true
       arguments:
           value: 0
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Send Test Command to unsupported endpoint"
       command: "Test"
@@ -1068,11 +1068,8 @@ tests:
               - name: "arg2"
                 value: 101
       response:
-          values:
-              - name: "arg1"
-                value: 20003
-              - name: "arg2"
-                value: 4
+          # Attempting to echo back the invalid enum value should fail.
+          error: FAILURE
 
     # Tests for Struct
 

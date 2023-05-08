@@ -15,13 +15,19 @@
  *    limitations under the License.
  */
 
-#include "spi_multiplex.h"
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#include "sl_wfx.h"
+#endif /* EFR32MG24 && WF200_WIFI */
+
 #include "dmadrv.h"
 #include "em_bus.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
+#if SL_WIFI
+#include "spi_multiplex.h"
+#endif /* SL_WIFI */
 
 /****************************************************************************
  * @fn  void spi_drv_reinit()
@@ -32,6 +38,11 @@
  *****************************************************************************/
 void spi_drv_reinit(uint32_t baudrate)
 {
+    if (USART_BaudrateGet(USART0) == baudrate)
+    {
+        // USART synced to baudrate already
+        return;
+    }
     // USART is used in MG24 + WF200 combination
     USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
     usartInit.msbf                   = true;
@@ -42,29 +53,6 @@ void spi_drv_reinit(uint32_t baudrate)
     usartInit.autoCsEnable           = true;
 
     USART_InitSync(USART0, &usartInit);
-}
-
-/****************************************************************************
- * @fn  void set_spi_baudrate()
- * @brief
- *     Setting the appropriate SPI baudrate
- * @param[in] None
- * @return returns void
- *****************************************************************************/
-void set_spi_baudrate(peripheraltype_t pr_type)
-{
-    if (pr_type == LCD)
-    {
-        spi_drv_reinit(LCD_BIT_RATE);
-    }
-    else if (pr_type == EXP_HDR)
-    {
-        spi_drv_reinit(EXP_HDR_BIT_RATE);
-    }
-    else if (pr_type == EXT_SPIFLASH)
-    {
-        spi_drv_reinit(SPI_FLASH_BIT_RATE);
-    }
 }
 
 /****************************************************************************
@@ -105,13 +93,9 @@ void pre_bootloader_spi_transfer(void)
         return;
     }
     /*
-     * CS for Expansion header controlled within GSDK,
-     * however we need to ensure CS for Expansion header is High/disabled before use of EXT SPI Flash
-     */
-    sl_wfx_host_spi_cs_deassert();
-    /*
      * Assert CS pin for EXT SPI Flash
      */
+    spi_drv_reinit(SL_BIT_RATE_SPI_FLASH);
     spiflash_cs_assert();
 }
 
@@ -144,11 +128,7 @@ void pre_lcd_spi_transfer(void)
     {
         return;
     }
-    if (pr_type != LCD)
-    {
-        pr_type = LCD;
-        set_spi_baudrate(pr_type);
-    }
+    spi_drv_reinit(SL_BIT_RATE_LCD);
     /*LCD CS is handled as part of LCD gsdk*/
 }
 
@@ -163,3 +143,47 @@ void post_lcd_spi_transfer(void)
 {
     xSemaphoreGive(spi_sem_sync_hdl);
 }
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+/****************************************************************************
+ * @fn  void pre_uart_transfer()
+ * @brief
+ *     Take a semaphore and setting GPIO, disable IRQ
+ * @param[in] None
+ * @return returns void
+ *****************************************************************************/
+void pre_uart_transfer(void)
+{
+    if (spi_sem_sync_hdl == NULL)
+    {
+        // UART is initialized before host SPI interface
+        // spi_sem_sync_hdl will not be initalized during execution
+        GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
+        return;
+    }
+    sl_wfx_disable_irq();
+    sl_wfx_host_disable_platform_interrupt();
+    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
+    {
+        return;
+    }
+    GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
+}
+/****************************************************************************
+ * @fn  void post_uart_transfer()
+ * @brief
+ *     Reset GPIO, enabled IRQ, release semaphore
+ * @param[in] None
+ * @return returns void
+ *****************************************************************************/
+void post_uart_transfer(void)
+{
+    if (spi_sem_sync_hdl == NULL)
+    {
+        return;
+    }
+    GPIO_PinModeSet(gpioPortA, 8, gpioModeInputPull, 1);
+    xSemaphoreGive(spi_sem_sync_hdl);
+    sl_wfx_host_enable_platform_interrupt();
+    sl_wfx_enable_irq();
+}
+#endif /* EFR32MG24 && WF200_WIFI */

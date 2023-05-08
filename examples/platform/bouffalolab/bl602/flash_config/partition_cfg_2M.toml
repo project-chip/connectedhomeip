@@ -29,7 +29,7 @@ len = 0
 type = 3
 name = "media"
 device = 0
-address0 = 0x1A2000
+address0 = 0x1A1000
 size0 = 0x47000
 address1 = 0
 size1 = 0
@@ -40,7 +40,7 @@ len = 0
 type = 4
 name = "PSM"
 device = 0
-address0 = 0x1E9000
+address0 = 0x1E8000
 size0 = 0x4000
 address1 = 0
 size1 = 0
@@ -51,7 +51,7 @@ len = 0
 type = 5
 name = "KEY"
 device = 0
-address0 = 0x1F1000
+address0 = 0x1F0000
 size0 = 0x2000
 address1 = 0
 size1 = 0
@@ -62,7 +62,7 @@ len = 0
 type = 6
 name = "DATA"
 device = 0
-address0 = 0x1F3000
+address0 = 0x1F2000
 size0 = 0x5000
 address1 = 0
 size1 = 0
@@ -74,16 +74,29 @@ len = 0
 type = 7
 name = "factory"
 device = 0
-address0 = 0x1F8000
+address0 = 0x1F7000
 size0 = 0x7000
 address1 = 0
 size1 = 0
 # compressed image must set len,normal image can left it to 0
 len = 0
 
+
+[[pt_entry]]
+type = 8
+name = "MFD"
+device = 0
+address0 = 0x1FE000
+size0 = 0x1000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+
 #if user want to put RF calibration data on flash, uncomment following pt entry
 #[[pt_entry]]
-#type = 8
+#type = 9
 #name = "rf_para"
 #device = 0
 #address0 = 0x1FF000

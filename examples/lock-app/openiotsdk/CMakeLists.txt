@@ -19,11 +19,17 @@ cmake_minimum_required(VERSION 3.21)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(OPEN_IOT_SDK_CONFIG ${CHIP_ROOT}/config/openiotsdk REALPATH)
 get_filename_component(OPEN_IOT_SDK_EXAMPLE_COMMON ${CHIP_ROOT}/examples/platform/openiotsdk REALPATH)
-get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
+get_filename_component(LOCK_APP_COMMON ${CHIP_ROOT}/examples/lock-app/lock-common REALPATH)
 
 list(APPEND CMAKE_MODULE_PATH ${OPEN_IOT_SDK_CONFIG}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${LOCK_APP_COMMON})
 
-set(APP_TARGET chip-openiotsdk-lock-app-example)
+set(APP_TARGET chip-openiotsdk-lock-app-example_ns)
+
+set(TFM_SUPPORT YES)
+set(TFM_PROJECT_CONFIG_HEADER_FILE "${CMAKE_CURRENT_SOURCE_DIR}/tf-m-config/TfmProjectConfig.h")
+set(TFM_NS_APP_VERSION "0.0.1")
+set(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS YES)
 
 # Toolchain files need to exist before first call to project
 include(toolchain)
@@ -55,30 +61,29 @@ include(chip)
 
 add_subdirectory(${OPEN_IOT_SDK_EXAMPLE_COMMON}/app ./app_build)
 
-target_include_directories(${APP_TARGET} 
-    PRIVATE
-        main/include
-        ${GEN_DIR}/app-common
-        ${GEN_DIR}/lock-app
+chip_add_data_model(openiotsdk-app PUBLIC lock)
+
+# Add common lock-app sources
+include(lock-app)
+chip_add_lock_app_common(openiotsdk-app 
+    SCOPE PUBLIC
 )
 
-target_sources(${APP_TARGET} 
+target_include_directories(${APP_TARGET}
     PRIVATE
-        main/main.cpp
-        main/ZclCallbacks.cpp
-        main/LockManager.cpp
-        main/LockEndpoint.cpp
+        main/include
+)
+
+target_sources(${APP_TARGET}
+    PRIVATE
+        main/main_ns.cpp
 )
 
 target_link_libraries(${APP_TARGET}
     openiotsdk-app
 )
 
-include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
-chip_configure_data_model(${APP_TARGET}
-    INCLUDE_SERVER
-    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lock-common/lock-app.zap
-)
-
 include(linker)
 set_target_link(${APP_TARGET})
+
+sdk_post_build(${APP_TARGET})

@@ -26,6 +26,7 @@
 
 #include <app/util/basic-types.h>
 #include <credentials/FabricTable.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -40,6 +41,7 @@ extern chip::SessionManager gSessionManager;
 extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
 extern chip::SessionHolder gSession;
 extern chip::TestPersistentStorageDelegate gStorage;
+extern chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 
 constexpr chip::NodeId kTestNodeId         = 0x1ULL;
 constexpr chip::NodeId kTestNodeId1        = 0x2ULL;

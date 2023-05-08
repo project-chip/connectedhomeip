@@ -35,6 +35,13 @@ class HostCryptoLibrary(Enum):
             return 'chip_crypto="boringssl"'
 
 
+class HostFuzzingType(Enum):
+    """Defines fuzz target options available for host targets."""
+    NONE = auto()
+    LIB_FUZZER = auto()
+    OSS_FUZZ = auto()
+
+
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
@@ -53,12 +60,15 @@ class HostApp(Enum):
     CERT_TOOL = auto()
     OTA_PROVIDER = auto()
     OTA_REQUESTOR = auto()
+    SIMULATED_APP1 = auto()
+    SIMULATED_APP2 = auto()
     PYTHON_BINDINGS = auto()
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
     DYNAMIC_BRIDGE = auto()
     JAVA_MATTER_CONTROLLER = auto()
+    CONTACT_SENSOR = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -87,6 +97,8 @@ class HostApp(Enum):
             return 'shell/standalone'
         elif self == HostApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
+        elif self in [HostApp.SIMULATED_APP1, HostApp.SIMULATED_APP2]:
+            return 'placeholder/linux/'
         elif self == HostApp.OTA_REQUESTOR:
             return 'ota-requestor-app/linux'
         elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
@@ -101,6 +113,8 @@ class HostApp(Enum):
             return 'dynamic-bridge-app/linux'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
+        elif self == HostApp.CONTACT_SENSOR:
+            return 'contact-sensor-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -152,6 +166,12 @@ class HostApp(Enum):
         elif self == HostApp.CERT_TOOL:
             yield 'chip-cert'
             yield 'chip-cert.map'
+        elif self == HostApp.SIMULATED_APP1:
+            yield 'chip-app1'
+            yield 'chip-app1.map'
+        elif self == HostApp.SIMULATED_APP2:
+            yield 'chip-app2'
+            yield 'chip-app2.map'
         elif self == HostApp.OTA_PROVIDER:
             yield 'chip-ota-provider-app'
             yield 'chip-ota-provider-app.map'
@@ -174,6 +194,9 @@ class HostApp(Enum):
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
+        elif self == HostApp.CONTACT_SENSOR:
+            yield 'contact-sensor-app'
+            yield 'contact-sensor-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -223,13 +246,10 @@ class HostBuilder(GnBuilder):
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
-                 separate_event_loop=True, use_libfuzzer=False, use_clang=False,
-                 interactive_mode=True, extra_tests=False,
-                 use_platform_mdns=False, enable_rpcs=False,
-                 use_coverage=False, use_dmalloc=False,
-                 minmdns_address_policy=None,
-                 minmdns_high_verbosity=False,
-                 crypto_library: HostCryptoLibrary = None):
+                 separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
+                 interactive_mode=True, extra_tests=False, use_platform_mdns=False, enable_rpcs=False,
+                 use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
+                 minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -279,8 +299,13 @@ class HostBuilder(GnBuilder):
         if not interactive_mode:
             self.extra_gn_options.append('config_use_interactive_mode=false')
 
-        if use_libfuzzer:
+        if fuzzing_type == HostFuzzingType.LIB_FUZZER:
             self.extra_gn_options.append('is_libfuzzer=true')
+        elif fuzzing_type == HostFuzzingType.OSS_FUZZ:
+            self.extra_gn_options.append('oss_fuzz=true')
+
+        if imgui_ui:
+            self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
 
         self.use_coverage = use_coverage
         if use_coverage:
@@ -340,6 +365,15 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('enable_rtti=false')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
             self.build_command = 'chip-repl'
+
+        if self.app == HostApp.SIMULATED_APP1:
+            self.extra_gn_options.append('chip_tests_zap_config="app1"')
+
+        if self.app == HostApp.SIMULATED_APP2:
+            self.extra_gn_options.append('chip_tests_zap_config="app2"')
+
+        if self.app == HostApp.TESTS and fuzzing_type != HostFuzzingType.NONE:
+            self.build_command = 'fuzz_tests'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

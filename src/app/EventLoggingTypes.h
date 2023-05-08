@@ -95,13 +95,12 @@ static_assert(sizeof(std::underlying_type_t<PriorityLevel>) <= sizeof(unsigned),
  */
 struct Timestamp
 {
-    enum class Type
+    enum class Type : uint8_t
     {
         kSystem = 0,
         kEpoch
     };
     Timestamp() {}
-    Timestamp(Type aType) : mType(aType) { mValue = 0; }
     Timestamp(Type aType, uint64_t aValue) : mType(aType), mValue(aValue) {}
     Timestamp(System::Clock::Timestamp aValue) : mType(Type::kSystem), mValue(aValue.count()) {}
     static Timestamp Epoch(System::Clock::Timestamp aValue)

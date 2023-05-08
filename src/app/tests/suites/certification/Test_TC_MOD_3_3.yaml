@@ -62,7 +62,7 @@ tests:
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
-          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2 and below is the sample log provided for the raspi platform:
+          on TH(chip-tool) log verify for StartUpMode. Record this value for usage in step 2b and below is the sample log provided for the raspi platform:
 
           [1645778279.693082][4898:4903] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003DataVersion: 3781469722
           [1645778279.693151][4898:4903] CHIP:TOO:   StartUpMode: 0
@@ -73,7 +73,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          on TH(chip-tool),Verify that the DUT response is the integer. Record this value for usage in step 2b and 3 and below is the sample log provided for the raspi platform:
+          on TH(chip-tool) log verify for CurrentMode. Record this value for usage in step 2b and 3 and below is the sample log provided for the raspi platform:
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 0
@@ -93,7 +93,7 @@ tests:
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          Verify on TH(chip-tool) logs supported modes provides a list of mode, each mode should be a struct containing a label and All of these values should be no larger than 16 bits  for usage in step 2d and below is the sample log provided for the raspi platform:
+          on TH(chip-tool) log verify for SupportedModes. Record the mode for usage in step 2b and below is the sample log provided for the raspi platform:
 
           [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
           [1654595268.854678][14400:14405] CHIP:TOO:   SupportedModes: 3 entries
@@ -136,7 +136,7 @@ tests:
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
 
-          on TH(chip-tool),Verify that the DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
+          on TH(chip-tool) log verify that  status has a value  0x00 (success)  and below is the sample log provided for the raspi platform:
 
           [1645778189.045030][4888:4893] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
       disabled: true
@@ -167,7 +167,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          on TH(chip-tool),Verify that the DUT response is the integer recorded in step 2a or, if the mode was changed, 2d and below is the sample log provided for the raspi platform:
+          on TH(chip-tool) log verify that CurrentMode is same as value recorded in step 2d and below is the sample log provided for the raspi platform:
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 4

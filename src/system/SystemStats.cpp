@@ -29,6 +29,7 @@
 #include <system/SystemStats.h>
 
 #include <lib/support/SafeInt.h>
+#include <platform/LockTracker.h>
 
 #include <string.h>
 

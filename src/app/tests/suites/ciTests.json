@@ -8,14 +8,13 @@
         "Test_TC_ACL_2_4",
         "Test_TC_ACL_2_7",
         "Test_TC_ACL_2_8",
-        "Test_TC_ACL_2_9"
+        "Test_TC_ACL_2_9",
+        "Test_TC_ACL_2_10"
     ],
+    "AccessControlEnforcement": ["Test_TC_ACE_1_1", "Test_TC_ACE_1_5"],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
-    "BridgedDeviceBasicInformation": [
-        "Test_TC_BRBINFO_1_1",
-        "Test_TC_BRBINFO_2_1"
-    ],
+    "BridgedDeviceBasicInformation": [],
     "Actions": ["Test_TC_ACT_1_1"],
     "ColorControl": [
         "Test_TC_CC_1_1",
@@ -35,7 +34,9 @@
         "Test_TC_CC_7_2",
         "Test_TC_CC_7_3",
         "Test_TC_CC_7_4",
-        "Test_TC_CC_8_1"
+        "Test_TC_CC_8_1",
+        "TestColorControl_9_1",
+        "TestColorControl_9_2"
     ],
     "DeviceManagement": [
         "Test_TC_OPCREDS_1_2",
@@ -103,7 +104,6 @@
         "Test_TC_APBSC_1_10",
         "Test_TC_CONTENTLAUNCHER_1_11",
         "Test_TC_ALOGIN_1_12",
-        "Test_TC_ALOGIN_12_1",
         "Test_TC_LOWPOWER_2_1",
         "Test_TC_KEYPADINPUT_3_2",
         "Test_TC_KEYPADINPUT_3_3",
@@ -116,7 +116,6 @@
         "Test_TC_MEDIAINPUT_3_11",
         "Test_TC_MEDIAINPUT_3_12",
         "Test_TC_MEDIAINPUT_3_13",
-        "Test_TC_WAKEONLAN_4_1",
         "Test_TC_CHANNEL_5_1",
         "Test_TC_CHANNEL_5_2",
         "Test_TC_CHANNEL_5_3",
@@ -239,8 +238,7 @@
         "TestAccessControlConstraints",
         "TestLevelControlWithOnOffDependency",
         "TestCommissioningWindow",
-        "TestCommissionerNodeId",
-        "TestClientMonitoringCluster"
+        "TestCommissionerNodeId"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
@@ -259,7 +257,8 @@
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_7",
-        "Test_TC_DRLK_2_9"
+        "Test_TC_DRLK_2_9",
+        "Test_TC_DRLK_2_11"
     ],
     "Groups": [
         "TestGroupMessaging",
@@ -270,6 +269,7 @@
     ],
     "collection": [
         "AccessControl",
+        "AccessControlEnforcement",
         "BooleanState",
         "BridgedDeviceBasicInformation",
         "Actions",

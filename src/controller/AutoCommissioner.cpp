@@ -301,18 +301,21 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         else
         {
-            return CommissioningStage::kWiFiNetworkEnable;
+            return CommissioningStage::kFailsafeBeforeWiFiEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
         if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
         {
-            return CommissioningStage::kWiFiNetworkEnable;
+            return CommissioningStage::kFailsafeBeforeWiFiEnable;
         }
         else
         {
-            return CommissioningStage::kThreadNetworkEnable;
+            return CommissioningStage::kFailsafeBeforeThreadEnable;
         }
-
+    case CommissioningStage::kFailsafeBeforeWiFiEnable:
+        return CommissioningStage::kWiFiNetworkEnable;
+    case CommissioningStage::kFailsafeBeforeThreadEnable:
+        return CommissioningStage::kThreadNetworkEnable;
     case CommissioningStage::kWiFiNetworkEnable:
         if (mParams.GetThreadOperationalDataset().HasValue() &&
             mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
@@ -374,6 +377,9 @@ void AutoCommissioner::SetCASEFailsafeTimerIfNeeded()
         // CASE establishment, and receipt of the commissioning complete command.
         // We know that the mCommissioneeDeviceProxy is still valid at this point since it gets cleared during cleanup
         // and SetCASEFailsafeTimerIfNeeded is always called before that stage.
+        //
+        // A false return from ExtendArmFailSafe is fine; we don't want to make
+        // the fail-safe shorter here.
         mCommissioner->ExtendArmFailSafe(mCommissioneeDeviceProxy, CommissioningStage::kFindOperational,
                                          mParams.GetCASEFailsafeTimerSeconds().Value(),
                                          GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe),

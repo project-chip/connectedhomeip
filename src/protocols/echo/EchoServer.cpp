@@ -32,8 +32,7 @@ namespace Echo {
 CHIP_ERROR EchoServer::Init(Messaging::ExchangeManager * exchangeMgr)
 {
     // Error if already initialized.
-    if (mExchangeMgr != nullptr)
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrReturnError(mExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mExchangeMgr          = exchangeMgr;
     OnEchoRequestReceived = nullptr;
@@ -63,9 +62,6 @@ CHIP_ERROR EchoServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloa
 CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle response;
-
     // NOTE: we already know this is an Echo Request message because we explicitly registered with the
     // Exchange Manager for unsolicited Echo Requests.
 
@@ -74,6 +70,8 @@ CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     {
         OnEchoRequestReceived(ec, payload.Retain());
     }
+
+    System::PacketBufferHandle response;
 
     // Since we are re-using the inbound EchoRequest buffer to send the EchoResponse, if necessary,
     // adjust the position of the payload within the buffer to ensure there is enough room for the
@@ -86,12 +84,11 @@ CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     else
     {
         response = MessagePacketBuffer::NewWithData(payload->Start(), payload->DataLength());
+        VerifyOrReturnError(!response.IsNull(), CHIP_ERROR_NO_MEMORY);
     }
 
     // Send an Echo Response back to the sender.
-    err = ec->SendMessage(MsgType::EchoResponse, std::move(response));
-
-    return err;
+    return ec->SendMessage(MsgType::EchoResponse, std::move(response));
 }
 
 } // namespace Echo

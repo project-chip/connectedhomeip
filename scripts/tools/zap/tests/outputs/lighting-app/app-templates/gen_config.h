@@ -20,14 +20,6 @@
 // Prevent multiple inclusion
 #pragma once
 
-// User options for plugin Binding Table Library
-#define EMBER_BINDING_TABLE_SIZE 10
-
-/**** Network Section ****/
-#define EMBER_SUPPORTED_NETWORKS (1)
-
-#define EMBER_APS_UNICAST_MESSAGE_COUNT 10
-
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUPS_CLUSTER_SERVER_ENDPOINT_COUNT (2)

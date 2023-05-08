@@ -279,7 +279,7 @@ public:
     {
         chip::TLV::TLVReader reader;
         reader.Init(mData, mDataLen);
-        reader.Next();
+        ReturnErrorOnFailure(reader.Next());
 
         return writer.CopyElement(tag, reader);
     }

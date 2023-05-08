@@ -37,9 +37,6 @@
 #include <AppTask.h> // nogncheck
 
 #include "app_config.h"
-#include "fsl_gpio.h"
-#include "fsl_iocon.h"
-#include "gpio_pins.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -53,16 +50,16 @@ extern "C" void BOARD_SetClockForPowerMode(void);
 extern "C" void stopM2();
 extern "C" void sched_enable();
 extern "C" uint64_t otPlatTimeGet(void);
+extern "C" void vOptimizeConsumption(void);
 
-static void dm_switch_wakeupCallBack(void);
-static void dm_switch_preSleepCallBack(void);
+WEAK void dm_switch_wakeupCallBack(void);
+WEAK void dm_switch_preSleepCallBack(void);
+WEAK void vOptimizeConsumption(void);
 static void ThreadExitSleep();
 static void BOARD_SetClockForWakeup(void);
 
 typedef struct
 {
-    bool_t bleAppRunning;
-    bool_t bleAppStopInprogress;
     bool_t threadInitialized;
     uint32_t threadWarmBootInitTime;
 } sDualModeAppStates;
@@ -74,7 +71,7 @@ static sDualModeAppStates dualModeStates;
 /* 15.4 warm time must be > 0, so this value will be
  * updated when 15.4 is initialized for the first time
  */
-constexpr uint16_t kThreadWarmNotInitializedValue = 0;
+constexpr uint16_t kThreadWarmNotInitializedValue = 1000; /* 1 ms */
 
 extern "C" void otTaskletsSignalPending(otInstance * p_instance);
 
@@ -126,7 +123,7 @@ extern "C" bleResult_t App_PostCallbackMessage(appCallbackHandler_t handler, app
     return gBleSuccess_c;
 }
 
-static void dm_switch_wakeupCallBack(void)
+WEAK void dm_switch_wakeupCallBack(void)
 {
     BOARD_SetClockForWakeup();
     SHA_ClkInit(SHA_INSTANCE);
@@ -142,6 +139,10 @@ static void dm_switch_wakeupCallBack(void)
     OTA_InitExternalMemory();
 
     KBD_PrepareExitLowPower();
+
+#if gAdcUsed_d
+    BOARD_ADCWakeupInit();
+#endif
 
     PWR_WakeupReason_t wakeReason = PWR_GetWakeupReason();
     if (wakeReason.Bits.FromBLE_LLTimer == 1)
@@ -162,73 +163,47 @@ static void dm_switch_wakeupCallBack(void)
         K32W_LOG("woken up from TMR");
 #endif
     }
+    else if (wakeReason.Bits.FromWakeTimer == 1)
+    {
+#if ENABLE_LOW_POWER_LOGS
+        K32W_LOG("woken up from Wake Timer");
+#endif
+    }
+    else
+    {
+#if ENABLE_LOW_POWER_LOGS
+        K32W_LOG("woken up from unknown source");
+#endif
+    }
     dm_lp_wakeup();
 }
 
-void vOptimizeConsumption(uint32_t u32PIOvalue, uint32_t u32SkipIO)
+WEAK void vOptimizeConsumption(void)
 {
-    uint8_t u8KeepFro32k, u8KeepIOclk, u8KeepXtal32M;
-
-    u8KeepFro32k                       = u32SkipIO >> 31;
-    u8KeepIOclk                        = (u32SkipIO >> 30) & 0x1;
-    u8KeepXtal32M                      = (u32SkipIO >> 29) & 0x1;
-    const gpio_pin_config_t pin_config = { .pinDirection = kGPIO_DigitalInput, .outputLogic = 1U };
-
-    if (u32PIOvalue != 0)
-    {
-        for (int i = 0; i < 22; i++)
-        {
-
-            if (((u32SkipIO >> i) & 0x1) != 1)
-            {
-                /* configure GPIOs to Input mode */
-                GPIO_PinInit(GPIO, 0, i, &pin_config);
-                IOCON_PinMuxSet(IOCON, 0, i, u32PIOvalue);
-            }
-        }
-    }
-
-    if (u8KeepIOclk == 0)
-    {
-        CLOCK_DisableClock(kCLOCK_Iocon);
-        CLOCK_DisableClock(kCLOCK_InputMux);
-        CLOCK_DisableClock(kCLOCK_Gpio0);
-    }
-
-    if (u8KeepXtal32M == 0)
-    {
-        CLOCK_DisableClock(kCLOCK_Xtal32M); // Crystal 32MHz
-    }
-
-    // Keep the 32K clock
-    if (u8KeepFro32k == 0)
-    {
-        CLOCK_DisableClock(kCLOCK_Fro32k);
-    }
+    /* Intentionally left empty, user needs to redefine it at application level */
 }
 
-static void dm_switch_preSleepCallBack(void)
+WEAK void dm_switch_preSleepCallBack(void)
 {
 #if ENABLE_LOW_POWER_LOGS
     K32W_LOG("dm_switch_preSleepCallBack");
 #endif
 
+    /* Inform the low power dual mode module that we will sleep.
+       It disables the MAC scheduler.
+       Disabling the scheduler must be done before calling vMMAC_Disable()
+       so it works correctly */
+    dm_lp_preSleep();
+
     if (dualModeStates.threadInitialized)
     {
-        /* stop the internal MAC Scheduler timer */
-        stopM2();
-        /* disable the MAC scheduler */
-        sched_disable();
         otPlatRadioDisable(NULL);
         setThreadInitialized(FALSE);
     }
-    /* Inform the low power dual mode module that we will sleep */
-    dm_lp_preSleep();
 
     EEPROM_DeInit();
-    /* BUTTON2 change contact, BUTTON4 start adv/factoryreset */
-    vOptimizeConsumption((IOCON_FUNC0 | (0x2 << 3) | IOCON_ANALOG_EN),
-                         (1 << IOCON_USER_BUTTON1_PIN) | (1 << IOCON_USER_BUTTON2_PIN));
+
+    vOptimizeConsumption();
 
     /* disable SHA clock */
     SHA_ClkDeinit(SHA_INSTANCE);
@@ -244,12 +219,6 @@ static void dm_switch_preSleepCallBack(void)
     BOARD_SetClockForPowerMode();
 }
 
-extern "C" void vDynStopAll(void)
-{
-    vDynRequestState(E_DYN_SLAVE, E_DYN_STATE_OFF);
-    vDynRequestState(E_DYN_MASTER, E_DYN_STATE_OFF);
-}
-
 void dm_switch_init15_4AfterWakeUp(void)
 {
     uint64_t tick1 = 0;
@@ -261,53 +230,56 @@ void dm_switch_init15_4AfterWakeUp(void)
         tick1 = otPlatTimeGet();
     }
 
-    if (!dualModeStates.threadInitialized && ConnectivityMgr().IsThreadEnabled())
+    OSA_InstallIntHandler(ZIGBEE_MAC_IRQn, vMMAC_IntHandlerBbc);
+    OSA_InstallIntHandler(ZIGBEE_MODEM_IRQn, vMMAC_IntHandlerPhy);
+
+    /* Radio must be re-enabled after waking up from sleep.
+       The module is completely disabled in power down mode.
+       15.4 is set as active by default */
+    otPlatRadioEnable(NULL);
+
+    /* set the correct state */
+    vDynRequestState(E_DYN_SLAVE, E_DYN_STATE_INACTIVE); /* 15.4 */
+    vDynRequestState(E_DYN_MASTER, E_DYN_STATE_ACTIVE);  /* BLE */
+
+    sched_enable();
+
+    if (dualModeStates.threadWarmBootInitTime == kThreadWarmNotInitializedValue)
     {
-        OSA_InstallIntHandler(ZIGBEE_MAC_IRQn, vMMAC_IntHandlerBbc);
-        OSA_InstallIntHandler(ZIGBEE_MODEM_IRQn, vMMAC_IntHandlerPhy);
+        dualModeStates.threadWarmBootInitTime = (uint32_t)(otPlatTimeGet() - tick1);
 
-        /* Radio must be re-enabled after waking up from sleep.
-         * The module is completely disabled in power down mode */
-        otPlatRadioEnable(NULL);
-        sched_enable();
-
-        if (dualModeStates.threadWarmBootInitTime == kThreadWarmNotInitializedValue)
-        {
-            dualModeStates.threadWarmBootInitTime = (uint32_t)(otPlatTimeGet() - tick1);
-
-            /* Add a margin of 1 ms */
-            dualModeStates.threadWarmBootInitTime += 1000;
+        /* Add a margin of 0.5 ms */
+        dualModeStates.threadWarmBootInitTime += 500;
 
 #if ENABLE_LOW_POWER_LOGS
-            K32W_LOG("Calibration: %d", dualModeStates.threadWarmBootInitTime);
+        K32W_LOG("Calibration: %d", dualModeStates.threadWarmBootInitTime);
 #endif
-        }
-
-        setThreadInitialized(TRUE);
-
-        /* wake up the Thread stack and check if any processing needs to be done */
-        otTaskletsSignalPending(NULL);
     }
+
+    setThreadInitialized(TRUE);
+
+    /* wake up the Thread stack and check if any processing needs to be done.
+       We're called form ISR context */
+    otSysEventSignalPending();
 }
 
 extern "C" void App_NotifyWakeup(void)
 {
     if ((!dualModeStates.threadInitialized))
     {
-
         /* Notify the dual mode low power mode */
-        (void) App_PostCallbackMessage(dm_lp_processEvent, (void *) e15_4WakeUpEnded);
+        dm_lp_processEvent((void *) e15_4WakeUpEnded);
     }
 }
 
 extern "C" void App_AllowDeviceToSleep()
 {
-    PWR_PreventEnterLowPower(false);
+    PWR_AllowDeviceToSleep();
 }
 
 extern "C" void App_DisallowDeviceToSleep()
 {
-    PWR_PreventEnterLowPower(true);
+    PWR_DisallowDeviceToSleep();
 }
 
 static void BOARD_SetClockForWakeup(void)

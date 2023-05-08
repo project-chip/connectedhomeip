@@ -58,12 +58,12 @@ tests:
 
 
           2.  run below subscribe-event  command in interactive mode shell and then Turn down the TH (all-clusters-app)
-          basic subscribe-event shut-down 20 100 1 0
+          basicinformation subscribe-event shut-down 20 100 1 0
 
           On TH(all-cluster-app), ,verify that Shutdown event has priority set as CRITICAL (0x2)
 
           [1666095658.719821][16788:16788] CHIP:DMG: Unblock report hold after min 20 seconds
-          ^C[1666095661.196050][16788:16788] CHIP:DL: Caught signal 2
+          [1666095661.196050][16788:16788] CHIP:DL: Caught signal 2
           [1666095661.196434][16788:16788] CHIP:DL: Select failed: ../../third_party/connectedhomeip/src/system/SystemLayerImplSelect.cpp:493: OS Error 0x02000004: Interrupted system call
           [1666095661.196516][16788:16788] CHIP:ZCL: Emitting ShutDown event
           [1666095661.196659][16788:16788] CHIP:EVL: LogEvent event number: 0x0000000000000004 priority: 2, endpoint id:  0x0 cluster id: 0x0000_0028 event id: 0x1 Sys timestamp: 0x0000000006C599DA
@@ -208,7 +208,7 @@ tests:
           To verify leave event follow the below commands
 
           1. ./chip-tool interactive start
-          2. basic subscribe-event leave 1 100 1 0
+          2. basicinformation subscribe-event leave 1 100 1 0
           3. operationalcredentials remove-fabric 1 1 0
 
           verify that leave event has priority as INFO(0x1) on TH (all-clusters-app)

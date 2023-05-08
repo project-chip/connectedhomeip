@@ -25,6 +25,7 @@
 #pragma once
 
 #include <credentials/FabricTable.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -39,6 +40,7 @@ extern chip::SessionManager gSessionManager;
 extern chip::Messaging::ExchangeManager gExchangeManager;
 extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
 extern chip::TestPersistentStorageDelegate gStorage;
+extern chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 
 void InitializeChip(void);
 void ShutdownChip(void);

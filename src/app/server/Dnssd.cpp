@@ -46,13 +46,17 @@ namespace {
 
 void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
-    if (event->Type == DeviceLayer::DeviceEventType::kDnssdPlatformInitialized
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-        || event->Type == DeviceLayer::DeviceEventType::kSEDIntervalChange
-#endif
-    )
+    switch (event->Type)
     {
+    case DeviceLayer::DeviceEventType::kDnssdInitialized:
+    case DeviceLayer::DeviceEventType::kDnssdRestartNeeded:
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    case DeviceLayer::DeviceEventType::kSEDIntervalChange:
+#endif
         app::DnssdServer::Instance().StartServer();
+        break;
+    default:
+        break;
     }
 }
 
@@ -337,6 +341,33 @@ void DnssdServer::StartServer()
         mode = mCommissioningModeProvider->GetCommissioningMode();
     }
     return StartServer(mode);
+}
+
+void DnssdServer::StopServer()
+{
+    // Make sure we don't hold on to a dangling fabric table pointer.
+    mFabricTable = nullptr;
+
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    if (mExtendedDiscoveryExpiration != kTimeoutCleared)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(HandleExtendedDiscoveryExpiration, nullptr);
+        mExtendedDiscoveryExpiration = kTimeoutCleared;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+    if (Dnssd::ServiceAdvertiser::Instance().IsInitialized())
+    {
+        auto err = Dnssd::ServiceAdvertiser::Instance().RemoveServices();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to remove advertised services: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        Dnssd::ServiceAdvertiser::Instance().Shutdown();
+    }
 }
 
 void DnssdServer::StartServer(Dnssd::CommissioningMode mode)

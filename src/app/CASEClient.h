@@ -54,6 +54,8 @@ class DLL_EXPORT CASEClient
 public:
     void SetRemoteMRPIntervals(const ReliableMessageProtocolConfig & remoteMRPConfig);
 
+    const ReliableMessageProtocolConfig & GetRemoteMRPIntervals();
+
     CHIP_ERROR EstablishSession(const CASEClientInitParams & params, const ScopedNodeId & peer,
                                 const Transport::PeerAddress & peerAddress, const ReliableMessageProtocolConfig & remoteMRPConfig,
                                 SessionEstablishmentDelegate * delegate);

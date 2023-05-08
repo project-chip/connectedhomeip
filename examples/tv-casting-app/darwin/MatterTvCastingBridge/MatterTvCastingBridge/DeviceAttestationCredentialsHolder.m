@@ -29,9 +29,7 @@
 
 @property NSData * productAttestationIntermediateCert;
 
-@property NSData * deviceAttestationCertPrivateKey;
-
-@property NSData * deviceAttestationCertPublicKeyKey;
+@property SecKeyRef deviceAttestationCertPrivateKeyRef;
 
 @end
 
@@ -42,8 +40,7 @@
                    firmwareInformation:(NSData * _Nonnull)firmwareInformation
                  deviceAttestationCert:(NSData * _Nonnull)deviceAttestationCert
     productAttestationIntermediateCert:(NSData * _Nonnull)productAttestationIntermediateCert
-       deviceAttestationCertPrivateKey:(NSData * _Nonnull)deviceAttestationCertPrivateKey
-     deviceAttestationCertPublicKeyKey:(NSData * _Nonnull)deviceAttestationCertPublicKeyKey
+    deviceAttestationCertPrivateKeyRef:(SecKeyRef _Nonnull)deviceAttestationCertPrivateKeyRef
 {
     self = [super init];
     if (self) {
@@ -51,8 +48,7 @@
         _firmwareInformation = firmwareInformation;
         _deviceAttestationCert = deviceAttestationCert;
         _productAttestationIntermediateCert = productAttestationIntermediateCert;
-        _deviceAttestationCertPrivateKey = deviceAttestationCertPrivateKey;
-        _deviceAttestationCertPublicKeyKey = deviceAttestationCertPublicKeyKey;
+        _deviceAttestationCertPrivateKeyRef = deviceAttestationCertPrivateKeyRef;
     }
     return self;
 }
@@ -62,28 +58,24 @@
     return _certificationDeclaration;
 }
 
-- (NSData * _Nonnull)getFirmwareInformation;
+- (NSData * _Nonnull)getFirmwareInformation
 {
     return _firmwareInformation;
 }
 
-- (NSData * _Nonnull)getDeviceAttestationCert;
+- (NSData * _Nonnull)getDeviceAttestationCert
 {
     return _deviceAttestationCert;
 }
 
-- (NSData * _Nonnull)getProductAttestationIntermediateCert;
+- (NSData * _Nonnull)getProductAttestationIntermediateCert
 {
     return _productAttestationIntermediateCert;
 }
 
-- (NSData * _Nonnull)getDeviceAttestationCertPrivateKey;
+- (SecKeyRef)getDeviceAttestationCertPrivateKeyRef
 {
-    return _deviceAttestationCertPrivateKey;
+    return _deviceAttestationCertPrivateKeyRef;
 }
 
-- (NSData * _Nonnull)getDeviceAttestationCertPublicKeyKey;
-{
-    return _deviceAttestationCertPublicKeyKey;
-}
 @end

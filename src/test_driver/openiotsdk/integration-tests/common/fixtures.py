@@ -19,13 +19,11 @@ import logging
 import os
 import pathlib
 import shutil
-from time import sleep
 
 import chip.CertificateAuthority
 import chip.native
 import pytest
-from chip import ChipDeviceCtrl, exceptions
-from chip.ChipStack import *
+from chip import exceptions
 
 from .fvp_device import FvpDevice
 from .telnet_connection import TelnetConnection
@@ -113,7 +111,7 @@ def controller(vendor_id, fabric_id, node_id):
     except exceptions.ChipStackException as ex:
         log.error("Controller initialization failed {}".format(ex))
         return None
-    except:
+    except Exception:
         log.error("Controller initialization failed")
         return None
 

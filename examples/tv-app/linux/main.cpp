@@ -50,12 +50,6 @@ using namespace chip::DeviceLayer;
 using namespace chip::AppPlatform;
 using namespace chip::app::Clusters;
 
-bool emberAfBasicClusterMfgSpecificPingCallback(app::CommandHandler * commandObj)
-{
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
-
 namespace {
 static AccountLoginManager accountLoginManager;
 static ApplicationBasicManager applicationBasicManager;

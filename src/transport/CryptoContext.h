@@ -26,6 +26,7 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Span.h>
 #include <transport/raw/MessageHeader.h>
@@ -44,22 +45,22 @@ public:
 
     CryptoContext();
     ~CryptoContext();
-    CryptoContext(CryptoContext &&)      = default;
-    CryptoContext(const CryptoContext &) = default;
-    CryptoContext(Crypto::SymmetricKeyContext * context) : mKeyContext(context){};
-    CryptoContext & operator=(const CryptoContext &) = default;
-    CryptoContext & operator=(CryptoContext &&) = default;
+    CryptoContext(CryptoContext &&)      = delete;
+    CryptoContext(const CryptoContext &) = delete;
+    explicit CryptoContext(Crypto::SymmetricKeyContext * context) : mKeyContext(context) {}
+    CryptoContext & operator=(const CryptoContext &) = delete;
+    CryptoContext & operator=(CryptoContext &&) = delete;
 
     /**
      *    Whether the current node initiated the session, or it is responded to a session request.
      */
-    enum class SessionRole
+    enum class SessionRole : uint8_t
     {
         kInitiator, /**< We initiated the session. */
         kResponder, /**< We responded to the session request. */
     };
 
-    enum class SessionInfoType
+    enum class SessionInfoType : uint8_t
     {
         kSessionEstablishment, /**< A new secure session is established. */
         kSessionResumption,    /**< An old session is being resumed. */
@@ -70,6 +71,7 @@ public:
      *   Derive a shared key. The derived key will be used for encrypting/decrypting
      *   data exchanged on the secure channel.
      *
+     * @param keystore           Session keystore for management of symmetric encryption keys
      * @param local_keypair      A reference to local ECP keypair
      * @param remote_public_key  A reference to peer's public key
      * @param salt               A reference to the initial salt used for deriving the keys
@@ -77,21 +79,24 @@ public:
      * @param role               Role of the new session (initiator or responder)
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR InitFromKeyPair(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                               const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
+    CHIP_ERROR InitFromKeyPair(Crypto::SessionKeystore & keystore, const Crypto::P256Keypair & local_keypair,
+                               const Crypto::P256PublicKey & remote_public_key, const ByteSpan & salt, SessionInfoType infoType,
+                               SessionRole role);
 
     /**
      * @brief
      *   Derive a shared key. The derived key will be used for encrypting/decrypting
      *   data exchanged on the secure channel.
      *
+     * @param keystore           Session keystore for management of symmetric encryption keys
      * @param secret             A reference to the shared secret
      * @param salt               A reference to the initial salt used for deriving the keys
      * @param infoType           The info buffer to use for deriving session keys
      * @param role               Role of the new session (initiator or responder)
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role);
+    CHIP_ERROR InitFromSecret(Crypto::SessionKeystore & keystore, const ByteSpan & secret, const ByteSpan & salt,
+                              SessionInfoType infoType, SessionRole role);
 
     /** @brief Build a Nonce buffer using given parameters for encrypt or decrypt. */
     static CHIP_ERROR BuildNonce(NonceView nonce, uint8_t securityFlags, uint32_t messageCounter, NodeId nodeId);
@@ -136,7 +141,7 @@ public:
     CHIP_ERROR PrivacyDecrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                               const MessageAuthenticationCode & mac) const;
 
-    ByteSpan GetAttestationChallenge() const { return ByteSpan(mKeys[kAttestationChallengeKey], Crypto::kAES_CCM128_Key_Length); }
+    ByteSpan GetAttestationChallenge() const { return mAttestationChallenge.Span(); }
 
     /**
      * @brief
@@ -152,20 +157,13 @@ public:
     bool IsResponder() const { return mKeyAvailable && mSessionRole == SessionRole::kResponder; }
 
 private:
-    typedef uint8_t CryptoKey[Crypto::kAES_CCM128_Key_Length];
-
-    enum KeyUsage
-    {
-        kI2RKey                  = 0,
-        kR2IKey                  = 1,
-        kAttestationChallengeKey = 2,
-        kNumCryptoKeys           = 3
-    };
-
     SessionRole mSessionRole;
 
     bool mKeyAvailable;
-    CryptoKey mKeys[KeyUsage::kNumCryptoKeys];
+    Crypto::Aes128KeyHandle mEncryptionKey;
+    Crypto::Aes128KeyHandle mDecryptionKey;
+    Crypto::AttestationChallenge mAttestationChallenge;
+    Crypto::SessionKeystore * mKeystore       = nullptr;
     Crypto::SymmetricKeyContext * mKeyContext = nullptr;
 
     // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.

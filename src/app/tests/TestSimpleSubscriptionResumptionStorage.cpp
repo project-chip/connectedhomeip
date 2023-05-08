@@ -18,8 +18,6 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-
 #include <app/SimpleSubscriptionResumptionStorage.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
@@ -468,15 +466,3 @@ int TestSimpleSubscriptionResumptionStorage()
 }
 
 CHIP_REGISTER_TEST_SUITE(TestSimpleSubscriptionResumptionStorage)
-
-#else // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-
-/**
- *  Main
- */
-int TestSimpleSubscriptionResumptionStorage()
-{
-    return 0;
-}
-
-#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS

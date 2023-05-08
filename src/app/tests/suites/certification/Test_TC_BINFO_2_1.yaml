@@ -268,7 +268,7 @@ tests:
           "Verify that the Location is same as CountryCode value saved from
           step1"
       verification: |
-          ./chip-tool basic read location 1 0
+          ./chip-tool  basicinformation read location 1 0
 
           On TH,  Verify that TH reads Location from the DUT successfully,  the name should be string and length is less than or equal to 2 bytes.
           [1656495999.760797][2249:2254] CHIP:DMG: }

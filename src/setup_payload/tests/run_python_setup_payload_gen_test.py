@@ -15,14 +15,13 @@
 # limitations under the License.
 
 import os
-import random
 import re
 import subprocess
 import sys
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('src', 'setup_payload', 'tests'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
-from generate_setup_payload import INVALID_PASSCODES, CommissioningFlow, SetupPayload  # noqa: E402
+from generate_setup_payload import CommissioningFlow, SetupPayload  # noqa: E402
 
 
 def payload_param_dict():

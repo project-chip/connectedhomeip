@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/BufferedReadCallback.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
@@ -174,6 +175,12 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, arraySize == 0);
     }
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+    else if (aPath.mAttributeId == Globals::Attributes::EventList::Id)
+    {
+        // Nothing to check for this one; depends on the endpoint.
+    }
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
     {
         // Nothing to check for this one; depends on the endpoint.
@@ -367,7 +374,7 @@ void TestReadChunking::TestChunking(nlTestSuite * apSuite, void * apContext)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
@@ -403,11 +410,9 @@ void TestReadChunking::TestChunking(nlTestSuite * apSuite, void * apContext)
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
 
         //
-        // Always returns the same number of attributes read (5 + revision +
-        // AttributeList + AcceptedCommandList +
-        // GeneratedCommandList = 9).
+        // Always returns the same number of attributes read (5 + revision + GlobalAttributesNotInMetadata).
         //
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 9);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 6 + ArraySize(GlobalAttributesNotInMetadata));
         readCallback.mAttributeCount = 0;
 
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -432,7 +437,7 @@ void TestReadChunking::TestListChunking(nlTestSuite * apSuite, void * apContext)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
@@ -496,7 +501,7 @@ void TestReadChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
 
@@ -548,7 +553,7 @@ void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apConte
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpoint4Clusters)];
@@ -581,9 +586,10 @@ void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apConte
         ctx.DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
-        // AcceptedCommandList / GeneratedCommandList / AttributeList attribute are not included in
-        // testClusterAttrsOnEndpoint4.
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
+        // GlobalAttributesNotInMetadata attributes are not included in testClusterAttrsOnEndpoint4.
+        NL_TEST_ASSERT(apSuite,
+                       readCallback.mAttributeCount ==
+                           ArraySize(testClusterAttrsOnEndpoint4) + ArraySize(GlobalAttributesNotInMetadata));
 
         // We have received all report data.
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
@@ -607,9 +613,10 @@ void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apConte
         ctx.DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
-        // AcceptedCommandList / GeneratedCommandList / AttributeList attribute are not include in
-        // testClusterAttrsOnEndpoint4.
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 3);
+        // GlobalAttributesNotInMetadata attributes are not included in testClusterAttrsOnEndpoint4.
+        NL_TEST_ASSERT(apSuite,
+                       readCallback.mAttributeCount ==
+                           ArraySize(testClusterAttrsOnEndpoint4) + ArraySize(GlobalAttributesNotInMetadata));
 
         // We have received all report data.
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
@@ -748,7 +755,7 @@ void TestReadChunking::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * a
     gSuite = apSuite;
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(2);

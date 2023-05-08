@@ -59,8 +59,11 @@ CHIP_ERROR TizenWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
     {
         return CHIP_NO_ERROR;
     }
-    mSavedNetwork.credentialsLen = credentialsLen;
-    mSavedNetwork.ssidLen        = ssidLen;
+    static_assert(sizeof(mSavedNetwork.credentials) <= UINT8_MAX, "credentialsLen might not fit");
+    mSavedNetwork.credentialsLen = static_cast<uint8_t>(credentialsLen);
+
+    static_assert(sizeof(mSavedNetwork.ssid) <= UINT8_MAX, "ssidLen might not fit");
+    mSavedNetwork.ssidLen = static_cast<uint8_t>(ssidLen);
 
     mStagingNetwork = mSavedNetwork;
     return err;

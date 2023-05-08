@@ -171,21 +171,43 @@ tests:
       PICS: DGETH.S.C00.Rsp
       command: "ResetCounts"
 
+    #https://github.com/CHIP-Specifications/chip-certification-tool/issues/702#issuecomment-1427974329
     - label: "TH reads PacketRxCount attribute value from DUT"
-      PICS: DGETH.S.A0002
-      command: "readAttribute"
-      attribute: "PacketRxCount"
-      response:
-          constraints:
-              maxValue: PacketRxCount
+      PICS: DGETH.S.A0002 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
 
+          Verify the value of PacketRxCount is less than the value from step 2b on TH(chip-tool) log
+
+          [1657259203.212932][2661:2666] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0002 DataVersion: 4077191321
+          [1657259203.213000][2661:2666] CHIP:TOO:   PacketRxCount: 30
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #https://github.com/CHIP-Specifications/chip-certification-tool/issues/702#issuecomment-1427974329
     - label: "TH reads PacketTxCount attribute value from DUT"
-      PICS: DGETH.S.A0003
-      command: "readAttribute"
-      attribute: "PacketTxCount"
-      response:
-          constraints:
-              maxValue: PacketTxCount
+      PICS: DGETH.S.A0003 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
+
+          Verify the value of PacketTxCount is less than the value from step 2c on TH(chip-tool) log
+
+          [1657259233.211240][2668:2673] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0003 DataVersion: 4077191321
+          [1657259233.211315][2668:2673] CHIP:TOO:   PacketTxCount: 96
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads TxErrCount attribute value from DUT"
       PICS: DGETH.S.A0004

@@ -26,6 +26,26 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          Commission TH and DUT on Thread setup
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          The cluster Identifier 49 (0x0031) is present in the ServerList attribute
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          The FeatureMap attribute value is 2
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          MaxNetworks attribute value is at least 1 which is saved as 'MaxNetworksValue' for future use
+      disabled: true
+
     - label:
           "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 900"

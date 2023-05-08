@@ -13,7 +13,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue({{asUpperCamelCase ../n
 {
     using EnumType = {{asUpperCamelCase ../name}}::{{asType label}};
     switch (val) {
-{{#if (isWeaklyTypedEnum label)}}
+{{#if (isInConfigList label "WeakEnums")}}
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -21,7 +21,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue({{asUpperCamelCase ../n
     {{#zcl_enum_items}}
     case EnumType::k{{asUpperCamelCase label}}:
     {{/zcl_enum_items}}
-{{#if (isWeaklyTypedEnum label)}}
+{{#if (isInConfigList label "WeakEnums")}}
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     {{#zcl_enum_items}}
     case EMBER_ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}:

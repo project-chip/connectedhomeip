@@ -22,16 +22,23 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandlerInterface.h>
 #include <jni.h>
+#include <json/json.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/JniReferences.h>
 
 namespace chip {
 namespace AppPlatform {
 
-using CommandHandlerInterface = chip::app::CommandHandlerInterface;
+using CommandHandlerInterface    = chip::app::CommandHandlerInterface;
+using Status                     = Protocols::InteractionModel::Status;
+using LaunchResponseType         = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
+using PlaybackResponseType       = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type;
+using NavigateTargetResponseType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type;
+using GetSetupPINResponseType    = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type;
 
 class ContentAppCommandDelegate : public CommandHandlerInterface
 {
@@ -65,6 +72,14 @@ public:
     }
 
     void InvokeCommand(CommandHandlerInterface::HandlerContext & handlerContext) override;
+
+    Status InvokeCommand(EndpointId epId, ClusterId clusterId, CommandId commandId, std::string payload, bool & commandHandled,
+                         Json::Value & value);
+
+    GetSetupPINResponseType FormatGetSetupPINResponse(Json::Value value, Status & status);
+    LaunchResponseType FormatContentLauncherResponse(Json::Value value, Status & status);
+    NavigateTargetResponseType FormatNavigateTargetResponse(Json::Value value, Status & status);
+    PlaybackResponseType FormatMediaPlaybackResponse(Json::Value value, Status & status);
 
 private:
     void InitializeJNIObjects(jobject manager)

@@ -23,9 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     - label: "DUT reads LabelList from the TH"
       PICS: FLABEL.C.A0000

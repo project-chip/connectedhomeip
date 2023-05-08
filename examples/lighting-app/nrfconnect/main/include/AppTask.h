@@ -26,6 +26,8 @@
 
 #if CONFIG_CHIP_FACTORY_DATA
 #include <platform/nrfconnect/FactoryDataProvider.h>
+#else
+#include <platform/nrfconnect/DeviceInstanceInfoProviderImpl.h>
 #endif
 
 #ifdef CONFIG_CHIP_PW_RPC
@@ -85,10 +87,6 @@ private:
     static void LEDStateUpdateHandler(LEDWidget & ledWidget);
     static void FunctionHandler(const AppEvent & event);
     static void StartBLEAdvertisementAndLightActionEventHandler(const AppEvent & event);
-
-#ifdef CONFIG_MCUMGR_SMP_BT
-    static void RequestSMPAdvertisingStart(void);
-#endif
 
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;

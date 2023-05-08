@@ -83,6 +83,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         WriteConfigValue(BL702Config::kCounterKey_RebootCount, rebootCount + 1);
     }
 
+    if (!BL702Config::ConfigValueExists(BL702Config::kCounterKey_TotalOperationalHours))
+    {
+        ReturnErrorOnFailure(StoreTotalOperationalHours(0));
+    }
+
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {

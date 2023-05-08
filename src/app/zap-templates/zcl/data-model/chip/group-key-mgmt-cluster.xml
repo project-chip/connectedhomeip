@@ -33,7 +33,7 @@ limitations under the License.
   <struct name="GroupKeySetStruct">
     <cluster code="0x003F"/>
     <item fieldId="0" name="GroupKeySetID" type="INT16U"/>
-    <item fieldId="1" name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicy"/>
+    <item fieldId="1" name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicyEnum"/>
     <item fieldId="2" name="EpochKey0" type="OCTET_STRING" length="16" isNullable="true"/>
     <item fieldId="3" name="EpochStartTime0" type="epoch_us" isNullable="true"/>
     <item fieldId="4" name="EpochKey1" type="OCTET_STRING" length="16" isNullable="true"/>
@@ -42,7 +42,7 @@ limitations under the License.
     <item fieldId="7" name="EpochStartTime2" type="epoch_us" isNullable="true"/>
   </struct>
 
-  <enum name="GroupKeySecurityPolicy" type="ENUM8">
+  <enum name="GroupKeySecurityPolicyEnum" type="ENUM8">
     <cluster code="0x003F"/>
     <item name="TrustFirst" value="0x00"/>
     <item name="CacheAndSync" value="0x01"/>

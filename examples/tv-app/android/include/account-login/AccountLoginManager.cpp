@@ -19,21 +19,24 @@
 #include "AccountLoginManager.h"
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
+#include <json/json.h>
+#include <lib/core/DataModelTypes.h>
 
 using namespace std;
 using namespace chip::app::Clusters::AccountLogin;
+using Status = chip::Protocols::InteractionModel::Status;
 
-AccountLoginManager::AccountLoginManager(const char * setupPin)
+AccountLoginManager::AccountLoginManager(ContentAppCommandDelegate * commandDelegate, const char * setupPin) :
+    mCommandDelegate(commandDelegate)
 {
     CopyString(mSetupPin, sizeof(mSetupPin), setupPin);
 }
 
 bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin)
 {
+    ChipLogProgress(DeviceLayer, "AccountLoginManager::HandleLogin called for endpoint %d", mEndpointId);
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
     string setupPinString(setupPin.data(), setupPin.size());
-    ChipLogProgress(Zcl, "temporary account id: %s", tempAccountIdentifierString.c_str());
-    ChipLogProgress(Zcl, "setup pin %s", setupPinString.c_str());
 
     if (strcmp(mSetupPin, setupPinString.c_str()) == 0)
     {
@@ -64,3 +67,37 @@ void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINRes
     response.setupPIN = CharSpan::fromCharString(mSetupPin);
     helper.Success(response);
 }
+
+void AccountLoginManager::GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifier)
+{
+    // Only this method is called outside of the normal Matter communication with endpoints and clusters.
+    // Hence we have to introduce call to the java layer(thorough the command delegate) here.
+    // Other methods in this class do not need to be changed beecause those will get routed to java layer
+    // upstream.
+    ChipLogProgress(DeviceLayer, "AccountLoginManager::GetSetupPin called for endpoint %d", mEndpointId);
+    string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
+    if (mCommandDelegate == nullptr)
+    {
+        // For the dummy content apps to work.
+        CopyString(setupPin, setupPinSize, mSetupPin);
+        ChipLogProgress(Zcl, "Returning pin for dummy content app");
+        return;
+    }
+
+    Json::Value response;
+    bool commandHandled = true;
+    mCommandDelegate->InvokeCommand(mEndpointId, chip::app::Clusters::AccountLogin::Id,
+                                    chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Id,
+                                    "{\"0\": \"" + tempAccountIdentifierString + "\"}", commandHandled, response);
+    Status status;
+    GetSetupPINResponse pinResponse = mCommandDelegate->FormatGetSetupPINResponse(response, status);
+    if (status == chip::Protocols::InteractionModel::Status::Success)
+    {
+        CopyString(setupPin, setupPinSize, pinResponse.setupPIN);
+    }
+    else
+    {
+        CopyString(setupPin, setupPinSize, "");
+    }
+    ChipLogProgress(Zcl, "Returning pin for content app for endpoint %d", mEndpointId);
+};

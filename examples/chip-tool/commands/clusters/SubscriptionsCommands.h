@@ -30,7 +30,7 @@ public:
         CHIPCommand("shutdown-one", credsIssuerConfig,
                     "Shut down a single subscription, identified by its subscription id and target node id.")
     {
-        AddArgument("subscription-id", 0, UINT64_MAX, &mSubscriptionId);
+        AddArgument("subscription-id", 0, UINT32_MAX, &mSubscriptionId);
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId,
                     "The node id, scoped to the commissioner name the command is running under.");
     }
@@ -94,7 +94,7 @@ public:
 private:
 };
 
-void registerClusterSubscriptions(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerCommandsSubscriptions(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName = "Subscriptions";
 
@@ -104,5 +104,5 @@ void registerClusterSubscriptions(Commands & commands, CredentialIssuerCommands 
         make_unique<ShutdownAllSubscriptions>(credsIssuerConfig),     //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.Register(clusterName, clusterCommands, "Commands for shutting down subscriptions.");
 }

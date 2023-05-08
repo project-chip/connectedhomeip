@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/BytesToHex.h>
@@ -49,9 +50,11 @@ bool IsKey(const ByteSpan & key, const char * desired)
     {
         return false;
     }
+
+    auto desired_bytes = Uint8::from_const_char(desired);
     for (size_t i = 0; i < key.size(); ++i)
     {
-        if (SafeToLower(key.data()[i]) != SafeToLower(desired[i]))
+        if (SafeToLower(key.data()[i]) != SafeToLower(desired_bytes[i]))
         {
             return false;
         }
@@ -104,8 +107,8 @@ bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
 
 size_t GetPlusSignIdx(const ByteSpan & value)
 {
-    // Fist value is the vendor id, second (after the +) is the product.
-    for (int i = 0; i < static_cast<int>(value.size()); ++i)
+    // First value is the vendor id, second (after the +) is the product.
+    for (size_t i = 0; i < value.size(); ++i)
     {
         if (static_cast<char>(value.data()[i]) == '+')
         {

@@ -181,11 +181,12 @@ public:
 
     // Service advertiser
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
+    bool IsInitialized() override { return mIsInitialized; }
     void Shutdown() override;
     CHIP_ERROR RemoveServices() override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
-    CHIP_ERROR FinalizeServiceUpdate() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR FinalizeServiceUpdate() override;
     CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) const override;
     CHIP_ERROR UpdateCommissionableInstanceName() override;
 
@@ -236,8 +237,9 @@ private:
                                     "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
                     mrp.mIdleRetransTimeout = kMaxRetryInterval;
                 }
-                size_t writtenCharactersNumber = snprintf(storage.sleepyIdleIntervalBuf, sizeof(storage.sleepyIdleIntervalBuf),
-                                                          "SII=%" PRIu32, mrp.mIdleRetransTimeout.count());
+                size_t writtenCharactersNumber =
+                    static_cast<size_t>(snprintf(storage.sleepyIdleIntervalBuf, sizeof(storage.sleepyIdleIntervalBuf),
+                                                 "SII=%" PRIu32, mrp.mIdleRetransTimeout.count()));
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.sleepyIdleIntervalBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
@@ -252,8 +254,9 @@ private:
                                     "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
                     mrp.mActiveRetransTimeout = kMaxRetryInterval;
                 }
-                size_t writtenCharactersNumber = snprintf(storage.sleepyActiveIntervalBuf, sizeof(storage.sleepyActiveIntervalBuf),
-                                                          "SAI=%" PRIu32, mrp.mActiveRetransTimeout.count());
+                size_t writtenCharactersNumber =
+                    static_cast<size_t>(snprintf(storage.sleepyActiveIntervalBuf, sizeof(storage.sleepyActiveIntervalBuf),
+                                                 "SAI=%" PRIu32, mrp.mActiveRetransTimeout.count()));
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.sleepyActiveIntervalBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
@@ -262,8 +265,8 @@ private:
         }
         if (params.GetTcpSupported().HasValue())
         {
-            size_t writtenCharactersNumber =
-                snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", params.GetTcpSupported().Value());
+            size_t writtenCharactersNumber = static_cast<size_t>(
+                snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", params.GetTcpSupported().Value()));
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.tcpSupportedBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.tcpSupportedBuf;
@@ -290,7 +293,7 @@ private:
 
     // current request handling
     const chip::Inet::IPPacketInfo * mCurrentSource = nullptr;
-    uint32_t mMessageId                             = 0;
+    uint16_t mMessageId                             = 0;
 
     const char * mEmptyTextEntries[1] = {
         "=",
@@ -337,7 +340,7 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
     // is true.  But we don't handle updates to our set of interfaces right now,
     // so rely on the logic in this function to shut down and restart the
     // GlobalMinimalMdnsServer to handle that.
-    GlobalMinimalMdnsServer::Server().Shutdown();
+    GlobalMinimalMdnsServer::Server().ShutdownEndpoints();
 
     if (!mIsInitialized)
     {
@@ -361,6 +364,8 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
 
 void AdvertiserMinMdns::Shutdown()
 {
+    VerifyOrReturn(mIsInitialized);
+
     AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
 
     GlobalMinimalMdnsServer::Server().Shutdown();
@@ -369,6 +374,8 @@ void AdvertiserMinMdns::Shutdown()
 
 CHIP_ERROR AdvertiserMinMdns::RemoveServices()
 {
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+
     // Send a "goodbye" packet for each RR being removed, as defined in RFC 6762.
     // This allows mDNS clients to remove stale cached records which may not be re-added with
     // subsequent Advertise() calls. In the case the same records are re-added, this extra
@@ -444,6 +451,8 @@ OperationalQueryAllocator::Allocator * AdvertiserMinMdns::FindEmptyOperationalAl
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+
     char nameBuffer[Operational::kInstanceNameMaxLength + 1] = "";
 
     // need to set server name
@@ -545,6 +554,12 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AdvertiserMinMdns::FinalizeServiceUpdate()
+{
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName, size_t maxLength) const
 {
     if (maxLength < (Commission::kInstanceNameMaxLength + 1))
@@ -566,6 +581,8 @@ CHIP_ERROR AdvertiserMinMdns::UpdateCommissionableInstanceName()
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         mQueryResponderAllocatorCommissionable.Clear();

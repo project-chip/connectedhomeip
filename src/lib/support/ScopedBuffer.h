@@ -137,7 +137,7 @@ class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<MemoryManagement>
 public:
     using Base = Impl::ScopedMemoryBufferBase<MemoryManagement>;
 
-    static_assert(std::is_trivial<T>::value, "Constructors won't get run");
+    static_assert(std::is_trivially_destructible<T>::value, "Destructors won't get run");
 
     inline T * Get() { return static_cast<T *>(Base::Ptr()); }
     inline T & operator[](size_t index) { return Get()[index]; }
@@ -150,13 +150,40 @@ public:
     ScopedMemoryBuffer & Calloc(size_t elementCount)
     {
         Base::Calloc(elementCount, sizeof(T));
+        ExecuteConstructors(elementCount);
         return *this;
     }
 
     ScopedMemoryBuffer & Alloc(size_t elementCount)
     {
         Base::Alloc(elementCount * sizeof(T));
+        ExecuteConstructors(elementCount);
         return *this;
+    }
+
+private:
+    template <typename U = T, std::enable_if_t<std::is_trivial<U>::value, int> = 0>
+    void ExecuteConstructors(size_t elementCount)
+    {
+        // Do nothing if our type is trivial.  In particular, if we are a buffer
+        // of integers, we should not go zero-initializing them here: either
+        // caller wants that and called Calloc(), or it doesn't and we shouldn't
+        // do it.
+    }
+
+    template <typename U = T, std::enable_if_t<!std::is_trivial<U>::value, int> = 0>
+    void ExecuteConstructors(size_t elementCount)
+    {
+        T * elementPtr = Get();
+        if (elementPtr == nullptr)
+        {
+            // Alloc failed, don't bother.
+            return;
+        }
+        for (size_t i = 0; i < elementCount; ++i)
+        {
+            new (&elementPtr[i]) T();
+        }
     }
 };
 

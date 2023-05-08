@@ -26,12 +26,7 @@ config:
 tests:
     - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
       verification: |
-          On DUT side:
-          sudo ./chip-bridge-app
 
-
-          On TH side:
-          ./chip-tool pairing ethernet 1 20202021 3840 fe80::e65f:1ff:fe0f:2753  5540
       disabled: true
 
     - label:

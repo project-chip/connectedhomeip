@@ -134,11 +134,13 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
     void OnChipDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info) override;
-    void OnChipScanComplete() override;
+    void OnScanComplete() override;
+    void OnScanError(CHIP_ERROR err) override;
 
     // ===== Members for internal use by the following friends.
 
@@ -162,7 +164,7 @@ private:
         kAdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
     };
 
-    static gboolean _BleInitialize(void * userData);
+    static CHIP_ERROR _BleInitialize(void * userData);
     void DriveBLEState();
     static void DriveBLEState(intptr_t arg);
 
@@ -172,6 +174,8 @@ private:
     static void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState,
                                           void * userData);
     static void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle, void * userData);
+    static void ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
+                                     int offset, void * userData);
     static void WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
                                       bool responseNeeded, int offset, const char * value, int len, void * userData);
     static void IndicationConfirmationCb(int result, const char * remoteAddress, bt_gatt_server_h server, bt_gatt_h characteristic,
@@ -203,8 +207,7 @@ private:
     void NotifyBLEWriteReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
 
     // ==== Connection.
-    void ConnectHandler(const char * address);
-    static gboolean ConnectChipThing(gpointer userData);
+    static CHIP_ERROR ConnectChipThing(const char * userData);
     void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyHandleNewConnection(BLE_CONNECTION_OBJECT conId);
@@ -231,7 +234,6 @@ private:
 
     BLEScanConfig mBLEScanConfig;
     std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
-    GMainContext * mMainContext  = nullptr;
     bt_gatt_client_h mGattClient = nullptr;
 };
 

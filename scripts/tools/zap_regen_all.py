@@ -24,6 +24,8 @@ import subprocess
 import sys
 import tempfile
 import time
+import traceback
+import urllib.request
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
@@ -41,6 +43,10 @@ class TargetType(Flag):
     # Global templates: generally examples and chip controller
     GLOBAL = auto()
 
+    # codgen.py templates (generally java templates, which cannot be built
+    # at compile time currently)
+    IDL_CODEGEN = auto()
+
     # App-specific templates (see getSpecificTemplatesTargets)
     SPECIFIC = auto()
 
@@ -48,12 +54,13 @@ class TargetType(Flag):
     GOLDEN_TEST_IMAGES = auto()
 
     # All possible targets. Convenience constant
-    ALL = TESTS | GLOBAL | SPECIFIC | GOLDEN_TEST_IMAGES
+    ALL = TESTS | GLOBAL | IDL_CODEGEN | SPECIFIC | GOLDEN_TEST_IMAGES
 
 
 __TARGET_TYPES__ = {
     'tests': TargetType.TESTS,
     'global': TargetType.GLOBAL,
+    'idl_codegen': TargetType.IDL_CODEGEN,
     'specific': TargetType.SPECIFIC,
     'golden_test_images': TargetType.GOLDEN_TEST_IMAGES,
     'all': TargetType.ALL,
@@ -81,6 +88,13 @@ class ZapDistinctOutput:
 
 
 class ZAPGenerateTarget:
+
+    @staticmethod
+    def MatterIdlTarget(zap_config):
+        # NOTE: this assumes `src/app/zap-templates/matter-idl.json` is the
+        #       DEFAULT generation target and it needs no output_dir
+        return ZAPGenerateTarget(zap_config, template=None, output_dir=None)
+
     def __init__(self, zap_config, template, output_dir=None):
         self.script = './scripts/tools/zap/generate.py'
         self.zap_config = str(zap_config)
@@ -93,7 +107,16 @@ class ZAPGenerateTarget:
             self.output_dir = None
 
     def distinct_output(self):
-        return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
+        if not self.template and not self.output_dir:
+            # Matter IDL templates have no template/output dir as they go with the
+            # default.
+            #
+            # output_directory is MIS-USED here because zap files may reside in the same
+            # directory (e.g. chef) so we claim the zap config is an output directory
+            # for uniqueness
+            return ZapDistinctOutput(input_template=None, output_directory=self.zap_config)
+        else:
+            return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
 
     def log_command(self):
         """Log the command that will get run for this target
@@ -128,9 +151,6 @@ class ZAPGenerateTarget:
         generate_end = time.time()
 
         if "chef" in self.zap_config:
-            af_gen_event = os.path.join(self.output_dir, "af-gen-event.h")
-            with open(af_gen_event, "w+"):  # Empty file needed for linux
-                pass
             idl_path = self.zap_config.replace(".zap", ".matter")
             target_path = os.path.join("examples",
                                        "chef",
@@ -178,6 +198,61 @@ class GoldenTestImageTarget():
     def distinct_output(self):
         # Fake output - this is a single target that generates golden images
         return ZapDistinctOutput(input_template='GOLDEN_IMAGES', output_directory='GOLDEN_IMAGES')
+
+    def log_command(self):
+        logging.info("  %s" % " ".join(self.command))
+
+
+class JinjaCodegenTarget():
+    def __init__(self, generator: str, output_directory: str, idl_path: str):
+        # This runs a test, but the important bit is we pass `--regenerate`
+        # to it and this will cause it to OVERWRITE golden images.
+        self.idl_path = idl_path
+        self.generator = generator
+        self.output_directory = output_directory
+        self.command = ["./scripts/codegen.py", "--output-dir", output_directory,
+                        "--generator", generator, idl_path]
+
+    def runJavaPrettifier(self):
+        try:
+            java_outputs = subprocess.check_output(["./scripts/codegen.py", "--name-only", "--generator",
+                                                   self.generator, "--log-level", "fatal", self.idl_path]).decode("utf8").split("\n")
+            java_outputs = [os.path.join(self.output_directory, name) for name in java_outputs if name]
+
+            logging.info("Prettifying %d java files:", len(java_outputs))
+            for name in java_outputs:
+                logging.info("    %s" % name)
+
+            # Keep this version in sync with what restyler uses (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
+            FORMAT_VERSION = "1.6"
+            URL_PREFIX = 'https://github.com/google/google-java-format/releases/download/google-java-format'
+            JAR_NAME = f"google-java-format-{FORMAT_VERSION}-all-deps.jar"
+            jar_url = f"{URL_PREFIX}-{FORMAT_VERSION}/{JAR_NAME}"
+
+            path, http_message = urllib.request.urlretrieve(jar_url, Path.home().joinpath(JAR_NAME).as_posix())
+
+            subprocess.check_call(['java', '-jar', path, '--replace'] + java_outputs)
+        except Exception as err:
+            traceback.print_exception(err)
+            print('google-java-format error:', err)
+
+    def generate(self) -> TargetRunStats:
+        generate_start = time.time()
+
+        subprocess.check_call(self.command)
+        self.runJavaPrettifier()
+
+        generate_end = time.time()
+
+        return TargetRunStats(
+            generate_time=generate_end - generate_start,
+            config=f'codegen:{self.generator}',
+            template=self.idl_path,
+        )
+
+    def distinct_output(self):
+        # Fake output - this is a single target that generates golden images
+        return ZapDistinctOutput(input_template=f'{self.generator}{self.idl_path}', output_directory=self.output_directory)
 
     def log_command(self):
         logging.info("  %s" % " ".join(self.command))
@@ -244,12 +319,11 @@ def getGlobalTemplatesTargets():
             # a name like <zap-generated/foo.h>
             output_dir = os.path.join(
                 'zzz_generated', 'placeholder', example_name, 'zap-generated')
-            template = 'examples/placeholder/templates/templates.json'
+            template = os.path.join(
+                'examples', 'placeholder', 'linux', 'apps', example_name, 'templates', 'templates.json')
 
-            targets.append(ZAPGenerateTarget(
-                filepath, output_dir=output_dir, template="src/app/zap-templates/matter-idl.json"))
-            targets.append(
-                ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
+            targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
+            targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
             continue
 
         if example_name == "chef":
@@ -263,7 +337,7 @@ def getGlobalTemplatesTargets():
         generate_subdir = example_name
 
         # Special casing lighting app because separate folders
-        if example_name == "lighting-app":
+        if example_name == "lighting-app" or example_name == "lock-app":
             if 'nxp' in str(filepath):
                 generate_subdir = f"{example_name}/nxp"
 
@@ -271,13 +345,9 @@ def getGlobalTemplatesTargets():
         # a name like <zap-generated/foo.h>
         output_dir = os.path.join(
             'zzz_generated', generate_subdir, 'zap-generated')
-        targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir,
-                       template="src/app/zap-templates/matter-idl.json"))
+        targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
 
-    targets.append(ZAPGenerateTarget(
-        'src/controller/data_model/controller-clusters.zap',
-        template="src/app/zap-templates/matter-idl.json",
-        output_dir=os.path.join('zzz_generated/controller-clusters/zap-generated')))
+    targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/data_model/controller-clusters.zap'))
 
     # This generates app headers for darwin only, for easier/clearer include
     # in .pbxproj files.
@@ -287,7 +357,18 @@ def getGlobalTemplatesTargets():
     targets.append(ZAPGenerateTarget(
         'src/controller/data_model/controller-clusters.zap',
         template="src/app/zap-templates/app-templates.json",
-        output_dir=os.path.join('zzz_generated/darwin/controller-clusters/zap-generated')))
+        output_dir='zzz_generated/darwin/controller-clusters/zap-generated'))
+
+    return targets
+
+
+def getCodegenTemplates():
+    targets = []
+
+    targets.append(JinjaCodegenTarget(
+        generator="java-class",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="src/controller/java/generated"))
 
     return targets
 
@@ -348,13 +429,16 @@ def getTargets(type, test_target):
     targets = []
 
     if type & TargetType.TESTS:
-        targets.extend(getTestsTemplatesTargets('all'))
+        targets.extend(getTestsTemplatesTargets(test_target))
 
     if type & TargetType.GLOBAL:
         targets.extend(getGlobalTemplatesTargets())
 
     if type & TargetType.SPECIFIC:
         targets.extend(getSpecificTemplatesTargets())
+
+    if type & TargetType.IDL_CODEGEN:
+        targets.extend(getCodegenTemplates())
 
     if type & TargetType.GOLDEN_TEST_IMAGES:
         targets.extend(getGoldenTestImageTargets())
@@ -424,6 +508,9 @@ def main():
     print(" Time (s) | {:^50} | {:^50}".format("Config", "Template"))
     for timing in timings:
         tmpl = timing.template
+
+        if tmpl is None:
+            tmpl = '[NONE (matter idl generation)]'
 
         if len(tmpl) > 50:
             # easier to distinguish paths ... shorten common in-fixes

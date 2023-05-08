@@ -537,16 +537,14 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
                       ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(
-        err = writer->Put(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kNetworkingStatus)), status));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));
     if (debugText.size() != 0)
     {
-        SuccessOrExit(err = DataModel::Encode(
-                          *writer, TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kDebugText)), debugText));
+        SuccessOrExit(
+            err = DataModel::Encode(*writer, TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kDebugText), debugText));
     }
-    SuccessOrExit(
-        err = writer->StartContainer(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kThreadScanResults)),
-                                     TLV::TLVType::kTLVType_Array, listContainerType));
+    SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kThreadScanResults),
+                                               TLV::TLVType::kTLVType_Array, listContainerType));
 
     VerifyOrExit(scanResponseArray.Alloc(chip::min(networks->Count(), kMaxNetworksInScanResponse)), err = CHIP_ERROR_NO_MEMORY);
     for (; networks != nullptr && networks->Next(scanResponse);)
@@ -646,16 +644,14 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
                       ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(
-        err = writer->Put(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kNetworkingStatus)), status));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));
     if (debugText.size() != 0)
     {
-        SuccessOrExit(err = DataModel::Encode(
-                          *writer, TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kDebugText)), debugText));
+        SuccessOrExit(
+            err = DataModel::Encode(*writer, TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kDebugText), debugText));
     }
-    SuccessOrExit(
-        err = writer->StartContainer(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kWiFiScanResults)),
-                                     TLV::TLVType::kTLVType_Array, listContainerType));
+    SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kWiFiScanResults),
+                                               TLV::TLVType::kTLVType_Array, listContainerType));
 
     for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse; networksEncoded++)
     {
@@ -802,46 +798,6 @@ DeviceLayer::NetworkCommissioning::NetworkIterator * NullNetworkDriver::GetNetwo
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-// These functions are ember interfaces, they should never be implemented since all network commissioning cluster functions are
-// implemented in NetworkCommissioning::Instance.
-bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::AddOrUpdateThreadNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::AddOrUpdateWiFiNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterConnectNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              const Commands::ConnectNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                             const Commands::RemoveNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                            const Commands::ScanNetworks::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterReorderNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              const Commands::ReorderNetwork::DecodableType & commandData)
-{
-    return false;
-}
 
 void MatterNetworkCommissioningPluginServerInitCallback()
 {

@@ -48,4 +48,4 @@ chip_ble_project_config_include = ""
 
 custom_toolchain = "//config/qpg/chip-gn/toolchain:qpgtoolchain"
 
-pw_build_PIP_CONSTRAINTS = [ "//scripts/constraints.txt" ]
+pw_build_PIP_CONSTRAINTS = [ "//scripts/setup/constraints.txt" ]

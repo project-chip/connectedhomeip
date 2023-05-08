@@ -47,14 +47,14 @@ limitations under the License.
     <item name="Gnss" value="0x10"/>	    
   </enum>
 
-  <struct name="TimeZoneType">
+  <struct name="TimeZoneStruct">
     <cluster code="0x0038"/>
     <item fieldId="0" name="Offset" type="INT32S"/>
     <item fieldId="1" name="ValidAt" type="epoch_us"/>
     <item fieldId="2" name="Name" type="CHAR_STRING" length="64" optional="true"/>
   </struct>
 
-  <struct name="DstOffsetType">
+  <struct name="DSTOffsetStruct">
     <cluster code="0x0038"/>
     <item fieldId="0" name="Offset" type="INT32S"/>
     <item fieldId="1" name="ValidStarting" type="epoch_us"/>
@@ -84,13 +84,13 @@ security materials.</description>
 	<access op="read" privilege="view"/>
 	<access op="write" privilege="administer"/>
     </attribute>		
-    <attribute side="server" code="0x0005" define="TIME_ZONE" type="ARRAY" entryType="TimeZoneType" min="1" max="2" writable="true" optional="true">
+    <attribute side="server" code="0x0005" define="TIME_ZONE" type="ARRAY" entryType="TimeZoneStruct" min="1" max="2" writable="true" optional="true">
 	<description>TimeZone</description>
 	<access op="read" privilege="view"/>
 	<access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0006" define="DST_OFFSET" type="ARRAY" entryType="DstOffsetType" max="20" writable="true" optional="true">
-	<description>DstOffset</description>
+    <attribute side="server" code="0x0006" define="DST_OFFSET" type="ARRAY" entryType="DSTOffsetStruct" max="20" writable="true" optional="true">
+	<description>DSTOffset</description>
 	<access op="read" privilege="view"/>
 	<access op="write" privilege="manage"/>
     </attribute>		

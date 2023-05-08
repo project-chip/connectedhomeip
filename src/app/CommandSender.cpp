@@ -361,7 +361,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
 
     if (aStartDataStruct)
     {
-        ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)),
+        ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
     }
 

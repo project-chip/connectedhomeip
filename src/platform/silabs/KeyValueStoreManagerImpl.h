@@ -42,18 +42,20 @@ public:
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0) const;
     CHIP_ERROR _Delete(const char * key);
-    CHIP_ERROR ErasePartition(void);
+    void ErasePartition(void);
 
     static constexpr size_t kMaxEntries = KVS_MAX_ENTRIES;
 
     static void ForceKeyMapSave();
+    static void KvsMapMigration();
 
 private:
     static void OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState);
 
     void ScheduleKeyMapSave(void);
     bool IsValidKvsNvm3Key(const uint32_t nvm3Key) const;
-    CHIP_ERROR MapKvsKeyToNvm3(const char * key, uint32_t & nvm3Key, bool isSlotNeeded = false) const;
+    uint16_t hashKvsKeyString(const char * key) const;
+    CHIP_ERROR MapKvsKeyToNvm3(const char * key, uint16_t hash, uint32_t & nvm3Key, bool isSlotNeeded = false) const;
 
     //  ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();

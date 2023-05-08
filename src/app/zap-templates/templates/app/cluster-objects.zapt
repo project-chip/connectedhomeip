@@ -84,7 +84,7 @@ namespace {{asUpperCamelCase name}} {
 namespace Commands {
 {{/first}}
 namespace {{asUpperCamelCase name}} {
-enum class Fields {
+enum class Fields : uint8_t {
     {{#zcl_command_arguments}}
     k{{asUpperCamelCase label}} = {{fieldIdentifier}},
     {{/zcl_command_arguments}}
@@ -165,7 +165,7 @@ namespace Events {
 namespace {{asUpperCamelCase name}} {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::{{asUpperCamelCase priority}};
 
-enum class Fields {
+enum class Fields : uint8_t {
     {{#zcl_event_fields}}
     k{{asUpperCamelCase name}} = {{fieldIdentifier}},
     {{/zcl_event_fields}}

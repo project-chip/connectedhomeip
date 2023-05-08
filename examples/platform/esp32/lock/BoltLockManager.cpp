@@ -21,6 +21,7 @@
 #include "AppTask.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
+#include <esp_log.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 BoltLockManager BoltLockManager::sLock;
@@ -429,11 +430,8 @@ bool BoltLockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, c
 
     for (size_t i = 0; i < totalCredentials; ++i)
     {
-        mCredentials[userIndex][i]                 = credentials[i];
-        mCredentials[userIndex][i].CredentialType  = 1;
-        mCredentials[userIndex][i].CredentialIndex = i + 1;
+        mCredentials[userIndex][i] = credentials[i];
     }
-
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
 
     // Save user information in NVM flash

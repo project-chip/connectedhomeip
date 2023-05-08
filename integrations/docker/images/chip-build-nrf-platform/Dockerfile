@@ -6,7 +6,7 @@ ARG VERSION=latest
 
 FROM connectedhomeip/chip-build:${VERSION} as build
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=v2.2.0
+ARG NCS_REVISION=v2.3.0
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 WORKDIR /opt/NordicSemiconductor/nRF5_tools

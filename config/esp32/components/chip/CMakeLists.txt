@@ -33,7 +33,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
 set(CHIP_REQUIRE_COMPONENTS freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
-if((NOT "${IDF_TARGET}" STREQUAL "esp32h2") AND (NOT "${IDF_TARGET}" STREQUAL "esp32c2"))
+if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
     list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
 endif()
 
@@ -86,10 +86,29 @@ chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                ${is_debug})
 
 # Config the chip log level by IDF menuconfig
-chip_gn_arg_bool  ("chip_error_logging"        CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
-chip_gn_arg_bool  ("chip_progress_logging"     CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
-chip_gn_arg_bool  ("chip_detail_logging"       CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
-chip_gn_arg_bool  ("chip_automation_logging"   CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
+    chip_gn_arg_bool  ("chip_error_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_error_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
+    chip_gn_arg_bool  ("chip_progress_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_progress_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
+    chip_gn_arg_bool  ("chip_detail_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_detail_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
+    chip_gn_arg_bool  ("chip_automation_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_automation_logging" "false")
+endif()
 
 if(CONFIG_ENABLE_CHIPOBLE)
 chip_gn_arg_append("chip_config_network_layer_ble"           "true")
@@ -137,16 +156,38 @@ if (CONFIG_ENABLE_CHIP_SHELL)
     chip_gn_arg_append("chip_build_libshell"                "true")
 endif()
 
-if (CONFIG_IDF_TARGET_ESP32H2)
+if (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABLE_WIFI_AP)
+    chip_gn_arg_append("chip_enable_wifi"                       "true")
+else()
     chip_gn_arg_append("chip_enable_wifi"                       "false")
 endif()
 
-if (CONFIG_OPENTHREAD_ENABLED)
+if (CONFIG_ENABLE_CHIPOBLE)
+    chip_gn_arg_append("chip_enable_chipoble"                "true")
+endif()
+
+if ((CONFIG_BT_ENABLED) AND (CONFIG_ENABLE_CHIPOBLE))
+	if (CONFIG_BT_NIMBLE_ENABLED)
+          chip_gn_arg_append("chip_bt_nimble_enabled"                "true")
+        else()
+          chip_gn_arg_append("chip_bt_bluedroid_enabled"                "true")
+        endif()
+endif()
+
+if (CONFIG_ENABLE_ESP32_BLE_CONTROLLER)
+    chip_gn_arg_append("chip_enable_ble_controller"             "true")
+endif()
+
+if (CONFIG_ENABLE_MATTER_OVER_THREAD)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
+else()
+    chip_gn_arg_append("chip_enable_openthread"                 "false")
 endif()
 
 if (CONFIG_OPENTHREAD_FTD)
     chip_gn_arg_append("chip_openthread_ftd"                    "true")
+else()
+    chip_gn_arg_append("chip_openthread_ftd"                    "false")
 endif()
 
 if (CONFIG_ENABLE_OTA_REQUESTOR)
@@ -160,6 +201,9 @@ endif()
 
 if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_device_platform"   "\"external\"")
+    if (CONFIG_ENABLE_CHIP_SHELL)
+        chip_gn_arg_append("chip_shell_platform"    "\"esp32\"")
+    endif()
     chip_gn_arg_append("chip_platform_target"   "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}\"")
 endif()
 
@@ -189,6 +233,11 @@ endif()
 if (CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER)
     chip_gn_arg_append("chip_use_device_info_provider"                     "true")
 endif()
+
+if (CONFIG_SEC_CERT_DAC_PROVIDER)
+    chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
+endif()
+
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
@@ -286,20 +335,20 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
 idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)
 
 if(CONFIG_BT_ENABLED)
+    idf_component_get_property(bt_lib bt COMPONENT_LIB)
     if("${CONFIG_IDF_TARGET}" STREQUAL "esp32h2")
-        idf_component_get_property(bt_lib bt COMPONENT_LIB)
         idf_component_get_property(bt_dir bt COMPONENT_DIR)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        if(CONFIG_IDF_TARGET_ESP32H2_BETA_VERSION_2)
-            list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32h2/esp32h2-bt-lib/beta2/libble_app.a)
-        endif()
+        list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32h2/esp32h2-bt-lib/libble_app.a)
     elseif("${CONFIG_IDF_TARGET}" STREQUAL "esp32c2")
-        idf_component_get_property(bt_lib bt COMPONENT_LIB)
         idf_component_get_property(bt_dir bt COMPONENT_DIR)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
         list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32c2/esp32c2-bt-lib/libble_app.a)
+    elseif("${CONFIG_IDF_TARGET}" STREQUAL "esp32c6")
+        idf_component_get_property(bt_dir bt COMPONENT_DIR)
+        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
+        list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32c6/esp32c6-bt-lib/libble_app.a)
     else()
-        idf_component_get_property(bt_lib bt COMPONENT_LIB)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
     endif()
 endif()
@@ -314,13 +363,25 @@ if(CONFIG_OPENTHREAD_ENABLED)
     list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
 endif()
 
-if((NOT CONFIG_USE_MINIMAL_MDNS) AND (NOT CONFIG_IDF_TARGET_ESP32H2) AND (NOT CONFIG_IDF_TARGET_ESP32C2))
-    idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
+if((NOT CONFIG_USE_MINIMAL_MDNS) AND (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABLE_WIFI_AP))
+    idf_build_get_property(build_components BUILD_COMPONENTS)
+    # For IDF v5.x, the mdns component was moved to idf_managed_components.
+    # We should use 'espressif__mdns' for 'idf_component_get_property'.
+    if("espressif__mdns" IN_LIST build_components)
+        idf_component_get_property(mdns_lib espressif__mdns COMPONENT_LIB)
+    elseif("mdns" IN_LIST build_components)
+        idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
+    endif()
     list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()
 
 idf_component_get_property(main_lib main COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
+
+if (CONFIG_SEC_CERT_DAC_PROVIDER)
+    idf_component_get_property(esp32_secure_cert_mgr_lib espressif__esp_secure_cert_mgr COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp32_secure_cert_mgr_lib}>)
+endif()
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
@@ -331,8 +392,10 @@ target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
 add_dependencies(${COMPONENT_LIB} chip_gn)
 
 if(CONFIG_ENABLE_PW_RPC)
-    set(WRAP_FUNCTIONS esp_log_write)
-    target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
+    set(WRAP_FUNCTIONS esp_log_write esp_log_writev)
+    foreach(func ${WRAP_FUNCTIONS})
+        target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${func}")
+    endforeach()
 endif()
 
 # Build Matter OTA image

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -74,12 +74,16 @@ using namespace ::chip;
 {
     auto other = [[MTRReadParams alloc] init];
     other.filterByFabric = self.filterByFabric;
+    other.minEventNumber = self.minEventNumber;
     return other;
 }
 
 - (void)toReadPrepareParams:(chip::app::ReadPrepareParams &)readPrepareParams
 {
     readPrepareParams.mIsFabricFiltered = self.filterByFabric;
+    if (self.minEventNumber) {
+        readPrepareParams.mEventNumber.SetValue(static_cast<chip::EventNumber>([self.minEventNumber unsignedLongLongValue]));
+    }
 }
 
 @end
@@ -88,8 +92,9 @@ using namespace ::chip;
 - (instancetype)initWithMinInterval:(NSNumber *)minInterval maxInterval:(NSNumber *)maxInterval
 {
     if (self = [super init]) {
+        _reportEventsUrgently = YES;
         _replaceExistingSubscriptions = YES;
-        _resubscribeIfLost = YES;
+        _resubscribeAutomatically = YES;
         _minInterval = [minInterval copy];
         _maxInterval = [maxInterval copy];
     }
@@ -100,8 +105,10 @@ using namespace ::chip;
 {
     auto other = [[MTRSubscribeParams alloc] initWithMinInterval:self.minInterval maxInterval:self.maxInterval];
     other.filterByFabric = self.filterByFabric;
+    other.minEventNumber = self.minEventNumber;
     other.replaceExistingSubscriptions = self.replaceExistingSubscriptions;
-    other.resubscribeIfLost = self.resubscribeIfLost;
+    other.reportEventsUrgently = self.reportEventsUrgently;
+    other.resubscribeAutomatically = self.resubscribeAutomatically;
     return other;
 }
 
@@ -139,7 +146,7 @@ using namespace ::chip;
 {
     if (self = [super init]) {
         _replaceExistingSubscriptions = YES;
-        _resubscribeIfLost = YES;
+        _resubscribeAutomatically = YES;
         _minInterval = @(1);
         _maxInterval = @(0);
     }
@@ -168,15 +175,15 @@ using namespace ::chip;
 - (void)setAutoResubscribe:(nullable NSNumber *)autoResubscribe
 {
     if (autoResubscribe == nil) {
-        self.resubscribeIfLost = YES;
+        self.resubscribeAutomatically = YES;
     } else {
-        self.resubscribeIfLost = [autoResubscribe boolValue];
+        self.resubscribeAutomatically = [autoResubscribe boolValue];
     }
 }
 
 - (nullable NSNumber *)autoResubscribe
 {
-    return @(self.resubscribeIfLost);
+    return @(self.resubscribeAutomatically);
 }
 
 @end

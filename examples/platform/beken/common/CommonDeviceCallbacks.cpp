@@ -17,7 +17,6 @@
  */
 #include "CommonDeviceCallbacks.h"
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app/server/Dnssd.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>

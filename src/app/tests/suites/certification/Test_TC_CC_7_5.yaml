@@ -372,6 +372,35 @@ tests:
           [1666947536.315798][52174:52174] CHIP:DMG:         SuppressResponse = true,
           [1666947536.315803][52174:52174] CHIP:DMG:         InteractionModelRevision = 1
           [1666947536.315805][52174:52174] CHIP:DMG: }
+
+          ./chip-tool colorcontrol read current-saturation 1 1
+          After 20 Seconds, Verify response contains  Current-saturation value in  TH(all-clusters-app)  Logs:
+          ReportDataMessage =
+          [1666947452.160090][52174:52174] CHIP:DMG: {
+          [1666947452.160094][52174:52174] CHIP:DMG:         AttributeReportIBs =
+          [1666947452.160100][52174:52174] CHIP:DMG:         [
+          [1666947452.160105][52174:52174] CHIP:DMG:                 AttributeReportIB =
+          [1666947452.160113][52174:52174] CHIP:DMG:                 {
+          [1666947452.160117][52174:52174] CHIP:DMG:                         AttributeDataIB =
+          [1666947452.160122][52174:52174] CHIP:DMG:                         {
+          [1666947452.160127][52174:52174] CHIP:DMG:                                 DataVersion = 0x257547d6,
+          [1666947452.160132][52174:52174] CHIP:DMG:                                 AttributePathIB =
+          [1666947452.160140][52174:52174] CHIP:DMG:                                 {
+          [1666947452.160145][52174:52174] CHIP:DMG:                                         Endpoint = 0x1,
+          [1666947452.160151][52174:52174] CHIP:DMG:                                         Cluster = 0x300,
+          [1666947452.160156][52174:52174] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1666947452.160162][52174:52174] CHIP:DMG:                                 }
+          [1666947452.160168][52174:52174] CHIP:DMG:
+          [1666947452.160174][52174:52174] CHIP:DMG:                                 Data = 100,
+          [1666947452.160178][52174:52174] CHIP:DMG:                         },
+          [1666947452.160186][52174:52174] CHIP:DMG:
+          [1666947452.160191][52174:52174] CHIP:DMG:                 },
+          [1666947452.160197][52174:52174] CHIP:DMG:
+          [1666947452.160201][52174:52174] CHIP:DMG:         ],
+          [1666947452.160209][52174:52174] CHIP:DMG:
+          [1666947452.160213][52174:52174] CHIP:DMG:         SuppressResponse = true,
+          [1666947452.160218][52174:52174] CHIP:DMG:         InteractionModelRevision = 1
+          [1666947452.160222][52174:52174] CHIP:DMG: }
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."

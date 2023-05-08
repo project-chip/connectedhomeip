@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 15.2.4. [TC-PCC-2.4] Primary functionality with server as DUT
+name: 16.2.4. [TC-PCC-2.4] Life Time Counters with Server as DUT
 
 PICS:
     - PCC.S

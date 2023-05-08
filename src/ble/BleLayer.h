@@ -249,6 +249,9 @@ public:
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
                                                BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
                                                BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
+    CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj, void * appState,
+                                        BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
+                                        BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
     CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 

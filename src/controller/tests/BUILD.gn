@@ -30,6 +30,7 @@ chip_test_suite("tests") {
     test_sources += [ "TestEventCaching.cpp" ]
     test_sources += [ "TestReadChunking.cpp" ]
     test_sources += [ "TestWriteChunking.cpp" ]
+    test_sources += [ "TestEventNumberCaching.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]

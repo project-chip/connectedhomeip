@@ -231,14 +231,14 @@ tests:
       verification: |
           ./chip-tool onoff read on-off 2 1
 
-          Verify on TH2 (Chip-tool),the onoff value is set to ON
+          Verify on TH1 (Chip-tool),the onoff value is set to ON
 
           [1657798291.396477][3835:3841] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4260513117
           [1657798291.396514][3835:3841] CHIP:TOO:   OnOff: TRUE
 
           ./chip-tool onoff read on-off 3 2
 
-          Verify on TH3 (Chip-tool) ,the onoff value is set to ON
+          Verify on TH1 (Chip-tool) ,the onoff value is set to ON
 
           [1657798691.194894][3869:3874] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 470320746
           [1657798691.194948][3869:3874] CHIP:TOO:   OnOff: TRUE
@@ -352,7 +352,7 @@ tests:
       verification: |
           ./chip-tool onoff read on-off  2 1
 
-          Verify on TH2 (Chip-tool),the onoff value is set to OFF
+          Verify on TH1 (Chip-tool),the onoff value is set to OFF
 
           [1657803168.769564][4272:4277] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 1968648540
 
@@ -364,7 +364,7 @@ tests:
       verification: |
           ./chip-tool onoff read on-off 3 2
 
-          Verify on TH3 (Chip-tool) ,the onoff value is set to ON
+          Verify on TH1 (Chip-tool) ,the onoff value is set to ON
 
           [1657803609.731464][4333:4339] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3914456390
 

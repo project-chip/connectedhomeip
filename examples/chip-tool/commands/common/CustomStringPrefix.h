@@ -18,6 +18,10 @@
 
 #pragma once
 
+#include <string.h>
+
+#include <lib/support/CodeUtils.h>
+
 static constexpr char kJsonStringPrefix[] = "json:";
 constexpr size_t kJsonStringPrefixLen     = ArraySize(kJsonStringPrefix) - 1; // Don't count the null
 

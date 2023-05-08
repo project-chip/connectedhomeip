@@ -42,11 +42,16 @@
 #define LED_B_PIN_PORT 2
 #define LED_B_PIN 17
 
-#define LED_R_PIN_PORT 0
-#define LED_R_PIN 20
+#define LED_R_PIN_PORT 4
+#define LED_R_PIN 14
 
 #define LED_G_PIN_PORT 1
-#define LED_G_PIN 21
+#define LED_G_PIN 11
+
+// comment out for last hardware
+//#define LED_R_PIN_PORT 0
+//#define LED_R_PIN 20
+//#define LED_G_PIN 21
 
 #define MAX_PWM_CHANNEL 3
 

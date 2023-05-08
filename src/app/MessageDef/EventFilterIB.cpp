@@ -104,7 +104,7 @@ EventFilterIB::Builder & EventFilterIB::Builder::Node(const NodeId aNode)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kNode)), aNode);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kNode), aNode);
     }
     return *this;
 }
@@ -114,7 +114,7 @@ EventFilterIB::Builder & EventFilterIB::Builder::EventMin(const uint64_t aEventM
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEventMin)), aEventMin);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEventMin), aEventMin);
     }
     return *this;
 }

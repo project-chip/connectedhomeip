@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,25 +16,13 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Matter/Matter.h>
+#import <Matter/MTRCluster.h>
+#import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRDefines.h>
+
+@class MTRDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
-
-typedef void (^MTRQueryImageCompletionHandler)(
-    MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error);
-
-typedef void (^MTRApplyUpdateRequestCompletionHandler)(
-    MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error);
-
-typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF);
-
-MTR_NEWLY_DEPRECATED("Please use MTRQueryImageCompletionHandler")
-typedef void (^MTRQueryImageCompletionHandlerDeprecated)(
-    MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error);
-
-MTR_NEWLY_DEPRECATED("Plase Use MTRApplyUpdateRequestCompletionHandler")
-typedef void (^MTRApplyUpdateRequestCompletionHandlerDeprecated)(
-    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error);
 
 /**
  * The protocol definition for the MTROTAProviderDelegate
@@ -61,12 +49,17 @@ typedef void (^MTRApplyUpdateRequestCompletionHandlerDeprecated)(
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
                            params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
-                       completion:(MTRQueryImageCompletionHandler)completion MTR_NEWLY_AVAILABLE;
+                       completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completion
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
                            params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-                completionHandler:(MTRQueryImageCompletionHandlerDeprecated)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
+                completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                                      NSError * _Nullable error))completionHandler
+    MTR_DEPRECATED_WITH_REPLACEMENT("handleQueryImageForNodeID:controller:params:completion:", ios(16.1, 16.4), macos(13.0, 13.3),
+        watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 /**
  * Notify the delegate when the apply update request command is received from
@@ -80,12 +73,17 @@ typedef void (^MTRApplyUpdateRequestCompletionHandlerDeprecated)(
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
                                    params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                               completion:(MTRApplyUpdateRequestCompletionHandler)completion MTR_NEWLY_AVAILABLE;
+                               completion:(void (^)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completion
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
                                    params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                        completionHandler:(MTRApplyUpdateRequestCompletionHandlerDeprecated)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
+                        completionHandler:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler
+    MTR_DEPRECATED_WITH_REPLACEMENT("handleApplyUpdateRequestForNodeID:controller:params:completion:", ios(16.1, 16.4),
+        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 /**
  * Notify the delegate when the notify update applied command is received from
@@ -98,12 +96,15 @@ typedef void (^MTRApplyUpdateRequestCompletionHandlerDeprecated)(
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller
                                     params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
-                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+                                completion:(MTRStatusCompletion)completion
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller
                                     params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                          completionHandler:(StatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
+    MTR_DEPRECATED_WITH_REPLACEMENT("handleNotifyUpdateAppliedForNodeID:controller:params:completion:", ios(16.1, 16.4),
+        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 /**
  * Notify the delegate when a BDX Session starts for some node.  The controller
@@ -114,13 +115,16 @@ typedef void (^MTRApplyUpdateRequestCompletionHandlerDeprecated)(
                                     controller:(MTRDeviceController *)controller
                                 fileDesignator:(NSString *)fileDesignator
                                         offset:(NSNumber *)offset
-                                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+                                    completion:(MTRStatusCompletion)completion
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
 - (void)handleBDXTransferSessionBeginForNodeID:(NSNumber *)nodeID
                                     controller:(MTRDeviceController *)controller
                                 fileDesignator:(NSString *)fileDesignator
                                         offset:(NSNumber *)offset
                              completionHandler:(StatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
+    MTR_DEPRECATED_WITH_REPLACEMENT("handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 /**
  * Notify the delegate when a BDX Session ends for some node.  The controller
@@ -141,14 +145,17 @@ typedef void (^MTRApplyUpdateRequestCompletionHandlerDeprecated)(
                       blockSize:(NSNumber *)blockSize
                      blockIndex:(NSNumber *)blockIndex
                     bytesToSkip:(NSNumber *)bytesToSkip
-                     completion:(MTRBDXQueryCompletionHandler)completion MTR_NEWLY_AVAILABLE;
+                     completion:(void (^)(NSData * _Nullable data, BOOL isEOF))completion
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
 - (void)handleBDXQueryForNodeID:(NSNumber *)nodeID
                      controller:(MTRDeviceController *)controller
                       blockSize:(NSNumber *)blockSize
                      blockIndex:(NSNumber *)blockIndex
                     bytesToSkip:(NSNumber *)bytesToSkip
-              completionHandler:(MTRBDXQueryCompletionHandler)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
+              completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler
+    MTR_DEPRECATED_WITH_REPLACEMENT("handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 

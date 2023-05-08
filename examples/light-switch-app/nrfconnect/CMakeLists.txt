@@ -70,6 +70,10 @@ if(CONFIG_MCUMGR_SMP_BT)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
 endif()
 
+if(CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING)
+    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/ICDUtil.cpp)
+endif()
+
 chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../light-switch-common/light-switch-app.zap

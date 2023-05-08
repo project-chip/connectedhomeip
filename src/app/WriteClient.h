@@ -260,8 +260,7 @@ private:
 
         ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(
-            DataModel::Encode(*writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), value));
         ReturnErrorOnFailure(FinishAttributeIB());
 
         return CHIP_NO_ERROR;
@@ -274,8 +273,8 @@ private:
 
         ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::EncodeForWrite(
-            *writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(
+            DataModel::EncodeForWrite(*writer, chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), value));
         ReturnErrorOnFailure(FinishAttributeIB());
 
         return CHIP_NO_ERROR;

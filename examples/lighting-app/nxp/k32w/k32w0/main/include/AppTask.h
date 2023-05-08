@@ -22,8 +22,16 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "K32W0FactoryDataProvider.h"
 #include "LightingManager.h"
+
+#include "CHIPProjectConfig.h"
+
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#include "K32W0FactoryDataProvider.h"
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+#include "CustomFactoryDataProvider.h"
+#endif
+#endif
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -41,6 +49,15 @@
 
 class AppTask
 {
+public:
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+    using FactoryDataProvider = chip::DeviceLayer::CustomFactoryDataProvider;
+#else
+    using FactoryDataProvider = chip::DeviceLayer::K32W0FactoryDataProvider;
+#endif
+#endif
+
 public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
@@ -76,7 +93,6 @@ private:
     static void BleHandler(AppEvent * aEvent);
     static void BleStartAdvertising(intptr_t arg);
     static void LightActionEventHandler(AppEvent * aEvent);
-    static void OTAResumeEventHandler(AppEvent * aEvent);
     static void ResetActionEventHandler(AppEvent * aEvent);
     static void InstallEventHandler(AppEvent * aEvent);
 
@@ -91,18 +107,16 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     static void InitOTA(intptr_t arg);
     static void StartOTAQuery(intptr_t arg);
-    static void PostOTAResume();
-    static void OnScheduleInitOTA(chip::System::Layer * systemLayer, void * appState);
 #endif
 
     static void UpdateClusterStateInternal(intptr_t arg);
     static void UpdateDeviceStateInternal(intptr_t arg);
     static void InitServer(intptr_t arg);
+    static void PrintOnboardingInfo();
 
     enum Function_t
     {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
+        kFunction_NoneSelected = 0,
         kFunction_FactoryReset,
         kFunctionTurnOnTurnOff,
         kFunction_Identify,

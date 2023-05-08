@@ -19,15 +19,11 @@
 
 #include <FreeRTOS.h>
 
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
-#endif // ENABLE_WSTK_LEDS
 
 #include <WindowApp.h>
 #include <queue.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <sl_simple_button_instances.h>
 #include <string>
 #include <task.h>
 #include <timers.h>
@@ -46,7 +42,8 @@ public:
     void Finish() override;
     void PostEvent(const WindowApp::Event & event) override;
     void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId) override;
-    friend void sl_button_on_change(const sl_button_t * handle);
+    static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
+    void OnButtonChange(uint8_t button, uint8_t btnAction);
 
 protected:
     struct Timer : public WindowApp::Timer
@@ -70,7 +67,6 @@ protected:
     WindowApp::Timer * CreateTimer(const char * name, uint32_t timeoutInMs, WindowApp::Timer::Callback callback,
                                    void * context) override;
     WindowApp::Button * CreateButton(WindowApp::Button::Id id, const char * name) override;
-    void OnButtonChange(const sl_button_t * handle);
     void ProcessEvents();
     void DispatchEvent(const WindowApp::Event & event) override;
     void UpdateLEDs();
@@ -85,10 +81,8 @@ private:
     TaskHandle_t mHandle = nullptr;
     QueueHandle_t mQueue = nullptr;
 
-#ifdef ENABLE_WSTK_LEDS
     LEDWidget mStatusLED;
     LEDWidget mActionLED;
-#endif // ENABLE_WSTK_LEDS
 
     // Get QR Code and emulate its content using NFC tag
     char mQRCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];

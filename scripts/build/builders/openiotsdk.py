@@ -67,11 +67,6 @@ class OpenIotSdkBuilder(Builder):
                            ], title='Generating ' + self.identifier)
 
     def _build(self):
-        # Remove old artifacts to force linking
-        cmd = 'rm -rf {}/chip-*'.format(self.output_dir)
-        self._Execute(['bash', '-c', cmd],
-                      title='Remove old artifacts ' + self.identifier)
-
         self._Execute(['cmake', '--build', shlex.quote(self.output_dir)],
                       title='Building ' + self.identifier)
 

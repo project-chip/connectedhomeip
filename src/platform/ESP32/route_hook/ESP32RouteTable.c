@@ -14,7 +14,7 @@
 #include "lwip/netif.h"
 #include "lwip/timeouts.h"
 
-#define MAX_RIO_TIMEOUT UINT32_MAX / (1000 * 4) // lwIP defined reasonable timeout value
+#define LWIP_MAX_TIMEOUT_SECONDS LWIP_UINT32_MAX / (1000 * 4) // lwIP defined reasonable timeout value
 
 static esp_route_entry_t * s_route_entries = NULL;
 
@@ -59,13 +59,22 @@ static esp_err_t remove_route_entry(esp_route_entry_t * route_entry)
 static void route_timeout_handler(void * arg)
 {
     esp_route_entry_t * route = (esp_route_entry_t *) arg;
-
-    remove_route_entry(route);
+    if (route->lifetime_seconds <= LWIP_MAX_TIMEOUT_SECONDS)
+    {
+        remove_route_entry(route);
+    }
+    else
+    {
+        route->lifetime_seconds -= LWIP_MAX_TIMEOUT_SECONDS;
+        sys_timeout(route->lifetime_seconds <= LWIP_MAX_TIMEOUT_SECONDS ? route->lifetime_seconds * 1000
+                                                                        : LWIP_MAX_TIMEOUT_SECONDS * 1000,
+                    route_timeout_handler, route);
+    }
 }
 
 esp_route_entry_t * esp_route_table_add_route_entry(const esp_route_entry_t * route_entry)
 {
-    if (route_entry == NULL || (route_entry->lifetime_seconds > MAX_RIO_TIMEOUT && route_entry->lifetime_seconds != UINT32_MAX))
+    if (route_entry == NULL)
     {
         return NULL;
     }
@@ -96,9 +105,11 @@ esp_route_entry_t * esp_route_table_add_route_entry(const esp_route_entry_t * ro
     }
     entry->preference       = route_entry->preference;
     entry->lifetime_seconds = route_entry->lifetime_seconds;
-    if (entry->lifetime_seconds != UINT32_MAX)
+    if (entry->lifetime_seconds != LWIP_UINT32_MAX)
     {
-        sys_timeout(entry->lifetime_seconds * 1000, route_timeout_handler, entry);
+        sys_timeout(entry->lifetime_seconds <= LWIP_MAX_TIMEOUT_SECONDS ? entry->lifetime_seconds * 1000
+                                                                        : LWIP_MAX_TIMEOUT_SECONDS * 1000,
+                    route_timeout_handler, entry);
     }
 
     return entry;

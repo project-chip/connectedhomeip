@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
 #include <app/util/error-mapping.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/Constants.h>

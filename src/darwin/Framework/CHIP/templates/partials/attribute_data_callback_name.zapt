@@ -13,9 +13,20 @@
     {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
       VendorId
     {{~else if_is_strongly_typed_chip_enum type~}}
-        {{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase type preserveAcronyms=true}}
+      {{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase type preserveAcronyms=true}}
+    {{~else if (isOctetString type)~}}
+      OctetString
+    {{~else if (isCharString type)~}}
+      CharString
+    {{~else if (or (is_str_equal type "float")
+                   (is_str_equal type "single"))~}}
+      Float
+    {{~else if (is_str_equal type "double")~}}
+      Double
+    {{~else if (is_str_equal type "boolean")~}}
+      Boolean
     {{~else~}}
-      {{chipCallback.name}}
+      Int{{as_zcl_data_type_size type parent.id sizeIn='bits' roundUpToPowerOfTwo=1}}{{~#if_is_data_type_signed type parent.id~}}s{{else}}u{{/if_is_data_type_signed}}
     {{~/if~}}
   {{~/if_is_struct~}}
 {{~/if~}}

@@ -114,7 +114,7 @@ public:
 
     friend class FabricTable;
 
-protected:
+private:
     struct InitParams
     {
         NodeId nodeId                         = kUndefinedNodeId;
@@ -718,6 +718,14 @@ public:
     bool HasOperationalKeyForFabric(FabricIndex fabricIndex) const;
 
     /**
+     * @brief Returns the operational keystore. This is used for
+     *        CASE and the only way the keystore should be used.
+     *
+     * @return The operational keystore, nullptr otherwise.
+     */
+    const Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
+
+    /**
      * @brief Add a pending trusted root certificate for the next fabric created with `AddNewPendingFabric*` methods.
      *
      * The root only becomes actually pending when the `AddNewPendingFabric*` is called afterwards. It is reverted
@@ -912,13 +920,17 @@ public:
      */
     void RevertPendingOpCertsExceptRoot();
 
-    // Verifies credentials, with the fabric's root under fabricIndex, and extract critical bits.
-    // This call is used for CASE.
+    // Verifies credentials, using the root certificate of the provided fabric index.
     CHIP_ERROR VerifyCredentials(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
                                  Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
                                  FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
                                  Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
 
+    // Verifies credentials, using the provided root certificate.
+    static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                        Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
+                                        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+                                        Crypto::P256PublicKey * outRootPublicKey = nullptr);
     /**
      * @brief Enables FabricInfo instances to collide and reference the same logical fabric (i.e Root Public Key + FabricId).
      *
@@ -1086,19 +1098,12 @@ private:
      */
     const FabricInfo * GetShadowPendingFabricEntry() const { return HasPendingFabricUpdate() ? &mPendingFabric : nullptr; }
 
-    // Returns true if we have a shadow entry pending for a fabruc update.
+    // Returns true if we have a shadow entry pending for a fabric update.
     bool HasPendingFabricUpdate() const
     {
         return mPendingFabric.IsInitialized() &&
             mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
     }
-
-    // Verifies credentials, using the provided root certificate.
-    // This call is done whenever a fabric is "directly" added
-    static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                        Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                        Crypto::P256PublicKey * outRootPublicKey);
 
     // Validate an NOC chain at time of adding/updating a fabric (uses VerifyCredentials with additional checks).
     // The `existingFabricId` is passed for UpdateNOC, and must match the Fabric, to make sure that we are

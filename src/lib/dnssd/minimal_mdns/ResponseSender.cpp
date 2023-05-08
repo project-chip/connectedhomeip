@@ -100,7 +100,7 @@ bool ResponseSender::HasQueryResponders() const
     return false;
 }
 
-CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource,
+CHIP_ERROR ResponseSender::Respond(uint16_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource,
                                    const ResponseConfiguration & configuration)
 {
     mSendState.Reset(messageId, query, querySource);

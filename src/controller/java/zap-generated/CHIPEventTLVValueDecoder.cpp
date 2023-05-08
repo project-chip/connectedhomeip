@@ -1420,8 +1420,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             else
             {
                 jobject value_nameInsideOptional;
-                value_nameInsideOptional =
-                    env->NewStringUTF(std::string(cppValue.name.Value().data(), cppValue.name.Value().size()).c_str());
+                LogErrorOnFailure(
+                    chip::JniReferences::GetInstance().CharToStringUTF(cppValue.name.Value(), value_nameInsideOptional));
                 chip::JniReferences::GetInstance().CreateOptional(value_nameInsideOptional, value_name);
             }
 
@@ -3436,16 +3436,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::ClientMonitoring::Id: {
-        using namespace app::Clusters::ClientMonitoring;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
     case app::Clusters::UnitTesting::Id: {
         using namespace app::Clusters::UnitTesting;
         switch (aPath.mEventId)
@@ -3498,7 +3488,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                     reinterpret_cast<const jbyte *>(cppValue.arg4.d.data()));
             value_arg4_d = value_arg4_dByteArray;
             jobject value_arg4_e;
-            value_arg4_e = env->NewStringUTF(std::string(cppValue.arg4.e.data(), cppValue.arg4.e.size()).c_str());
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.arg4.e, value_arg4_e));
             jobject value_arg4_f;
             std::string value_arg4_fClassName     = "java/lang/Integer";
             std::string value_arg4_fCtorSignature = "(I)V";
@@ -3566,7 +3556,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                         reinterpret_cast<const jbyte *>(entry_0.d.data()));
                 newElement_0_d = newElement_0_dByteArray;
                 jobject newElement_0_e;
-                newElement_0_e = env->NewStringUTF(std::string(entry_0.e.data(), entry_0.e.size()).c_str());
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.e, newElement_0_e));
                 jobject newElement_0_f;
                 std::string newElement_0_fClassName     = "java/lang/Integer";
                 std::string newElement_0_fCtorSignature = "(I)V";

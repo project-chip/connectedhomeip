@@ -45,7 +45,7 @@ directory.
 You need Android SDK 21 & NDK 21.4.7075529 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
-downloaded.
+downloaded. The build also requires `kotlinc` to be in your `$PATH`.
 
 1. Install [Android Studio](https://developer.android.com/studio)
 2. Install NDK:
@@ -103,8 +103,15 @@ JDK version on MacOS for Apple Silicon is 'openjdk 17.0.1' or above.
 
 Using JDK bundled with Android Studio will help with that.
 
+Android Studio Dolphin and below:
+
 ```shell
 export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home/
+```
+Android Studio Electric Eel 2022.1.1 and above:
+
+```shell
+export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jbr/Contents/Home/
 ```
 
 <hr>

@@ -41,8 +41,9 @@ public:
         }
 
         item.security.SetRaw(mpScanResults[mIternum].authmode);
-        item.ssidLen =
-            strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "SSID length might not fit in item.ssidLen");
+        item.ssidLen = static_cast<uint8_t>(
+            strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
         item.channel  = mpScanResults[mIternum].primary;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mpScanResults[mIternum].rssi;
@@ -115,7 +116,7 @@ public:
     void OnNetworkStatusChange();
 
     CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
-    int32_t GetLastDisconnectReason();
+    uint16_t GetLastDisconnectReason();
 
     static ESPWiFiDriver & GetInstance()
     {
@@ -132,7 +133,58 @@ private:
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
-    int32_t mLastDisconnectedReason;
+    uint16_t mLastDisconnectedReason;
+};
+
+class ESPEthernetDriver final : public EthernetDriver
+{
+public:
+    class EthernetNetworkIterator final : public NetworkIterator
+    {
+    public:
+        EthernetNetworkIterator(ESPEthernetDriver * aDriver) : mDriver(aDriver) {}
+        size_t Count() { return 1; }
+        bool Next(Network & item) override
+        {
+            if (exhausted)
+            {
+                return false;
+            }
+            exhausted = true;
+            memcpy(item.networkID, interfaceName, interfaceNameLen);
+            item.networkIDLen = interfaceNameLen;
+            item.connected    = true;
+            return true;
+        }
+        void Release() override { delete this; }
+        ~EthernetNetworkIterator() = default;
+
+        uint8_t interfaceName[kMaxNetworkIDLen];
+        uint8_t interfaceNameLen = 0;
+        bool exhausted           = false;
+
+    private:
+        ESPEthernetDriver * mDriver;
+    };
+
+    // BaseDriver
+    NetworkIterator * GetNetworks() override { return new EthernetNetworkIterator(this); }
+    uint8_t GetMaxNetworks() { return 1; }
+    CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
+    {
+        // TODO: This method can be implemented if Ethernet is used along with Wifi/Thread.
+        return CHIP_NO_ERROR;
+    }
+    void Shutdown()
+    {
+        // TODO: This method can be implemented if Ethernet is used along with Wifi/Thread.
+    }
+
+    static ESPEthernetDriver & GetInstance()
+    {
+        static ESPEthernetDriver instance;
+        return instance;
+    }
 };
 
 } // namespace NetworkCommissioning

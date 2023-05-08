@@ -15,44 +15,69 @@
  *    limitations under the License.
  */
 
+#include <openthread/platform/memory.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/nxp/k32w/common/RamStorage.h>
 
+#include "pdm_ram_storage_glue.h"
+
+#if PDM_SAVE_IDLE
+#include "fsl_os_abstraction.h"
+#define mutex_lock(descr, timeout) OSA_MutexLock(descr->header.mutexHandle, timeout)
+#define mutex_unlock(descr) OSA_MutexUnlock(descr->header.mutexHandle)
+#define mutex_destroy(descr) OSA_MutexDestroy(descr->header.mutexHandle)
+#else
+#define mutex_lock(...)
+#define mutex_unlock(...)
+#define mutex_destroy(...)
+#endif
+
+#if PDM_USE_DYNAMIC_MEMORY
+#define ot_free otPlatFree
+#else
+#define ot_free(...)
+#endif
+
 namespace chip::DeviceLayer::Internal {
 
-RamStorage::Buffer RamStorage::sBuffer = nullptr;
-
-CHIP_ERROR RamStorage::Init(uint16_t aNvmId, uint16_t aInitialSize)
+CHIP_ERROR RamStorage::Init(uint16_t aInitialSize)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    sBuffer        = getRamBuffer(aNvmId, aInitialSize);
-    if (!sBuffer)
-    {
-        err = CHIP_ERROR_NO_MEMORY;
-    }
+    CHIP_ERROR err;
 
-    return err;
+    mBuffer = getRamBuffer(mPdmId, aInitialSize);
+
+    return mBuffer ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
 void RamStorage::FreeBuffer()
 {
-    if (sBuffer)
+    if (mBuffer)
     {
-        free(sBuffer);
-        sBuffer = nullptr;
+        mutex_lock(mBuffer, osaWaitForever_c);
+        if (mBuffer->buffer)
+        {
+            ot_free(mBuffer->buffer);
+            mBuffer->buffer = nullptr;
+        }
+        mutex_unlock(mBuffer);
+        mutex_destroy(mBuffer);
+        ot_free(mBuffer);
+        mBuffer = nullptr;
     }
 }
 
-CHIP_ERROR RamStorage::Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength)
+CHIP_ERROR RamStorage::Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength) const
 {
     CHIP_ERROR err;
     rsError status;
 
-    status = ramStorageGet(sBuffer, aKey, aIndex, aValue, aValueLength);
+    mutex_lock(mBuffer, osaWaitForever_c);
+    status = ramStorageGet(mBuffer, aKey, aIndex, aValue, aValueLength);
     SuccessOrExit(err = MapStatusToChipError(status));
 
 exit:
+    mutex_unlock(mBuffer);
     return err;
 }
 
@@ -60,26 +85,52 @@ CHIP_ERROR RamStorage::Write(uint16_t aKey, const uint8_t * aValue, uint16_t aVa
 {
     CHIP_ERROR err;
     rsError status = RS_ERROR_NONE;
+    PDM_teStatus pdmStatus;
 
+    mutex_lock(mBuffer, osaWaitForever_c);
     // Delete all occurrences of "key" and resize buffer if needed
     // before scheduling writing of new value.
-    ramStorageDelete(sBuffer, aKey, -1);
-    status = ramStorageResize(&sBuffer, aKey, aValue, aValueLength);
+    ramStorageDelete(mBuffer, aKey, -1);
+#if PDM_USE_DYNAMIC_MEMORY
+    status = ramStorageResize(mBuffer, aKey, aValue, aValueLength);
     SuccessOrExit(err = MapStatusToChipError(status));
-    status = ramStorageSet(sBuffer, aKey, aValue, aValueLength);
+#endif
+    status = ramStorageSet(mBuffer, aKey, aValue, aValueLength);
     SuccessOrExit(err = MapStatusToChipError(status));
+    pdmStatus = PDM_SaveRecord(mPdmId, mBuffer);
+    SuccessOrExit(err = MapPdmStatusToChipError(pdmStatus));
 
 exit:
+    mutex_unlock(mBuffer);
     return err;
 }
 
 CHIP_ERROR RamStorage::Delete(uint16_t aKey, int aIndex)
 {
-    rsError status = ramStorageDelete(sBuffer, aKey, aIndex);
-    return MapStatusToChipError(status);
+    CHIP_ERROR err;
+    rsError status = RS_ERROR_NONE;
+    PDM_teStatus pdmStatus;
+
+    mutex_lock(mBuffer, osaWaitForever_c);
+    status = ramStorageDelete(mBuffer, aKey, aIndex);
+    SuccessOrExit(err = MapStatusToChipError(status));
+    pdmStatus = PDM_SaveRecord(mPdmId, mBuffer);
+    SuccessOrExit(err = MapPdmStatusToChipError(pdmStatus));
+
+exit:
+    mutex_unlock(mBuffer);
+    return err;
 }
 
-CHIP_ERROR RamStorage::MapStatusToChipError(rsError rsStatus)
+void RamStorage::OnFactoryReset()
+{
+    mutex_lock(mBuffer, osaWaitForever_c);
+    PDM_vDeleteDataRecord(mPdmId);
+    mutex_unlock(mBuffer);
+    FreeBuffer();
+}
+
+CHIP_ERROR RamStorage::MapStatusToChipError(rsError rsStatus) const
 {
     CHIP_ERROR err;
 
@@ -93,6 +144,23 @@ CHIP_ERROR RamStorage::MapStatusToChipError(rsError rsStatus)
         break;
     default:
         err = CHIP_ERROR_BUFFER_TOO_SMALL;
+        break;
+    }
+
+    return err;
+}
+
+CHIP_ERROR RamStorage::MapPdmStatusToChipError(PDM_teStatus status) const
+{
+    CHIP_ERROR err;
+
+    switch (status)
+    {
+    case PDM_E_STATUS_OK:
+        err = CHIP_NO_ERROR;
+        break;
+    default:
+        err = CHIP_ERROR(ChipError::Range::kPlatform, status);
         break;
     }
 

@@ -29,15 +29,35 @@ class CommissionerDiscoveryViewModel: ObservableObject {
     func discoverAndUpdate() {
         if let castingServerBridge = CastingServerBridge.getSharedInstance()
         {
-            castingServerBridge.discoverCommissioners(DispatchQueue.main, discoveryRequestSentHandler:  { (result: Bool) -> () in
-                self.discoveryRequestStatus = result
-            })
+            castingServerBridge.discoverCommissioners(DispatchQueue.main,
+                discoveryRequestSentHandler:  { (result: Bool) -> () in
+                    self.discoveryRequestStatus = result
+                },
+                discoveredCommissionerHandler: { (commissioner: DiscoveredNodeData) -> () in
+                    self.Log.info("discoveredCommissionerHandler called with \(commissioner)")
+                    if(self.commissioners.contains(commissioner))
+                    {
+                        var index = self.commissioners.firstIndex(of: commissioner)
+                        self.commissioners[index!] = commissioner
+                        self.Log.info("Updating previously discovered commissioner \(commissioner.description)")
+                    }
+                    else if(commissioner.numIPs == 0)
+                    {
+                        self.Log.info("Skipping commissioner because it does not have any resolved IP addresses \(commissioner.description)")
+                    }
+                    else
+                    {
+                        self.commissioners.append(commissioner)
+                    }
+                }
+            )
         }
         
-        Task {
+        /* Deprecated usage
+         Task {
             try? await Task.sleep(nanoseconds: 5_000_000_000)  // Wait for commissioners to respond
             updateCommissioners()
-        }
+        }*/
     }
     
     private func updateCommissioners() {
@@ -51,7 +71,9 @@ class CommissionerDiscoveryViewModel: ObservableObject {
                     if(commissioner != nil){
                         if(self.commissioners.contains(commissioner!))
                         {
-                            self.Log.info("Skipping previously discovered commissioner \(commissioner!.description)")
+                            var index = self.commissioners.firstIndex(of: commissioner!)
+                            self.commissioners[index!] = commissioner!
+                            self.Log.info("Updating previously discovered commissioner \(commissioner!.description)")
                         }
                         else
                         {

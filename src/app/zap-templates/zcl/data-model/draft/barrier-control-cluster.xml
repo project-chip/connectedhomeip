@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="Closures"/>
+
+  <bitmap name="BarrierControlCapabilities" type="BITMAP8">
+    <field name="partialBarrier" mask="0x01"/>
+  </bitmap>
+
+  <bitmap name="BarrierControlSafetyStatus" type="BITMAP16">
+    <field name="remoteLockout" mask="0x01"/>
+    <field name="temperDetected" mask="0x02"/>
+    <field name="failedCommunication" mask="0x04"/>
+    <field name="positionFailure" mask="0x08"/>
+  </bitmap>
+
+  <enum name="BarrierControlBarrierPosition" type="INT8U">
+    <item name="Closed" value="0"/>
+    <item name="Open" value="100"/>
+    <item name="Unknown" value="0xFF"/>
+  </enum>
+
+  <enum name="BarrierControlMovingState" type="ENUM8">
+    <item name="Stopped" value="0x00"/>
+    <item name="Closing" value="0x01"/>
+    <item name="Opening" value="0x02"/>
+  </enum>
+
+  <cluster>
+    <name>Barrier Control</name>
+    <domain>Closures</domain>
+    <code>0x0103</code>
+    <define>BARRIER_CONTROL_CLUSTER</define>
+    <description>This cluster provides control of a barrier (garage door).</description>
+
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+
+    <attribute side="server" code="0x0001" define="BARRIER_MOVING_STATE" type="ENUM8" min="0x00" max="0xFF" writable="false" optional="false">barrier moving state</attribute>
+    <attribute side="server" code="0x0002" define="BARRIER_SAFETY_STATUS" type="BITMAP16" min="0x0000" max="0xFFFF" writable="false" optional="false">barrier safety status</attribute>
+    <attribute side="server" code="0x0003" define="BARRIER_CAPABILITIES" type="BITMAP8" min="0x00" max="0xFF" writable="false" optional="false">barrier capabilities</attribute>
+    <attribute side="server" code="0x0004" define="BARRIER_OPEN_EVENTS" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">barrier open events</attribute>
+    <attribute side="server" code="0x0005" define="BARRIER_CLOSE_EVENTS" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">barrier close events</attribute>
+    <attribute side="server" code="0x0006" define="BARRIER_COMMAND_OPEN_EVENTS" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">barrier command open events</attribute>
+    <attribute side="server" code="0x0007" define="BARRIER_COMMAND_CLOSE_EVENTS" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">barrier command close events</attribute>
+    <attribute side="server" code="0x0008" define="BARRIER_OPEN_PERIOD" type="INT16U" min="0x0000" max="0xFFFE" writable="true" optional="true">barrier open period</attribute>
+    <attribute side="server" code="0x0009" define="BARRIER_CLOSE_PERIOD" type="INT16U" min="0x0000" max="0xFFFE" writable="true" optional="true">barrier close period</attribute>
+    <attribute side="server" code="0x000A" define="BARRIER_POSITION" type="INT8U" min="0x0000" max="0xFF" writable="false" optional="false">barrier position</attribute>
+
+    <command source="client" code="0x00" name="BarrierControlGoToPercent" optional="false">
+      <description>
+        Command to instruct a barrier to go to a percent open state.
+      </description>
+      <arg name="percentOpen" type="INT8U"/>
+    </command>
+
+    <command source="client" code="0x01" name="BarrierControlStop" optional="false">
+      <description>
+        Command that instructs the barrier to stop moving.
+      </description>
+    </command>
+
+  </cluster>
+</configurator>

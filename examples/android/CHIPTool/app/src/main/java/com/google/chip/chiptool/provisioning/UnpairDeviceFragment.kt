@@ -12,7 +12,7 @@ import chip.devicecontroller.UnpairDeviceCallback
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
-import kotlinx.android.synthetic.main.unpair_device_fragment.view.unpairDeviceBtn
+import com.google.chip.chiptool.databinding.UnpairDeviceFragmentBinding
 import kotlinx.coroutines.*
 
 class UnpairDeviceFragment : Fragment() {
@@ -23,19 +23,28 @@ class UnpairDeviceFragment : Fragment() {
 
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
+  private var _binding: UnpairDeviceFragmentBinding? = null
+  private val binding get() = _binding!!
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    _binding = UnpairDeviceFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
 
-    return inflater.inflate(R.layout.unpair_device_fragment, container, false).apply {
-      addressUpdateFragment =
-        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+    addressUpdateFragment =
+      childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-      unpairDeviceBtn.setOnClickListener { scope.launch { unpairDeviceClick() } }
-    }
+    binding.unpairDeviceBtn.setOnClickListener { scope.launch { unpairDeviceClick() } }
+
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   inner class ChipUnpairDeviceCallback : UnpairDeviceCallback {

@@ -86,6 +86,29 @@ BOUFFALO_OPTIONS = {
                 'type': pathlib.Path
             }
         },
+        'pk': {
+            'help': 'public key to sign and encrypt firmware. Available for OTA image building.',
+            'default': None,
+            'argparse': {
+                'metavar': 'path',
+                'type': pathlib.Path
+            }
+        },
+        'sk': {
+            'help': 'private key to sign and encrypt firmware. Available for OTA image building.',
+            'default': None,
+            'argparse': {
+                'metavar': 'path',
+                'type': pathlib.Path
+            }
+        },
+        'boot2': {
+            'help': 'boot2 image.',
+            'default': None,
+            'argparse': {
+                'metavar': 'path',
+            }
+        }
     },
 }
 
@@ -98,16 +121,20 @@ class Flasher(firmware_utils.Flasher):
         super().__init__(platform=None, module=__name__, **options)
         self.define_options(BOUFFALO_OPTIONS)
 
-    def get_boot_image(self, config_path):
+    def get_boot_image(self, config_path, boot2_image):
 
         boot_image_guess = None
 
         for root, dirs, files in os.walk(config_path, topdown=False):
             for name in files:
-                if name == "boot2_isp_release.bin":
-                    return os.path.join(root, name)
-                elif not boot_image_guess and name.find("release") >= 0:
-                    boot_image_guess = os.path.join(root, name)
+                print("get_boot_image", root, boot2_image)
+                if boot2_image:
+                    return os.path.join(root, boot2_image)
+                else:
+                    if name == "boot2_isp_release.bin":
+                        return os.path.join(root, name)
+                    elif not boot_image_guess and name.find("release") >= 0:
+                        boot_image_guess = os.path.join(root, name)
 
         return boot_image_guess
 
@@ -147,9 +174,16 @@ class Flasher(firmware_utils.Flasher):
 
         chip_name = None
         chip_config_path = None
-        boot_image = None
+        boot2_image = None
         dts_path = None
         xtal_value = None
+
+        is_for_ota_image_building = False
+        is_for_programming = False
+        has_private_key = False
+        has_public_key = False
+
+        boot2_image = None
 
         command_args = {}
         for (key, value) in dict(vars(self.option)).items():
@@ -164,6 +198,9 @@ class Flasher(firmware_utils.Flasher):
             if key == "application":
                 key = "firmware"
                 work_dir = os.path.dirname(os.path.join(os.getcwd(), str(value)))
+            elif key == "boot2":
+                boot2_image = value
+                continue
             elif key in options_keys:
                 pass
             else:
@@ -183,10 +220,31 @@ class Flasher(firmware_utils.Flasher):
                 xtal_value = value
             elif key == "dts":
                 dts_path = value
+            elif "port" == key:
+                if value:
+                    is_for_programming = True
+            elif "build" == key:
+                if value:
+                    is_for_ota_image_building = True
+            elif "pk" == key:
+                if value:
+                    has_public_key = True
+            elif "sk" == key:
+                if value:
+                    has_private_key = True
 
             arguments.append(arg)
 
             print(key, value)
+
+        if is_for_ota_image_building and is_for_programming:
+            print("ota imge build can't work with image programming")
+            return self
+
+        if is_for_ota_image_building:
+            if (has_private_key is not has_public_key) and (has_private_key or has_public_key):
+                print("For ota image signature, key pair must be used together")
+                return self
 
         print(dts_path, xtal_value)
         if not dts_path and xtal_value:
@@ -195,14 +253,20 @@ class Flasher(firmware_utils.Flasher):
             arguments.append("--dts")
             arguments.append(dts_path)
 
-        if self.option.erase:
-            arguments.append("--erase")
+        if boot2_image:
+            chip_config_path = os.path.join(tool_path, "chips", chip_name, "builtin_imgs")
+            boot2_image = self.get_boot_image(chip_config_path, boot2_image)
+            arguments.append("--boot2")
+            arguments.append(boot2_image)
+        else:
+            if self.option.erase:
+                arguments.append("--erase")
 
-            if chip_name == "bl602":
-                chip_config_path = os.path.join(tool_path, "chips", chip_name, "builtin_imgs")
-                boot_image = self.get_boot_image(chip_config_path)
-                arguments.append("--boot2")
-                arguments.append(boot_image)
+                if chip_name == "bl602":
+                    chip_config_path = os.path.join(tool_path, "chips", chip_name, "builtin_imgs")
+                    boot2_image = self.get_boot_image(chip_config_path, boot2_image)
+                    arguments.append("--boot2")
+                    arguments.append(boot2_image)
 
         os.chdir(work_dir)
         arguments[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', arguments[0])

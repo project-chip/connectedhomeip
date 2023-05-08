@@ -47,11 +47,7 @@ tests:
     - label: "Show Input Status Command"
       PICS: MEDIAINPUT.S.C01.Rsp
       command: "ShowInputStatus"
-      response:
-          error: 0
 
     - label: "Hide Input Status Command"
       PICS: MEDIAINPUT.S.C02.Rsp
       command: "HideInputStatus"
-      response:
-          error: 0

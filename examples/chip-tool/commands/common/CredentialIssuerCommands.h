@@ -73,6 +73,8 @@ public:
 
     virtual chip::Controller::OperationalCredentialsDelegate * GetCredentialIssuer() = 0;
 
+    virtual void SetCredentialIssuerCATValues(chip::CATValues cats) = 0;
+
     /**
      * @brief
      *   This function is used to Generate NOC Chain for the Controller/Commissioner. Parameters follow the example implementation,

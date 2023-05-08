@@ -50,8 +50,8 @@ public:
     using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * path, CHIP_ERROR err)>;
     using OnDoneCallbackType  = std::function<void(app::WriteClient *)>;
 
-    WriteCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
-        mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone), mCallback(this)
+    WriteCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone, bool aIsGroupWrite) :
+        mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone), mIsGroupWrite(aIsGroupWrite), mCallback(this)
     {}
 
     app::WriteClient::Callback * GetChunkedCallback() { return &mCallback; }
@@ -88,6 +88,16 @@ public:
 
     void OnDone(app::WriteClient * apWriteClient) override
     {
+        if (!mIsGroupWrite && !mCalledCallback)
+        {
+            // This can happen if the server sends a response with an empty
+            // WriteResponses list.  Since we are not sending wildcard write
+            // paths, that's not a valid response and we should treat it as an
+            // error.  Use the error we would have gotten if we in fact expected
+            // a nonempty list.
+            OnError(apWriteClient, CHIP_END_OF_TLV);
+        }
+
         if (mOnDone != nullptr)
         {
             mOnDone(apWriteClient);
@@ -104,6 +114,7 @@ private:
     OnDoneCallbackType mOnDone       = nullptr;
 
     bool mCalledCallback = false;
+    bool mIsGroupWrite   = false;
 
     app::ChunkedWriteCallback mCallback;
 };
@@ -121,7 +132,7 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr,
                           const Optional<DataVersion> & aDataVersion = NullOptional)
 {
-    auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb);
+    auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb, sessionHandle->IsGroupSession());
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
     auto client = Platform::MakeUnique<app::WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(),

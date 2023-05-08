@@ -193,7 +193,7 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
@@ -267,7 +267,7 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     bool atLeastOneRequestFailed = false;
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
@@ -348,7 +348,7 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
@@ -424,7 +424,7 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
@@ -605,7 +605,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     TestContext & ctx = *static_cast<TestContext *>(apContext);
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));

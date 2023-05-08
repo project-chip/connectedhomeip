@@ -29,7 +29,8 @@
 #include <lib/support/CodeUtils.h>
 
 //#include <lib/support/RandUtils.h>   //==> rm from TE7.5
-#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -1143,13 +1144,15 @@ void task_test_main(void * param)
             is_on             = !is_on;
             value             = (uint16_t) is_on;
             // sync-up the switch attribute:
-            PRINTF("--> update ZCL_CURRENT_POSITION_ATTRIBUTE_ID [%d] \r\n", value);
-            emAfWriteAttribute(1, Clusters::Switch::Id, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true,
-                               false);
+            PRINTF("--> update CurrentPosition [%d] \r\n", value);
+            Clusters::Switch::Attributes::CurrentPosition::Set(1, value);
 #ifdef SUPPORT_MANUAL_CTRL
+#error                                                                                                                             \
+    "This code thinks it's setting the OnOff attribute, but it's actually setting the NumberOfPositions attribute!  And passing the wrong size for either case.  Figure out what it's trying to do."
             // sync-up the Light attribute (for test event, OO.M.ManuallyControlled)
-            PRINTF("--> update [Clusters::Switch::Id]: ZCL_ON_OFF_ATTRIBUTE_ID [%d] \r\n", value);
-            emAfWriteAttribute(1, Clusters::Switch::Id, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true, false);
+            PRINTF("--> update [Clusters::Switch::Id]: OnOff::Id [%d] \r\n", value);
+            emAfWriteAttribute(1, Clusters::Switch::Id, Clusters::OnOff::Attributes::OnOff::Id, (uint8_t *) &value, sizeof(value),
+                               true, false);
 #endif // SUPPORT_MANUAL_CTRL
 
             need2sync_sw_attr = false;
@@ -1499,8 +1502,9 @@ bool lowPowerClusterSleep()
 
 static void OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID,
-                 ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
+    using namespace Clusters::OnOff::Attributes;
+
+    VerifyOrExit(attributeId == OnOff::Id, ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     // At this point we can assume that value points to a bool value.
@@ -1512,11 +1516,12 @@ exit:
 
 static void OnSwitchAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
+    using namespace Clusters::Switch::Attributes;
+
     //	auto * pimEngine = chip::app::InteractionModelEngine::GetInstance();
     //	bool do_sendrpt = false;
 
-    VerifyOrExit(attributeId == ZCL_CURRENT_POSITION_ATTRIBUTE_ID,
-                 ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
+    VerifyOrExit(attributeId == CurrentPosition::Id, ChipLogError(DeviceLayer, "Unhandled Attribute ID: '0x%04lx", attributeId));
     // Send the switch status report now
 /*
         for (uint32_t i = 0 ; i<pimEngine->GetNumActiveReadHandlers() ; i++) {
@@ -1549,20 +1554,23 @@ Identify_Time_t id_time[MAX_ENDPOINT_COUNT];
 
 void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
 {
+    using namespace Clusters::Identify::Attributes;
+
     Identify_Time_t * pidt = (Identify_Time_t *) appState;
     PRINTF(" -> %s(%u, %u) \r\n", __FUNCTION__, pidt->ep, pidt->identifyTimerCount);
     if (pidt->identifyTimerCount)
     {
         pidt->identifyTimerCount--;
-        emAfWriteAttribute(pidt->ep, Clusters::Identify::Id, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &pidt->identifyTimerCount,
-                           sizeof(identifyTimerCount), true, false);
+        IdentifyTime::Set(pidt->ep, pidt->identifyTimerCount);
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, pidt);
     }
 }
 
 static void OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+    using namespace Clusters::Identify::Attributes;
+
+    VerifyOrExit(attributeId == IdentifyTime::Id,
                  ChipLogError(DeviceLayer, "[%s] Unhandled Attribute ID: '0x%04lx", TAG, attributeId));
     VerifyOrExit((endpointId < MAX_ENDPOINT_COUNT),
                  ChipLogError(DeviceLayer, "[%s] EndPoint > max: [%u, %u]", TAG, endpointId, MAX_ENDPOINT_COUNT));

@@ -16,9 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/config/standalone/args.gni")
 import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
 
-efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+siwx917_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
+app_data_model = "${chip_root}/examples/lock-app/lock-common"
 chip_enable_ota_requestor = true
-chip_enable_openthread = true
-openthread_external_platform =
-    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"

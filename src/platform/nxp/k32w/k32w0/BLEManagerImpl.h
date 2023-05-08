@@ -197,6 +197,9 @@ private:
     uint16_t mNumGAPCons;
     uint8_t mAdvHandle;
     char mDeviceName[kMaxDeviceNameLength + 1];
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    chip::System::PacketBufferHandle c3AdditionalDataBufferHandle;
+#endif
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertising(void);
@@ -217,6 +220,10 @@ private:
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
     CHIP_ERROR ConfigureAdvertisingData(void);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    CHIP_ERROR EncodeAdditionalDataTlv();
+    void HandleC3ReadRequest(blekw_msg_t * msg);
+#endif
     BLEManagerImpl::ble_err_t blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data, uint32_t len);
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle);

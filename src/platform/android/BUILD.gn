@@ -91,6 +91,7 @@ android_library("java") {
     "java/chip/platform/NetworkInterface.java",
     "java/chip/platform/NsdManagerServiceBrowser.java",
     "java/chip/platform/NsdManagerServiceResolver.java",
+    "java/chip/platform/NsdServiceFinderAndResolver.java",
     "java/chip/platform/PreferencesConfigurationManager.java",
     "java/chip/platform/PreferencesKeyValueStoreManager.java",
     "java/chip/platform/ServiceBrowser.java",
@@ -104,5 +105,5 @@ android_library("java") {
 }
 
 java_prebuilt("android_sdk") {
-  jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
+  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
 }

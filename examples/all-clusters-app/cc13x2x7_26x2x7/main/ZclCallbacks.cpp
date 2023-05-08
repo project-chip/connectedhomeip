@@ -27,7 +27,6 @@
 
 #include "ClusterManager.h"
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
@@ -81,10 +80,4 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
     // TODO: implement any additional Cluster Server init actions
-}
-
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
-{
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-    return true;
 }

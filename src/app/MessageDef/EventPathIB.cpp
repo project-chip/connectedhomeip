@@ -206,7 +206,7 @@ EventPathIB::Builder & EventPathIB::Builder::Node(const NodeId aNode)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kNode)), aNode);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kNode), aNode);
     }
     return *this;
 }
@@ -216,7 +216,7 @@ EventPathIB::Builder & EventPathIB::Builder::Endpoint(const EndpointId aEndpoint
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEndpoint)), aEndpoint);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEndpoint), aEndpoint);
     }
     return *this;
 }
@@ -226,7 +226,7 @@ EventPathIB::Builder & EventPathIB::Builder::Cluster(const ClusterId aCluster)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kCluster)), aCluster);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kCluster), aCluster);
     }
     return *this;
 }
@@ -236,7 +236,7 @@ EventPathIB::Builder & EventPathIB::Builder::Event(const EventId aEvent)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEvent)), aEvent);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEvent), aEvent);
     }
     return *this;
 }
@@ -246,7 +246,7 @@ EventPathIB::Builder & EventPathIB::Builder::IsUrgent(const bool aIsUrgent)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsUrgent)), aIsUrgent);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kIsUrgent), aIsUrgent);
     }
     return *this;
 }

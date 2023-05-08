@@ -27,15 +27,13 @@
 #ifdef QR_CODE_ENABLED
 #include <qrcodegen.h>
 #else
-#include "EFR32DeviceDataProvider.h"
+#include "SilabsDeviceDataProvider.h"
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #endif // QR_CODE_ENABLED
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include <sl_simple_button_instances.h>
-
-#ifdef ENABLE_WSTK_LEDS
-#include <sl_simple_led_instances.h>
-#endif // ENABLE_WSTK_LEDS
+#endif
 
 #include <sl_system_kernel.h>
 
@@ -50,6 +48,8 @@
 SilabsLCD slLCD;
 #endif
 
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
@@ -60,8 +60,8 @@ SilabsLCD slLCD;
 using namespace chip::app::Clusters::WindowCovering;
 using namespace chip;
 using namespace ::chip::DeviceLayer;
-#define APP_STATE_LED &sl_led_led0
-#define APP_ACTION_LED &sl_led_led1
+#define APP_STATE_LED 0
+#define APP_ACTION_LED 1
 
 #ifdef SL_WIFI
 chip::app::Clusters::NetworkCommissioning::Instance
@@ -74,11 +74,11 @@ chip::app::Clusters::NetworkCommissioning::Instance
 WindowAppImpl::Timer::Timer(const char * name, uint32_t timeoutInMs, Callback callback, void * context) :
     WindowApp::Timer(name, timeoutInMs, callback, context)
 {
-    mHandler = xTimerCreate(name,          // Just a text name, not used by the RTOS kernel
-                            timeoutInMs,   // == default timer period (mS)
-                            false,         // no timer reload (==one-shot)
-                            (void *) this, // init timer id = app task obj context
-                            TimerCallback  // timer callback handler
+    mHandler = xTimerCreate(name,                       // Just a text name, not used by the RTOS kernel
+                            pdMS_TO_TICKS(timeoutInMs), // == default timer period (mS)
+                            false,                      // no timer reload (==one-shot)
+                            (void *) this,              // init timer id = app task obj context
+                            TimerCallback               // timer callback handler
     );
     if (mHandler == NULL)
     {
@@ -95,7 +95,7 @@ void WindowAppImpl::Timer::Start()
     }
 
     // Timer is not active
-    if (xTimerStart(mHandler, 100) != pdPASS)
+    if (xTimerStart(mHandler, pdMS_TO_TICKS(100)) != pdPASS)
     {
         SILABS_LOG("Timer start() failed");
         appError(CHIP_ERROR_INTERNAL);
@@ -120,7 +120,7 @@ void WindowAppImpl::Timer::IsrStart()
 void WindowAppImpl::Timer::Stop()
 {
     mIsActive = false;
-    if (xTimerStop(mHandler, 0) == pdFAIL)
+    if (xTimerStop(mHandler, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         SILABS_LOG("Timer stop() failed");
         appError(CHIP_ERROR_INTERNAL);
@@ -172,7 +172,9 @@ void WindowAppImpl::OnTaskCallback(void * parameter)
     }
     SILABS_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     sWiFiNetworkCommissioningInstance.Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     /* added for commisioning with wifi */
 #endif
 
@@ -189,6 +191,8 @@ void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 
 CHIP_ERROR WindowAppImpl::Init()
 {
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(WindowAppImpl::ButtonEventHandler);
+
     WindowApp::Init();
 
     // Initialize App Task
@@ -208,11 +212,9 @@ CHIP_ERROR WindowAppImpl::Init()
     }
 
     // Initialize LEDs
-#ifdef ENABLE_WSTK_LEDS
     LEDWidget::InitGpio();
     mStatusLED.Init(APP_STATE_LED);
     mActionLED.Init(APP_ACTION_LED);
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
     slLCD.Init();
@@ -223,7 +225,7 @@ CHIP_ERROR WindowAppImpl::Init()
     char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan QRCode(qrCodeBuffer);
 
-    if (EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
+    if (Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
     {
         PrintQrCodeURL(QRCode);
     }
@@ -397,21 +399,17 @@ void WindowAppImpl::UpdateLEDs()
     Cover & cover = GetCover();
     if (mResetWarning)
     {
-#ifdef ENABLE_WSTK_LEDS
         mStatusLED.Set(false);
         mStatusLED.Blink(500);
 
         mActionLED.Set(false);
         mActionLED.Blink(500);
-#endif // ENABLE_WSTK_LEDS
     }
     else
     {
         if (mState.isWinking)
         {
-#ifdef ENABLE_WSTK_LEDS
             mStatusLED.Blink(200, 200);
-#endif // ENABLE_WSTK_LEDS
         }
         else
 #if CHIP_ENABLE_OPENTHREAD
@@ -421,22 +419,11 @@ void WindowAppImpl::UpdateLEDs()
 #endif
 
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mStatusLED.Blink(950, 50);
-#endif // ENABLE_WSTK_LEDS
         }
-        else if (mState.haveBLEConnections)
-        {
-#ifdef ENABLE_WSTK_LEDS
-            mStatusLED.Blink(100, 100);
-#endif // ENABLE_WSTK_LEDS
-        }
-        else
-        {
-#ifdef ENABLE_WSTK_LEDS
-            mStatusLED.Blink(50, 950);
-#endif // ENABLE_WSTK_LEDS
-        }
+        else if (mState.haveBLEConnections) { mStatusLED.Blink(100, 100); }
+        else { mStatusLED.Blink(50, 950); }
 
         // Action LED
         NPercent100ths current;
@@ -454,27 +441,23 @@ void WindowAppImpl::UpdateLEDs()
 
         if (OperationalState::Stall != cover.mLiftOpState)
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mActionLED.Blink(100);
-#endif // ENABLE_WSTK_LEDS
         }
         else if (LimitStatus::IsUpOrOpen == liftLimit)
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mActionLED.Set(true);
-#endif // ENABLE_WSTK_LEDS
         }
         else if (LimitStatus::IsDownOrClose == liftLimit)
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mActionLED.Set(false);
-#endif // ENABLE_WSTK_LEDS
         }
         else
         {
-#ifdef ENABLE_WSTK_LEDS
+
             mActionLED.Blink(1000);
-#endif // ENABLE_WSTK_LEDS
         }
     }
 }
@@ -523,10 +506,9 @@ void WindowAppImpl::UpdateLCD()
 
 void WindowAppImpl::OnMainLoop()
 {
-#ifdef ENABLE_WSTK_LEDS
+
     mStatusLED.Animate();
     mActionLED.Animate();
-#endif // ENABLE_WSTK_LEDS
 }
 
 //------------------------------------------------------------------------------
@@ -534,11 +516,11 @@ void WindowAppImpl::OnMainLoop()
 //------------------------------------------------------------------------------
 WindowAppImpl::Button::Button(WindowApp::Button::Id id, const char * name) : WindowApp::Button(id, name) {}
 
-void WindowAppImpl::OnButtonChange(const sl_button_t * handle)
+void WindowAppImpl::OnButtonChange(uint8_t button, uint8_t btnAction)
 {
-    WindowApp::Button * btn = static_cast<Button *>((handle == &sl_button_btn0) ? sInstance.mButtonUp : sInstance.mButtonDown);
-
-    if (sl_button_get_state(handle) == SL_SIMPLE_BUTTON_PRESSED)
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+    WindowApp::Button * btn = static_cast<Button *>((button == 0) ? sInstance.mButtonUp : sInstance.mButtonDown);
+    if (btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         btn->Press();
     }
@@ -546,11 +528,12 @@ void WindowAppImpl::OnButtonChange(const sl_button_t * handle)
     {
         btn->Release();
     }
+#endif
 }
 
 // Silabs button callback from button event ISR
-void sl_button_on_change(const sl_button_t * handle)
+void WindowAppImpl::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     WindowAppImpl * app = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
-    app->OnButtonChange(handle);
+    app->OnButtonChange(button, btnAction);
 }

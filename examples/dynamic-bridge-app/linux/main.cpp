@@ -20,12 +20,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include <app-common/zap-generated/af-structs.h>
-
-#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
-#include <app/chip-zcl-zpro-codec.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
@@ -187,12 +184,6 @@ chip::Optional<chip::ClusterId> LookupClusterByName(const char * name)
     return chip::Optional<chip::ClusterId>();
 }
 
-std::unique_ptr<GeneratedCluster> CreateCluster(const char * name)
-{
-    auto id = LookupClusterByName(name);
-    return id.HasValue() ? CreateCluster(id.Value()) : nullptr;
-}
-
 std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id)
 {
     for (const auto & cluster : clusters::kKnownClusters)
@@ -203,6 +194,12 @@ std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id)
         }
     }
     return nullptr;
+}
+
+std::unique_ptr<GeneratedCluster> CreateCluster(const char * name)
+{
+    auto id = LookupClusterByName(name);
+    return id.HasValue() ? CreateCluster(id.Value()) : nullptr;
 }
 
 CHIP_ERROR TLVWriteValue(chip::TLV::TLVWriter & wr, const Span<const char> & v)

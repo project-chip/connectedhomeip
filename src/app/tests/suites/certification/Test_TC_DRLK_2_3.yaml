@@ -73,7 +73,7 @@ tests:
               - name: "CredentialRule"
                 value: 0
               - name: "Credentials"
-                value: null
+                value: []
               - name: "CreatorFabricIndex"
                 value: 1
               - name: "LastModifiedFabricIndex"
@@ -138,7 +138,7 @@ tests:
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && ! DRLK.S.A0033
+      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -157,8 +157,6 @@ tests:
       PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
-      response:
-          error: 0x00
 
     - label: "TH sends the unlock Door command to the DUT with valid PINCode"
       PICS: DRLK.S.C01.Rsp
@@ -181,7 +179,7 @@ tests:
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && ! DRLK.S.A0033
+      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -310,7 +308,7 @@ tests:
     - label:
           "TH reads the UserCodeTemporaryDisableTime attribute from the DUT and
           check attribute is triggered"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0031
+      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0031
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       response:
@@ -377,7 +375,7 @@ tests:
           "TH sends the unlock Door command to the DUT with valid PINCode and
           Verify that DUT sends SUCCESS response to the TH"
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
 
           Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:

@@ -69,7 +69,7 @@ private:
     static void UpdateOperationalStatus(MoveType aMoveType, OperationalState aDirection);
     static bool TargetCompleted(MoveType aMoveType, NPercent100ths aCurrent, NPercent100ths aTarget);
     static void StartTimer(MoveType aMoveType, uint32_t aTimeoutMs);
-    static chip::Percent100ths CalculateSingleStep(MoveType aMoveType);
+    static chip::Percent100ths CalculateNextPosition(MoveType aMoveType);
     static void DriveCurrentLiftPosition(intptr_t);
     static void DriveCurrentTiltPosition(intptr_t);
     static void MoveTimerTimeoutCallback(chip::System::Layer * systemLayer, void * appState);

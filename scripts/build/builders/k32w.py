@@ -65,7 +65,8 @@ class K32WBuilder(GnBuilder):
                  disable_ota: bool = False,
                  disable_logs: bool = False,
                  se05x: bool = False,
-                 tinycrypt: bool = False):
+                 tinycrypt: bool = False,
+                 crypto_platform: bool = False):
         super(K32WBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
@@ -79,6 +80,7 @@ class K32WBuilder(GnBuilder):
         self.disable_logs = disable_logs
         self.se05x = se05x
         self.tinycrypt = tinycrypt
+        self.crypto_platform = crypto_platform
 
     def GnBuildArgs(self):
         args = [
@@ -109,7 +111,10 @@ class K32WBuilder(GnBuilder):
             args.append('chip_with_se05x=true')
 
         if self.tinycrypt:
-            args.append('chip_crypto=\"tinycrypt\" mbedtls_repo=\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"')
+            args.append('chip_crypto=\"platform\" chip_crypto_flavor=\"tinycrypt\"')
+
+        if self.crypto_platform:
+            args.append('chip_crypto=\"platform\"')
 
         return args
 

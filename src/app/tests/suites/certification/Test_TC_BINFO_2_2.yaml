@@ -32,7 +32,7 @@ tests:
 
           3. BINFO.S.A0011(Reachable) - TH reads Reachable attribute from DUT and saves for future use(should be true)
 
-          4. BINFO.S.E00(StartUp) | BINFO.S.E01(ShutDown) && BINFO.S.E02(Leave) - TH subscribes to StartUp, ShutDown, Leave and ReachableChanged events on the Basic Information cluster of the DUT
+          4. BINFO.S.E00(StartUp) | BINFO.S.E01(ShutDown) || BINFO.S.E02(Leave) - TH subscribes to StartUp, ShutDown, Leave and ReachableChanged events on the Basic Information cluster of the DUT
 
           5. TH saves the FabricIndex during commissioning
       disabled: true
@@ -45,7 +45,7 @@ tests:
 
           ./chip-tool  basicinformation read-event start-up 1 0
 
-          verify that StartUp event as priority set has CRITICAL and software verision on TH(chip-tool)
+          Verify that StartUp event priority is set is to CRITICAL and software verision is 1 on TH(chip-tool)
 
           [1657193007.841105][5422:5427] CHIP:DMG:         ],
           [1657193007.841137][5422:5427] CHIP:DMG:
@@ -65,7 +65,7 @@ tests:
     - label: "TH subscribes to the ShutDown event on the DUT. Shutdown DUT."
       PICS: BINFO.S.E01
       verification: |
-          To verify leave event follow the below commands , Pls use equivalent command on the respective DUT
+          To verify ShutDown event follow the below commands , Pls use equivalent command on the respective DUT
 
 
           1. Launch chip-tool into interactive mode with the command

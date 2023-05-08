@@ -13,6 +13,10 @@ set(pigweed_dir "${chip_dir}/third_party/pigweed/repo")
 
 include(${pigweed_dir}/pw_build/pigweed.cmake)
 include(${pigweed_dir}/pw_protobuf_compiler/proto.cmake)
+include(${pigweed_dir}/pw_assert/backend.cmake)
+include(${pigweed_dir}/pw_log/backend.cmake)
+include(${pigweed_dir}/pw_sys_io/backend.cmake)
+include(${pigweed_dir}/pw_trace/backend.cmake)
 
 set(dir_pw_third_party_nanopb "${chip_dir}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
@@ -148,6 +152,9 @@ list(
     ${chip_dir}/examples/lighting-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/lighting-app/ameba/main/Globals.cpp
     ${chip_dir}/examples/lighting-app/ameba/main/LEDWidget.cpp
+
+    ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
+    ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
 
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )

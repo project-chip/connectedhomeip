@@ -69,23 +69,38 @@ public:
 #if INET_CONFIG_ENABLE_IPV4
         if (mState == State::kIpV4)
         {
-            *id    = mIterator.GetInterfaceId();
-            *type  = chip::Inet::IPAddressType::kIPv4;
             mState = State::kIpV6;
-            return true;
+
+            if (CurrentInterfaceHasAddressOfType(chip::Inet::IPAddressType::kIPv4))
+            {
+                *id   = mIterator.GetInterfaceId();
+                *type = chip::Inet::IPAddressType::kIPv4;
+                return true;
+            }
         }
 #endif
 
-        *id   = mIterator.GetInterfaceId();
-        *type = chip::Inet::IPAddressType::kIPv6;
 #if INET_CONFIG_ENABLE_IPV4
         mState = State::kIpV4;
 #endif
 
+        bool haveResult = CurrentInterfaceHasAddressOfType(chip::Inet::IPAddressType::kIPv6);
+        if (haveResult)
+        {
+            *id   = mIterator.GetInterfaceId();
+            *type = chip::Inet::IPAddressType::kIPv6;
+        }
+
         for (mIterator.Next(); SkipCurrentInterface(); mIterator.Next())
         {
         }
-        return true;
+
+        if (haveResult)
+        {
+            return true;
+        }
+
+        return Next(id, type);
     }
 
 private:
@@ -119,6 +134,8 @@ private:
 
         return !IsCurrentInterfaceUsable(mIterator);
     }
+
+    bool CurrentInterfaceHasAddressOfType(chip::Inet::IPAddressType type);
 };
 
 class AllAddressesIterator : public mdns::Minimal::IpAddressIterator
@@ -169,6 +186,19 @@ private:
     const chip::Inet::IPAddressType mAddrType;
     chip::Inet::InterfaceAddressIterator mIterator;
 };
+
+bool AllInterfaces::CurrentInterfaceHasAddressOfType(chip::Inet::IPAddressType type)
+{
+    // mIterator.HasCurrent() must be true here.
+    AllAddressesIterator addressIter(mIterator.GetInterfaceId(), type);
+    chip::Inet::IPAddress addr;
+    if (addressIter.Next(addr))
+    {
+        return true;
+    }
+
+    return false;
+}
 
 class DefaultAddressPolicy : public AddressPolicy
 {

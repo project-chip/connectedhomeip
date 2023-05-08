@@ -2,19 +2,17 @@
 
 import logging
 import os
-import traceback
 import xml.etree.ElementTree
-from dataclasses import dataclass, field
-from typing import List, Mapping, Optional
+from dataclasses import dataclass
+from typing import List, MutableMapping
 
-import stringcase
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
 
 try:
     from .types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
                         RequiredCommandsRule)
-except:
+except ImportError:
     import sys
 
     sys.path.append(os.path.join(os.path.abspath(
@@ -23,7 +21,12 @@ except:
                                        RequiredCommandsRule)
 
 
-def parseNumberString(n):
+class ElementNotFoundError(Exception):
+    def __init__(self, name):
+        super().__init__(f"Could not find {name}")
+
+
+def parseNumberString(n: str) -> int:
     if n.startswith('0x'):
         return int(n[2:], 16)
     else:
@@ -59,9 +62,12 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
     #  - name (general name for this cluster)
     #  - code (unique identifier, may be hex or numeric)
     #  - attribute with side, code and optional attributes
-
     try:
-        name = element.find('name').text.replace(' ', '')
+        name = element.find('name')
+        if name is None or not name.text:
+            raise ElementNotFoundError('name')
+
+        name = name.text.replace(' ', '')
         required_attributes = []
         required_commands = []
 
@@ -77,8 +83,9 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             # or
             # <attribute ...><description>myName</description><access .../>...</attribute>
             attr_name = attr.text
-            if attr.find('description') is not None:
-                attr_name = attr.find('description').text
+            description = attr.find('description')
+            if description is not None:
+                attr_name = description.text
 
             required_attributes.append(
                 RequiredAttribute(
@@ -96,13 +103,17 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             required_commands.append(RequiredCommand(
                 name=cmd.attrib["name"], code=parseNumberString(cmd.attrib['code'])))
 
+        code = element.find('code')
+        if code is None:
+            raise Exception("Failed to find cluster code")
+
         return DecodedCluster(
             name=name,
-            code=parseNumberString(element.find('code').text),
+            code=parseNumberString(code.text),
             required_attributes=required_attributes,
             required_commands=required_commands
         )
-    except Exception as e:
+    except Exception:
         logging.exception("Failed to decode cluster %r" % element)
         return None
 
@@ -134,7 +145,7 @@ class LintRulesContext:
             "Required commands")
 
         # Map cluster names to the underlying code
-        self._cluster_codes: Mapping[str, int] = {}
+        self._cluster_codes: MutableMapping[str, int] = {}
 
     def GetLinterRules(self):
         return [self._required_attributes_rule, self._required_commands_rule]
@@ -204,7 +215,7 @@ class LintRulesTransformer(Transformer):
         """Numbers in the grammar are integers or hex numbers.
         """
         if len(tokens) != 1:
-            raise Error("Unexpected argument counts")
+            raise Exception("Unexpected argument counts")
 
         return parseNumberString(tokens[0].value)
 
@@ -220,7 +231,7 @@ class LintRulesTransformer(Transformer):
         """An id is a string containing an identifier
         """
         if len(tokens) != 1:
-            raise Error("Unexpected argument counts")
+            raise Exception("Unexpected argument counts")
         return tokens[0].value
 
     def ESCAPED_STRING(self, s):
@@ -279,14 +290,14 @@ def CreateParser(file_name: str):
     """
     Generates a parser that will process a ".matter" file into a IDL
     """
-    return Parser(Lark.open('lint_rules_grammar.lark', rel_to=__file__, parser='lalr', propagate_positions=True), file_name=file_name)
+    return Parser(
+        Lark.open('lint_rules_grammar.lark', rel_to=__file__, parser='lalr', propagate_positions=True), file_name=file_name)
 
 
 if __name__ == '__main__':
     # This Parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
     import click
-    import coloredlogs
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -301,12 +312,14 @@ if __name__ == '__main__':
     @click.option(
         '--log-level',
         default='INFO',
-        type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
         help='Determines the verbosity of script output.')
     @click.argument('filename')
     def main(log_level, filename=None):
-        coloredlogs.install(level=__LOG_LEVELS__[
-                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+        logging.basicConfig(
+            level=__LOG_LEVELS__[log_level],
+            format='%(asctime)s %(levelname)-7s %(message)s',
+        )
 
         logging.info("Starting to parse ...")
         data = CreateParser(filename).parse()

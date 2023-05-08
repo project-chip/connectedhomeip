@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/DecodableList.h>
@@ -30,3 +29,11 @@
 #include <lib/support/Span.h>
 
 // List specific responses
+typedef void (*OtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OtaSoftwareUpdateProviderEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*OtaSoftwareUpdateProviderAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);

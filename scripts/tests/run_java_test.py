@@ -16,8 +16,6 @@
 
 import logging
 import os
-import pathlib
-import pty
 import queue
 import re
 import shlex
@@ -31,15 +29,22 @@ from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
 from java.commissioning_test import CommissioningTest
 from java.discover_test import DiscoverTest
+from java.im_test import IMTest
 
 
 @click.command()
-@click.option("--app", type=click.Path(exists=True), default=None, help='Path to local application to use, omit to use external apps.')
-@click.option("--app-args", type=str, default='', help='The extra arguments passed to the device.')
-@click.option("--tool-path", type=click.Path(exists=True), default=None, help='Path to java-matter-controller.')
-@click.option("--tool-cluster", type=str, default='pairing', help='The cluster name passed to the java-matter-controller.')
-@click.option("--tool-args", type=str, default='', help='The arguments passed to the java-matter-controller.')
-@click.option("--factoryreset", is_flag=True, help='Remove app configs (/tmp/chip*) before running the tests.')
+@click.option("--app", type=click.Path(exists=True), default=None,
+              help='Path to local application to use, omit to use external apps.')
+@click.option("--app-args", type=str, default='',
+              help='The extra arguments passed to the device.')
+@click.option("--tool-path", type=click.Path(exists=True), default=None,
+              help='Path to java-matter-controller.')
+@click.option("--tool-cluster", type=str, default='pairing',
+              help='The cluster name passed to the java-matter-controller.')
+@click.option("--tool-args", type=str, default='',
+              help='The arguments passed to the java-matter-controller.')
+@click.option("--factoryreset", is_flag=True,
+              help='Remove app configs (/tmp/chip*) before running the tests.')
 def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: str, factoryreset: bool):
     logging.info("Execute: {script_command}")
 
@@ -98,6 +103,15 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         logging.info("Testing discover cluster")
 
         test = DiscoverTest(log_cooking_threads, log_queue, command, tool_args)
+        try:
+            test.RunTest()
+        except Exception as e:
+            logging.error(e)
+            sys.exit(1)
+    elif tool_cluster == 'im':
+        logging.info("Testing IM")
+
+        test = IMTest(log_cooking_threads, log_queue, command, tool_args)
         try:
             test.RunTest()
         except Exception as e:

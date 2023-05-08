@@ -81,6 +81,10 @@ public:
         CHIP_ERROR SetAttributePaths(const ObjectList<AttributePathParams> * pAttributePathList)
         {
             mAttributePaths.Free();
+            if (!pAttributePathList)
+            {
+                return CHIP_NO_ERROR;
+            }
             const ObjectList<AttributePathParams> * attributePath = pAttributePathList;
             size_t attributePathCount                             = 0;
             while (attributePath)
@@ -102,6 +106,10 @@ public:
         CHIP_ERROR SetEventPaths(const ObjectList<EventPathParams> * pEventPathList)
         {
             mEventPaths.Free();
+            if (!pEventPathList)
+            {
+                return CHIP_NO_ERROR;
+            }
             const ObjectList<EventPathParams> * eventPath = pEventPathList;
             size_t eventPathCount                         = 0;
             while (eventPath)

@@ -169,6 +169,10 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->user);
         }
+        else if (strncmp("cert_dclrn", (const char *) currentString.value, currentString.len) == 0)
+        {
+            res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->certificate_declaration);
+        }
         else
         {
             res = res && zcbor_any_skip(states, NULL);

@@ -32,6 +32,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
@@ -72,8 +73,7 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(),
-                                                          sizeof(logStorageResources) / sizeof(logStorageResources[0]),
+        chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
 
         return SUCCESS;

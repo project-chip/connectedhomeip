@@ -320,8 +320,8 @@ sl_status_t sl_wfx_host_reset_chip(void)
  *****************************************************************************/
 sl_status_t sl_wfx_host_wait_for_wake_up(void)
 {
-    xSemaphoreTake(wfx_wakeup_sem, TICKS_TO_WAIT_0);
-    xSemaphoreTake(wfx_wakeup_sem, TICKS_TO_WAIT_3 / portTICK_PERIOD_MS);
+    xSemaphoreTake(wfx_wakeup_sem, pdMS_TO_TICKS(TICKS_TO_WAIT_0));
+    xSemaphoreTake(wfx_wakeup_sem, pdMS_TO_TICKS(TICKS_TO_WAIT_3));
 
     return SL_STATUS_OK;
 }
@@ -418,7 +418,7 @@ sl_status_t sl_wfx_host_lock(void)
 
     sl_status_t status = SL_STATUS_OK;
 
-    if (xSemaphoreTake(wfx_mutex, TICKS_TO_WAIT_500) != pdTRUE)
+    if (xSemaphoreTake(wfx_mutex, pdMS_TO_TICKS(TICKS_TO_WAIT_500)) != pdTRUE)
     {
         SILABS_LOG("*ERR*Wi-Fi driver mutex timo");
         status = SL_STATUS_TIMEOUT;

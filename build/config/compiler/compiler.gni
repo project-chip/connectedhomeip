@@ -53,4 +53,10 @@ declare_args() {
 
   # Enable address sanitizer
   is_asan = false
+
+  # Debug prefix mapping (values for -fdebug-prefix-map=).
+  prefix_mappings = []
+
+  # Enable fuzzer build for OSS-Fuzz
+  oss_fuzz = false
 }

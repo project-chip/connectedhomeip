@@ -1,5 +1,5 @@
 {
-  "featureLevel": 89,
+  "featureLevel": 96,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1058,7 +1058,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "4",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -1111,6 +1111,22 @@
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "AccessControlEntryChanged",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "AccessControlExtensionChanged",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -1426,7 +1442,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "boolean",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
@@ -1499,6 +1515,29 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "StartUp",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ShutDown",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "Leave",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -1818,6 +1857,29 @@
               "maxInterval": 65534,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "StateTransition",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "VersionApplied",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "DownloadError",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -1923,7 +1985,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "HourFormat",
+              "type": "HourFormatEnum",
               "included": 1,
               "storageOption": "NVM",
               "singleton": 0,
@@ -1939,7 +2001,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "CalendarType",
+              "type": "CalendarTypeEnum",
               "included": 1,
               "storageOption": "NVM",
               "singleton": 0,
@@ -2021,7 +2083,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "TempUnit",
+              "type": "TempUnitEnum",
               "included": 1,
               "storageOption": "NVM",
               "singleton": 0,
@@ -2810,6 +2872,15 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
+          ],
+          "events": [
+            {
+              "name": "BootReason",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            }
           ]
         },
         {
@@ -2941,6 +3012,42 @@
               "code": 65533,
               "mfgCode": null,
               "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Thread Network Diagnostics",
+          "code": 53,
+          "mfgCode": null,
+          "define": "THREAD_NETWORK_DIAGNOSTICS_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "commands": [
+            {
+              "name": "ResetCounts",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
+          "attributes": [
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
               "type": "int16u",
               "included": 1,
               "storageOption": "RAM",
@@ -4011,6 +4118,16 @@
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "commands": [
+            {
+              "name": "ResetCounts",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -4059,7 +4176,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "SecurityType",
+              "type": "SecurityTypeEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4075,7 +4192,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "WiFiVersionType",
+              "type": "WiFiVersionEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4277,6 +4394,29 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "Disconnection",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "AssociationFailure",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ConnectionStatus",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         },
@@ -7509,6 +7649,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "TriggerEffect",
+              "code": 64,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -10929,7 +11077,7 @@
               "code": 16,
               "mfgCode": null,
               "side": "server",
-              "type": "PumpStatus",
+              "type": "PumpStatusBitmap",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -10945,7 +11093,7 @@
               "code": 17,
               "mfgCode": null,
               "side": "server",
-              "type": "PumpOperationMode",
+              "type": "OperationModeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -10961,7 +11109,7 @@
               "code": 18,
               "mfgCode": null,
               "side": "server",
-              "type": "PumpControlMode",
+              "type": "ControlModeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -10993,7 +11141,7 @@
               "code": 32,
               "mfgCode": null,
               "side": "server",
-              "type": "PumpOperationMode",
+              "type": "OperationModeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -14634,5 +14782,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 769
     }
-  ]
+  ],
+  "log": []
 }

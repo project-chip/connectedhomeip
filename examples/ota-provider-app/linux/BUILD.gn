@@ -35,3 +35,7 @@ executable("chip-ota-provider-app") {
 group("linux") {
   deps = [ ":chip-ota-provider-app" ]
 }
+
+group("default") {
+  deps = [ ":linux" ]
+}

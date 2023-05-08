@@ -24,9 +24,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     - label: "DUT read (0xFFFD) ClusterRevision attribute"
       PICS: LUNIT.C.Afffd

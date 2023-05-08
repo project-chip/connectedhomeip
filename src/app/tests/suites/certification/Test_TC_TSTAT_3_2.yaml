@@ -40,7 +40,7 @@ tests:
           ./chip-tool thermostat setpoint-raise-lower 0 10 1 1
 
 
-          verify On TH(all-clusters-app) receives the right invoke Request Message for the data sent in the above command
+          verify On TH(thermostat-app) receives the right invoke Request Message for the data sent in the above command
 
 
           [1666952425.387487][5547:5547] CHIP:EM: Handling via exchange: 27004r, Delegate: 0xaaaabacd6d38
@@ -131,7 +131,7 @@ tests:
 
           ./chip-tool thermostat setpoint-raise-lower 0 -10 1 1
 
-          verify On TH(all-clusters-app) receives the right invoke Request Message for the data sent in the above command
+          verify On TH(thermostat-app) receives the right invoke Request Message for the data sent in the above command
 
           [1666952478.420042][5547:5547] CHIP:EM: Handling via exchange: 59365r, Delegate: 0xaaaabacd6d38
           [1666952478.420209][5547:5547] CHIP:DMG: InvokeRequestMessage =

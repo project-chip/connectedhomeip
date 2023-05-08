@@ -374,7 +374,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     MutableByteSpan rcacSpan(rcac.Get(), kMaxDERCertLength);
 
     ReturnErrorOnFailure(
-        GenerateNOCChainAfterValidation(assignedId, mNextFabricId, chip::kUndefinedCATs, pubkey, rcacSpan, icacSpan, nocSpan));
+        GenerateNOCChainAfterValidation(assignedId, mNextFabricId, mNextCATs, pubkey, rcacSpan, icacSpan, nocSpan));
 
     // TODO(#13825): Should always generate some IPK. Using a temporary fixed value until APIs are plumbed in to set it end-to-end
     // TODO: Force callers to set IPK if used before GenerateNOCChain will succeed.

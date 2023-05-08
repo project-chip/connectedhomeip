@@ -15,9 +15,28 @@
 
 from ..pseudo_cluster import PseudoCluster
 
+_DEFINITION = '''<?xml version="1.0"?>
+<configurator>
+<cluster>
+    <name>LogCommands</name>
+    <code>0xFFF1FD01</code>
+
+    <command source="client" code="0" name="Log">
+      <arg name="message" type="char_string"/>
+    </command>
+
+    <command source="client" code="1" name="UserPrompt">
+      <arg name="message" type="char_string"/>
+      <arg name="expectedValue" type="char_string" optional="true"/>
+    </command>
+</cluster>
+</configurator>
+'''
+
 
 class LogCommands(PseudoCluster):
     name = 'LogCommands'
+    definition = _DEFINITION
 
     async def UserPrompt(self, request):
         pass

@@ -33,9 +33,16 @@ extern "C" {
 
 void initAntenna(void);
 
+/* GPIO button config */
+void RSI_Wakeupsw_config(void);
+void RSI_Wakeupsw_config_gpio0(void);
+
 void init_ccpPlatform(void)
 {
 
+    RSI_Wakeupsw_config();
+
+    RSI_Wakeupsw_config_gpio0();
 #if SILABS_LOG_ENABLED
     silabsInitLog();
 #endif

@@ -110,7 +110,7 @@ private:
             {
                 if (previous == name)
                 {
-                    return chip::Optional<uint16_t>::Value(previous.OffsetInCurrentValidData());
+                    return chip::MakeOptional(static_cast<uint16_t>(previous.OffsetInCurrentValidData()));
                 }
 
                 if (!previous.Next())

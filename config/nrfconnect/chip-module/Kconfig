@@ -88,6 +88,9 @@ config CHIP_DEBUG_SYMBOLS
 	help
 	  Enables building the application with debug symbols.
 
+config CHIP_MALLOC_SYS_HEAP
+	default y if !ARCH_POSIX
+
 config CHIP_FACTORY_DATA
 	bool "Factory data provider"
 	select ZCBOR
@@ -135,6 +138,14 @@ config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
 	  build file. As a result, the merged.hex build output file, which is used
 	  when flashing the firmware using the west tool, includes the factory data
 	  as well.
+
+config CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES
+	bool "Generate onboarding codes during the generation of a factory data set"
+	help
+	  Enables generation of onboarding codes (manual pairing code and QR code)
+	  during the generation of a factory data set. You can provide the 
+	  onboarding codes a Matter controller to commission a device to a Matter 
+	  network.
 
 # Select source of the certificates
 choice CHIP_FACTORY_DATA_CERT_SOURCE

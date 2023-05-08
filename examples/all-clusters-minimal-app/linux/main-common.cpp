@@ -18,7 +18,6 @@
 
 #include "include/tv-callbacks.h"
 #include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -42,12 +41,6 @@ using namespace chip::DeviceLayer;
 namespace {
 static LowPowerManager lowPowerManager;
 } // namespace
-
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
-{
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
 
 void OnIdentifyStart(::Identify *)
 {

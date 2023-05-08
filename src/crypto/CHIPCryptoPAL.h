@@ -32,6 +32,7 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafePointerCast.h>
 #include <lib/support/Span.h>
 
 #include <stddef.h>
@@ -345,6 +346,11 @@ public:
      */
     FixedByteSpan<kCapacity> Span() const { return FixedByteSpan<kCapacity>(mBytes); }
 
+    /**
+     * @brief Returns capacity of the buffer
+     */
+    static constexpr size_t Capacity() { return kCapacity; }
+
 private:
     uint8_t mBytes[kCapacity];
 };
@@ -354,6 +360,8 @@ using P256ECDHDerivedSecret = SensitiveDataBuffer<kMax_ECDH_Secret_Length>;
 
 using IdentityProtectionKey     = SensitiveDataFixedBuffer<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
 using IdentityProtectionKeySpan = FixedByteSpan<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
+
+using AttestationChallenge = SensitiveDataFixedBuffer<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
 
 class P256PublicKey : public ECPKey<P256ECDSASignature>
 {
@@ -541,6 +549,54 @@ protected:
     bool mInitialized = false;
 };
 
+using Aes128KeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+
+/**
+ * @brief Platform-specific AES key
+ *
+ * The class represents AES key used by Matter stack either in the form of raw key material or key
+ * reference, depending on the platform. To achieve that, it contains an opaque context that can be
+ * cast to a concrete representation used by the given platform. Note that currently Matter uses
+ * 128-bit symmetric keys only.
+ */
+class Aes128KeyHandle
+{
+public:
+    Aes128KeyHandle() = default;
+    ~Aes128KeyHandle() { ClearSecretData(mContext.mOpaque); }
+
+    Aes128KeyHandle(const Aes128KeyHandle &) = delete;
+    Aes128KeyHandle(Aes128KeyHandle &&)      = delete;
+    void operator=(const Aes128KeyHandle &) = delete;
+    void operator=(Aes128KeyHandle &&) = delete;
+
+    /**
+     * @brief Get internal context cast to the desired key representation
+     */
+    template <class T>
+    const T & As() const
+    {
+        return *SafePointerCast<const T *>(&mContext);
+    }
+
+    /**
+     * @brief Get internal context cast to the desired, mutable key representation
+     */
+    template <class T>
+    T & AsMutable()
+    {
+        return *SafePointerCast<T *>(&mContext);
+    }
+
+private:
+    static constexpr size_t kContextSize = CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
+
+    struct alignas(uintptr_t) OpaqueContext
+    {
+        uint8_t mOpaque[kContextSize] = {};
+    } mContext;
+};
+
 /**
  * @brief Convert a raw ECDSA signature to ASN.1 signature (per X9.62) as used by TLS libraries.
  *
@@ -612,7 +668,6 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @param aad Additional authentication data
  * @param aad_length Length of additional authentication data
  * @param key Encryption key
- * @param key_length Length of encryption key (in bytes)
  * @param nonce Encryption nonce
  * @param nonce_length Length of encryption nonce
  * @param ciphertext Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
@@ -621,7 +676,7 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * key, size_t key_length, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
+                           const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length);
 
 /**
@@ -639,14 +694,13 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @param tag Tag to use to decrypt
  * @param tag_length Length of tag
  * @param key Decryption key
- * @param key_length Length of Decryption key (in bytes)
  * @param nonce Encryption nonce
  * @param nonce_length Length of encryption nonce
  * @param plaintext Buffer to write plaintext into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                           const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext);
 
 /**
@@ -660,13 +714,12 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
  * @param input Input text to encrypt/decrypt
  * @param input_length Length of ciphertext
  * @param key Decryption key
- * @param key_length Length of Decryption key (in bytes)
  * @param nonce Encryption nonce
  * @param nonce_length Length of encryption nonce
  * @param output Buffer to write output into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                          size_t nonce_length, uint8_t * output);
 
 /**

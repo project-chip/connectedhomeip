@@ -50,11 +50,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     VerifyOrExit(mThread != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     /* Initialize the event flags. */
-    mEventFlags = wiced_rtos_create_event_flags();
-    VerifyOrExit(mEventFlags != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(mEventFlags.Init());
 
-    result = wiced_rtos_init_event_flags(mEventFlags);
-    VerifyOrExit(result == WICED_SUCCESS, err = CHIP_ERROR_NO_MEMORY);
     /* Initialize the event queue. */
     mEventQueue = wiced_rtos_create_queue();
     VerifyOrExit(mEventQueue != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -87,12 +84,9 @@ void PlatformManagerImpl::_RunEventLoop(void)
 
     while (true)
     {
-        uint32_t flags_set          = 0;
-        const wiced_result_t result = wiced_rtos_wait_for_event_flags(mEventFlags, 0xffffffff, &flags_set, WICED_TRUE,
-                                                                      WAIT_FOR_ANY_EVENT, WICED_WAIT_FOREVER);
-        if (result != WICED_SUCCESS)
+        uint32_t flags_set = 0;
+        if (mEventFlags.WaitAnyForever(flags_set) != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "wiced_rtos_wait_for_event_flags 0x%08x", result);
             continue;
         }
 
@@ -147,7 +141,7 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
         return CHIP_ERROR_INTERNAL;
     }
 
-    SetEventFlags(kPostEventFlag);
+    mEventFlags.Set(kPostEventFlag);
 
     return CHIP_NO_ERROR;
 }
@@ -171,16 +165,6 @@ CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout durationM
 }
 
 void PlatformManagerImpl::_Shutdown() {}
-
-void PlatformManagerImpl::SetEventFlags(uint32_t flags)
-{
-    assert(!wiced_rtos_check_for_stack_overflow());
-
-    if (wiced_rtos_set_event_flags(mEventFlags, flags) != WICED_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "%s wiced_rtos_set_event_flags %08lx", __func__, flags);
-    }
-}
 
 void PlatformManagerImpl::HandleTimerEvent(void)
 {
@@ -217,7 +201,7 @@ void PlatformManagerImpl::HandlePostEvent(void)
     /* Set another application thread event if the event queue is not empty. */
     if (!wiced_rtos_is_queue_empty(mEventQueue))
     {
-        SetEventFlags(kPostEventFlag);
+        mEventFlags.Set(kPostEventFlag);
     }
 }
 
@@ -229,7 +213,7 @@ void PlatformManagerImpl::EventLoopTaskMain(uint32_t arg)
 
 void PlatformManagerImpl::TimerCallback(WICED_TIMER_PARAM_TYPE params)
 {
-    PlatformMgrImpl().SetEventFlags(kTimerEventFlag);
+    PlatformMgrImpl().mEventFlags.Set(kTimerEventFlag);
 }
 
 int PlatformManagerImpl::GetEntropy(void * data, unsigned char * output, size_t len, size_t * olen)

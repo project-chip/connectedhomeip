@@ -161,13 +161,28 @@ bool PlatformManagerImpl::_IsChipStackLockedByCurrentThread() const
 };
 #endif
 
+CHIP_ERROR PlatformManagerImpl::StartBleScan(BleScannerDelegate * delegate)
+{
+#if CONFIG_NETWORK_LAYER_BLE
+    ReturnErrorOnFailure(Internal::BLEMgrImpl().StartScan(delegate));
+#endif // CONFIG_NETWORK_LAYER_BLE
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::StopBleScan()
+{
+#if CONFIG_NETWORK_LAYER_BLE
+    ReturnErrorOnFailure(Internal::BLEMgrImpl().StopScan());
+#endif // CONFIG_NETWORK_LAYER_BLE
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR PlatformManagerImpl::PrepareCommissioning()
 {
-    auto error = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
-    error = Internal::BLEMgrImpl().PrepareConnection();
+    ReturnErrorOnFailure(Internal::BLEMgrImpl().StartScan());
 #endif // CONFIG_NETWORK_LAYER_BLE
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

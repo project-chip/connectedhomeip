@@ -2,7 +2,8 @@
 
 ## Compiling all-clusters-app for testing on Linux and Mac
 
-To compile all-clusters-app on Intel Mac, run:
+To compile all-clusters-app on Intel Mac, using the bootstrap-provided clang,
+run:
 
 ```
 $ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darwin-x64-all-clusters-no-ble-asan-clang build"
@@ -10,10 +11,16 @@ $ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darw
 
 at the top level of the Matter tree.
 
-To compile on an Arm Mac, run:
+To compile all-clusters-app on Intel Mac, using the system clang, run:
 
 ```
-$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darwin-arm64-all-clusters-no-ble-asan-clang build"
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darwin-x64-all-clusters-no-ble-asan build"
+```
+
+To compile on an Arm Mac, which can only be done using the system clang, run:
+
+```
+$ ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target darwin-arm64-all-clusters-no-ble-asan build"
 ```
 
 Similarly, to compile on Linux x86-64 run:

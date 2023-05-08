@@ -56,6 +56,11 @@ static void TestByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s2.data_equal(s2));
     NL_TEST_ASSERT(inSuite, !s2.data_equal(s1));
     NL_TEST_ASSERT(inSuite, IsSpanUsable(s2) == true);
+    NL_TEST_ASSERT(inSuite, s2.front() == 1);
+    NL_TEST_ASSERT(inSuite, s2.back() == 3);
+    NL_TEST_ASSERT(inSuite, s2[0] == 1);
+    NL_TEST_ASSERT(inSuite, s2[1] == 2);
+    NL_TEST_ASSERT(inSuite, s2[2] == 3);
 
     ByteSpan s3 = s2;
     NL_TEST_ASSERT(inSuite, s3.data() == arr);
@@ -175,6 +180,11 @@ static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s2.data()[2] == 3);
     NL_TEST_ASSERT(inSuite, !s2.empty());
     NL_TEST_ASSERT(inSuite, s2.data_equal(s2));
+    NL_TEST_ASSERT(inSuite, s2.front() == 1);
+    NL_TEST_ASSERT(inSuite, s2.back() == 3);
+    NL_TEST_ASSERT(inSuite, s2[0] == 1);
+    NL_TEST_ASSERT(inSuite, s2[1] == 2);
+    NL_TEST_ASSERT(inSuite, s2[2] == 3);
 
     FixedByteSpan<3> s3 = s2;
     NL_TEST_ASSERT(inSuite, s3.data() == arr);

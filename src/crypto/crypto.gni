@@ -13,7 +13,7 @@
 # limitations under the License.
 
 declare_args() {
-  # Crypto implementation: mbedtls, openssl, tinycrypt, boringssl, platform.
+  # Crypto implementation: mbedtls, openssl, boringssl, platform.
   chip_crypto = ""
   chip_with_se05x = 0
 

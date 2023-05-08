@@ -28,6 +28,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <platform/LockTracker.h>
 
 namespace chip {
 using namespace Credentials;
@@ -342,6 +343,7 @@ CHIP_ERROR FabricTable::VerifyCredentials(FabricIndex fabricIndex, const ByteSpa
                                           FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
                                           Crypto::P256PublicKey * outRootPublicKey) const
 {
+    assertChipStackLockedByCurrentThread();
     uint8_t rootCertBuf[kMaxCHIPCertLength];
     MutableByteSpan rootCertSpan{ rootCertBuf };
     ReturnErrorOnFailure(FetchRootCert(fabricIndex, rootCertSpan));
@@ -797,7 +799,7 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
     }
     else
     {
-        // Initialization for Upating fabric: setting up a shadow fabricInfo
+        // Initialization for Updating fabric: setting up a shadow fabricInfo
         const FabricInfo * existingFabric = FindFabricWithIndex(fabricIndex);
         VerifyOrReturnError(existingFabric != nullptr, CHIP_ERROR_INTERNAL);
 

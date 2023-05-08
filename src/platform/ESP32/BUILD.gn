@@ -24,6 +24,11 @@ declare_args() {
   chip_use_factory_data_provider = false
   chip_use_device_info_provider = false
   chip_config_software_version_number = 0
+  chip_enable_chipoble = true
+  chip_bt_nimble_enabled = false
+  chip_bt_bluedroid_enabled = false
+  chip_enable_ble_controller = false
+  chip_use_secure_cert_dac_provider = false
 }
 
 defines = [
@@ -33,7 +38,6 @@ defines = [
 static_library("ESP32") {
   sources = [
     "../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "ConfigurationManagerImpl.cpp",
@@ -55,8 +59,6 @@ static_library("ESP32") {
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
     "SystemTimeSupport.h",
-    "bluedroid/BLEManagerImpl.cpp",
-    "nimble/BLEManagerImpl.cpp",
   ]
 
   deps = [
@@ -64,17 +66,47 @@ static_library("ESP32") {
     "${chip_root}/src/setup_payload",
   ]
 
-  public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
+  public = [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
+  }
+
+  if (chip_enable_chipoble) {
+    sources += [
+      "BLEManagerImpl.h",
+      "ChipDeviceScanner.h",
+    ]
+  }
+
+  if (chip_bt_nimble_enabled) {
+    sources += [ "nimble/BLEManagerImpl.cpp" ]
+    if (chip_enable_ble_controller) {
+      sources += [
+        "nimble/ChipDeviceScanner.cpp",
+        "nimble/blecent.h",
+        "nimble/misc.c",
+        "nimble/peer.c",
+      ]
+    }
+  }
+
+  if (chip_bt_bluedroid_enabled) {
+    sources += [ "bluedroid/BLEManagerImpl.cpp" ]
+    if (chip_enable_ble_controller) {
+      sources += [ "bluedroid/ChipDeviceScanner.cpp" ]
+    }
   }
 
   if (chip_enable_wifi) {
@@ -123,4 +155,13 @@ static_library("ESP32") {
       "ESP32DeviceInfoProvider.h",
     ]
   }
+
+  if (chip_use_secure_cert_dac_provider) {
+    sources += [
+      "ESP32SecureCertDACProvider.cpp",
+      "ESP32SecureCertDACProvider.h",
+    ]
+  }
+
+  cflags = [ "-Wconversion" ]
 }

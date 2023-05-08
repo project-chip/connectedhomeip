@@ -57,7 +57,7 @@ public:
     CHIP_ERROR Init(AppParams * AppParams = nullptr);
     CHIP_ERROR InitBindingHandlers();
 
-    CHIP_ERROR DiscoverCommissioners();
+    CHIP_ERROR DiscoverCommissioners(chip::Controller::DeviceDiscoveryDelegate * deviceDiscoveryDelegate = nullptr);
     const chip::Dnssd::DiscoveredNodeData *
     GetDiscoveredCommissioner(int index, chip::Optional<TargetVideoPlayerInfo *> & outAssociatedConnectableVideoPlayer);
     CHIP_ERROR OpenBasicCommissioningWindow(std::function<void(CHIP_ERROR)> commissioningCompleteCallback,
@@ -97,7 +97,8 @@ public:
                                            std::function<void(CHIP_ERROR)> onConnectionFailure,
                                            std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
 
-    CHIP_ERROR PurgeVideoPlayerCache();
+    void LogCachedVideoPlayers();
+    CHIP_ERROR PurgeCache();
 
     /**
      * Tears down all active subscriptions.
@@ -185,6 +186,10 @@ public:
     CHIP_ERROR MediaPlayback_Pause(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_StopPlayback(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_Next(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Previous(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Rewind(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_FastForward(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_StartOver(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_Seek(TargetEndpointInfo * endpoint, uint64_t position,
                                   std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_SkipForward(TargetEndpointInfo * endpoint, uint64_t deltaPositionMilliseconds,
@@ -425,6 +430,19 @@ private:
     static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void ReadServerClusters(chip::EndpointId endpointId);
 
+    /**
+     * @brief Retrieve the IP Address to use for the UDC request.
+     * This function will look for an IPv4 address in the list of IPAddresses passed in if available and return
+     * that address if found. If there are no available IPv4 addresses, it will default to the first available address.
+     * This logic is similar to the one used by the UDC server that prefers IPv4 addresses.
+     *
+     * @param ipAddresses - The list of ip addresses available to use
+     * @param numIPs - The number of ip addresses available in the array
+     *
+     * @returns The IPv4 address in the array if available, otherwise will return the first address in the list.
+     */
+    static chip::Inet::IPAddress * getIpAddressForUDCRequest(chip::Inet::IPAddress ipAddresses[], const size_t numIPs);
+
     PersistenceManager mPersistenceManager;
     bool mInited        = false;
     bool mUdcInProgress = false;
@@ -432,8 +450,9 @@ private:
     TargetVideoPlayerInfo mCachedTargetVideoPlayerInfo[kMaxCachedVideoPlayers];
     uint16_t mTargetVideoPlayerVendorId                                   = 0;
     uint16_t mTargetVideoPlayerProductId                                  = 0;
-    uint16_t mTargetVideoPlayerDeviceType                                 = 0;
+    chip::DeviceTypeId mTargetVideoPlayerDeviceType                       = 0;
     char mTargetVideoPlayerDeviceName[chip::Dnssd::kMaxDeviceNameLen + 1] = {};
+    char mTargetVideoPlayerHostName[chip::Dnssd::kHostNameMaxLength + 1]  = {};
     size_t mTargetVideoPlayerNumIPs                                       = 0; // number of valid IP addresses
     chip::Inet::IPAddress mTargetVideoPlayerIpAddress[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
 
@@ -477,6 +496,10 @@ private:
     PauseCommand mPauseCommand;
     StopPlaybackCommand mStopPlaybackCommand;
     NextCommand mNextCommand;
+    PreviousCommand mPreviousCommand;
+    RewindCommand mRewindCommand;
+    FastForwardCommand mFastForwardCommand;
+    StartOverCommand mStartOverCommand;
     SeekCommand mSeekCommand;
     SkipForwardCommand mSkipForwardCommand;
     SkipBackwardCommand mSkipBackwardCommand;

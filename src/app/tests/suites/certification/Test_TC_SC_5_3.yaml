@@ -69,7 +69,7 @@ tests:
 
     - label:
           "DUT operator initiates transmission of multicast message to TH (by
-          interacting with DUT)."
+          interacting with DUT)"
       verification: |
           ./chip-tool groupsettings add-group grp1 0x0001
 
@@ -80,7 +80,6 @@ tests:
           ./chip-tool groupsettings show-groups
 
           ./chip-tool identify identify 0x0078 0xffffffffffff0001 1
-
 
           Verify Destination Node ID matches the GroupID on TH(Reference app)log :
 
@@ -115,6 +114,9 @@ tests:
           [1657785422.724770][2083:2083] CHIP:DMG: AccessControl: checking f=1 a=g s=0xFFFFFFFFFFFF0001 t= c=0x0000_0003 e=1 p=m
           [1657785422.724846][2083:2083] CHIP:DMG: AccessControl: allowed
           [1657785422.724929][2083:2083] CHIP:DMG: Endpoint 1, Cluster 0x0000_0003 update version to 435c9140
+
+
+          Verify the Multicast address follows the format "FF35:0040:FD<Fabric ID>00:<Group ID> and UDP port is 5540   on DUT(chip-tool)log
 
           <<< [E:15304i M:15000] (G) Msg TX to 1:FFFFFFFFFFFF0001 [D5AE] --- Type 0001:08 (IM:InvokeCommandRequest)
           [1670395515.064662][14427:14429] CHIP:IN: (G) Sending msg 15000 to Multicast IPV6 address "UDP:[ff35:40:fd00::100:1]:5540"

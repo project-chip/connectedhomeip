@@ -35,7 +35,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
 {
     ESP_LOGI(TAG,
              "PostAttributeChangeCallback - Cluster ID: '" ChipLogFormatMEI
-             "', EndPoint ID: '0x%02x', Attribute ID: '" ChipLogFormatMEI "'",
+             "', EndPoint ID: '0x%x', Attribute ID: '" ChipLogFormatMEI "'",
              ChipLogValueMEI(clusterId), endpointId, ChipLogValueMEI(attributeId));
 
     // TODO handle this callback in switch statement

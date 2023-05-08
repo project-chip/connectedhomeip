@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from matter_idl.matter_idl_types import *
+from matter_idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, DataType, Field, FieldQuality
 
 
 def ParseInt(value: str) -> int:
@@ -66,7 +66,7 @@ def AttrsToAttribute(attrs) -> Attribute:
     field = Field(
         data_type=data_type,
         code=ParseInt(attrs['code']),
-        name=None,
+        name='',
         is_list=(attrs['type'].lower() == 'array')
     )
 

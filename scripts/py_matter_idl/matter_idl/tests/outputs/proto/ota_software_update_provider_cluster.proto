@@ -1,0 +1,107 @@
+
+/// AUTO-GENERATED with matter_idl.
+
+syntax = "proto3";
+
+package com.matter.example.proto;
+
+option java_multiple_files = true;
+
+message OtaSoftwareUpdateProviderCluster {
+  // option (message_type) = MATTER_TRAIT;
+
+  enum ClusterId {
+    CLUSTER_ID_UNSUPPORTED = 0;
+    CLUSTER_ID = 41;
+  }
+
+  // Enums
+  enum OTAApplyUpdateAction {
+    OTAAUA_PROCEED = 0;
+    OTAAUA_AWAIT_NEXT_ACTION = 1;
+    OTAAUA_DISCONTINUE = 2;
+  }
+
+  enum OTADownloadProtocol {
+    OTADP_BDXSYNCHRONOUS = 0;
+    OTADP_BDXASYNCHRONOUS = 1;
+    OTADP_HTTPS = 2;
+    OTADP_VENDOR_SPECIFIC = 3;
+  }
+
+  enum OTAQueryStatus {
+    OTAQS_UPDATE_AVAILABLE = 0;
+    OTAQS_BUSY = 1;
+    OTAQS_NOT_AVAILABLE = 2;
+    OTAQS_DOWNLOAD_PROTOCOL_NOT_SUPPORTED = 3;
+  }
+
+
+  // Structs
+
+  // Attributes
+  /** int16u Type: 6 IsList: 0 FieldId: 65533 */
+  int16u cluster_revision = 3211261;
+    /*
+    [(attribute) = {
+      is_subscribable: true,
+    }];
+    */
+
+
+
+  // Commands
+  message QueryImageCommand {
+    // option (message_type) = MATTER_COMMAND;
+    
+    /** vendor_id Type: 1 IsList: 0 FieldId: 0 */
+    uint32 vendor_id = 524288;
+    /** INT16U Type: 6 IsList: 0 FieldId: 1 */
+    INT16U product_id = 3145729;
+    /** INT32U Type: 6 IsList: 0 FieldId: 2 */
+    INT32U software_version = 3145730;
+    /** OTADownloadProtocol Type: 6 IsList: 1 FieldId: 3 */
+    repeated OTADownloadProtocol protocols_supported = 3145731;
+    /** INT16U Type: 6 IsList: 0 FieldId: 4 */
+    optional INT16U hardware_version = 3145732;
+    /** CHAR_STRING Type: 4 IsList: 0 FieldId: 5 */
+    optional string location = 2097157;
+    /** BOOLEAN Type: 3 IsList: 0 FieldId: 6 */
+    optional bool requestor_can_consent = 1572870;
+    /** OCTET_STRING Type: 5 IsList: 0 FieldId: 7 */
+    optional bytes metadata_for_provider = 2621447;
+  }
+  
+  message QueryImageCommandResponse {
+    // option (message_type) = MATTER_COMMAND_RESPONSE;
+    
+  }
+
+  message ApplyUpdateRequestCommand {
+    // option (message_type) = MATTER_COMMAND;
+    
+    /** OCTET_STRING Type: 5 IsList: 0 FieldId: 0 */
+    bytes update_token = 2621440;
+    /** INT32U Type: 6 IsList: 0 FieldId: 1 */
+    INT32U new_version = 3145729;
+  }
+  
+  message ApplyUpdateRequestCommandResponse {
+    // option (message_type) = MATTER_COMMAND_RESPONSE;
+    
+    /** OTAApplyUpdateAction Type: 6 IsList: 0 FieldId: 0 */
+    OTAApplyUpdateAction action = 3145728;
+    /** INT32U Type: 6 IsList: 0 FieldId: 1 */
+    INT32U delayed_action_time = 3145729;
+  }
+
+  message NotifyUpdateAppliedCommand {
+    // option (message_type) = MATTER_COMMAND;
+    
+    /** OCTET_STRING Type: 5 IsList: 0 FieldId: 0 */
+    bytes update_token = 2621440;
+    /** INT32U Type: 6 IsList: 0 FieldId: 1 */
+    INT32U software_version = 3145729;
+  }
+
+} // OtaSoftwareUpdateProviderCluster

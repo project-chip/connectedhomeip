@@ -34,5 +34,3 @@ tests:
     - label: "TH sends Sleep command to DUT"
       PICS: LOWPOWER.S.C00.Rsp
       command: "Sleep"
-      response:
-          error: 0

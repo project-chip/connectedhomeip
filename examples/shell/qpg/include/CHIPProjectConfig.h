@@ -100,13 +100,6 @@
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 
 /**
- * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
- *
- * A size, in bytes, of the individual debug event logging buffer.
- */
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
-
-/**
  * CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
  *
  * Enable Thread CLI interface at initialisation.

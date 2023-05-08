@@ -37,4 +37,4 @@ custom_toolchain = "//third_party/connectedhomeip/config/esp32/toolchain:esp32"
 #   Matter already fixes python constraints, we use those instead of
 # whatever pigweed ships with
 pw_build_PIP_CONSTRAINTS =
-    [ "//third_party/connectedhomeip/scripts/constraints.txt" ]
+    [ "//third_party/connectedhomeip/scripts/setup/constraints.txt" ]

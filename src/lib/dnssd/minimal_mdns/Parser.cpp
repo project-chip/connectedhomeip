@@ -75,7 +75,7 @@ bool QueryData::Append(HeaderRef & hdr, RecordWriter & out) const
 
     out.WriteQName(GetName())
         .Put16(static_cast<uint16_t>(mType))
-        .Put16(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0));
+        .Put16(static_cast<uint16_t>(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0)));
 
     if (!out.Fit())
     {

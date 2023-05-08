@@ -22,6 +22,27 @@ get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALP
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
 
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
+  set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
+else()
+  unset(LOCAL_DTC_OVERLAY_FILE)
+endif()
+
+if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
+  set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
+else()
+  unset(GLOBAL_DTC_OVERLAY_FILE)
+endif()
+
+if(DTC_OVERLAY_FILE)
+  set(DTC_OVERLAY_FILE
+    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
+    CACHE STRING "" FORCE
+  )
+else()
+  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
+endif()
+
 set(CONF_FILE ${CHIP_ROOT}/config/telink/app/zephyr.conf prj.conf)
 
 # Load NCS/Zephyr build system
@@ -40,6 +61,7 @@ target_include_directories(app PRIVATE
                            ${ALL_CLUSTERS_COMMON_DIR}/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-minimal-app
+                           ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include)
 
 add_definitions(
@@ -48,10 +70,11 @@ add_definitions(
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/main.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
+               ${TELINK_COMMON}/common/src/mainCommon.cpp
+               ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp)

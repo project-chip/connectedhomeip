@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly, nonatomic, strong) NSData * ipk;
 
+@property (readonly, nonatomic) NSData * publicKeyData;
+
 - (instancetype)init;
 
 @end

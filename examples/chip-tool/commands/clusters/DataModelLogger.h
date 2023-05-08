@@ -103,26 +103,20 @@ private:
     template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
     static CHIP_ERROR LogValue(const char * label, size_t indent, X value)
     {
-        DataModelLogger::LogValue(label, indent, chip::to_underlying(value));
-        return CHIP_NO_ERROR;
+        return DataModelLogger::LogValue(label, indent, chip::to_underlying(value));
     }
 
     template <typename X>
     static CHIP_ERROR LogValue(const char * label, size_t indent, chip::BitFlags<X> value)
     {
-        DataModelLogger::LogValue(label, indent, value.Raw());
-        return CHIP_NO_ERROR;
+        return DataModelLogger::LogValue(label, indent, value.Raw());
     }
 
     template <typename T>
     static CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::DataModel::DecodableList<T> & value)
     {
-        size_t count   = 0;
-        CHIP_ERROR err = value.ComputeSize(&count);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
+        size_t count = 0;
+        ReturnErrorOnFailure(value.ComputeSize(&count));
         DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
 
         auto iter = value.begin();
@@ -146,13 +140,10 @@ private:
         if (value.IsNull())
         {
             DataModelLogger::LogString(label, indent, "null");
-        }
-        else
-        {
-            DataModelLogger::LogValue(label, indent, value.Value());
+            return CHIP_NO_ERROR;
         }
 
-        return CHIP_NO_ERROR;
+        return DataModelLogger::LogValue(label, indent, value.Value());
     }
 
     template <typename T>
@@ -160,7 +151,7 @@ private:
     {
         if (value.HasValue())
         {
-            DataModelLogger::LogValue(label, indent, value.Value());
+            return DataModelLogger::LogValue(label, indent, value.Value());
         }
 
         return CHIP_NO_ERROR;

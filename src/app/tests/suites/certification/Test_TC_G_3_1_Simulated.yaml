@@ -23,9 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     - label: "DUT reads NameSupport attribute value from TH"
       PICS: G.C.A0000

@@ -26,6 +26,8 @@
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
@@ -71,6 +73,10 @@ public:
 
     using ThreadStackManager::InitThreadStack;
     CHIP_ERROR InitThreadStack(otInstance * otInst);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
+#endif
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.

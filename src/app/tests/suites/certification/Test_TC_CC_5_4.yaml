@@ -121,7 +121,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
-          After 30 Seconds, Verify response contains a CurrentX value in  TH(all-clusters-app)  Logs:
+          After 30 Seconds, Verify response contains CurrentX value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666937465.689943][47283:47283] CHIP:DMG: {
           [1666937465.689946][47283:47283] CHIP:DMG:         AttributeReportIBs =
@@ -150,6 +150,7 @@ tests:
           [1666937465.690053][47283:47283] CHIP:DMG: }
 
           ./chip-tool colorcontrol read current-y 1 1
+
           After 30 Seconds, Verify response contains a CurrentY value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666937453.573485][47283:47283] CHIP:DMG: {
@@ -223,7 +224,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
-          After 10 seconds, Verify response contains a CurrentX value in  TH(all-clusters-app)  Logs:
+          After 10 seconds, Verify response contains CurrentX value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666948520.819763][52742:52742] CHIP:DMG: {
           [1666948520.819766][52742:52742] CHIP:DMG:         AttributeReportIBs =
@@ -249,13 +250,11 @@ tests:
           [1666948520.819859][52742:52742] CHIP:DMG:
           [1666948520.819863][52742:52742] CHIP:DMG:         SuppressResponse = true,
           [1666948520.819867][52742:52742] CHIP:DMG:         InteractionModelRevision = 1
-          [1666948520.819870][52742:52742] CHIP:DMG: }
-
+          [1666948520.819870][52742:52742] CHIP:DMG:
 
           ./chip-tool colorcontrol read current-y 1 1
 
-          After 10 seconds, Verify response contains a CurrentY value in  TH(all-clusters-app)  Logs:
-
+          After 10 seconds, Verify response contains CurrentY value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666948542.982566][52742:52742] CHIP:DMG: {
           [1666948542.982570][52742:52742] CHIP:DMG:         AttributeReportIBs =
@@ -357,6 +356,7 @@ tests:
           [1666948591.930837][52742:52742] CHIP:DMG:         InteractionModelRevision = 1
           [1666948591.930839][52742:52742] CHIP:DMG: }
 
+
           ./chip-tool colorcontrol read current-y 1 1
 
           After 20 Seconds, Verify response contains a CurrentY value in  TH(all-clusters-app)  Logs:
@@ -433,7 +433,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
 
-          Verify response contains a CurrentX value in  TH(all-clusters-app)  Logs:
+          Verify response contains CurrentX value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666948762.408750][52742:52742] CHIP:DMG: {
           [1666948762.408753][52742:52742] CHIP:DMG:         AttributeReportIBs =
@@ -464,7 +464,7 @@ tests:
 
           ./chip-tool colorcontrol read current-y 1 1
 
-          Verify response contains a CurrentY value in  TH(all-clusters-app)  Logs:
+          Verify response contains CurrentY value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666948770.658007][52742:52742] CHIP:DMG: {
           [1666948770.658010][52742:52742] CHIP:DMG:         AttributeReportIBs =

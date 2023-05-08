@@ -204,19 +204,30 @@ public:
     ///     in progress)
     virtual CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) = 0;
 
-    /// Inform the Lookup handle that the previous node lookup was not sufficient
-    /// for the purpose of the caller (e.g establishing a session fails with the
-    /// result of the previous lookup), and that more data is needed.
+    /// Inform the Lookup handle that the previous node lookup was not
+    /// sufficient for the purpose of the caller (e.g establishing a session
+    /// fails with the result of the previous lookup), and that more data is
+    /// needed.
     ///
-    /// If this returns CHIP_NO_ERROR, the following is expected:
-    ///   - The listener OnNodeAddressResolved will be called with the additional data.
-    ///   - handle must NOT be destroyed while the lookup is in progress (it
-    ///     is part of an internal 'lookup list')
-    ///   - handle must NOT be reused (the lookup is done on a per-node basis
-    ///     and maintains lookup data internally while the operation is still
-    ///     in progress)
+    /// This method must be called on a handle that is no longer active to
+    /// succeed.
     ///
-    /// If no additional data is available at the time of the request, it returns CHIP_ERROR_WELL_EMPTY.
+    /// If the handle is no longer active and has results that have not been
+    /// delivered to the listener yet, the listener's OnNodeAddressResolved will
+    /// be called synchronously before the method returns.  Note that depending
+    /// on the listener implementation this can end up destroying the handle
+    /// and/or the listener.
+    ///
+    /// This method will return CHIP_NO_ERROR if and only if it has called
+    /// OnNodeAddressResolved.
+    ///
+    /// This method will return CHIP_ERROR_INCORRECT_STATE if the handle is
+    /// still active.
+    ///
+    /// This method will return CHIP_ERROR_WELL_EMPTY if there are no more
+    /// results.
+    ///
+    /// This method may return other errors in some cases.
     virtual CHIP_ERROR TryNextResult(Impl::NodeLookupHandle & handle) = 0;
 
     /// Stops an active lookup request.

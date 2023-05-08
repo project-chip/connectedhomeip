@@ -18,7 +18,6 @@
 #include "client-monitoring-server.h"
 
 #include "app/server/Server.h"
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -26,7 +25,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/ClientMonitoringRegistrationTable.h>
-#include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 

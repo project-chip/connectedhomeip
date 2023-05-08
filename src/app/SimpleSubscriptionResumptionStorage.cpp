@@ -23,9 +23,6 @@
 
 #include <app/SimpleSubscriptionResumptionStorage.h>
 
-// TODO: move the conditional compilation into BUILD.gn config options
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-
 #include <lib/support/Base64.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -469,5 +466,3 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::DeleteAll(FabricIndex fabricInde
 
 } // namespace app
 } // namespace chip
-
-#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS

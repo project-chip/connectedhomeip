@@ -19,30 +19,6 @@ device works as a Thread Minimal End Device.
 
 <hr>
 
--   [Overview](#overview)
-    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
--   [Requirements](#requirements)
-    -   [Supported devices](#supported-devices)
--   [Device UI](#device-ui)
--   [Setting up the environment](#setting-up-the-environment)
-    -   [Using Docker container for setup](#using-docker-container-for-setup)
-    -   [Using native shell for setup](#using-native-shell-for-setup)
--   [Building](#building)
-    -   [Removing build artifacts](#removing-build-artifacts)
-    -   [Building with release configuration](#building-with-release-configuration)
-    -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
--   [Configuring the example](#configuring-the-example)
-    -   [Example build types](#example-build-types)
--   [Flashing and debugging](#flashing-and-debugging)
-    -   [Flashing on the development kits](#flashing-on-the-development-kits)
-    -   [Flashing on the nRF52840 Dongle](#flashing-on-the-nrf52840-dongle)
--   [Testing the example](#testing-the-example)
-    -   [Testing using Linux CHIPTool](#testing-using-linux-chiptool)
-    -   [Testing using Android CHIPTool](#testing-using-android-chiptool)
-
-<hr>
-
 ## Overview
 
 This example is running on the nRF Connect platform, which is based on Nordic

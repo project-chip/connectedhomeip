@@ -11,7 +11,7 @@ RUN apt-get update && \
 COPY out/${DEVICE_NAME} /chef_device
 COPY out/${DEVICE_NAME}.map /chef_device.map
 COPY out/${DEVICE_NAME}.matter /chef_device.matter
-COPY out/${DEVICE_NAME}_hashmeta.yaml /chef_device_hashmeta.yaml
+COPY out/${DEVICE_NAME}_meta.yaml /chef_device_meta.yaml
 
 ENV DBUS_SYSTEM_BUS_ADDRESS="unix:path=/var/run/dbus/system_bus_socket"
 

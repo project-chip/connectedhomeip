@@ -25,6 +25,8 @@
 #pragma once
 
 #include <cstdint>
+#include <lib/support/TypeTraits.h>
+#include <type_traits>
 
 namespace chip {
 namespace TLV {
@@ -161,6 +163,35 @@ constexpr Tag ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum
 constexpr Tag ContextTag(uint8_t tagNum)
 {
     return ProfileTag(Tag::kSpecialTagProfileId, tagNum);
+}
+
+/**
+ * Also allow using enum class values as context tags.  There are four possible
+ * cases when is_enum is true:
+ *
+ * 1) The enum is a scoped enum (enum class) and the underlying type is
+ *    uint8_t.  Then the is_convertible test will test false, this overload will be
+ *    used, to_underlying will return a uint8_t, and everything will work.
+ * 2) The enum is a scoped enum (enum class) and the underlying type is
+ *    not uint8_t.  Then the is_convertible test will test false, this overload will be
+ *    used, to_underlying will return the other type, and -Wconversion will
+ *    catch the type mismatch, if it's enabled.
+ * 3) The enum is an old-style enum.  Then the is_convertible test will test
+ *    true, this overload will be not be used, and the uint8_t overload will be
+ *    used instead.  The compiler should then catch (at least with sufficient
+ *    warnings turned on) if the constant being passed in is too big to fit into
+ *    uint8_t.
+ *
+ * Leaving out the is_convertible test, so this overload gets used for old-style
+ * enums, would cause old-style enums where the underlying type is wider than
+ * uint8_t to fail compilation with -Wconversion even if the values are all
+ * inside the uint8_t range, since to_underlying would explicitly return a type
+ * that is wider than uint8_t.
+ */
+template <typename T, std::enable_if_t<std::is_enum<T>::value && !std::is_convertible<T, uint8_t>::value, int> = 0>
+constexpr Tag ContextTag(T tagNum)
+{
+    return ContextTag(to_underlying(tagNum));
 }
 
 /**

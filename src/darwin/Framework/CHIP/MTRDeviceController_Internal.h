@@ -62,9 +62,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.
- * This property MUST be gotten from the Matter work queue.
  */
 @property (readonly) chip::FabricIndex fabricIndex;
+
+/**
+ * Will return the compressed fabric id of the fabric if the controller is
+ * running, else nil.
+ *
+ * This property MUST be gotten from the Matter work queue.
+ */
+@property (readonly, nullable) NSNumber * compressedFabricID;
 
 /**
  * Init a newly created controller.
@@ -184,6 +191,12 @@ NS_ASSUME_NONNULL_BEGIN
  * sort of MTRBaseDevice they return.
  */
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID;
+
+/**
+ * Notify the controller that a new operational instance with the given node id
+ * and a compressed fabric id that matches this controller has been observed.
+ */
+- (void)operationalInstanceAdded:(chip::NodeId)nodeID;
 
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages

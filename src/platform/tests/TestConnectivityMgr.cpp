@@ -99,7 +99,7 @@ int TestConnectivityMgr()
 {
     nlTestSuite theSuite = { "ConfigurationMgr tests", &sTests[0], TestConnectivityMgr_Setup, TestConnectivityMgr_Teardown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

@@ -298,9 +298,6 @@ void BindingHandler::PrintBindingTable()
         case EMBER_UNUSED_BINDING:
             LOG_INF("[%d] UNUSED", i++);
             break;
-        case EMBER_MANY_TO_ONE_BINDING:
-            LOG_INF("[%d] MANY TO ONE", i++);
-            break;
         default:
             break;
         }

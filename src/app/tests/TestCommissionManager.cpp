@@ -35,7 +35,7 @@ using chip::CommissioningWindowManager;
 using chip::Server;
 
 // Mock function for linking
-void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr) {}
+void InitDataModelHandler() {}
 
 namespace {
 bool sAdminFabricIndexDirty = false;

@@ -98,6 +98,7 @@ using namespace chip;
     _ipk = params.ipk;
     _vendorID = params.vendorID;
     _nodeID = params.nodeID;
+    _caseAuthenticatedTags = params.caseAuthenticatedTags;
     _rootCertificate = params.rootCertificate;
     _intermediateCertificate = params.intermediateCertificate;
     _operationalCertificate = params.operationalCertificate;
@@ -190,6 +191,11 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         return nil;
     }
 
+    if (self.caseAuthenticatedTags != nil && self.nodeID == nil) {
+        MTR_LOG_ERROR("caseAuthenticatedTags must be nil if nodeID is nil");
+        return nil;
+    }
+
     if (self.operationalCertificate != nil) {
         if (self.operationalKeypair == nil) {
             MTR_LOG_ERROR("Must have an operational keypair if an operational certificate is provided");
@@ -207,6 +213,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 - (instancetype)initForNewFabric:(chip::FabricTable *)fabricTable
                         keystore:(chip::Crypto::OperationalKeystore *)keystore
+            advertiseOperational:(BOOL)advertiseOperational
                           params:(MTRDeviceControllerStartupParams *)params
 {
     if (!(self = [self initWithParams:params])) {
@@ -240,6 +247,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
     _fabricTable = fabricTable;
     _keystore = keystore;
+    _advertiseOperational = advertiseOperational;
 
     return self;
 }
@@ -247,6 +255,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 - (instancetype)initForExistingFabric:(FabricTable *)fabricTable
                           fabricIndex:(FabricIndex)fabricIndex
                              keystore:(chip::Crypto::OperationalKeystore *)keystore
+                 advertiseOperational:(BOOL)advertiseOperational
                                params:(MTRDeviceControllerStartupParams *)params
 {
     if (!(self = [self initWithParams:params])) {
@@ -263,14 +272,16 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     if (self.operationalCertificate == nil && self.nodeID == nil) {
         self.nodeID = @(fabric->GetNodeId());
 
+        // Make sure to preserve caseAuthenticatedTags from the existing certificate.
+        uint8_t nocBuf[Credentials::kMaxCHIPCertLength];
+        MutableByteSpan noc(nocBuf);
+        CHIP_ERROR err = fabricTable->FetchNOCCert(fabric->GetFabricIndex(), noc);
+        if (err != CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("Failed to get existing NOC: %s", ErrorStr(err));
+            return nil;
+        }
+
         if (self.operationalKeypair == nil) {
-            uint8_t nocBuf[Credentials::kMaxCHIPCertLength];
-            MutableByteSpan noc(nocBuf);
-            CHIP_ERROR err = fabricTable->FetchNOCCert(fabric->GetFabricIndex(), noc);
-            if (err != CHIP_NO_ERROR) {
-                MTR_LOG_ERROR("Failed to get existing NOC: %s", ErrorStr(err));
-                return nil;
-            }
             self.operationalCertificate = MatterCertToX509Data(noc);
             if (self.operationalCertificate == nil) {
                 MTR_LOG_ERROR("Failed to convert TLV NOC to DER X.509: %s", ErrorStr(err));
@@ -280,6 +291,26 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
                 MTR_LOG_ERROR("No existing operational key for fabric");
                 return nil;
             }
+        }
+
+        CATValues cats;
+        err = Credentials::ExtractCATsFromOpCert(noc, cats);
+        if (err != CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("Failed to extract existing CATs: %s", ErrorStr(err));
+            return nil;
+        }
+
+        auto tagCount = cats.GetNumTagsPresent();
+        if (tagCount > 0) {
+            auto * catSet = [[NSMutableSet alloc] initWithCapacity:tagCount];
+            for (auto & value : cats.values) {
+                if (value != kUndefinedCAT) {
+                    [catSet addObject:@(value)];
+                }
+            }
+            self.caseAuthenticatedTags = [NSSet setWithSet:catSet];
+        } else {
+            self.caseAuthenticatedTags = nil;
         }
 
         usingExistingNOC = YES;
@@ -352,6 +383,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _fabricTable = fabricTable;
     _fabricIndex.Emplace(fabricIndex);
     _keystore = keystore;
+    _advertiseOperational = advertiseOperational;
 
     return self;
 }

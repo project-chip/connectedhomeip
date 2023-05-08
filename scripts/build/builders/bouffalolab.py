@@ -77,7 +77,8 @@ class BouffalolabBuilder(GnBuilder):
                  enable_rpcs: bool = False,
                  module_type: str = "BL706C-22",
                  baudrate=2000000,
-                 enable_shell: bool = False
+                 enable_shell: bool = False,
+                 enable_cdc: bool = False
                  ):
 
         bouffalo_chip = "bl702" if "BL70" in module_type else "bl602"
@@ -103,6 +104,11 @@ class BouffalolabBuilder(GnBuilder):
 
         if bouffalo_chip == "bl702":
             self.argsOpt.append('module_type=\"{}\"'.format(module_type))
+
+        if enable_cdc:
+            if bouffalo_chip != "bl702":
+                raise Exception('Chip %s does NOT support USB CDC' % bouffalo_chip)
+            self.argsOpt.append('enable_cdc_module=true')
 
         if enable_rpcs:
             self.argsOpt.append('import("//with_pw_rpc.gni")')

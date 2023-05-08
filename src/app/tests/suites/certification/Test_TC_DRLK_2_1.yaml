@@ -751,6 +751,7 @@ tests:
     - label: "TH writes NumberOfHoliday SchedulesSupported attribute as 36"
       verification: |
           ./chip-tool doorlock write-by-id 22 36 1 1
+
           Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1654680084.923185][3619:3624] CHIP:DMG:                        StatusIB =
@@ -767,6 +768,7 @@ tests:
     - label: "TH reads NumberOfHoliday SchedulesSupported attribute from DUT"
       verification: |
           ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
+
           Verify " NumberOfHoliDaySchedulesSupported " on the TH(Chip-tool) Log:
 
           [1654680009.422218][3611:3616] CHIP:DMG:        SuppressResponse = true,
@@ -780,6 +782,7 @@ tests:
       PICS: DRLK.S.F00 && DRLK.S.A0017
       verification: |
           ./chip-tool doorlock read  max-pincode-length 1 1
+
           Verify "  MaxPINCodeLength " on the TH(Chip-tool) Log:
 
           [1654680165.814980][3630:3635] CHIP:DMG:
@@ -793,6 +796,7 @@ tests:
     - label: "TH writes MaxPINCodeLength attribute as 85"
       verification: |
           ./chip-tool doorlock write-by-id 23 85 1 1
+
           Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1653636463.990965][3391:3396] CHIP:DMG:                        StatusIB =
@@ -807,6 +811,7 @@ tests:
     - label: "TH reads MaxPINCodeLength attribute from DUT"
       verification: |
           ./chip-tool doorlock read  max-pincode-length 1 1
+
           Verify "  MaxPINCodeLength " on the TH(Chip-tool) Log:
 
           [1654680165.814980][3630:3635] CHIP:DMG:
@@ -821,6 +826,7 @@ tests:
       PICS: DRLK.S.F00 && DRLK.S.A0018
       verification: |
           ./chip-tool doorlock read min-pincode-length 1 1
+
           Verify "  MinPINCodeLength " on the TH(Chip-tool) Log:
 
           [1654680280.327216][3639:3644] CHIP:DMG:        SuppressResponse = true,
@@ -833,6 +839,7 @@ tests:
     - label: "TH writes MinPINCodeLength attribute as 63"
       verification: |
           ./chip-tool doorlock write-by-id 24 63 1 1
+
           Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1653636555.069388][3409:3414] CHIP:DMG:                        StatusIB =
@@ -848,6 +855,7 @@ tests:
     - label: "TH reads MinPINCodeLength attribute from DUT"
       verification: |
           ./chip-tool doorlock read min-pincode-length 1 1
+
           Verify "  MinPINCodeLength " on the TH(Chip-tool) Log:
 
           [1654680280.327216][3639:3644] CHIP:DMG:        SuppressResponse = true,
@@ -861,6 +869,7 @@ tests:
       PICS: DRLK.S.F01 && DRLK.S.A0019
       verification: |
           ./chip-tool doorlock read  max-rfidcode-length 1 1
+
           Verify "  MaxRFIDCodeLength " on the TH(Chip-tool) Log:
 
           [1654680386.044531][3650:3655] CHIP:DMG:        SuppressResponse = true,
@@ -873,6 +882,7 @@ tests:
     - label: "TH writes MaxRFIDCodeLength attribute as 46"
       verification: |
           ./chip-tool doorlock write-by-id 25 46 1 1
+
           Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1653636648.222617][3428:3433] CHIP:DMG:
@@ -889,6 +899,7 @@ tests:
     - label: "TH reads MaxRFIDCodeLength attribute from DUT"
       verification: |
           ./chip-tool doorlock read  max-rfidcode-length 1 1
+
           Verify " MaxRFIDCodeLength " on the TH(Chip-tool) Log:
 
           [1654680386.044531][3650:3655] CHIP:DMG:        SuppressResponse = true,
@@ -902,6 +913,7 @@ tests:
       PICS: DRLK.S.F01 && DRLK.S.A001a
       verification: |
           ./chip-tool doorlock read min-rfidcode-length 1 1
+
           Verify " MinRFIDCodeLength " on the TH(Chip-tool) Log:
 
           [1654680510.153261][3668:3673] CHIP:DMG:        SuppressResponse = true,
@@ -914,6 +926,7 @@ tests:
     - label: "TH writes MinRFIDCodeLength attribute as 17"
       verification: |
           ./chip-tool doorlock write-by-id 26 17 1 1
+
           Verify "DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
 
           [1654680561.429054][3676:3681] CHIP:DMG:                        StatusIB =
@@ -929,6 +942,7 @@ tests:
     - label: "TH reads MinRFIDCodeLength attribute from DUT"
       verification: |
           ./chip-tool doorlock read min-rfidcode-length 1 1
+
           Verify "  MinRFIDCodeLength " on the TH(Chip-tool) Log:
 
           [1654680510.153261][3668:3673] CHIP:DMG:        SuppressResponse = true,
@@ -1001,6 +1015,7 @@ tests:
     - label: "TH writes Language attribute as fr"
       verification: |
           ./chip-tool doorlock write language fr 1 1
+
           Verify "DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
           [1654680959.481870][3711:3716] CHIP:DMG:                        StatusIB =
@@ -1019,6 +1034,7 @@ tests:
     - label: "TH reads Language attribute from DUT"
       verification: |
           ./chip-tool doorlock read language 1 1
+
           Verify " Language " on the TH(Chip-tool) Log:
 
           [1654681045.720848][3721:3726] CHIP:DMG:        SuppressResponse = true,
@@ -1097,6 +1113,7 @@ tests:
       PICS: DRLK.S.A0023
       verification: |
           ./chip-tool doorlock read  auto-relock-time 1 1
+
           Verify " AutoRelockTime " on the TH(Chip-tool) Log:
 
           [1654681151.469284][3736:3741] CHIP:DMG:        SuppressResponse = true,
@@ -1109,6 +1126,7 @@ tests:
     - label: "TH writes AutoRelockTime attribute as 180 seconds"
       verification: |
           ./chip-tool doorlock write auto-relock-time 180 1 1
+
           Verify " DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
           [1654681228.902110][3744:3749] CHIP:DMG:                        StatusIB =
@@ -1127,6 +1145,7 @@ tests:
     - label: "TH reads AutoRelockTime attribute from DUT"
       verification: |
           ./chip-tool doorlock read  auto-relock-time 1 1
+
           Verify " AutoRelockTime " on the TH(Chip-tool) Log:
 
           [1654681283.157135][3754:3759] CHIP:DMG:        SuppressResponse = true,
@@ -1142,6 +1161,7 @@ tests:
       PICS: DRLK.S.A0024
       verification: |
           ./chip-tool doorlock read sound-volume 1 1
+
           Verify " SoundVolume " on the TH(Chip-tool) Log:
 
           [1654681357.022476][3768:3773] CHIP:DMG:        SuppressResponse = true,
@@ -1154,6 +1174,7 @@ tests:
     - label: "TH writes SoundVolume attribute as 3"
       verification: |
           ./chip-tool doorlock write sound-volume 3 1 1
+
           Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1654681412.367916][3782:3787] CHIP:DMG:                        StatusIB =
@@ -1169,6 +1190,7 @@ tests:
     - label: "TH reads SoundVolume attribute from DUT"
       verification: |
           ./chip-tool doorlock read sound-volume 1 1
+
           Verify " SoundVolume " on the TH(Chip-tool) Log:
 
           [1654681449.086921][3789:3794] CHIP:DMG:        SuppressResponse = true,
@@ -1182,6 +1204,7 @@ tests:
       PICS: DRLK.S.A0026
       verification: |
           ./chip-tool doorlock read supported-operating-modes 1 1
+
           Verify " SupportedOperatingModes " on the TH(Chip-tool) Log:
 
           [1654681500.464948][3797:3802] CHIP:DMG:        SuppressResponse = true,
@@ -1194,6 +1217,7 @@ tests:
     - label: "TH writes Supported OperatingModes attribute as bit 0 is set to 0"
       verification: |
           ./chip-tool doorlock write-by-id 38 0 1 1
+
           Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
 
           [1653637108.039160][3522:3527] CHIP:DMG:                        StatusIB =
@@ -1209,6 +1233,7 @@ tests:
     - label: "TH reads Supported OperatingModes attribute from DUT"
       verification: |
           ./chip-tool doorlock read supported-operating-modes 1 1
+
           Verify " SupportedOperatingModes " on the TH(Chip-tool) Log:
 
           [1654681500.464948][3797:3802] CHIP:DMG:        SuppressResponse = true,
@@ -1224,6 +1249,7 @@ tests:
       PICS: DRLK.S.A0025
       verification: |
           ./chip-tool doorlock read operating-mode 1 1
+
           Verify "OperatingMode " on the TH(Chip-tool) Log:
 
 
@@ -1239,6 +1265,7 @@ tests:
           value is present in SupportedOperatingModes"
       verification: |
           ./chip-tool doorlock write operating-mode 0 1 1
+
           Verify "DUT sends SUCCESS response " on the TH(Chip-tool) Log:
 
           [1654681685.239429][3833:3838] CHIP:DMG:                        StatusIB =
@@ -1257,6 +1284,7 @@ tests:
           and the new value is present in Supported OperatingModes"
       verification: |
           ./chip-tool doorlock write operating-mode 3 1 1
+
           Verify "OperatingMode response " on the TH(Chip-tool) Log:
 
 
@@ -1274,6 +1302,7 @@ tests:
     - label: "TH reads OperatingMode attribute from DUT"
       verification: |
           ./chip-tool doorlock read operating-mode 1 1
+
           Verify "OperatingMode " on the TH(Chip-tool) Log:
 
           [1654681926.819078][3864:3870] CHIP:DMG:        SuppressResponse = true,
@@ -1428,6 +1457,7 @@ tests:
       PICS: DRLK.S.A0029
       verification: |
           ./chip-tool doorlock write enable-one-touch-locking 1 1 1
+
           Verify "DUT send the success response" on the TH(Chip-tool) Log:
 
           [1654682241.954790][3903:3908] CHIP:DMG:                        StatusIB =
@@ -1444,6 +1474,7 @@ tests:
     - label: "TH reads EnableOneTouchLocking attribute from DUT"
       verification: |
           ./chip-tool doorlock read enable-one-touch-locking 1 1
+
           Verify "EnableOneTouchLocking " on the TH(Chip-tool) Log:
 
           [1654682289.946247][3914:3919] CHIP:DMG:        SuppressResponse = true,
@@ -1894,6 +1925,7 @@ tests:
     - label: "TH writes RequirePINfor RemoteOperation attribute as true"
       verification: |
           ./chip-tool doorlock write require-pinfor-remote-operation 1 1 1
+
           Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
           [1655211439.627206][18643:18648] CHIP:DMG: ReportDataMessage =

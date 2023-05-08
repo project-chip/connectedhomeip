@@ -36,12 +36,6 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &s
 } // namespace
 #endif
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
-{
-    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
-
 void OnIdentifyStart(Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");

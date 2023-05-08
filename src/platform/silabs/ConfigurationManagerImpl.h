@@ -34,7 +34,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the EFR32 platform.
  */
-class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::SILABSConfig>
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::SilabsConfig>
 {
 public:
     // This returns an instance of this class.

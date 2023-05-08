@@ -133,7 +133,6 @@ public:
     bool IsSessionSetupInProgress() const { return mState == ConnectionState::Connecting; }
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
-    void ShutdownSubscriptions() override {}
     PeerId GetPeerId() const { return mPeerId; }
     CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) override;
     const Transport::PeerAddress & GetPeerAddress() const { return mDeviceAddress; }

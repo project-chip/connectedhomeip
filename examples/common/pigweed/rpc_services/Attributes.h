@@ -21,7 +21,6 @@
 #include "app/util/attribute-storage.h"
 #include "attributes_service/attributes_service.rpc.pb.h"
 #include "pigweed/rpc_services/internal/StatusUtils.h"
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>

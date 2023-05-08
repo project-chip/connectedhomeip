@@ -44,7 +44,10 @@ chip_test_suite("tests") {
     "TestCryptoLayer.h",
   ]
 
-  test_sources = [ "TestGroupOperationalCredentials.cpp" ]
+  test_sources = [
+    "TestGroupOperationalCredentials.cpp",
+    "TestSessionKeystore.cpp",
+  ]
 
   if (chip_crypto == "psa") {
     test_sources += [ "TestPSAOpKeyStore.cpp" ]

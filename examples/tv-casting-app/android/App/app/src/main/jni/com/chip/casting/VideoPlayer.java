@@ -37,6 +37,7 @@ public class VideoPlayer {
 
   private int numIPs;
   private List<InetAddress> ipAddresses;
+  private String hostName;
 
   private boolean isInitialized = false;
 
@@ -50,6 +51,7 @@ public class VideoPlayer {
       List<ContentApp> contentApps,
       int numIPs,
       List<InetAddress> ipAddresses,
+      String hostName,
       boolean isConnected) {
     this.nodeId = nodeId;
     this.fabricIndex = fabricIndex;
@@ -61,6 +63,7 @@ public class VideoPlayer {
     this.isConnected = isConnected;
     this.numIPs = numIPs;
     this.ipAddresses = ipAddresses;
+    this.hostName = hostName;
     this.isInitialized = true;
   }
 
@@ -68,6 +71,11 @@ public class VideoPlayer {
     // return false because 'this' VideoPlayer is not null
     if (discoveredNodeData == null) {
       return false;
+    }
+
+    // return true if hostNames match
+    if (Objects.equals(hostName, discoveredNodeData.getHostName())) {
+      return true;
     }
 
     // return false because deviceNames are different
@@ -133,6 +141,9 @@ public class VideoPlayer {
         + ", ipAddresses="
         + ipAddresses
         + ", isInitialized="
+        + ", hostName='"
+        + hostName
+        + '\''
         + isInitialized
         + '}';
   }

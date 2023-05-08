@@ -11,6 +11,7 @@ struct PyObject;
 using DeviceScannedCallback
     = void (*)(PyObject * context, const char * address, uint16_t discriminator, uint16_t vendorId, uint16_t productId);
 using ScanCompleteCallback = void (*)(PyObject * context);
+using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
 }
 
 @interface ChipDeviceBleScanner : NSObject <CBCentralManagerDelegate>
@@ -23,10 +24,12 @@ using ScanCompleteCallback = void (*)(PyObject * context);
 @property (assign, nonatomic) PyObject * context;
 @property (assign, nonatomic) DeviceScannedCallback scanCallback;
 @property (assign, nonatomic) ScanCompleteCallback completeCallback;
+@property (assign, nonatomic) ScanErrorCallback errorCallback;
 
 - (id)initWithContext:(PyObject *)context
          scanCallback:(DeviceScannedCallback)scanCallback
      completeCallback:(ScanCompleteCallback)completeCallback
+        errorCallback:(ScanErrorCallback)errorCallback
             timeoutMs:(uint32_t)timeout;
 
 - (void)stopTimeoutReached;
@@ -38,6 +41,7 @@ using ScanCompleteCallback = void (*)(PyObject * context);
 - (id)initWithContext:(PyObject *)context
          scanCallback:(DeviceScannedCallback)scanCallback
      completeCallback:(ScanCompleteCallback)completeCallback
+        errorCallback:(ScanErrorCallback)errorCallback
             timeoutMs:(uint32_t)timeout
 {
     self = [super init];
@@ -50,6 +54,7 @@ using ScanCompleteCallback = void (*)(PyObject * context);
         _context = context;
         _scanCallback = scanCallback;
         _completeCallback = completeCallback;
+        _errorCallback = errorCallback;
 
         dispatch_source_set_event_handler(_timer, ^{
             [self stopTimeoutReached];
@@ -100,6 +105,7 @@ using ScanCompleteCallback = void (*)(PyObject * context);
     ChipLogProgress(Ble, "Scan timeout reached.");
 
     _completeCallback(_context);
+    _errorCallback(_context, CHIP_ERROR_TIMEOUT.AsInteger());
 
     dispatch_source_cancel(_timer);
     [self.centralManager stopScan];
@@ -125,14 +131,15 @@ using ScanCompleteCallback = void (*)(PyObject * context);
 
 @end
 
-extern "C" void * pychip_ble_start_scanning(
-    PyObject * context, void * adapter, uint32_t timeout, DeviceScannedCallback scanCallback, ScanCompleteCallback completeCallback)
+extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, uint32_t timeout,
+    DeviceScannedCallback scanCallback, ScanCompleteCallback completeCallback, ScanErrorCallback errorCallback)
 {
     // NOTE: adapter is ignored as it does not apply to mac
 
     ChipDeviceBleScanner * scanner = [[ChipDeviceBleScanner alloc] initWithContext:context
                                                                       scanCallback:scanCallback
                                                                   completeCallback:completeCallback
+                                                                     errorCallback:errorCallback
                                                                          timeoutMs:timeout];
 
     return (__bridge_retained void *) (scanner);

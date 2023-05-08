@@ -32,4 +32,5 @@ tests:
       command: "readAttribute"
       attribute: "MACAddress"
       response:
-          value: "00:00:00:00:00"
+          constraints:
+              minLength: 3

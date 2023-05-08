@@ -65,7 +65,9 @@ tests:
                   0x0040, # Fixed Label
                   0x0041, # User Label
                   0x0405, # Relative Humidity Measurement (why on EP0?)
-                  0x1046, # Client Monitoring
+                  # Disable CM cluster table tests until update is done
+                  # https://github.com/project-chip/connectedhomeip/issues/24425
+                  # 0x1046, # Client Monitoring
                   0xFFF1FC06, # Fault Injection
               ]
 

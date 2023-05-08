@@ -131,7 +131,7 @@ CHIP_ERROR TraceDecoder::ReadString(const char * str)
 CHIP_ERROR TraceDecoder::LogJSON(Json::Value & json)
 {
     auto protocol       = json[kProtocolIdKey].asLargestUInt();
-    uint16_t vendorId   = protocol >> 16;
+    uint16_t vendorId   = static_cast<uint16_t>(protocol >> 16);
     uint16_t protocolId = protocol & 0xFFFF;
     if (!mOptions.IsProtocolEnabled(chip::Protocols::Id(chip::VendorId(vendorId), protocolId)))
     {
@@ -213,7 +213,7 @@ CHIP_ERROR TraceDecoder::LogAndConsumeProtocol(Json::Value & json)
     auto id     = json[kProtocolIdKey].asLargestUInt();
     auto opcode = static_cast<uint8_t>(json[kProtocolCodeKey].asLargestUInt());
 
-    uint16_t vendorId   = (id >> 16);
+    uint16_t vendorId   = static_cast<uint16_t>(id >> 16);
     uint16_t protocolId = (id & 0xFFFF);
 
     chip::StringBuilderBase builder(protocolInfo, sizeof(protocolInfo));
@@ -228,7 +228,7 @@ CHIP_ERROR TraceDecoder::LogAndConsumeProtocol(Json::Value & json)
     builder.Add(protocolDetail);
 
     builder.Add(" [");
-    builder.Add(ToProtocolName(id));
+    builder.Add(ToProtocolName(vendorId, protocolId));
 
     builder.Add("  ");
     memset(protocolDetail, '\0', sizeof(protocolDetail));
@@ -236,7 +236,7 @@ CHIP_ERROR TraceDecoder::LogAndConsumeProtocol(Json::Value & json)
     builder.Add(protocolDetail);
 
     builder.Add(" / ");
-    builder.Add(ToProtocolMessageTypeName(id, opcode));
+    builder.Add(ToProtocolMessageTypeName(vendorId, protocolId, opcode));
 
     builder.Add(" ");
     memset(protocolDetail, '\0', sizeof(protocolDetail));
@@ -278,11 +278,14 @@ CHIP_ERROR TraceDecoder::MaybeLogAndConsumePayload(Json::Value & json, bool isRe
             Log("data", payload.c_str());
         }
 
-        bool shouldDecode = !isResponse || mOptions.mEnableProtocolInteractionModelResponse;
-        auto payload      = json[kPayloadDataKey].asString();
-        auto protocolId   = json[kProtocolIdKey].asLargestUInt();
-        auto protocolCode = json[kProtocolCodeKey].asLargestUInt();
-        ReturnErrorOnFailure(LogAsProtocolMessage(protocolId, protocolCode, payload.c_str(), payload.size(), shouldDecode));
+        bool shouldDecode   = !isResponse || mOptions.mEnableProtocolInteractionModelResponse;
+        auto payload        = json[kPayloadDataKey].asString();
+        auto id             = json[kProtocolIdKey].asLargestUInt();
+        uint16_t vendorId   = static_cast<uint16_t>(id >> 16);
+        uint16_t protocolId = (id & 0xFFFF);
+        auto protocolCode   = static_cast<uint8_t>(json[kProtocolCodeKey].asLargestUInt());
+        ReturnErrorOnFailure(
+            LogAsProtocolMessage(vendorId, protocolId, protocolCode, payload.c_str(), payload.size(), shouldDecode));
         Log(" ");
     }
 

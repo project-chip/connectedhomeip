@@ -14,17 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import filecmp
 import sys
+import xmlrpc.client
 
-file1 = sys.argv[1]
-file2 = sys.argv[2]
+IP = '127.0.0.1'
+PORT = 9000
 
+if sys.platform == 'linux':
+    IP = '10.10.10.5'
 
-def main():
-    if filecmp.cmp(file1, file2, shallow=False) is False:
-        raise Exception('Files %s and %s do not match' % (file1, file2))
-
-
-if __name__ == "__main__":
-    main()
+# Passing in sys.argv[2:] gets rid of the script name and key to the apps register. The remaining
+# values in the list are key-value pairs, e.g. [option1, value1, option2, value2, ...]
+with xmlrpc.client.ServerProxy('http://' + IP + ':' + str(PORT) + '/', allow_none=True) as proxy:
+    file1 = sys.argv[1]
+    file2 = sys.argv[2]
+    proxy.compareFiles(file1, file2)

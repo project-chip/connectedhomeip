@@ -36,16 +36,18 @@ AmebaOTAImageProcessor gImageProcessor;
 extern "C" void amebaQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
+    if (OTAInitializer::Instance().CheckInit())
+        PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
 }
 
 extern "C" void amebaApplyUpdateCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaApplyUpdateCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
+    if (OTAInitializer::Instance().CheckInit())
+        PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
 }
 
-void OTAInitializer::InitOTARequestor(void)
+void OTAInitializer::InitOTARequestor()
 {
     SetRequestorInstance(&gRequestorCore);
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
@@ -55,4 +57,10 @@ void OTAInitializer::InitOTARequestor(void)
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+    initialized = true;
+}
+
+bool OTAInitializer::CheckInit()
+{
+    return initialized;
 }

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
@@ -131,6 +132,7 @@ public:
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
     FabricTable & GetFabricTable() { return mFabricTable; }
+    Crypto::DefaultSessionKeystore & GetSessionKeystore() { return mSessionKeystore; }
 
     FabricIndex GetAliceFabricIndex() { return mAliceFabricIndex; }
     FabricIndex GetBobFabricIndex() { return mBobFabricIndex; }
@@ -182,6 +184,7 @@ private:
     chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
     chip::PersistentStorageOperationalKeystore mOpKeyStore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+    chip::Crypto::DefaultSessionKeystore mSessionKeystore;
 
     FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;

@@ -156,7 +156,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
 
-    ChipLogProgress(NetworkProvisioning, "LinuxNetworkCommissioningDelegate: SSID: %s",
+    ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: SSID: %.*s", static_cast<int>(networkId.size()),
                     StringOrNullMarker((char *) networkId.data()));
 
     err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen),

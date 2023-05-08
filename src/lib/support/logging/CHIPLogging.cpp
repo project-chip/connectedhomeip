@@ -39,31 +39,68 @@
 #include <atomic>
 
 #if CHIP_PW_TOKENIZER_LOGGING
-
-extern "C" void pw_tokenizer_HandleEncodedMessageWithPayload(uintptr_t levels, const uint8_t encoded_message[], size_t size_bytes)
-{
-    uint8_t log_category = levels >> 8 & 0xFF;
-    uint8_t log_module   = levels & 0xFF;
-    char * buffer        = (char *) chip::Platform::MemoryAlloc(2 * size_bytes + 1);
-
-    if (buffer)
-    {
-        for (int i = 0; i < size_bytes; i++)
-        {
-            sprintf(buffer + 2 * i, "%02x", encoded_message[i]);
-        }
-        buffer[2 * size_bytes] = '\0';
-        chip::Logging::Log(log_module, log_category, "%s", buffer);
-        chip::Platform::MemoryFree(buffer);
-    }
-}
-
+#include "pw_tokenizer/encode_args.h"
 #endif
 
 namespace chip {
 namespace Logging {
 
 #if _CHIP_USE_LOGGING
+
+#if CHIP_PW_TOKENIZER_LOGGING
+
+void HandleTokenizedLog(uint32_t levels, pw_tokenizer_Token token, pw_tokenizer_ArgTypes types, ...)
+{
+    uint8_t encoded_message[PW_TOKENIZER_CFG_ENCODING_BUFFER_SIZE_BYTES];
+
+    memcpy(encoded_message, &token, sizeof(token));
+
+    va_list args;
+    va_start(args, types);
+    // Use the C argument encoding API, since the C++ API requires C++17.
+    const size_t encoded_size = sizeof(token) +
+        pw_tokenizer_EncodeArgs(types, args, encoded_message + sizeof(token), sizeof(encoded_message) - sizeof(token));
+    va_end(args);
+
+    uint8_t log_category  = levels >> 8 & 0xFF;
+    uint8_t log_module    = levels & 0xFF;
+    char * logging_buffer = nullptr;
+
+    // To reduce the number of alloc/free that is happening we will use a stack
+    // buffer when buffer required to log is small.
+    char stack_buffer[32];
+    char * allocated_buffer     = nullptr;
+    size_t required_buffer_size = 2 * encoded_size + 1;
+
+    if (required_buffer_size > sizeof(stack_buffer))
+    {
+        allocated_buffer = (char *) chip::Platform::MemoryAlloc(required_buffer_size);
+        if (allocated_buffer)
+        {
+            logging_buffer = allocated_buffer;
+        }
+    }
+    else
+    {
+        logging_buffer = stack_buffer;
+    }
+
+    if (logging_buffer)
+    {
+        for (size_t i = 0; i < encoded_size; i++)
+        {
+            sprintf(logging_buffer + 2 * i, "%02x", encoded_message[i]);
+        }
+        logging_buffer[2 * encoded_size] = '\0';
+        Log(log_module, log_category, "%s", logging_buffer);
+    }
+    if (allocated_buffer)
+    {
+        chip::Platform::MemoryFree(allocated_buffer);
+    }
+}
+
+#endif
 
 namespace {
 

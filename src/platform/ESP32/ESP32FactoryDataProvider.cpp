@@ -230,6 +230,26 @@ CHIP_ERROR ESP32FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan
 #endif
     return err;
 }
+
+CHIP_ERROR ESP32FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
+{
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetSerialNumber(buf, bufSize);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
+{
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetManufacturingDate(year, month, day);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
+{
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetHardwareVersion(hardwareVersion);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
+{
+    return GenericDeviceInstanceInfoProvider<ESP32Config>::GetPartNumber(buf, bufSize);
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 
 } // namespace DeviceLayer

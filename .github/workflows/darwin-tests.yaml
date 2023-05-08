@@ -17,6 +17,7 @@ name: Darwin Tests
 on:
     push:
     pull_request:
+    merge_group:
     workflow_dispatch:
 
 concurrency:
@@ -39,10 +40,6 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
-            # NOTE: Generally kept in sync within the repo using
-            #       scripts/tools/zap/version_update.py
-            ZAP_VERSION: v2023.01.19-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.19-nightly
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -57,10 +54,10 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform darwin
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
-              run: brew install openssl pkg-config coreutils
+              run: brew install coreutils
             - name:
                   Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
@@ -68,27 +65,18 @@ jobs:
                   sudo chown ${USER} /cores || true
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
-            - name: Install zap
-              run: |
-                 sudo mkdir -p $ZAP_INSTALL_PATH
-                 sudo chown `whoami` $ZAP_INSTALL_PATH
-                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
-                      --output $ZAP_INSTALL_PATH/zap-mac.zip
-                 cd $ZAP_INSTALL_PATH
-                 unzip zap-mac.zip zap-cli
-                 rm zap-mac.zip
-                 ./zap-cli --version
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
@@ -97,6 +85,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
@@ -131,6 +120,19 @@ jobs:
                      --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                      --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+            - name: Run OTA Test
+              timeout-minutes: 5
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_darwin_framework_ota_test.py \
+                     run \
+                     --darwin-framework-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT}/darwin-framework-tool \
+                     --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --ota-data-file /tmp/rawImage \
+                     --ota-image-file /tmp/otaImage \
+                     --ota-destination-file /tmp/downloadedImage \
+                     --ota-candidate-file /tmp/otaCandidateJSON \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v3

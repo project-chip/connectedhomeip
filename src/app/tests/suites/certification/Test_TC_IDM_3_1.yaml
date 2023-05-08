@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.3.1. [TC-IDM-3.1] Write Request Action from DUT to TH. [{DUT_Client}]
+name: 3.3.1. [TC-IDM-3.1] Write Request Action from DUT to TH. [DUT Client]
 
 PICS:
     - MCORE.IDM.C.WriteRequest
@@ -299,7 +299,8 @@ tests:
           [1657884155.222229][2865:2870] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
 
-          ./chip-tool basic read node-label 1 0
+          ./chip-tool  basicinformation read node-label 1 0
+
           verify on TH(reference app) receives the right write Request Message for the data sent in the above command
           [1657884173.738798][2748:2748] CHIP:IM: Received Read request
           [1657884173.738877][2748:2748] CHIP:DMG: ReadRequestMessage =

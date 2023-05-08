@@ -43,6 +43,7 @@ chip::SessionHolder gSession;
 chip::TestPersistentStorageDelegate gStorage;
 chip::PersistentStorageOperationalKeystore gOperationalKeystore;
 chip::Credentials::PersistentStorageOpCertStore gOpCertStore;
+chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 
 void InitializeChip()
 {

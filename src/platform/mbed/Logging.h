@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <support/logging/Constants.h>
+#include <lib/support/logging/Constants.h>
 
 namespace chip {
 namespace Logging {

@@ -42,8 +42,10 @@
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #endif
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+#endif
 // For convenience, Chip Security Test Mode can be enabled and the
 // requirement for authentication in various protocols can be disabled.
 //
@@ -55,19 +57,13 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
- * 0xFFF1: Test vendor
  */
-//#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x130D
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x534B: BL602 lock-app
- * TODO: 3R
  */
-//#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xF001
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
 
 /**
@@ -89,6 +85,7 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
@@ -98,7 +95,6 @@
 /* The SoftwareVersion attribute of the Basic cluster. */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0001
-#endif
 #endif
 
 /**
@@ -111,16 +107,6 @@
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 1
 
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
- *
- * A string identifying the firmware revision running on the device.
- * CHIP service currently expects the firmware version to be in the format
- * {MAJOR_VERSION}.0d{MINOR_VERSION}
- */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "0.1ALPHA"
-#endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *
@@ -148,3 +134,9 @@
 #define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 128
 
 #define CHIP_BLE_DEVICE_NAME "MatterLight"
+
+/** Please contact Bouffalo Lab for how to use factory data provider */
+// #define CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE 1
+// uncomment out the following macro to use factory test data
+// when CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE sets to 1
+// #define CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 92.1. [TC-ULABEL-3.1] Global Attributes [DUT-server]
+name: 95.3.1. [TC-ULABEL-3.1] User label cluster [DUT-client]
 
 PICS:
     - ULABEL.C
@@ -20,12 +20,12 @@ PICS:
 config:
     nodeId: 0x12344321
     cluster: "User Label"
-    endpoint: 0
+    endpoint: 1
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     - label: "Read attribute: LabelList"
       PICS: ULABEL.C.A0000

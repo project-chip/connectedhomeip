@@ -24,23 +24,29 @@
 
 #pragma once
 
+#include <platform/nxp/k32w/common/RamStorage.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
 class KeyValueStoreManagerImpl final : public KeyValueStoreManager
 {
+public:
+    /* Storage for KVS keys. Cleared during factory reset. */
+    static Internal::RamStorage sKeysStorage;
+    /* Storage for KVS values. Cleared during factory reset. */
+    static Internal::RamStorage sValuesStorage;
+
     // Allow the KeyValueStoreManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class KeyValueStoreManager;
 
-public:
-    // NOTE: Currently this platform does not support partial and offset reads
-    //       these will return CHIP_ERROR_NOT_IMPLEMENTED.
+    static CHIP_ERROR Init();
+    static void FactoryResetStorage();
+
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset);
-
     CHIP_ERROR _Delete(const char * key);
-
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
 private:

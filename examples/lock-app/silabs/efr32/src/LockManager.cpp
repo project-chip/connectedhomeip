@@ -79,7 +79,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     // Create FreeRTOS sw timer for lock timer.
     sLockTimer = xTimerCreate("lockTmr",        // Just a text name, not used by the RTOS kernel
-                              1,                // == default timer period (mS)
+                              1,                // == default timer period
                               false,            // no timer reload (==one-shot)
                               (void *) this,    // init timer id = lock obj context
                               TimerEventHandler // timer callback handler
@@ -113,6 +113,11 @@ bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, CredentialTyp
     return (credentialIndex < kMaxCredentialsPerUser);
 }
 
+bool LockManager::IsValidCredentialType(CredentialTypeEnum type)
+{
+    return (to_underlying(type) < kNumCredentialTypes);
+}
+
 bool LockManager::IsValidWeekdayScheduleIndex(uint8_t scheduleIndex)
 {
     return (scheduleIndex < kMaxWeekdaySchedulesPerUser);
@@ -131,33 +136,33 @@ bool LockManager::IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
 bool LockManager::ReadConfigValues()
 {
     size_t outLen;
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
                                      sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
+                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
                                      sizeof(mUserNames), outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
                                      sizeof(mCredentialData), outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
                                      sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
                                      outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
                                      sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
                                          LockParams.numberOfUsers,
                                      outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
                                      sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
                                          LockParams.numberOfUsers,
                                      outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
                                      sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
 
     return true;
@@ -224,9 +229,9 @@ void LockManager::StartTimer(uint32_t aTimeoutMs)
     }
 
     // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // FreeRTOS- Block for a maximum of 100 ms if the change period command
     // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sLockTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
+    if (xTimerChangePeriod(sLockTimer, pdMS_TO_TICKS(aTimeoutMs), pdMS_TO_TICKS(100)) != pdPASS)
     {
         SILABS_LOG("sLockTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
@@ -235,7 +240,7 @@ void LockManager::StartTimer(uint32_t aTimeoutMs)
 
 void LockManager::CancelTimer(void)
 {
-    if (xTimerStop(sLockTimer, 0) == pdFAIL)
+    if (xTimerStop(sLockTimer, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         SILABS_LOG("sLockTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
@@ -378,21 +383,19 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     for (size_t i = 0; i < totalCredentials; ++i)
     {
-        mCredentials[userIndex][i]                 = credentials[i];
-        mCredentials[userIndex][i].CredentialType  = 1;
-        mCredentials[userIndex][i].CredentialIndex = i + 1;
+        mCredentials[userIndex][i] = credentials[i];
     }
 
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
 
     // Save user information in NVM flash
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
                                       sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
 
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
                                       sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
 
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
                                       sizeof(mUserNames));
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
@@ -403,6 +406,8 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
+
+    VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
 
     if (CredentialTypeEnum::kProgrammingPIN == credentialType)
     {
@@ -417,7 +422,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d",
                     to_underlying(credentialType), credentialIndex);
 
-    const auto & credentialInStorage = mLockCredentials[credentialIndex];
+    const auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
 
     credential.status = credentialInStorage.status;
     ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
@@ -447,6 +452,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                 const chip::ByteSpan & credentialData)
 {
 
+    VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
+
     if (CredentialTypeEnum::kProgrammingPIN == credentialType)
     {
         VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType),
@@ -462,21 +469,22 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
-    auto & credentialInStorage = mLockCredentials[credentialIndex];
+    auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
 
     credentialInStorage.status         = credentialStatus;
     credentialInStorage.credentialType = credentialType;
     credentialInStorage.createdBy      = creator;
     credentialInStorage.lastModifiedBy = modifier;
 
-    memcpy(mCredentialData[credentialIndex], credentialData.data(), credentialData.size());
-    credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData[credentialIndex], credentialData.size() };
+    memcpy(mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.data(), credentialData.size());
+    credentialInStorage.credentialData =
+        chip::ByteSpan{ mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.size() };
 
     // Save credential information in NVM flash
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
+                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes);
 
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
                                       sizeof(mCredentialData));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
@@ -532,8 +540,8 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.status               = status;
 
     // Save schedule information in NVM flash
-    SILABSConfig::WriteConfigValueBin(
-        SILABSConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
+    SilabsConfig::WriteConfigValueBin(
+        SilabsConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
         sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
@@ -581,8 +589,8 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    SILABSConfig::WriteConfigValueBin(
-        SILABSConfig::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
+    SilabsConfig::WriteConfigValueBin(
+        SilabsConfig::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
         sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
@@ -625,7 +633,7 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_HolidaySchedules,
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_HolidaySchedules,
                                       reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
                                       sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
 
@@ -679,15 +687,15 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     }
 
     // Check the PIN code
-    for (uint8_t i = 0; i < kMaxCredentials; i++)
+    for (const auto & currentCredential : mLockCredentials[to_underlying(CredentialTypeEnum::kPin)])
     {
-        if (mLockCredentials[i].credentialType != CredentialTypeEnum::kPin ||
-            mLockCredentials[i].status == DlCredentialStatus::kAvailable)
+
+        if (currentCredential.status == DlCredentialStatus::kAvailable)
         {
             continue;
         }
 
-        if (mLockCredentials[i].credentialData.data_equal(pin.Value()))
+        if (currentCredential.credentialData.data_equal(pin.Value()))
         {
             ChipLogDetail(Zcl,
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",

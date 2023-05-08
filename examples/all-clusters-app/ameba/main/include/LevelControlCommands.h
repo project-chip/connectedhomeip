@@ -27,9 +27,9 @@
 
 using namespace chip;
 using namespace chip::app;
+using chip::app::Clusters::LevelControl::LevelControlOptions;
 
 #if CONFIG_ENABLE_CHIP_SHELL
-using chip::app::Clusters::LevelControl::LevelControlOptions;
 using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;

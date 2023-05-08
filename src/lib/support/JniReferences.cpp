@@ -139,6 +139,7 @@ void JniReferences::CallVoidInt(JNIEnv * env, jobject object, const char * metho
 
     env->ExceptionClear();
     env->CallVoidMethod(object, method, argument);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName)
@@ -279,17 +280,17 @@ jdouble JniReferences::DoubleToPrimitive(jobject boxedDouble)
     return env->CallDoubleMethod(boxedDouble, valueMethod);
 }
 
-CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback)
+CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback, long subscriptionId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID subscriptionEstablishedMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallback, "onSubscriptionEstablished", "()V",
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallback, "onSubscriptionEstablished", "(J)V",
                                                         &subscriptionEstablishedMethod);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    env->CallVoidMethod(javaCallback, subscriptionEstablishedMethod);
+    env->CallVoidMethod(javaCallback, subscriptionEstablishedMethod, subscriptionId);
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
     return err;
@@ -385,6 +386,36 @@ CHIP_ERROR JniReferences::GetObjectField(jobject objectToRead, const char * name
 
     outObject = env->GetObjectField(objectToRead, field);
     return err;
+}
+
+CHIP_ERROR JniReferences::CharToStringUTF(const chip::CharSpan & charSpan, jobject & outStr)
+{
+    JNIEnv * env        = GetEnvForCurrentThread();
+    jobject jbyteBuffer = env->NewDirectByteBuffer((void *) charSpan.data(), static_cast<jlong>(charSpan.size()));
+
+    jclass charSetClass = env->FindClass("java/nio/charset/Charset");
+    jmethodID charsetForNameMethod =
+        env->GetStaticMethodID(charSetClass, "forName", "(Ljava/lang/String;)Ljava/nio/charset/Charset;");
+    jobject charsetObject = env->CallStaticObjectMethod(charSetClass, charsetForNameMethod, env->NewStringUTF("UTF-8"));
+
+    jclass charSetDocoderClass = env->FindClass("java/nio/charset/CharsetDecoder");
+    jmethodID newDocoderMethod = env->GetMethodID(charSetClass, "newDecoder", "()Ljava/nio/charset/CharsetDecoder;");
+    jobject decoderObject      = env->CallObjectMethod(charsetObject, newDocoderMethod);
+
+    jmethodID charSetDecodeMethod = env->GetMethodID(charSetDocoderClass, "decode", "(Ljava/nio/ByteBuffer;)Ljava/nio/CharBuffer;");
+    jobject decodeObject          = env->CallObjectMethod(decoderObject, charSetDecodeMethod, jbyteBuffer);
+    env->DeleteLocalRef(jbyteBuffer);
+
+    // If decode exception occur, outStr will be set null.
+    outStr = nullptr;
+
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+    jclass charBufferClass       = env->FindClass("java/nio/CharBuffer");
+    jmethodID charBufferToString = env->GetMethodID(charBufferClass, "toString", "()Ljava/lang/String;");
+    outStr                       = static_cast<jstring>(env->CallObjectMethod(decodeObject, charBufferToString));
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

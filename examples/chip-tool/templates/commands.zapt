@@ -10,7 +10,6 @@
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ClusterCommand.h>
 #include <commands/clusters/ReportCommand.h>
-#include <commands/clusters/SubscriptionsCommands.h>
 #include <commands/clusters/WriteAttributeCommand.h>
 
 {{> clusters_header}}
@@ -93,21 +92,17 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands, CredentialIss
         {{/zcl_attributes_server}}
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
-        {{#if isWritable}}
         {{#if_chip_complex}}
-        make_unique<WriteAttributeAsComplex<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, WriteCommandType::k{{#unless isWritable}}Force{{/unless}}Write, credsIssuerConfig), //
         {{else if (isString type)}}
-        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, WriteCommandType::k{{#unless isWritable}}Force{{/unless}}Write, credsIssuerConfig), //
         {{else}}
-        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}>>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, Attributes::{{asUpperCamelCase name}}::Id, WriteCommandType::k{{#unless isWritable}}Force{{/unless}}Write, credsIssuerConfig), //
         {{/if_chip_complex}}
-        {{/if}}
         {{/zcl_attributes_server}}
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig), //
         {{#zcl_attributes_server}}
-        {{#if isReportable}}
         make_unique<SubscribeAttribute>(Id, "{{cleanse_label_as_kebab_case (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id, credsIssuerConfig), //
-        {{/if}}
         {{/zcl_attributes_server}}
         //
         // Events
@@ -150,5 +145,4 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
 {{#zcl_clusters}}
     registerCluster{{asUpperCamelCase name}}(commands, credsIssuerConfig);
 {{/zcl_clusters}}
-    registerClusterSubscriptions(commands, credsIssuerConfig);
 }

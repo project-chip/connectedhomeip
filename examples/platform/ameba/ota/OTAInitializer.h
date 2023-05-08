@@ -24,4 +24,8 @@ public:
         return sInitOTA;
     }
     void InitOTARequestor(void);
+    bool CheckInit(void);
+
+private:
+    bool initialized = false;
 };

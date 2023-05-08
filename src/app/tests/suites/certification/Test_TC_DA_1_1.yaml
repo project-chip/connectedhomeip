@@ -78,7 +78,7 @@ tests:
     - label:
           "Factory reset DUT and perform the necessary actions to put the DUT
           into a commissionable state"
-      PICS: PICS_MCORE_UI_FACTORYRESET
+      PICS: MCORE.UI.FACTORYRESET
       verification: |
           To perform Factory reset on DUT  follow the below commands in RPI, And use equivalent command on the respective DUT
           sudo rm -rf /tmp/chip_*

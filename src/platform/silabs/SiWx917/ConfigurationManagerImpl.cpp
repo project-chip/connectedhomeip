@@ -52,7 +52,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     CHIP_ERROR err;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<SILABSConfig>::Init();
+    err = Internal::GenericConfigurationManagerImpl<SilabsConfig>::Init();
     SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here (#1626)
@@ -80,19 +80,19 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
-    return SILABSConfig::ReadConfigValue(SILABSConfig::kConfigKey_BootCount, rebootCount);
+    return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_BootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 {
     uint32_t bootCount = 0;
 
-    if (SILABSConfig::ConfigValueExists(SILABSConfig::kConfigKey_BootCount))
+    if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_BootCount))
     {
         GetRebootCount(bootCount);
     }
 
-    return SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_BootCount, bootCount + 1);
+    return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_BootCount, bootCount + 1);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
@@ -154,18 +154,18 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    if (!SILABSConfig::ConfigValueExists(SILABSConfig::kConfigKey_TotalOperationalHours))
+    if (!SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_TotalOperationalHours))
     {
         totalOperationalHours = 0;
         return CHIP_NO_ERROR;
     }
 
-    return SILABSConfig::ReadConfigValue(SILABSConfig::kConfigKey_TotalOperationalHours, totalOperationalHours);
+    return SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
-    return SILABSConfig::WriteConfigValue(SILABSConfig::kConfigKey_TotalOperationalHours, totalOperationalHours);
+    return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
@@ -175,7 +175,7 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
     // (where persistedStorageKey represents an index to the counter).
     CHIP_ERROR err;
 
-    err = SILABSConfig::ReadConfigValueCounter(persistedStorageKey, value);
+    err = SilabsConfig::ReadConfigValueCounter(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -193,7 +193,7 @@ CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform
     // (where persistedStorageKey represents an index to the counter).
     CHIP_ERROR err;
 
-    err = SILABSConfig::WriteConfigValueCounter(persistedStorageKey, value);
+    err = SilabsConfig::WriteConfigValueCounter(persistedStorageKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -206,62 +206,62 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
-    return SILABSConfig::ReadConfigValue(key, val);
+    return SilabsConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
-    return SILABSConfig::ReadConfigValue(key, val);
+    return SilabsConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
 {
-    return SILABSConfig::ReadConfigValue(key, val);
+    return SilabsConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return SILABSConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+    return SilabsConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    return SILABSConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+    return SilabsConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
 {
-    return SILABSConfig::WriteConfigValue(key, val);
+    return SilabsConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
 {
-    return SILABSConfig::WriteConfigValue(key, val);
+    return SilabsConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
 {
-    return SILABSConfig::WriteConfigValue(key, val);
+    return SilabsConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
 {
-    return SILABSConfig::WriteConfigValueStr(key, str);
+    return SilabsConfig::WriteConfigValueStr(key, str);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return SILABSConfig::WriteConfigValueStr(key, str, strLen);
+    return SilabsConfig::WriteConfigValueStr(key, str, strLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    return SILABSConfig::WriteConfigValueBin(key, data, dataLen);
+    return SilabsConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void)
 {
-    SILABSConfig::RunConfigUnitTest();
+    SilabsConfig::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
@@ -270,7 +270,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = SILABSConfig::FactoryResetConfig();
+    err = SilabsConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(err));

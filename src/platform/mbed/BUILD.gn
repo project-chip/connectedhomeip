@@ -47,4 +47,6 @@ static_library("mbed") {
       "NetworkCommissioningWiFiDriver.cpp",
     ]
   }
+
+  cflags = [ "-Wconversion" ]
 }

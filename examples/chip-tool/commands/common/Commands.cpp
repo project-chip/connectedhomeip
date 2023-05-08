@@ -41,21 +41,27 @@ constexpr const char * kJsonCommandKey              = "command";
 constexpr const char * kJsonCommandSpecifierKey     = "command_specifier";
 constexpr const char * kJsonArgumentsKey            = "arguments";
 
-std::vector<std::string> GetArgumentsFromJson(Command * command, Json::Value & value, bool optional)
+bool GetArgumentsFromJson(Command * command, Json::Value & value, bool optional, std::vector<std::string> & outArgs)
 {
+    auto memberNames = value.getMemberNames();
+
     std::vector<std::string> args;
     for (size_t i = 0; i < command->GetArgumentsCount(); i++)
     {
-        auto argName = command->GetArgumentName(i);
-        for (auto const & memberName : value.getMemberNames())
+        auto argName             = command->GetArgumentName(i);
+        auto memberNamesIterator = memberNames.begin();
+        while (memberNamesIterator != memberNames.end())
         {
+            auto memberName = *memberNamesIterator;
             if (strcasecmp(argName, memberName.c_str()) != 0)
             {
+                memberNamesIterator++;
                 continue;
             }
 
             if (command->GetArgumentIsOptional(i) != optional)
             {
+                memberNamesIterator = memberNames.erase(memberNamesIterator);
                 continue;
             }
 
@@ -66,19 +72,59 @@ std::vector<std::string> GetArgumentsFromJson(Command * command, Json::Value & v
 
             auto argValue = value[memberName].asString();
             args.push_back(std::move(argValue));
+            memberNamesIterator = memberNames.erase(memberNamesIterator);
             break;
         }
     }
-    return args;
+
+    if (memberNames.size())
+    {
+        auto memberName = memberNames.front();
+        ChipLogError(chipTool, "The argument \"\%s\" is not supported.", memberName.c_str());
+        return false;
+    }
+
+    outArgs = args;
+    return true;
 };
+
+// Check for arguments with a starting '"' but no ending '"': those
+// would indicate that people are using double-quoting, not single
+// quoting, on arguments with spaces.
+static void DetectAndLogMismatchedDoubleQuotes(int argc, char ** argv)
+{
+    for (int curArg = 0; curArg < argc; ++curArg)
+    {
+        char * arg = argv[curArg];
+        if (!arg)
+        {
+            continue;
+        }
+
+        auto len = strlen(arg);
+        if (len == 0)
+        {
+            continue;
+        }
+
+        if (arg[0] == '"' && arg[len - 1] != '"')
+        {
+            ChipLogError(chipTool,
+                         "Mismatched '\"' detected in argument: '%s'.  Use single quotes to delimit arguments with spaces "
+                         "in them: 'x y', not \"x y\".",
+                         arg);
+        }
+    }
+}
 
 } // namespace
 
-void Commands::Register(const char * clusterName, commands_list commandsList)
+void Commands::Register(const char * clusterName, commands_list commandsList, const char * helpText)
 {
+    mClusters[clusterName].second = helpText;
     for (auto & command : commandsList)
     {
-        mClusters[clusterName].push_back(std::move(command));
+        mClusters[clusterName].first.push_back(std::move(command));
     }
 }
 
@@ -136,14 +182,11 @@ int Commands::RunInteractive(const char * command)
         delete[] argv[i];
     }
 
-    VerifyOrReturnValue(CHIP_NO_ERROR == err, EXIT_FAILURE, ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err)));
-
-    return EXIT_SUCCESS;
+    return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
 {
-    std::map<std::string, CommandsVector>::iterator cluster;
     Command * command = nullptr;
 
     if (argc <= 1)
@@ -153,29 +196,32 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    cluster = GetCluster(argv[1]);
-    if (cluster == mClusters.end())
+    auto clusterIter = GetCluster(argv[1]);
+    if (clusterIter == mClusters.end())
     {
         ChipLogError(chipTool, "Unknown cluster: %s", argv[1]);
         ShowClusters(argv[0]);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    auto & commandList = clusterIter->second.first;
+    auto * clusterHelp = clusterIter->second.second;
+
     if (argc <= 2)
     {
         ChipLogError(chipTool, "Missing command name");
-        ShowCluster(argv[0], argv[1], cluster->second);
+        ShowCluster(argv[0], argv[1], commandList, clusterHelp);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     bool isGlobalCommand = IsGlobalCommand(argv[2]);
     if (!isGlobalCommand)
     {
-        command = GetCommand(cluster->second, argv[2]);
+        command = GetCommand(commandList, argv[2]);
         if (command == nullptr)
         {
             ChipLogError(chipTool, "Unknown command: %s", argv[2]);
-            ShowCluster(argv[0], argv[1], cluster->second);
+            ShowCluster(argv[0], argv[1], commandList, clusterHelp);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
@@ -184,15 +230,15 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
         if (argc <= 3)
         {
             ChipLogError(chipTool, "Missing event name");
-            ShowClusterEvents(argv[0], argv[1], argv[2], cluster->second);
+            ShowClusterEvents(argv[0], argv[1], argv[2], commandList);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        command = GetGlobalCommand(cluster->second, argv[2], argv[3]);
+        command = GetGlobalCommand(commandList, argv[2], argv[3]);
         if (command == nullptr)
         {
             ChipLogError(chipTool, "Unknown event: %s", argv[3]);
-            ShowClusterEvents(argv[0], argv[1], argv[2], cluster->second);
+            ShowClusterEvents(argv[0], argv[1], argv[2], commandList);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
@@ -201,15 +247,15 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
         if (argc <= 3)
         {
             ChipLogError(chipTool, "Missing attribute name");
-            ShowClusterAttributes(argv[0], argv[1], argv[2], cluster->second);
+            ShowClusterAttributes(argv[0], argv[1], argv[2], commandList);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        command = GetGlobalCommand(cluster->second, argv[2], argv[3]);
+        command = GetGlobalCommand(commandList, argv[2], argv[3]);
         if (command == nullptr)
         {
             ChipLogError(chipTool, "Unknown attribute: %s", argv[3]);
-            ShowClusterAttributes(argv[0], argv[1], argv[2], cluster->second);
+            ShowClusterAttributes(argv[0], argv[1], argv[2], commandList);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
@@ -217,6 +263,10 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
     int argumentsPosition = isGlobalCommand ? 4 : 3;
     if (!command->InitArguments(argc - argumentsPosition, &argv[argumentsPosition]))
     {
+        if (interactive)
+        {
+            DetectAndLogMismatchedDoubleQuotes(argc - argumentsPosition, &argv[argumentsPosition]);
+        }
         ShowCommand(argv[0], argv[1], command);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -224,7 +274,7 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
     return interactive ? command->RunAsInteractive() : command->Run();
 }
 
-std::map<std::string, Commands::CommandsVector>::iterator Commands::GetCluster(std::string clusterName)
+Commands::ClusterMap::iterator Commands::GetCluster(std::string clusterName)
 {
     for (auto & cluster : mClusters)
     {
@@ -267,7 +317,8 @@ Command * Commands::GetGlobalCommand(CommandsVector & commands, std::string comm
 
 bool Commands::IsAttributeCommand(std::string commandName) const
 {
-    return commandName.compare("read") == 0 || commandName.compare("write") == 0 || commandName.compare("subscribe") == 0;
+    return commandName.compare("read") == 0 || commandName.compare("write") == 0 || commandName.compare("force-write") == 0 ||
+        commandName.compare("subscribe") == 0;
 }
 
 bool Commands::IsEventCommand(std::string commandName) const
@@ -294,20 +345,28 @@ void Commands::ShowClusters(std::string executable)
         std::transform(clusterName.begin(), clusterName.end(), clusterName.begin(),
                        [](unsigned char c) { return std::tolower(c); });
         fprintf(stderr, "  | * %-82s|\n", clusterName.c_str());
+        ShowHelpText(cluster.second.second);
     }
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
 }
 
-void Commands::ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands)
+void Commands::ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands, const char * helpText)
 {
     fprintf(stderr, "Usage:\n");
     fprintf(stderr, "  %s %s command_name [param1 param2 ...]\n", executable.c_str(), clusterName.c_str());
+
+    if (helpText)
+    {
+        fprintf(stderr, "\n%s\n", helpText);
+    }
+
     fprintf(stderr, "\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Commands:                                                                           |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     bool readCommand           = false;
     bool writeCommand          = false;
+    bool writeOverrideCommand  = false;
     bool subscribeCommand      = false;
     bool readEventCommand      = false;
     bool subscribeEventCommand = false;
@@ -324,6 +383,10 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
             else if (strcmp(command->GetName(), "write") == 0 && !writeCommand)
             {
                 writeCommand = true;
+            }
+            else if (strcmp(command->GetName(), "force-write") == 0 && !writeOverrideCommand)
+            {
+                writeOverrideCommand = true;
             }
             else if (strcmp(command->GetName(), "subscribe") == 0 && !subscribeCommand)
             {
@@ -346,6 +409,7 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
         if (shouldPrint)
         {
             fprintf(stderr, "  | * %-82s|\n", command->GetName());
+            ShowHelpText(command->GetHelpText());
         }
     }
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
@@ -471,16 +535,18 @@ bool Commands::DecodeArgumentsFromBase64EncodedJson(const char * json, std::vect
     auto commandName = jsonValue[kJsonCommandKey].asString();
     auto arguments   = jsonValue[kJsonArgumentsKey].asString();
 
-    auto cluster = GetCluster(clusterName);
-    VerifyOrReturnValue(cluster != mClusters.end(), false,
+    auto clusterIter = GetCluster(clusterName);
+    VerifyOrReturnValue(clusterIter != mClusters.end(), false,
                         ChipLogError(chipTool, "Cluster '%s' is not supported.", clusterName.c_str()));
 
-    auto command = GetCommand(cluster->second, commandName);
+    auto & commandList = clusterIter->second.first;
+
+    auto command = GetCommand(commandList, commandName);
 
     if (jsonValue.isMember(kJsonCommandSpecifierKey) && IsGlobalCommand(commandName))
     {
         auto commandSpecifierName = jsonValue[kJsonCommandSpecifierKey].asString();
-        command                   = GetGlobalCommand(cluster->second, commandName, commandSpecifierName);
+        command                   = GetGlobalCommand(commandList, commandName, commandSpecifierName);
     }
     VerifyOrReturnValue(nullptr != command, false, ChipLogError(chipTool, "Unknown command."));
 
@@ -503,8 +569,10 @@ bool Commands::DecodeArgumentsFromBase64EncodedJson(const char * json, std::vect
     VerifyOrReturnValue(parsedArguments, false, ChipLogError(chipTool, "Error while parsing json."));
     VerifyOrReturnValue(jsonArguments.isObject(), false, ChipLogError(chipTool, "Unexpected json type, expects and object."));
 
-    auto mandatoryArguments = GetArgumentsFromJson(command, jsonArguments, false /* addOptional */);
-    auto optionalArguments  = GetArgumentsFromJson(command, jsonArguments, true /* addOptional */);
+    std::vector<std::string> mandatoryArguments;
+    std::vector<std::string> optionalArguments;
+    VerifyOrReturnValue(GetArgumentsFromJson(command, jsonArguments, false /* addOptional */, mandatoryArguments), false);
+    VerifyOrReturnValue(GetArgumentsFromJson(command, jsonArguments, true /* addOptional */, optionalArguments), false);
 
     args.push_back(std::move(clusterName));
     args.push_back(std::move(commandName));
@@ -529,4 +597,26 @@ bool Commands::DecodeArgumentsFromStringStream(const char * command, std::vector
     }
 
     return true;
+}
+
+void Commands::ShowHelpText(const char * helpText)
+{
+    if (helpText == nullptr)
+    {
+        return;
+    }
+
+    // We leave 82 chars for command/cluster names.  The help text starts
+    // two chars further to the right, so there are 80 chars left
+    // for it.
+    if (strlen(helpText) > 80)
+    {
+        // Add "..." at the end to indicate truncation, and only
+        // show the first 77 chars, since that's what will fit.
+        fprintf(stderr, "  |   - %.77s...|\n", helpText);
+    }
+    else
+    {
+        fprintf(stderr, "  |   - %-80s|\n", helpText);
+    }
 }

@@ -185,6 +185,7 @@ class ChipStack(object):
         self.devMgr = None
         self.callbackRes = None
         self.commissioningEventRes = None
+        self.openCommissioningWindowPincode = {}
         self._activeLogFunct = None
         self.addModulePrefixToLogMessage = True
         self._enableServerInteractions = enableServerInteractions

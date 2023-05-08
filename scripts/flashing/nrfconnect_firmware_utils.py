@@ -170,7 +170,7 @@ class Nrf5Platform:
 def verify_platform_args(platform_args):
     required_args = ['application']
     for r in required_args:
-        if not r in platform_args:
+        if r not in platform_args:
             raise ValueError("Required argument %s missing" % r)
 
 

@@ -28,23 +28,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.google.chip.chiptool.NetworkCredentialsParcelable
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
-import com.google.chip.chiptool.attestation.AttestationTestFragment
-import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterInteractionFragment
-import com.google.chip.chiptool.clusterclient.MultiAdminClientFragment
-import com.google.chip.chiptool.clusterclient.OpCredClientFragment
-import com.google.chip.chiptool.clusterclient.BasicClientFragment
-import com.google.chip.chiptool.clusterclient.OnOffClientFragment
-import com.google.chip.chiptool.clusterclient.SensorClientFragment
-import com.google.chip.chiptool.clusterclient.WildcardFragment
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.EnterNetworkFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
-import com.google.chip.chiptool.provisioning.UnpairDeviceFragment
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
@@ -71,7 +61,7 @@ class CHIPToolActivity :
       val fragment = SelectActionFragment.newInstance()
       supportFragmentManager
           .beginTransaction()
-          .add(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
+          .add(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
           .commit()
     } else {
       networkType =
@@ -116,58 +106,12 @@ class CHIPToolActivity :
     showFragment(SelectActionFragment.newInstance(), false)
   }
 
-  override fun handleScanQrCodeClicked() {
-    showFragment(BarcodeFragment.newInstance())
-  }
-
-  override fun onProvisionWiFiCredentialsClicked() {
-    networkType = ProvisionNetworkType.WIFI
-    showFragment(BarcodeFragment.newInstance(), false)
-  }
-
-  override fun onProvisionThreadCredentialsClicked() {
-    networkType = ProvisionNetworkType.THREAD
-    showFragment(BarcodeFragment.newInstance(), false)
-  }
-
   override fun onShowDeviceAddressInput() {
     showFragment(AddressCommissioningFragment.newInstance(), false)
   }
 
   override fun onNetworkCredentialsEntered(networkCredentials: NetworkCredentialsParcelable) {
     showFragment(DeviceProvisioningFragment.newInstance(deviceInfo!!, networkCredentials))
-  }
-
-  override fun handleClusterInteractionClicked() {
-    showFragment(ClusterInteractionFragment.newInstance())
-  }
-
-  override fun handleWildcardClicked() {
-    showFragment(WildcardFragment.newInstance())
-  }
-
-  override fun handleOnOffClicked() {
-    showFragment(OnOffClientFragment.newInstance())
-  }
-
-  override fun handleSensorClicked() {
-    showFragment(SensorClientFragment.newInstance())
-  }
-
-  override fun handleMultiAdminClicked() {
-    showFragment(MultiAdminClientFragment.newInstance())
-  }
-
-  override fun handleOpCredClicked() {
-    showFragment(OpCredClientFragment.newInstance())
-  }
-
-  override fun handleBasicClicked() {
-    showFragment(BasicClientFragment.newInstance())
-  }
-
-  override fun handleAttestationTestClicked() {
-    showFragment(AttestationTestFragment.newInstance())
   }
 
   override fun handleReadFromLedgerClicked(deviceInfo: CHIPDeviceInfo) {
@@ -179,27 +123,14 @@ class CHIPToolActivity :
     startActivity(redirectIntent)
   }
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-
-    if (requestCode == REQUEST_CODE_COMMISSIONING) {
-      // Simply ignore the commissioning result.
-      // TODO: tracking commissioned devices.
-    }
-  }
-
-  override fun handleCustomFlowClicked() {
-    showFragment(BarcodeFragment.newInstance())
-  }
-
-  override fun handleUnpairDeviceClicked() {
-    showFragment(UnpairDeviceFragment.newInstance())
+  override fun SetNetworkType(type: ProvisionNetworkType) {
+    networkType = type
   }
 
   private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
     val fragmentTransaction = supportFragmentManager
         .beginTransaction()
-        .replace(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
+        .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
 
     if (showOnBack) {
       fragmentTransaction.addToBackStack(null)
@@ -314,7 +245,5 @@ class CHIPToolActivity :
     private const val TAG = "CHIPToolActivity"
     private const val ADDRESS_COMMISSIONING_FRAGMENT_TAG = "address_commissioning_fragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
-
-    var REQUEST_CODE_COMMISSIONING = 0xB003
   }
 }

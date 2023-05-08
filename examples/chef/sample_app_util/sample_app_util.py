@@ -32,8 +32,8 @@ def zap_cmd_handler(args: argparse.Namespace) -> None:
         output_path = os.path.join(dirpath, f"{name}.zap")
         shutil.move(zap_file_path, output_path)
         print(f"Renamed from: {zap_file_path} to {output_path}")
-    elif args.generate_hash_metadata:
-        created_file = zap_file_parser.generate_hash_metadata_file(zap_file_path)
+    elif args.generate_metadata:
+        created_file = zap_file_parser.generate_metadata_file(zap_file_path)
         print(f"Created {created_file}")
 
 
@@ -41,7 +41,8 @@ parser = argparse.ArgumentParser()
 subparsers = parser.add_subparsers(dest="command")
 subparsers.required = True
 
-zap_cmd_parser = subparsers.add_parser("zap", help="Command to operate on zap files.")
+zap_cmd_parser = subparsers.add_parser(
+    "zap", help="Command to operate on zap files.")
 zap_cmd_parser.add_argument(
     "zap_file", metavar="ZAP_FILE", type=str, help="Zap file to generate name for.")
 
@@ -53,10 +54,9 @@ zap_cmd_group.add_argument(
 )
 
 zap_cmd_parser.add_argument(
-    "--generate-hash-metadata", action="store_true",
+    "--generate-metadata", action="store_true",
     help=(
-        "Generate the hash metadata file which provide information about what was included in "
-        "the hash digest.")
+        "Generate the metadata file which provides summary information about the app.")
 )
 
 zap_cmd_group.add_argument(

@@ -34,7 +34,8 @@ enum class PairingMode
     CodePaseOnly,
     Ble,
     SoftAP,
-    Ethernet,
+    AlreadyDiscovered,
+    AlreadyDiscoveredByIndex,
     OnNetwork,
 };
 
@@ -43,7 +44,6 @@ enum class PairingNetworkType
     None,
     WiFi,
     Thread,
-    Ethernet,
 };
 
 class PairingCommand : public CHIPCommand,
@@ -64,11 +64,11 @@ public:
         AddArgument("bypass-attestation-verifier", 0, 1, &mBypassAttestationVerifier,
                     "Bypass the attestation verifier. If not provided or false, the attestation verifier is not bypassed."
                     " If true, the commissioning will continue in case of attestation verification failure.");
+        AddArgument("case-auth-tags", 1, UINT32_MAX, &mCASEAuthTags, "The CATs to be encoded in the NOC sent to the commissionee");
 
         switch (networkType)
         {
         case PairingNetworkType::None:
-        case PairingNetworkType::Ethernet:
             break;
         case PairingNetworkType::WiFi:
             AddArgument("ssid", &mSSID);
@@ -85,6 +85,7 @@ public:
             break;
         case PairingMode::Code:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            FALLTHROUGH;
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("discover-once", 0, 1, &mDiscoverOnce);
@@ -108,12 +109,17 @@ public:
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
-        case PairingMode::Ethernet:
+        case PairingMode::AlreadyDiscovered:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
+            break;
+        case PairingMode::AlreadyDiscoveredByIndex:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         }
@@ -160,7 +166,6 @@ public:
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
-    bool IsDiscoverOnce() { return mDiscoverOnce.ValueOr(false); }
 
     /////////// DeviceAttestationDelegate /////////
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override;
@@ -174,6 +179,7 @@ private:
     CHIP_ERROR PairWithMdns(NodeId remoteId);
     CHIP_ERROR PairWithCode(NodeId remoteId);
     CHIP_ERROR PaseWithCode(NodeId remoteId);
+    CHIP_ERROR PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index);
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
 
@@ -188,9 +194,11 @@ private:
     chip::Optional<bool> mPaseOnly;
     chip::Optional<bool> mSkipCommissioningComplete;
     chip::Optional<bool> mBypassAttestationVerifier;
+    chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
+    uint16_t mIndex;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;

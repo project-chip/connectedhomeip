@@ -54,10 +54,10 @@ using namespace ::chip::DeviceLayer;
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the SiWx917-provided crypto backend, we can use the
 
-#include "SiWx917DeviceDataProvider.h"
+#include "SilabsDeviceDataProvider.h"
 
-#if EFR32_OTA_ENABLED
-void SI917MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+#if SILABS_OTA_ENABLED
+void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
 #if 0 // TODO : OTA is not planned now for CCP
     OTAConfig::Init();
@@ -65,7 +65,7 @@ void SI917MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, voi
 }
 #endif
 
-void SI917MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg){
+void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg){
     // Initialize OTA only when Thread or WiFi connectivity is established
     /*if (((event->Type == DeviceEventType::kThreadConnectivityChange) &&
          (event->ThreadConnectivityChange.Result == kConnectivity_Established)) ||
@@ -79,7 +79,7 @@ void SI917MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event,
     SILABS_LOG("Scheduling OTA Requestor initialization")
 }
 
-CHIP_ERROR SI917MatterConfig::InitMatter(const char * appName)
+CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
     CHIP_ERROR err;
 
@@ -96,9 +96,6 @@ CHIP_ERROR SI917MatterConfig::InitMatter(const char * appName)
 #ifdef HEAP_MONITORING
     MemMonitoring::startHeapMonitoring();
 #endif
-    SetDeviceInstanceInfoProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
-    SetCommissionableDataProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
-
     //==============================================
     // Init Matter Stack
     //==============================================
@@ -115,6 +112,17 @@ CHIP_ERROR SI917MatterConfig::InitMatter(const char * appName)
     }
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
+    SetDeviceInstanceInfoProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+    SetCommissionableDataProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+
+#ifdef SIWX917_USE_COMISSIONABLE_DATA
+    err = Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().FlashFactoryData();
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("Flashing to the device failed");
+        return err;
+    }
+#endif
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 
     // Stop Matter event handling while setting up resources
@@ -151,7 +159,7 @@ CHIP_ERROR SI917MatterConfig::InitMatter(const char * appName)
 }
 
 #ifdef SL_WIFI
-void SI917MatterConfig::InitWiFi(void)
+void SilabsMatterConfig::InitWiFi(void)
 {
 #ifdef RS911X_WIFI
     /*
@@ -169,7 +177,4 @@ void SI917MatterConfig::InitWiFi(void)
 extern "C" void vApplicationIdleHook(void)
 {
     // FreeRTOS Idle callback
-
-    // Check CHIP Config nvm3 and repack flash if necessary.
-    Internal::SILABSConfig::RepackNvm3Flash();
 }

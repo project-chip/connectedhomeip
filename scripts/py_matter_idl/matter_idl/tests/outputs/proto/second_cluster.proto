@@ -1,0 +1,28 @@
+
+/// AUTO-GENERATED with matter_idl.
+
+syntax = "proto3";
+
+package com.matter.example.proto;
+
+option java_multiple_files = true;
+
+message SecondCluster {
+  // option (message_type) = MATTER_TRAIT;
+
+  enum ClusterId {
+    CLUSTER_ID_UNSUPPORTED = 0;
+    CLUSTER_ID = 2;
+  }
+
+  // Attributes
+  /** octet_string Type: 5 IsList: 0 FieldId: 123 */
+  bytes some_bytes = 2621563;
+    /*
+    [(attribute) = {
+      is_subscribable: true,
+    }];
+    */
+
+
+} // SecondCluster

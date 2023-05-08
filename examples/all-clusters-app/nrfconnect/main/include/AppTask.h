@@ -24,6 +24,8 @@
 
 #if CONFIG_CHIP_FACTORY_DATA
 #include <platform/nrfconnect/FactoryDataProvider.h>
+#else
+#include <platform/nrfconnect/DeviceInstanceInfoProviderImpl.h>
 #endif
 
 #ifdef CONFIG_MCUMGR_SMP_BT
@@ -65,10 +67,6 @@ private:
     static void LEDStateUpdateHandler(LEDWidget & ledWidget);
     static void FunctionTimerTimeoutCallback(k_timer * timer);
     static void UpdateStatusLED();
-
-#ifdef CONFIG_MCUMGR_SMP_BT
-    static void RequestSMPAdvertisingStart(void);
-#endif
 
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;

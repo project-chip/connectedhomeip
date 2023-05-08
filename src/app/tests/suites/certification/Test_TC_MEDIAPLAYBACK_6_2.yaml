@@ -38,7 +38,7 @@ tests:
       PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Reads the CurrentState attribute from the DUT"
@@ -53,7 +53,7 @@ tests:
       command: "Play"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media state is playing"
@@ -79,7 +79,7 @@ tests:
       command: "StartOver"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media is started over"
@@ -98,7 +98,7 @@ tests:
       command: "Next"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the next media item in the queue has been loaded"
@@ -118,7 +118,7 @@ tests:
       command: "Previous"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the previous media item in the queue has been loaded"
@@ -139,11 +139,11 @@ tests:
       command: "SkipForward"
       arguments:
           values:
-              - name: "deltaPositionMilliseconds"
+              - name: "DeltaPositionMilliseconds"
                 value: 10000
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media has skipped forward 10 seconds"
@@ -163,18 +163,18 @@ tests:
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: 10000
+          value: { "Position": 10000 }
 
     - label: "Sends a SkipBackward command to the DUT "
       PICS: MEDIAPLAYBACK.S.C09.Rsp
       command: "SkipBackward"
       arguments:
           values:
-              - name: "deltaPositionMilliseconds"
+              - name: "DeltaPositionMilliseconds"
                 value: 10000
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Verify that the media has skipped backward 10 seconds"
@@ -194,4 +194,4 @@ tests:
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: 0
+          value: { "Position": 0 }

@@ -75,7 +75,7 @@ wiced_result_t app_button_init(void)
 void app_button_event_handler(const button_manager_button_t * button_mgr, button_manager_event_t event,
                               button_manager_button_state_t state)
 {
-    uint8_t attributeValue;
+    chip::BitMask<OccupancySensing::OccupancyBitmap> attributeValue;
     if (button_mgr[0].configuration->button == PLATFORM_BUTTON_1 && event == BUTTON_CLICK_EVENT && state == BUTTON_STATE_RELEASED)
     {
         if (LightMgr().IsLightOn())
@@ -93,7 +93,9 @@ void app_button_event_handler(const button_manager_button_t * button_mgr, button
     {
         // update the current occupancy here for hardcoded endpoint 1
         OccupancySensing::Attributes::Occupancy::Get(1, &attributeValue);
-        printf("Button Holding Toggle: %d -> %d\n", attributeValue, !attributeValue);
-        OccupancySensing::Attributes::Occupancy::Set(1, !attributeValue);
+        uint8_t bitValue = attributeValue.Raw();
+        printf("Button Holding Toggle: %d -> %d\n", bitValue, !bitValue);
+        attributeValue.SetRaw(!bitValue);
+        OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
     }
 }

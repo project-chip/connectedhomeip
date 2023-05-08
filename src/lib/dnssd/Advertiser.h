@@ -63,7 +63,7 @@ public:
         mPort = port;
         return *reinterpret_cast<Derived *>(this);
     }
-    uint64_t GetPort() const { return mPort; }
+    uint16_t GetPort() const { return mPort; }
 
     Derived & SetInterfaceId(Inet::InterfaceId interfaceId)
     {
@@ -298,6 +298,13 @@ public:
      * If the advertiser has already been initialized, the method exits immediately with no error.
      */
     virtual CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) = 0;
+
+    /**
+     * Returns whether the advertiser has completed the initialization.
+     *
+     * Returns true if the advertiser is ready to advertise services.
+     */
+    virtual bool IsInitialized() = 0;
 
     /**
      * Shuts down the advertiser.

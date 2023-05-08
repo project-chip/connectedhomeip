@@ -68,9 +68,12 @@ public:
     using DeviceScannedCallback = void (*)(PyObject * context, const char * address, uint16_t discriminator, uint16_t vendorId,
                                            uint16_t productId);
     using ScanCompleteCallback  = void (*)(PyObject * context);
+    using ScanErrorCallback     = void (*)(PyObject * context, CHIP_ERROR::StorageType error);
 
-    ScannerDelegateImpl(PyObject * context, DeviceScannedCallback scanCallback, ScanCompleteCallback completeCallback) :
-        mContext(context), mScanCallback(scanCallback), mCompleteCallback(completeCallback)
+    ScannerDelegateImpl(PyObject * context, DeviceScannedCallback scanCallback, ScanCompleteCallback completeCallback,
+                        ScanErrorCallback errorCallback) :
+        mContext(context),
+        mScanCallback(scanCallback), mCompleteCallback(completeCallback), mErrorCallback(errorCallback)
     {}
 
     void SetScanner(std::unique_ptr<ChipDeviceScanner> scanner) { mScanner = std::move(scanner); }
@@ -94,20 +97,31 @@ public:
         delete this;
     }
 
+    virtual void OnScanError(CHIP_ERROR error) override
+    {
+        if (mErrorCallback)
+        {
+            mErrorCallback(mContext, error.AsInteger());
+        }
+    }
+
 private:
     std::unique_ptr<ChipDeviceScanner> mScanner;
     PyObject * const mContext;
     const DeviceScannedCallback mScanCallback;
     const ScanCompleteCallback mCompleteCallback;
+    const ScanErrorCallback mErrorCallback;
 };
 
 } // namespace
 
 extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, uint32_t timeoutMs,
                                             ScannerDelegateImpl::DeviceScannedCallback scanCallback,
-                                            ScannerDelegateImpl::ScanCompleteCallback completeCallback)
+                                            ScannerDelegateImpl::ScanCompleteCallback completeCallback,
+                                            ScannerDelegateImpl::ScanErrorCallback errorCallback)
 {
-    std::unique_ptr<ScannerDelegateImpl> delegate = std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback);
+    std::unique_ptr<ScannerDelegateImpl> delegate =
+        std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback, errorCallback);
 
     std::unique_ptr<ChipDeviceScanner> scanner = ChipDeviceScanner::Create(static_cast<BluezAdapter1 *>(adapter), delegate.get());
 

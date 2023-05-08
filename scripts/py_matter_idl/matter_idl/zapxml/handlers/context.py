@@ -39,7 +39,7 @@ class ProcessingPath:
     and in general to report things like 'this path found but was not handled'.
     """
 
-    def __init__(self, paths: List[str] = None):
+    def __init__(self, paths: Optional[List[str]] = None):
         if paths is None:
             paths = []
         self.paths = paths
@@ -81,17 +81,27 @@ class Context:
     def __init__(self, locator: Optional[xml.sax.xmlreader.Locator] = None):
         self.path = ProcessingPath()
         self.locator = locator
+        self.file_name = None
         self._not_handled = set()
         self._idl_post_processors = []
 
         # Map of code -> attribute
         self._global_attributes = {}
 
-    def GetCurrentLocationMeta(self) -> ParseMetaData:
+    def GetCurrentLocationMeta(self) -> Optional[ParseMetaData]:
         if not self.locator:
             return None
 
         return ParseMetaData(line=self.locator.getLineNumber(), column=self.locator.getColumnNumber())
+
+    def ParseLogLocation(self) -> Optional[str]:
+        if not self.file_name:
+            return None
+        meta = self.GetCurrentLocationMeta()
+        if not meta:
+            return None
+
+        return f"{self.file_name}:{meta.line}:{meta.column}"
 
     def GetGlobalAttribute(self, code):
         if code in self._global_attributes:
@@ -99,6 +109,9 @@ class Context:
 
         raise Exception(
             'Global attribute 0x%X (%d) not found. You probably need to load global-attributes.xml' % (code, code))
+
+    def GetGlobalAttributes(self):
+        return [attribute for code, attribute in self._global_attributes.items()]
 
     def AddGlobalAttribute(self, attribute: Attribute):
         # NOTE: this may get added several times as both 'client' and 'server'
@@ -112,11 +125,20 @@ class Context:
     def MarkTagNotHandled(self):
         path = str(self.path)
         if path not in self._not_handled:
-            logging.warning("TAG %s was not handled/recognized" % path)
+            msg = "TAG %s was not handled/recognized" % path
+
+            where = self.ParseLogLocation()
+            if where:
+                msg = msg + " at " + where
+
+            logging.warning(msg)
             self._not_handled.add(path)
 
-    def AddIdlPostProcessor(self, processor: IdlPostProcessor):
-        self._idl_post_processors.append(processor)
+    def AddIdlPostProcessor(self, processor: IdlPostProcessor, has_priority: bool = False):
+        if has_priority:
+            self._idl_post_processors.insert(0, processor)
+        else:
+            self._idl_post_processors.append(processor)
 
     def PostProcess(self, idl: Idl):
         for p in self._idl_post_processors:

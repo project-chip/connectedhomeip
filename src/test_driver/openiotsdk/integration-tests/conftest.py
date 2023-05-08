@@ -15,8 +15,6 @@
 #    limitations under the License.
 #
 
-import pytest
-
 pytest_plugins = ['common.fixtures']
 
 

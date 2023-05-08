@@ -142,7 +142,7 @@ ReadHandler::~ReadHandler()
 void ReadHandler::Close(CloseOptions options)
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    if (options == CloseOptions::kDropPersistedSubscription)
+    if (IsType(InteractionType::Subscribe) && options == CloseOptions::kDropPersistedSubscription)
     {
         auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
@@ -177,7 +177,12 @@ void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
             status = StatusIB(err).mStatus;
         }
         StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
-        Close();
+        // At this point we can't have a persisted subscription, since that
+        // happens only when ProcessSubscribeRequest returns success. And our
+        // subscription id is almost certainly not actually useful at this
+        // point, either.  So don't try to mess with persisted subscriptions in
+        // Close().
+        Close(CloseOptions::kKeepPersistedSubscription);
     }
     else
     {
@@ -389,9 +394,10 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     reader.Init(std::move(aPayload));
 
     ReturnErrorOnFailure(readRequestParser.Init(reader));
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    readRequestParser.PrettyPrint();
-#endif
+
+    // No need to pretty-print here.  We pretty-print read requests in the read
+    // case of InteractionModelEngine::OnReadInitialRequest, so we do it even if
+    // we reject a read request.
 
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
@@ -642,9 +648,10 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
     SubscribeRequestMessage::Parser subscribeRequestParser;
     ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    subscribeRequestParser.PrettyPrint();
-#endif
+
+    // No need to pretty-print here.  We pretty-print subscribe requests in the
+    // subscribe case of InteractionModelEngine::OnReadInitialRequest, so we do
+    // it even if we reject a subscribe request.
 
     AttributePathIBs::Parser attributePathListParser;
     CHIP_ERROR err = subscribeRequestParser.GetAttributeRequests(&attributePathListParser);

@@ -22,8 +22,8 @@
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -554,8 +554,7 @@ void AppTask::UpdateClusterState(intptr_t context)
     uint8_t newValue = LightMgr().IsLightOn();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, app::Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(1, newValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         P6_LOG("ERR: updating on/off %x", status);

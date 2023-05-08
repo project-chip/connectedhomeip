@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
   private static final String ATTR_TL_LONG = "Target List : LONG";
   private static final String ATTR_TL_SHORT = "Target List : SHORT";
   private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+  private String setupPIN = "";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +45,30 @@ public class MainActivity extends AppCompatActivity {
     TextView textView = (TextView) findViewById(R.id.commandTextView);
     textView.setText("Command Payload : " + command);
 
-    Button sendMessageButton = findViewById(R.id.sendMessageButton);
+    Button setupPINButton = findViewById(R.id.setupPINButton);
+    if (!setupPIN.isEmpty()) {
+      EditText pinText = findViewById(R.id.setupPINText);
+      pinText.setText(setupPIN);
+    }
+    setupPINButton.setOnClickListener(
+        view -> {
+          EditText pinText = findViewById(R.id.setupPINText);
+          String pinStr = pinText.getText().toString();
+          setupPIN = pinStr;
+          CommandResponseHolder.getInstance()
+              .setResponseValue(
+                  Clusters.AccountLogin.Id,
+                  Clusters.AccountLogin.Commands.GetSetupPIN.ID,
+                  "{\""
+                      + Clusters.AccountLogin.Commands.GetSetupPINResponse.Fields.SetupPIN
+                      + "\":\""
+                      + pinStr
+                      + "\"}");
+        });
 
-    sendMessageButton.setOnClickListener(
+    Button attributeUpdateButton = findViewById(R.id.updateAttributeButton);
+
+    attributeUpdateButton.setOnClickListener(
         view -> {
           Spinner dropdown = findViewById(R.id.spinnerAttribute);
           String attribute = (String) dropdown.getSelectedItem();

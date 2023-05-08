@@ -89,14 +89,14 @@ CHIP_ERROR AttributeReportIB::Parser::PrettyPrint() const
 CHIP_ERROR AttributeReportIB::Parser::GetAttributeStatus(AttributeStatusIB::Parser * const apAttributeStatus) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kAttributeStatus)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kAttributeStatus), reader));
     return apAttributeStatus->Init(reader);
 }
 
 CHIP_ERROR AttributeReportIB::Parser::GetAttributeData(AttributeDataIB::Parser * const apAttributeData) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kAttributeData)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kAttributeData), reader));
     return apAttributeData->Init(reader);
 }
 

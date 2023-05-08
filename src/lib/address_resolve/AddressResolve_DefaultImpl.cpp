@@ -61,6 +61,24 @@ System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timesta
     {
         return mRequest.GetMinLookupTime() - elapsed;
     }
+
+    if (HasLookupResult())
+    {
+        // We can get here if we got our result before our min lookup time had
+        // elapsed, but time has passed between then and this attempt to re-arm
+        // the timer, such that now we are past our min lookup time.  For
+        // example, this can happen because the timer is a bit delayed in firing
+        // but is now being re-scheduled due to a cancellation of a lookup or
+        // start of a new lookup.  Or it could happen because
+        // OnOperationalNodeResolved got called close to our min lookup time,
+        // and we crossed that line while going through mActiveLookups and
+        // before we got to calling ReArmTimer.
+        //
+        // In this case, we should just fire the timer ASAP, since our min
+        // lookup time has elapsed and we have results.
+        return System::Clock::Timeout::zero();
+    }
+
     if (elapsed < mRequest.GetMaxLookupTime())
     {
         return mRequest.GetMaxLookupTime() - elapsed;
@@ -169,20 +187,14 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 
 CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
 {
-    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!mActiveLookups.Contains(&handle), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(handle.HasLookupResult(), CHIP_ERROR_WELL_EMPTY);
 
-    return mSystemLayer->ScheduleWork(&OnTryNextResult, static_cast<void *>(&handle));
-}
-
-void Resolver::OnTryNextResult(System::Layer * layer, void * context)
-{
-    auto handle   = static_cast<Impl::NodeLookupHandle *>(context);
-    auto listener = handle->GetListener();
-    auto peerId   = handle->GetRequest().GetPeerId();
-    auto result   = handle->TakeLookupResult();
+    auto listener = handle.GetListener();
+    auto peerId   = handle.GetRequest().GetPeerId();
+    auto result   = handle.TakeLookupResult();
     listener->OnNodeAddressResolved(peerId, result);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method)

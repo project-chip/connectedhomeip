@@ -24,7 +24,7 @@ import tempfile
 import unittest
 
 from matter_yamltests.definitions import *
-from matter_yamltests.parser import TestParser
+from matter_yamltests.parser import TestParser, TestParserConfig
 
 simple_test_description = '''<?xml version="1.0"?>
   <configurator>
@@ -74,18 +74,43 @@ class TestYamlParser(unittest.TestCase):
         self._temp_file = tempfile.NamedTemporaryFile(suffix='.yaml')
         with open(self._temp_file.name, 'w') as f:
             f.writelines(simple_test_yaml)
-        pics_file = None
-        self._yaml_parser = TestParser(
-            self._temp_file.name, pics_file, self._definitions)
 
     def test_able_to_iterate_over_all_parsed_tests(self):
         # self._yaml_parser.tests implements `__next__`, which does value substitution. We are
         # simply ensure there is no exceptions raise.
+        parser_config = TestParserConfig(None, self._definitions)
+        yaml_parser = TestParser(self._temp_file.name, parser_config)
         count = 0
-        for idx, test_step in enumerate(self._yaml_parser.tests):
+        for idx, test_step in enumerate(yaml_parser.tests):
             count += 1
             pass
         self.assertEqual(count, 3)
+
+    def test_config(self):
+        parser_config = TestParserConfig(None, self._definitions)
+        yaml_parser = TestParser(self._temp_file.name, parser_config)
+        for idx, test_step in enumerate(yaml_parser.tests):
+            self.assertEqual(test_step.node_id, 0x12344321)
+            self.assertEqual(test_step.cluster, 'Test')
+            self.assertEqual(test_step.endpoint, 1)
+
+    def test_config_override(self):
+        config_override = {'nodeId': 12345,
+                           'cluster': 'TestOverride', 'endpoint': 4}
+        parser_config = TestParserConfig(
+            None, self._definitions, config_override)
+        yaml_parser = TestParser(self._temp_file.name, parser_config)
+        for idx, test_step in enumerate(yaml_parser.tests):
+            self.assertEqual(test_step.node_id, 12345)
+            self.assertEqual(test_step.cluster, 'TestOverride')
+            self.assertEqual(test_step.endpoint, 4)
+
+    def test_config_override_unknown_field(self):
+        config_override = {'unknown_field': 1}
+        parser_config = TestParserConfig(
+            None, self._definitions, config_override)
+        self.assertRaises(KeyError, TestParser,
+                          self._temp_file.name, parser_config)
 
 
 def main():

@@ -29,15 +29,32 @@
 #include "mbedtls/platform.h"
 
 #include <DeviceInfoProviderImpl.h>
-#include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/openiotsdk/OpenIoTSDKArchUtils.h>
+
+#include <lib/core/CHIPConfig.h>
+#include <platform/CHIPDeviceLayer.h>
+
+#ifdef USE_CHIP_DATA_MODEL
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
+#include <app/util/af.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#endif // USE_CHIP_DATA_MODEL
+
+#ifdef TFM_SUPPORT
+#include "psa/fwu_config.h"
+#include "psa/update.h"
+#include "tfm_ns_interface.h"
+#endif // TFM_SUPPORT
 
 using namespace ::chip;
 using namespace ::chip::Platform;
 using namespace ::chip::DeviceLayer;
+
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 #define NETWORK_UP_FLAG 0x00000001U
 #define NETWORK_DOWN_FLAG 0x00000002U
@@ -48,6 +65,13 @@ using namespace ::chip::DeviceLayer;
 static osEventFlagsId_t event_flags_id;
 
 static DeviceLayer::DeviceInfoProviderImpl gDeviceInfoProvider;
+
+#ifdef TFM_SUPPORT
+extern "C" {
+// RTOS-specific initialization that is not declared in any header file
+uint32_t tfm_ns_interface_init(void);
+}
+#endif // TFM_SUPPORT
 
 /** Wait for specific event and check error */
 static int wait_for_event(uint32_t event)
@@ -111,6 +135,36 @@ static void network_state_callback(network_state_callback_event_t event)
     }
 }
 
+#ifdef TFM_SUPPORT
+static int get_psa_images_details()
+{
+    psa_status_t status;
+    psa_fwu_component_info_t image_info;
+
+    status = psa_fwu_query(FWU_COMPONENT_ID_SECURE, &image_info);
+    if (status != PSA_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "Failed to query secure firmware information. Error %ld", status);
+        return EXIT_FAILURE;
+    }
+
+    ChipLogProgress(NotSpecified, "Secure firmware version: %u.%u.%u-%lu\r\n", image_info.version.major, image_info.version.minor,
+                    image_info.version.patch, image_info.version.build);
+
+    status = psa_fwu_query(FWU_COMPONENT_ID_NONSECURE, &image_info);
+    if (status != PSA_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "Failed to query non-secure firmware information. Error %ld", status);
+        return EXIT_FAILURE;
+    }
+
+    ChipLogProgress(NotSpecified, "Non-secure firmware version: %u.%u.%u-%lu\r\n", image_info.version.major,
+                    image_info.version.minor, image_info.version.patch, image_info.version.build);
+
+    return EXIT_SUCCESS;
+}
+#endif // TFM_SUPPORT
+
 int openiotsdk_platform_init(void)
 {
     int ret;
@@ -122,6 +176,22 @@ int openiotsdk_platform_init(void)
         ChipLogError(NotSpecified, "Mbed TLS platform initialization failed: %d", ret);
         return EXIT_FAILURE;
     }
+
+#ifdef TFM_SUPPORT
+    ret = tfm_ns_interface_init();
+    if (ret != 0)
+    {
+        ChipLogError(NotSpecified, "TF-M initialization failed: %d", ret);
+        return EXIT_FAILURE;
+    }
+
+    ret = get_psa_images_details();
+    if (ret != 0)
+    {
+        ChipLogError(NotSpecified, "Get PSA image details failed: %d", ret);
+        return EXIT_FAILURE;
+    }
+#endif // TFM_SUPPORT
 
     ret = osKernelInitialize();
     if (ret != osOK)
@@ -215,4 +285,51 @@ int openiotsdk_network_init(bool wait)
     }
 
     return EXIT_SUCCESS;
+}
+
+int openiotsdk_chip_run(void)
+{
+    CHIP_ERROR err;
+
+#ifdef USE_CHIP_DATA_MODEL
+    // Init ZCL Data Model and start server
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    err = initParams.InitializeStaticResourcesBeforeServerInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Initialize static resources before server init failed: %s", err.AsString());
+        return EXIT_FAILURE;
+    }
+    initParams.operationalServicePort        = CHIP_PORT;
+    initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
+
+    err = Server::GetInstance().Init(initParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Initialize server failed: %s", err.AsString());
+        return EXIT_FAILURE;
+    }
+
+    // Now that the server has started and we are done with our startup logging,
+    // log our discovery/onboarding information again so it's not lost in the
+    // noise.
+    ConfigurationMgr().LogDeviceConfig();
+
+    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork));
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+
+    // We only have network commissioning on endpoint 0.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+#endif // USE_CHIP_DATA_MODEL
+
+    return EXIT_SUCCESS;
+}
+
+void openiotsdk_chip_shutdown()
+{
+#ifdef USE_CHIP_DATA_MODEL
+    Server::GetInstance().Shutdown();
+#endif // USE_CHIP_DATA_MODEL
 }

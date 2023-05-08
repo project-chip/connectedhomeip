@@ -40,8 +40,8 @@ class FactoryDataWriter:
     VERIFIER_NVM3_KEY = "0x8720A:"
     PRODUCT_ID_NVM3_KEY = "0x8720B:"
     VENDOR_ID_NVM3_KEY = "0x8720C:"
-    PRODUCT_NAME_NVM3_KEY = "0x8720D:"
-    VENDOR_NAME_NVM3_KEY = "0x8720E:"
+    VENDOR_NAME_NVM3_KEY = "0x8720D:"
+    PRODUCT_NAME_NVM3_KEY = "0x8720E:"
     HW_VER_STR_NVM3_KEY = "0x8720F:"
     UNIQUE_ID_NVM3_KEY = "0x8721F:"
     HW_VER_NVM3_KEY = "0x87308:"
@@ -147,8 +147,8 @@ class FactoryDataWriter:
 
         self._args = arguments
 
-        if self._args.rotating_id:
-            assert (len(bytearray.fromhex(self._args.rotating_id)) == kUniqueIDLength), "Provide a 16 bytes rotating id"
+        if self._args.unique_id:
+            assert (len(bytearray.fromhex(self._args.unique_id)) == kUniqueIDLength), "Provide a 16 bytes unique id"
         if self._args.product_name:
             assert (len(self._args.product_name) <= kMaxProductNameLength), "Product name exceeds the size limit"
         if self._args.vendor_name:
@@ -262,8 +262,8 @@ class FactoryDataWriter:
             hwVersionByteArray = bytes(self._args.hw_version_str, 'utf-8').hex()
             cmd.extend(["--object", self.HW_VER_STR_NVM3_KEY + str(hwVersionByteArray)])
 
-        if self._args.rotating_id:
-            cmd.extend(["--object", self.UNIQUE_ID_NVM3_KEY + self._args.rotating_id])
+        if self._args.unique_id:
+            cmd.extend(["--object", self.UNIQUE_ID_NVM3_KEY + self._args.unique_id])
 
         if self._args.manufacturing_date:
             dateByteArray = bytes(self._args.manufacturing_date, 'utf-8').hex()
@@ -338,7 +338,7 @@ def main():
                         help="[string] Provide the product label [optional]")
     parser.add_argument("--product_url", type=str,
                         help="[string] Provide the product url [optional]")
-    parser.add_argument("--rotating_id", type=str,
+    parser.add_argument("--unique_id", type=str,
                         help="[hex_string] A 128 bits hex string unique id (without 0x) [optional]")
     parser.add_argument("--serial_number", type=str,
                         help="[string] Provide serial number of the device")

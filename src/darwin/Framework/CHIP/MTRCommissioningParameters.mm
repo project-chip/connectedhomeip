@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,12 +37,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSNumber * _Nullable)failSafeExpiryTimeoutSecs
 {
-    return self.failSafeExpiryTimeout;
+    return self.failSafeTimeout;
 }
 
 - (void)setFailSafeExpiryTimeoutSecs:(NSNumber * _Nullable)failSafeExpiryTimeoutSecs
 {
-    self.failSafeExpiryTimeout = failSafeExpiryTimeoutSecs;
+    self.failSafeTimeout = failSafeExpiryTimeoutSecs;
 }
 
 @end

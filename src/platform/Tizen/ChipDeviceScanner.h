@@ -30,6 +30,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -65,7 +66,10 @@ public:
     virtual void OnChipDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 
     // Called when a scan was completed (stopped or timed out)
-    virtual void OnChipScanComplete(void) = 0;
+    virtual void OnScanComplete(void) = 0;
+
+    // Called on scan error
+    virtual void OnScanError(CHIP_ERROR err) = 0;
 };
 
 /// Allows scanning for CHIP devices
@@ -82,7 +86,7 @@ public:
     ~ChipDeviceScanner(void);
 
     /// Initiate a scan for devices, with the given timeout & scan filter data
-    CHIP_ERROR StartChipScan(unsigned timeoutMs, ScanFilterType filterType, ScanFilterData & filterData);
+    CHIP_ERROR StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType, ScanFilterData & filterData);
 
     /// Stop any currently running scan
     CHIP_ERROR StopChipScan(void);
@@ -92,18 +96,18 @@ public:
     static std::unique_ptr<ChipDeviceScanner> Create(ChipDeviceScannerDelegate * delegate);
 
 private:
-    static gboolean TriggerScan(GMainLoop * mainLoop, gpointer userData);
     static void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * info, void * userData);
+    static gboolean TimerExpiredCb(gpointer user_data);
+    static CHIP_ERROR TriggerScan(ChipDeviceScanner * userData);
     void CheckScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
     int RegisterScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
     void UnRegisterScanFilter(void);
     int CreateLEScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
-    static gboolean TimerExpiredCb(gpointer user_data);
 
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     bool mIsScanning                      = false;
     bool mIsStopping                      = false;
-    GMainLoop * mAsyncLoop                = nullptr;
+    unsigned int mScanTimeoutMs           = 10000;
     bt_scan_filter_h mScanFilter          = nullptr;
 };
 

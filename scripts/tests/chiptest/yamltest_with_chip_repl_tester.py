@@ -14,6 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import asyncio
+import atexit
+import logging
 import os
 import tempfile
 import traceback
@@ -25,18 +28,54 @@ import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 
 # isort: on
 
+# ensure matter IDL is availale for import, otherwise set relative paths
+try:
+    from matter_idl import matter_idl_types
+except:
+    SCRIPT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+    import sys
+
+    sys.path.append(os.path.join(SCRIPT_PATH, 'py_matter_idl'))
+    sys.path.append(os.path.join(SCRIPT_PATH, 'py_matter_yamltests'))
+
+    from matter_idl import matter_idl_types
+
+
 import chip.CertificateAuthority
 import chip.native
 import click
 from chip.ChipStack import *
 from chip.yaml.runner import ReplTestRunner
-from matter_yamltests.definitions import SpecDefinitionsFromPath
-from matter_yamltests.parser import TestParser
+from matter_yamltests.definitions import SpecDefinitionsFromPaths
+from matter_yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 _CLUSTER_XML_DIRECTORY_PATH = os.path.abspath(
     os.path.join(_DEFAULT_CHIP_ROOT, "src/app/zap-templates/zcl/data-model/"))
+
+
+async def execute_test(yaml, runner):
+    # Executing and validating test
+    for test_step in yaml.tests:
+        if not test_step.is_pics_enabled:
+            continue
+        test_action = runner.encode(test_step)
+        if test_action is None:
+            raise Exception(
+                f'Failed to encode test step {test_step.label}')
+
+        response = await runner.execute(test_action)
+        decoded_response = runner.decode(response)
+        post_processing_result = test_step.post_process_response(
+            decoded_response)
+        if not post_processing_result.is_success():
+            logging.warning(f"Test step failure in 'test_step.label'")
+            for entry in post_processing_result.entries:
+                if entry.state == PostProcessCheckStatus.SUCCESS:
+                    continue
+                logging.warning("%s: %s", entry.state, entry.message)
+            raise Exception(f'Test step failed {test_step.label}')
 
 
 @click.command()
@@ -69,7 +108,8 @@ def main(setup_code, yaml_path, node_id, pics_file):
             ca = certificate_authority_manager.NewCertificateAuthority()
             ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
         elif len(certificate_authority_manager.activeCaList[0].adminList) == 0:
-            certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+            certificate_authority_manager.activeCaList[0].NewFabricAdmin(
+                vendorId=0xFFF1, fabricId=1)
 
         ca_list = certificate_authority_manager.activeCaList
 
@@ -78,36 +118,32 @@ def main(setup_code, yaml_path, node_id, pics_file):
         dev_ctrl = ca_list[0].adminList[0].NewController()
         dev_ctrl.CommissionWithCode(setup_code, node_id)
 
+        def _StackShutDown():
+            # Tearing down chip stack. If not done in the correct order test will fail.
+            certificate_authority_manager.Shutdown()
+            chip_stack.Shutdown()
+
+        atexit.register(_StackShutDown)
+
         try:
             # Creating Cluster definition.
-            clusters_definitions = SpecDefinitionsFromPath(_CLUSTER_XML_DIRECTORY_PATH + '/*/*.xml')
+            clusters_definitions = SpecDefinitionsFromPaths([
+                _CLUSTER_XML_DIRECTORY_PATH + '/chip/*.xml',
+            ])
 
             # Parsing YAML test and setting up chip-repl yamltests runner.
-            yaml = TestParser(yaml_path, pics_file, clusters_definitions)
-            runner = ReplTestRunner(clusters_definitions, certificate_authority_manager, dev_ctrl)
+            parser_config = TestParserConfig(pics_file, clusters_definitions)
+            yaml = TestParser(yaml_path, parser_config)
+            runner = ReplTestRunner(
+                clusters_definitions, certificate_authority_manager, dev_ctrl)
 
-            # Executing and validating test
-            for test_step in yaml.tests:
-                test_action = runner.encode(test_step)
-                # TODO if test_action is None we should see if it is a pseudo cluster.
-                if test_action is None:
-                    raise Exception(f'Failed to encode test step {test_step.label}')
-                if not test_action.pics_enabled:
-                    continue
+            asyncio.run(execute_test(yaml, runner))
 
-                response = runner.execute(test_action)
-                decoded_response = runner.decode(response)
-                post_processing_result = test_step.post_process_response(decoded_response)
-                if not post_processing_result.is_success():
-                    raise Exception(f'Test step failed {test_step.label}')
         except Exception:
             print(traceback.format_exc())
             exit(-2)
 
         runner.shutdown()
-        # Tearing down chip stack. If not done in the correct order test will fail.
-        certificate_authority_manager.Shutdown()
-        chip_stack.Shutdown()
 
 
 if __name__ == '__main__':

@@ -85,8 +85,13 @@ def _ParallelGenerateOne(arg):
     '--sdk-root',
     default=None,
     help='Path to the SDK root (where .zap/.matter files exist).')
+@click.option(
+    '--external-root',
+    default=None,
+    multiple=True,
+    help='Path to an external app root (where .zap/.matter files exist).')
 @click.argument('output_dir')
-def main(log_level, parallel, dry_run, generator, input_glob, sdk_root, output_dir):
+def main(log_level, parallel, dry_run, generator, input_glob, sdk_root, external_root, output_dir):
     if _has_coloredlogs:
         coloredlogs.install(level=__LOG_LEVELS__[
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
@@ -122,7 +127,7 @@ def main(log_level, parallel, dry_run, generator, input_glob, sdk_root, output_d
     elif generator == 'codegen':
         filter.file_type = IdlFileType.MATTER
 
-    targets = FindPregenerationTargets(sdk_root, filter, runner)
+    targets = FindPregenerationTargets(sdk_root, external_root, filter, runner)
 
     runner.ensure_directory_exists(output_dir)
     if parallel:

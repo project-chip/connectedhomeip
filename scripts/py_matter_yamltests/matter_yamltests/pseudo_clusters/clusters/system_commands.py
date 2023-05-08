@@ -13,94 +13,71 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import sys
-import xmlrpc.client
-
 from ..pseudo_cluster import PseudoCluster
+from .accessory_server_bridge import AccessoryServerBridge
 
-DEFAULT_KEY = 'default'
-IP = '127.0.0.1'
-PORT = 9000
+_DEFINITION = '''<?xml version="1.0"?>
+<configurator>
+<cluster>
+    <name>SystemCommands</name>
+    <code>0xFFF1FD03</code>
 
-if sys.platform == 'linux':
-    IP = '10.10.10.5'
+    <command source="client" code="0" name="Start">
+      <arg name="registerKey" type="char_string" optional="true"/>
+      <arg name="discriminator" type="int16u" optional="true"/>
+      <arg name="port" type="int16u" optional="true"/>
+      <arg name="minCommissioningTimeout" type="int16u" optional="true"/>
+      <arg name="kvs" type="char_string" optional="true"/>
+      <arg name="filepath" type="char_string" optional="true"/>
+      <arg name="otaDownloadPath" type="char_string" optional="true"/>
+    </command>
 
+    <command source="client" code="1" name="Stop">
+      <arg name="registerKey" type="char_string" optional="true"/>
+    </command>
 
-def make_url():
-    return 'http://' + IP + ':' + str(PORT) + '/'
+    <command source="client" code="2" name="Reboot">
+      <arg name="registerKey" type="char_string" optional="true"/>
+    </command>
 
+    <command source="client" code="3" name="FactoryReset">
+      <arg name="registerKey" type="char_string" optional="true"/>
+    </command>
 
-def get_register_key(request):
-    if request.arguments:
-        values = request.arguments['values']
-        for item in values:
-            name = item['name']
-            value = item['value']
-            if name == 'registerKey':
-                return value
+    <command source="client" code="4" name="CreateOtaImage">
+      <arg name="otaImageFilePath" type="char_string"/>
+      <arg name="rawImageFilePath" type="char_string"/>
+      <arg name="rawImageContent" type="char_string"/>
+    </command>
 
-    return DEFAULT_KEY
+    <command source="client" code="5" name="CompareFiles">
+      <arg name="file1" type="char_string"/>
+      <arg name="file2" type="char_string"/>
+    </command>
 
-
-def get_options(request):
-    options = []
-
-    if request.arguments:
-        values = request.arguments['values']
-        for item in values:
-            name = item['name']
-            value = item['value']
-
-            if name == 'discriminator':
-                options.append('--discriminator')
-                options.append(str(value))
-            elif name == 'port':
-                options.append('--secured-device-port')
-                options.append(str(value))
-            elif name == 'kvs':
-                options.append('--KVS')
-                options.append(str(value))
-            elif name == 'minCommissioningTimeout':
-                options.append('--min_commissioning_timeout')
-                options.append(str(value))
-            elif name == 'filepath':
-                options.append('--filepath')
-                options.append(str(value))
-            elif name == 'otaDownloadPath':
-                options.append('--otaDownloadPath')
-                options.append(str(value))
-            elif name == 'registerKey':
-                pass
-            else:
-                raise KeyError(f'Unknown key: {name}')
-
-    return options
+</cluster>
+</configurator>
+'''
 
 
 class SystemCommands(PseudoCluster):
     name = 'SystemCommands'
+    definition = _DEFINITION
 
     async def Start(self, request):
-        register_key = get_register_key(request)
-        options = get_options(request)
-
-        with xmlrpc.client.ServerProxy(make_url(), allow_none=True) as proxy:
-            proxy.start(register_key, options)
+        AccessoryServerBridge.start(request)
 
     async def Stop(self, request):
-        register_key = get_register_key(request)
-
-        with xmlrpc.client.ServerProxy(make_url(), allow_none=True) as proxy:
-            proxy.stop(register_key)
+        AccessoryServerBridge.stop(request)
 
     async def Reboot(self, request):
-        register_key = get_register_key(request)
-
-        with xmlrpc.client.ServerProxy(make_url(), allow_none=True) as proxy:
-            proxy.reboot(register_key)
+        AccessoryServerBridge.reboot(request)
 
     async def FactoryReset(self, request):
-        register_key = get_register_key(request)
+        AccessoryServerBridge.factoryReset(request)
 
-        with xmlrpc.client.ServerProxy(make_url(), allow_none=True) as proxy:
-            proxy.factoryReset(register_key)
+    async def CreateOtaImage(self, request):
+        AccessoryServerBridge.createOtaImage(request)
+
+    async def CompareFiles(self, request):
+        AccessoryServerBridge.compareFiles(request)

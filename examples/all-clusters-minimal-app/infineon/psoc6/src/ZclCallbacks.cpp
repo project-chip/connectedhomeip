@@ -26,7 +26,6 @@
 
 #include "ClusterManager.h"
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af-types.h>

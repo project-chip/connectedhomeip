@@ -79,7 +79,8 @@ declare_args() {
   # When not set, CHIP_CONFIG_MAX_FABRICS is used for static allocation
   # of tracking information for operational advertisement.
   chip_config_minmdns_dynamic_operational_responder_list =
-      current_os == "linux" || current_os == "android" || current_os == "darwin"
+      current_os == "linux" || current_os == "android" || current_os == "mac" ||
+      current_os == "ios"
 
   # When using minmdns, set the number of parallel resolves
   chip_config_minmdns_max_parallel_resolves = 2

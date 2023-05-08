@@ -27,6 +27,9 @@
 
 namespace chip {
 namespace DeviceLayer {
+
+class BleScannerDelegate;
+
 namespace Internal {
 
 using namespace chip::Ble;
@@ -42,7 +45,8 @@ class BLEManagerImpl final : public BLEManager, private BleLayer
 
 public:
     CHIP_ERROR ConfigureBle(uint32_t aNodeId, bool aIsCentral) { return CHIP_NO_ERROR; }
-    CHIP_ERROR PrepareConnection();
+    CHIP_ERROR StartScan(BleScannerDelegate * delegate = nullptr);
+    CHIP_ERROR StopScan();
 
 private:
     // ===== Members that implement the BLEManager internal interface.

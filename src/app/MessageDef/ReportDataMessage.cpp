@@ -146,14 +146,14 @@ CHIP_ERROR ReportDataMessage::Parser::GetSubscriptionId(SubscriptionId * const a
 CHIP_ERROR ReportDataMessage::Parser::GetAttributeReportIBs(AttributeReportIBs::Parser * const apAttributeReportIBs) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kAttributeReportIBs)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kAttributeReportIBs), reader));
     return apAttributeReportIBs->Init(reader);
 }
 
 CHIP_ERROR ReportDataMessage::Parser::GetEventReports(EventReportIBs::Parser * const apEventReports) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventReports)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kEventReports), reader));
     return apEventReports->Init(reader);
 }
 
@@ -167,7 +167,7 @@ ReportDataMessage::Builder & ReportDataMessage::Builder::SuppressResponse(const 
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kSuppressResponse)), aSuppressResponse);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kSuppressResponse), aSuppressResponse);
     }
     return *this;
 }
@@ -177,7 +177,7 @@ ReportDataMessage::Builder & ReportDataMessage::Builder::SubscriptionId(const ch
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kSubscriptionId)), aSubscriptionId);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kSubscriptionId), aSubscriptionId);
     }
     return *this;
 }
@@ -207,7 +207,7 @@ ReportDataMessage::Builder & ReportDataMessage::Builder::MoreChunkedMessages(con
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kMoreChunkedMessages)), aMoreChunkedMessages);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kMoreChunkedMessages), aMoreChunkedMessages);
     }
     return *this;
 }

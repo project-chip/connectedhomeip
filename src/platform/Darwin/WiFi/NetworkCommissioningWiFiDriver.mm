@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Darwin/ConfigurationManagerImpl.h>
@@ -72,18 +73,23 @@ private:
     void CopyNetworkInformationTo(WiFiScanResponse & destination, CWNetwork * source)
     {
         destination.security = GetWiFiSecurity(source);
-        destination.ssidLen = [source.ssid length];
-        destination.channel = source.wlanChannel.channelNumber;
+        destination.channel = static_cast<uint16_t>(source.wlanChannel.channelNumber);
         destination.wiFiBand = GetWiFiBand(source.wlanChannel);
-        destination.rssi = source.rssiValue;
-        CopyStringTo(destination.ssid, source.ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
-        CopyStringTo(destination.bssid, source.bssid, DeviceLayer::Internal::kWiFiBSSIDLength);
-    }
+        destination.rssi = static_cast<int8_t>(source.rssiValue);
 
-    void CopyStringTo(uint8_t * destination, NSString * source, size_t maxLength)
-    {
-        NSData * data = [source dataUsingEncoding:NSUTF8StringEncoding];
-        memcpy(destination, [data bytes], std::min([data length], maxLength));
+        NSData * ssidData = source.ssidData;
+        destination.ssidLen = static_cast<uint8_t>(std::min(ssidData.length, DeviceLayer::Internal::kMaxWiFiSSIDLength));
+        memcpy(destination.ssid, ssidData.bytes, destination.ssidLen);
+
+        // source.bssid looks like "00:00:00:00:00:00" if it's not nil.
+        NSString * bssid = source.bssid;
+        // 3 chars per byte, except the last byte.
+        if (bssid.length == 3 * sizeof(destination.bssid) - 1) {
+            const char * chars = bssid.UTF8String;
+            for (size_t i = 0; i < sizeof(destination.bssid); ++i) {
+                Encoding::HexToBytes(&chars[3 * i], 2, &destination.bssid[i], 1);
+            }
+        }
     }
 
     WiFiSecurity GetWiFiSecurity(CWNetwork * network)

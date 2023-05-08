@@ -99,7 +99,7 @@ CHIP_ERROR ReadFabricList(JNIEnv * env, jobject & self)
         VerifyOrExit(jlabel != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
 
         env->SetIntField(jFabric, jvendorId, fabricInfo.GetVendorId());
-        env->SetLongField(jFabric, jnodeId, fabricInfo.GetNodeId());
+        env->SetLongField(jFabric, jnodeId, static_cast<jlong>(fabricInfo.GetNodeId()));
         env->SetShortField(jFabric, jfabricIndex, fabricInfo.GetFabricIndex());
         UtfString jLabelStr(env, fabricInfo.GetFabricLabel());
         env->SetObjectField(jFabric, jlabel, jLabelStr.jniValue());

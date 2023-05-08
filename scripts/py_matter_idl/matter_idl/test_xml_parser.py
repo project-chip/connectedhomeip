@@ -15,19 +15,23 @@
 
 import io
 import unittest
-from typing import List, Optional, Union
+from typing import List, Union
 
 try:
-    from matter_idl.matter_idl_types import *
+    from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
+                                             ConstantEntry, DataType, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+                                             Struct, StructQuality, StructTag)
     from matter_idl.zapxml import ParseSource, ParseXmls
-except:
+except ImportError:
     import os
     import sys
 
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
 
-    from matter_idl.matter_idl_types import *
+    from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
+                                             ConstantEntry, DataType, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+                                             Struct, StructQuality, StructTag)
     from matter_idl.zapxml import ParseSource, ParseXmls
 
 
@@ -56,10 +60,13 @@ class TestXmlParser(unittest.TestCase):
               <cluster>
                 <name>Test</name>
                 <code>0x1234</code>
+                <description>Test</description>
 
-                <attribute side="server" code="11" type="INT32U" min="0" max="2" isNullable="true" reportable="true" writable="false">SomeIntAttribute</attribute>
+                <attribute side="server" code="11" type="INT32U" min="0" max="2" isNullable="true" \
+                    reportable="true" writable="false">SomeIntAttribute</attribute>
 
-                <attribute side="server" code="22" define="SOME_DEFINE" type="INT8U" min="0" max="10" reportable="true" default="0" writable="true" optional="true">
+                <attribute side="server" code="22" define="SOME_DEFINE" type="INT8U" min="0" max="10" \
+                    reportable="true" default="0" writable="true" optional="true">
                     <description>AttributeWithAccess</description>
                     <access op="read" role="operate" />
                     <access op="write" role="manage" />
@@ -86,14 +93,23 @@ class TestXmlParser(unittest.TestCase):
                                  side=ClusterSide.CLIENT,
                                  name='Test',
                                  code=0x1234,
+                                 description="Test",
                                  attributes=[
-                                     Attribute(definition=Field(data_type=DataType(name='INT32U'), code=11, name='SomeIntAttribute',
-                                                                qualities=FieldQuality.NULLABLE), qualities=AttributeQuality.READABLE,
-                                               readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
-                                     Attribute(definition=Field(data_type=DataType(name='INT8U'), code=22, name='AttributeWithAccess',
-                                                                qualities=FieldQuality.OPTIONAL),
-                                               qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, readacl=AccessPrivilege.OPERATE,
-                                               writeacl=AccessPrivilege.MANAGE)
+                                     Attribute(definition=Field(
+                                         data_type=DataType(name='INT32U'),
+                                         code=11,
+                                         name='SomeIntAttribute',
+                                         qualities=FieldQuality.NULLABLE),
+                                         qualities=AttributeQuality.READABLE,
+                                         readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
+
+                                     Attribute(definition=Field(
+                                         data_type=DataType(name='INT8U'),
+                                         code=22, name='AttributeWithAccess',
+                                         qualities=FieldQuality.OPTIONAL),
+                                         qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE,
+                                         readacl=AccessPrivilege.OPERATE,
+                                         writeacl=AccessPrivilege.MANAGE)
                                  ],
                                  structs=[
                                      Struct(name='GetSomeDataRequest',
@@ -114,7 +130,9 @@ class TestXmlParser(unittest.TestCase):
                                             tag=StructTag.RESPONSE, code=0x44)
                                  ],
                                  commands=[
-                                     Command(name='GetSomeData', code=33, input_param='GetSomeDataRequest', output_param='GetSomeDataResponse',
+                                     Command(name='GetSomeData', code=33,
+                                             input_param='GetSomeDataRequest', output_param='GetSomeDataResponse',
+                                             description='This is just a test: client to server',
                                              invokeacl=AccessPrivilege.ADMINISTER)
                                  ])
                          ]))
@@ -264,7 +282,7 @@ class TestXmlParser(unittest.TestCase):
 Some copyright here... testing that we skip over comments
 -->
 <configurator>
-  <domain name="CHIP"/> 
+  <domain name="CHIP"/>
   <cluster>
     <name>Window Covering</name>
     <domain>Closures</domain>
@@ -292,6 +310,7 @@ Some copyright here... testing that we skip over comments
         self.assertEqual(idl,
                          Idl(clusters=[
                              Cluster(side=ClusterSide.CLIENT, name='WindowCovering', code=0x102,
+                                     description='Provides an interface for controlling and adjusting automatic window coverings. ',
                                      structs=[],
                                      attributes=[
                                          Attribute(

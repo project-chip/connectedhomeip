@@ -565,6 +565,37 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MTRBasicClusterCapabilityMinimaStruct : MTRBasicInformationClusterCapabilityMinimaStruct
 @end
 
+@implementation MTRBasicInformationClusterProductAppearanceStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _finish = @(0);
+
+        _primaryColor = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRBasicInformationClusterProductAppearanceStruct alloc] init];
+
+    other.finish = self.finish;
+    other.primaryColor = self.primaryColor;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: finish:%@; primaryColor:%@; >", NSStringFromClass([self class]), _finish, _primaryColor];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRBasicInformationClusterStartUpEvent
 - (instancetype)init
 {
@@ -1811,7 +1842,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTimeSynchronizationClusterDstOffsetType
+@implementation MTRTimeSynchronizationClusterDSTOffsetStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1827,7 +1858,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTimeSynchronizationClusterDstOffsetType alloc] init];
+    auto other = [[MTRTimeSynchronizationClusterDSTOffsetStruct alloc] init];
 
     other.offset = self.offset;
     other.validStarting = self.validStarting;
@@ -1845,7 +1876,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTimeSynchronizationClusterTimeZoneType
+@implementation MTRTimeSynchronizationClusterDstOffsetType : MTRTimeSynchronizationClusterDSTOffsetStruct
+@end
+
+@implementation MTRTimeSynchronizationClusterTimeZoneStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1861,7 +1895,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTimeSynchronizationClusterTimeZoneType alloc] init];
+    auto other = [[MTRTimeSynchronizationClusterTimeZoneStruct alloc] init];
 
     other.offset = self.offset;
     other.validAt = self.validAt;
@@ -1874,6 +1908,40 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString
         stringWithFormat:@"<%@: offset:%@; validAt:%@; name:%@; >", NSStringFromClass([self class]), _offset, _validAt, _name];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRTimeSynchronizationClusterTimeZoneType : MTRTimeSynchronizationClusterTimeZoneStruct
+@end
+
+@implementation MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _finish = @(0);
+
+        _primaryColor = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct alloc] init];
+
+    other.finish = self.finish;
+    other.primaryColor = self.primaryColor;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: finish:%@; primaryColor:%@; >", NSStringFromClass([self class]), _finish, _primaryColor];
     return descriptionString;
 }
 

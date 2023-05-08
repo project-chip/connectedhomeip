@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,6 +38,7 @@ struct AppEvent
         struct
         {
             uint8_t Action;
+            uint8_t PinNo;
         } ButtonEvent;
         struct
         {

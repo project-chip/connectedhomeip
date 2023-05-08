@@ -57,7 +57,7 @@ private:
     using Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::PostEventFromISR;
 
     // ===== Methods that implement the PlatformManager Implementation dedicated.
-    void PlatformInit(void);
+    CHIP_ERROR PlatformInit(void);
 };
 
 /**

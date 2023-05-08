@@ -18,8 +18,8 @@
 
 MEMORY
 {
-	FLASH (rx)  : ORIGIN = 0x08012000, LENGTH = 0x200000
-	RAM (rwx) : ORIGIN = 0xC, LENGTH = 262144
+	FLASH (rx)  : ORIGIN = 0x08012000, LENGTH = 0x400000
+	RAM (rwx) : ORIGIN = 0xC, LENGTH = 0x4FC00
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -203,7 +203,7 @@ SECTIONS
   } > FLASH
 
   /* Last page of flash is reserved for the manufacturing token space */
-  linker_nvm_end = __main_flash_end__ - 2048;
+  linker_nvm_end = __main_flash_end__ - 4096;
   linker_nvm_begin = linker_nvm_end - SIZEOF(.nvm);
   linker_nvm_size = SIZEOF(.nvm);
   __nvm3Base = linker_nvm_begin;

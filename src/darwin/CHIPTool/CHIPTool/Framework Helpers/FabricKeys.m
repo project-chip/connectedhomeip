@@ -110,7 +110,7 @@ static const NSString * MTRCAKeyChainLabel = @"matter-tool.nodeopcerts.CA:0";
 
     return @{
         (__bridge NSString *) kSecAttrKeyClass : (__bridge NSString *) kSecAttrKeyClassPrivate,
-        (__bridge NSString *) kSecAttrKeyType : (__bridge NSNumber *) kSecAttrKeyTypeECSECPrimeRandom,
+        (__bridge NSString *) kSecAttrKeyType : (__bridge NSString *) kSecAttrKeyTypeECSECPrimeRandom,
         (__bridge NSString *) kSecAttrKeySizeInBits : @(keySizeInBits),
         (__bridge NSString *) kSecAttrIsPermanent : @(NO)
     };

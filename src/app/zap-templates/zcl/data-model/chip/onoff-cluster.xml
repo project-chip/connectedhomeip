@@ -80,7 +80,7 @@ limitations under the License.
     <command source="client" code="0x40" name="OffWithEffect" optional="true">
       <description>The OffWithEffect command allows devices to be turned off using enhanced ways of fading.</description>
       <arg name="EffectIdentifier" type="OnOffEffectIdentifier"/>
-      <arg name="EffectVariant" type="OnOffDelayedAllOffEffectVariant"/>
+      <arg name="EffectVariant" type="int8u"/>
     </command>
 
     <command source="client" code="0x41" name="OnWithRecallGlobalScene" optional="true">

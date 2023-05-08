@@ -104,7 +104,7 @@ CHIP_ERROR AlarmEventHandler(int argc, char ** argv)
 
     AlarmEventData * data = Platform::New<AlarmEventData>();
     data->eventId         = Events::DoorLockAlarm::Id;
-    data->alarmCode       = static_cast<DlAlarmCode>(atoi(argv[0]));
+    data->alarmCode       = static_cast<AlarmCodeEnum>(atoi(argv[0]));
 
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 
@@ -136,7 +136,7 @@ CHIP_ERROR DoorStateEventHandler(int argc, char ** argv)
 
     DoorStateEventData * data = Platform::New<DoorStateEventData>();
     data->eventId             = Events::DoorStateChange::Id;
-    data->doorState           = static_cast<DlDoorState>(atoi(argv[0]));
+    data->doorState           = static_cast<DoorStateEnum>(atoi(argv[0]));
 
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 

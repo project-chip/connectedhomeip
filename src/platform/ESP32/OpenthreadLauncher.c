@@ -31,6 +31,8 @@
 #include "openthread/logging.h"
 #include "openthread/tasklet.h"
 
+static esp_netif_t * openthread_netif = NULL;
+
 static esp_netif_t * init_openthread_netif(const esp_openthread_platform_config_t * config)
 {
     esp_netif_config_t cfg = ESP_NETIF_DEFAULT_OPENTHREAD();
@@ -43,20 +45,6 @@ static esp_netif_t * init_openthread_netif(const esp_openthread_platform_config_
 
 static void ot_task_worker(void * context)
 {
-    esp_openthread_platform_config_t config = {
-        .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
-        .host_config  = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
-        .port_config  = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
-    };
-    esp_netif_t * openthread_netif;
-
-    // Initialize the OpenThread stack
-    ESP_ERROR_CHECK(esp_openthread_init(&config));
-    // The OpenThread log level directly matches ESP log level
-    (void) otLoggingSetLevel(CONFIG_LOG_DEFAULT_LEVEL);
-    // Initialize the esp_netif bindings
-    openthread_netif = init_openthread_netif(&config);
-
     // Run the main loop
     esp_openthread_launch_mainloop();
 
@@ -67,7 +55,7 @@ static void ot_task_worker(void * context)
     vTaskDelete(NULL);
 }
 
-esp_err_t openthread_launch_task(void)
+esp_err_t openthread_init_stack(void)
 {
     // Used eventfds:
     // * netif
@@ -79,6 +67,20 @@ esp_err_t openthread_launch_task(void)
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_vfs_eventfd_register(&eventfd_config));
+    esp_openthread_platform_config_t config = {
+        .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
+        .host_config  = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
+        .port_config  = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
+    };
+    // Initialize the OpenThread stack
+    ESP_ERROR_CHECK(esp_openthread_init(&config));
+    // Initialize the esp_netif bindings
+    openthread_netif = init_openthread_netif(&config);
+    return ESP_OK;
+}
+
+esp_err_t openthread_launch_task(void)
+{
     xTaskCreate(ot_task_worker, "ot_task", CONFIG_THREAD_TASK_STACK_SIZE, xTaskGetCurrentTaskHandle(), 5, NULL);
     return ESP_OK;
 }

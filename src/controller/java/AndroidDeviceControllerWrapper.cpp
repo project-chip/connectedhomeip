@@ -67,6 +67,18 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
         delete mDeviceAttestationDelegateBridge;
         mDeviceAttestationDelegateBridge = nullptr;
     }
+
+    if (mDeviceAttestationVerifier != nullptr)
+    {
+        delete mDeviceAttestationVerifier;
+        mDeviceAttestationVerifier = nullptr;
+    }
+
+    if (mAttestationTrustStoreBridge != nullptr)
+    {
+        delete mAttestationTrustStoreBridge;
+        mAttestationTrustStoreBridge = nullptr;
+    }
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
@@ -156,9 +168,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 #endif
 
     // Initialize device attestation verifier
-    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
     const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     chip::Controller::FactoryInitParams initParams;
     chip::Controller::SetupParams setupParams;
@@ -177,8 +188,10 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
     setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
     initParams.fabricIndependentStorage        = wrapperStorage;
+    initParams.sessionKeystore                 = &wrapper->mSessionKeystore;
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
+    wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
 
     CommissioningParameters params = wrapper->mAutoCommissioner.GetCommissioningParameters();
     params.SetFailsafeTimerSeconds(failsafeTimerSeconds);
@@ -203,11 +216,16 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     }
     initParams.opCertStore = &wrapper->mOpCertStore;
 #ifdef JAVA_MATTER_CONTROLLER_TEST
-    opCredsIssuer->Initialize(wrapper->mExampleStorage);
+    err = opCredsIssuer->Initialize(wrapper->mExampleStorage);
 #else
     // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
-    opCredsIssuer->Initialize(*wrapper.get(), &wrapper->mAutoCommissioner, wrapper.get()->mJavaObjectRef);
+    err = opCredsIssuer->Initialize(*wrapper.get(), &wrapper->mAutoCommissioner, wrapper.get()->mJavaObjectRef);
 #endif
+    if (err != CHIP_NO_ERROR)
+    {
+        *errInfoOnFailure = err;
+        return nullptr;
+    }
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     if (!noc.Alloc(kMaxCHIPDERCertLength))
@@ -424,6 +442,64 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateCommissioningParameters(const c
     // this will wipe out any custom attestationNonce and csrNonce that was being used.
     // however, Android APIs don't allow these to be set to custom values today.
     return mAutoCommissioner.SetCommissioningParameters(params);
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::UpdateDeviceAttestationDelegateBridge(jobject deviceAttestationDelegate,
+                                                                                 chip::Optional<uint16_t> expiryTimeoutSecs,
+                                                                                 bool shouldWaitAfterDeviceAttestation)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    DeviceAttestationDelegateBridge * delegateBridge =
+        new DeviceAttestationDelegateBridge(deviceAttestationDelegate, expiryTimeoutSecs, shouldWaitAfterDeviceAttestation);
+    VerifyOrExit(delegateBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    if (mDeviceAttestationDelegateBridge != nullptr)
+    {
+        delete mDeviceAttestationDelegateBridge;
+    }
+
+    mDeviceAttestationDelegateBridge = delegateBridge;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    DeviceAttestationVerifier * deviceAttestationVerifier     = nullptr;
+    AttestationTrustStoreBridge * attestationTrustStoreBridge = new AttestationTrustStoreBridge(attestationTrustStoreDelegate);
+    VerifyOrExit(attestationTrustStoreBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    deviceAttestationVerifier = new Credentials::DefaultDACVerifier(attestationTrustStoreBridge);
+    VerifyOrExit(deviceAttestationVerifier != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    if (mAttestationTrustStoreBridge != nullptr)
+    {
+        delete mAttestationTrustStoreBridge;
+    }
+    mAttestationTrustStoreBridge = attestationTrustStoreBridge;
+
+    if (mDeviceAttestationVerifier != nullptr)
+    {
+        delete mDeviceAttestationVerifier;
+    }
+    mDeviceAttestationVerifier = deviceAttestationVerifier;
+
+    mController->SetDeviceAttestationVerifier(mDeviceAttestationVerifier);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        if (attestationTrustStoreBridge != nullptr)
+        {
+            delete attestationTrustStoreBridge;
+        }
+    }
+
+    return err;
 }
 
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)

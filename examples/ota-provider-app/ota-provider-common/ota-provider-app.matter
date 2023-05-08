@@ -1,11 +1,17 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
+}
+
 struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
 }
 
+/** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
@@ -18,11 +24,16 @@ server cluster Descriptor = 29 {
   readonly attribute ENDPOINT_NO partsList[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The Access Control Cluster exposes a data model view of a
+      Node's Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node's endpoints and their associated
+      cluster instances. */
 client cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
     kPase = 1;
@@ -44,18 +55,18 @@ client cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
+  struct Target {
+    nullable cluster_id cluster = 0;
+    nullable endpoint_no endpoint = 1;
+    nullable devtype_id deviceType = 2;
+  }
+
   fabric_scoped struct AccessControlEntryStruct {
     fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
-  }
-
-  struct Target {
-    nullable cluster_id cluster = 0;
-    nullable endpoint_no endpoint = 1;
-    nullable devtype_id deviceType = 2;
   }
 
   fabric_scoped struct AccessControlExtensionStruct {
@@ -80,15 +91,22 @@ client cluster AccessControl = 31 {
   }
 
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
-  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
+  attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The Access Control Cluster exposes a data model view of a
+      Node's Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node's endpoints and their associated
+      cluster instances. */
 server cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
     kPase = 1;
@@ -110,18 +128,18 @@ server cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
+  struct Target {
+    nullable cluster_id cluster = 0;
+    nullable endpoint_no endpoint = 1;
+    nullable devtype_id deviceType = 2;
+  }
+
   fabric_scoped struct AccessControlEntryStruct {
     fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
-  }
-
-  struct Target {
-    nullable cluster_id cluster = 0;
-    nullable endpoint_no endpoint = 1;
-    nullable devtype_id deviceType = 2;
   }
 
   fabric_scoped struct AccessControlExtensionStruct {
@@ -150,15 +168,59 @@ server cluster AccessControl = 31 {
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides attributes and events for determining basic information about Nodes, which supports both
+      Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
+      which apply to the whole Node. Also allows setting user device information such as location. */
 server cluster BasicInformation = 40 {
+  enum ColorEnum : ENUM8 {
+    kBlack = 0;
+    kNavy = 1;
+    kGreen = 2;
+    kTeal = 3;
+    kMaroon = 4;
+    kPurple = 5;
+    kOlive = 6;
+    kGray = 7;
+    kBlue = 8;
+    kLime = 9;
+    kAqua = 10;
+    kRed = 11;
+    kFuchsia = 12;
+    kYellow = 13;
+    kWhite = 14;
+    kNickel = 15;
+    kChrome = 16;
+    kBrass = 17;
+    kCopper = 18;
+    kSilver = 19;
+    kGold = 20;
+  }
+
+  enum ProductFinishEnum : ENUM8 {
+    kOther = 0;
+    kMatte = 1;
+    kSatin = 2;
+    kPolished = 3;
+    kRugged = 4;
+    kFabric = 5;
+  }
+
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
+  }
+
+  struct ProductAppearanceStruct {
+    ProductFinishEnum finish = 0;
+    nullable ColorEnum primaryColor = 1;
   }
 
   critical event StartUp = 0 {
@@ -193,13 +255,17 @@ server cluster BasicInformation = 40 {
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
   attribute access(write: manage) boolean localConfigDisabled = 16;
-  readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Provides an interface for providing OTA software updates */
 server cluster OtaSoftwareUpdateProvider = 41 {
   enum OTAApplyUpdateAction : ENUM8 {
     kProceed = 0;
@@ -221,6 +287,10 @@ server cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -266,15 +336,27 @@ server cluster OtaSoftwareUpdateProvider = 41 {
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc */
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 0;
   readonly attribute CHAR_STRING supportedLocales[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
+      or audibly convey time information need a mechanism by which they can be configured to use a
+      user’s preferred format. */
 server cluster TimeFormatLocalization = 44 {
-  enum CalendarType : ENUM8 {
+  enum CalendarTypeEnum : ENUM8 {
     kBuddhist = 0;
     kChinese = 1;
     kCoptic = 2;
@@ -289,18 +371,23 @@ server cluster TimeFormatLocalization = 44 {
     kTaiwanese = 11;
   }
 
-  enum HourFormat : ENUM8 {
+  enum HourFormatEnum : ENUM8 {
     k12hr = 0;
     k24hr = 1;
   }
 
-  attribute HourFormat hourFormat = 0;
-  attribute CalendarType activeCalendarType = 1;
-  readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  attribute HourFormatEnum hourFormat = 0;
+  attribute CalendarTypeEnum activeCalendarType = 1;
+  readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
   enum CommissioningError : ENUM8 {
     kOk = 0;
@@ -326,6 +413,10 @@ server cluster GeneralCommissioning = 48 {
   readonly attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly attribute RegulatoryLocationType locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -360,6 +451,7 @@ server cluster GeneralCommissioning = 48 {
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
+/** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 server cluster NetworkCommissioning = 49 {
   enum NetworkCommissioningStatus : ENUM8 {
     kSuccess = 0;
@@ -404,15 +496,6 @@ server cluster NetworkCommissioning = 49 {
     boolean connected = 1;
   }
 
-  struct WiFiInterfaceScanResult {
-    WiFiSecurity security = 0;
-    octet_string<32> ssid = 1;
-    octet_string<6> bssid = 2;
-    int16u channel = 3;
-    WiFiBand wiFiBand = 4;
-    int8s rssi = 5;
-  }
-
   struct ThreadInterfaceScanResult {
     int16u panId = 0;
     int64u extendedPanId = 1;
@@ -424,6 +507,15 @@ server cluster NetworkCommissioning = 49 {
     int8u lqi = 7;
   }
 
+  struct WiFiInterfaceScanResult {
+    WiFiSecurity security = 0;
+    octet_string<32> ssid = 1;
+    octet_string<6> bssid = 2;
+    int16u channel = 3;
+    WiFiBand wiFiBand = 4;
+    int8s rssi = 5;
+  }
+
   readonly attribute access(read: administer) int8u maxNetworks = 0;
   readonly attribute access(read: administer) NetworkInfo networks[] = 1;
   readonly attribute int8u scanMaxTimeSeconds = 2;
@@ -432,6 +524,10 @@ server cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -494,6 +590,7 @@ server cluster NetworkCommissioning = 49 {
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
 }
 
+/** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
   enum BootReasonEnum : ENUM8 {
     kUnspecified = 0;
@@ -583,6 +680,10 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute RadioFaultEnum activeRadioFaults[] = 6;
   readonly attribute NetworkFaultEnum activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -594,6 +695,7 @@ server cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
+/** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatusEnum : ENUM8 {
     kWindowNotOpen = 0;
@@ -610,6 +712,10 @@ server cluster AdministratorCommissioning = 60 {
   readonly attribute CommissioningWindowStatusEnum windowStatus = 0;
   readonly attribute nullable fabric_idx adminFabricIndex = 1;
   readonly attribute nullable int16u adminVendorId = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -630,6 +736,7 @@ server cluster AdministratorCommissioning = 60 {
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
+/** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 server cluster OperationalCredentials = 62 {
   enum CertificateChainTypeEnum : ENUM8 {
     kDACCertificate = 1;
@@ -649,12 +756,6 @@ server cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
-  fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -664,12 +765,22 @@ server cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_scoped struct NOCStruct {
+    fabric_sensitive octet_string noc = 1;
+    nullable fabric_sensitive octet_string icac = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -741,16 +852,11 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
 
+/** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 server cluster GroupKeyManagement = 63 {
-  enum GroupKeySecurityPolicy : ENUM8 {
+  enum GroupKeySecurityPolicyEnum : ENUM8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
-  }
-
-  fabric_scoped struct GroupKeyMapStruct {
-    group_id groupId = 1;
-    int16u groupKeySetID = 2;
-    fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct GroupInfoMapStruct {
@@ -760,9 +866,15 @@ server cluster GroupKeyManagement = 63 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_scoped struct GroupKeyMapStruct {
+    group_id groupId = 1;
+    int16u groupKeySetID = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
   struct GroupKeySetStruct {
     int16u groupKeySetID = 0;
-    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    GroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
     nullable octet_string<16> epochKey0 = 2;
     nullable epoch_us epochStartTime0 = 3;
     nullable octet_string<16> epochKey1 = 4;
@@ -775,6 +887,10 @@ server cluster GroupKeyManagement = 63 {
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -808,14 +924,35 @@ server cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
+/** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
+labels. */
 server cluster FixedLabel = 64 {
+  struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+  }
+
   readonly attribute LabelStruct labelList[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 server cluster UserLabel = 65 {
+  struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+  }
+
   attribute access(write: manage) LabelStruct labelList[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -832,22 +969,27 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster AccessControl {
+    emits event AccessControlEntryChanged;
+    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute extension;
     callback attribute subjectsPerAccessControlEntry default = 4;
     callback attribute targetsPerAccessControlEntry default = 3;
-    callback attribute accessControlEntriesPerFabric default = 3;
+    callback attribute accessControlEntriesPerFabric default = 4;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster BasicInformation {
+    emits event StartUp;
+    emits event ShutDown;
+    emits event Leave;
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -855,50 +997,49 @@ endpoint 0 {
     callback attribute productID;
     persist  attribute nodeLabel;
     callback attribute location default = "XX";
-    callback attribute hardwareVersion;
+    callback attribute hardwareVersion default = 0;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
+    callback attribute softwareVersion default = 0;
     callback attribute softwareVersionString;
     callback attribute manufacturingDate default = "20210614123456ZZ";
     callback attribute partNumber;
     callback attribute productURL;
     callback attribute productLabel;
     callback attribute serialNumber;
-    persist  attribute localConfigDisabled;
-    ram      attribute reachable default = 1;
+    persist  attribute localConfigDisabled default = 0;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster OtaSoftwareUpdateProvider {
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster LocalizationConfiguration {
     persist  attribute activeLocale default = "en-US";
-    callback attribute supportedLocales;
-    ram      attribute featureMap;
+    callback attribute supportedLocales default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster TimeFormatLocalization {
-    persist  attribute hourFormat;
-    persist  attribute activeCalendarType;
+    persist  attribute hourFormat default = 0;
+    persist  attribute activeCalendarType default = 0;
     callback attribute supportedCalendarTypes;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralCommissioning {
-    ram      attribute breadcrumb;
+    ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig;
-    callback attribute locationCapability;
+    callback attribute regulatoryConfig default = 0;
+    callback attribute locationCapability default = 0;
     callback attribute supportsConcurrentConnection default = 1;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -916,16 +1057,17 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
+    emits event BootReason;
     callback attribute networkInterfaces;
-    callback attribute rebootCount;
-    callback attribute upTime;
-    callback attribute totalOperationalHours;
+    callback attribute rebootCount default = 0x0000;
+    callback attribute upTime default = 0x0000000000000000;
+    callback attribute totalOperationalHours default = 0x00000000;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
-    callback attribute testEventTriggersEnabled;
-    ram      attribute featureMap;
+    callback attribute testEventTriggersEnabled default = false;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -933,7 +1075,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -944,7 +1086,7 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -953,19 +1095,19 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster UserLabel {
     callback attribute labelList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 }

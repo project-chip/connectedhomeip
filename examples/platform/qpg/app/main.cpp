@@ -37,6 +37,7 @@
 
 // Qorvo CHIP library
 #include "qvCHIP.h"
+#include "qvIO.h"
 
 // CHIP includes
 #include <lib/support/CHIPMem.h>
@@ -81,7 +82,7 @@ constexpr int extDiscTimeoutSecs             = 20;
 CHIP_ERROR CHIP_Init(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+void InitOTARequestorHandler(void)
 {
     InitializeOTARequestor();
 }
@@ -94,6 +95,10 @@ void Application_Init(void)
 #if defined(GP_APP_DIVERSITY_CLEARBOX_TESTING_HOOK_APPLICATION_INIT)
     GP_CLEARBOX_TESTING_APPLICATION_INIT_HOOK;
 #endif
+
+    /* Initialize IO */
+    qvIO_Init();
+
 #if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
     gpAppFramework_Reset_Init();
 #endif
@@ -130,13 +135,9 @@ void ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* arg */)
 {
     switch (aEvent->Type)
     {
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdInitialized:
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        if (aEvent->ThreadConnectivityChange.Result == kConnectivity_Established)
-        {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
-                                                        InitOTARequestorHandler, nullptr);
-        }
+        InitOTARequestorHandler();
 #endif
         break;
     default:
@@ -190,10 +191,18 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 
-#if CHIP_DEVICE_CONFIG_THREAD_FTD
+#if CONFIG_CHIP_THREAD_SSED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
+    qvIO_EnableSleep(true);
+#elif CHIP_DEVICE_CONFIG_ENABLE_SED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+    qvIO_EnableSleep(true);
+#elif CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    qvIO_EnableSleep(false);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+    qvIO_EnableSleep(false);
 #endif
     if (ret != CHIP_NO_ERROR)
     {

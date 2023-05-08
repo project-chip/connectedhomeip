@@ -700,6 +700,19 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
     }
 
     {
+        char productName[ConfigurationManager::kMaxProductNameLength + 1];
+        err = deviceInstanceInfoProvider->GetProductName(productName, sizeof(productName));
+        if (CHIP_NO_ERROR == err)
+        {
+            ChipLogProgress(DeviceLayer, "  Product Name: %s", productName);
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "  Product Name: n/a (%" CHIP_ERROR_FORMAT ")", err.Format());
+        }
+    }
+
+    {
         uint16_t hardwareVer;
         if (deviceInstanceInfoProvider->GetHardwareVersion(hardwareVer) != CHIP_NO_ERROR)
         {

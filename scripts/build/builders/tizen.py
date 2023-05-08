@@ -20,9 +20,15 @@ from xml.etree import ElementTree as ET
 
 from .gn import GnBuilder
 
+Board = namedtuple('Board', ['target_cpu'])
 App = namedtuple('App', ['name', 'source', 'outputs'])
 Tool = namedtuple('Tool', ['name', 'source', 'outputs'])
-Board = namedtuple('Board', ['target_cpu'])
+TestDriver = namedtuple('TestDriver', ['name', 'source'])
+
+
+class TizenBoard(Enum):
+
+    ARM = Board('arm')
 
 
 class TizenApp(Enum):
@@ -49,10 +55,18 @@ class TizenApp(Enum):
         ('chip-tool',
          'chip-tool.map'))
 
+    TESTS = TestDriver(
+        'tests',
+        'src/test_driver/tizen')
+
     @property
     def is_tpk(self):
         """If True, this app is a TPK."""
         return isinstance(self.value, App)
+
+    @property
+    def package(self):
+        return f'{self.package_name}-{self.package_version}.tpk'
 
     @property
     def package_name(self):
@@ -66,11 +80,6 @@ class TizenApp(Enum):
         self.manifest = ET.parse(manifest).getroot()
 
 
-class TizenBoard(Enum):
-
-    ARM = Board('arm')
-
-
 class TizenBuilder(GnBuilder):
 
     def __init__(self,
@@ -79,6 +88,7 @@ class TizenBuilder(GnBuilder):
                  app: TizenApp = TizenApp.LIGHT,
                  board: TizenBoard = TizenBoard.ARM,
                  enable_ble: bool = True,
+                 enable_thread: bool = True,
                  enable_wifi: bool = True,
                  use_asan: bool = False,
                  use_tsan: bool = False,
@@ -105,6 +115,8 @@ class TizenBuilder(GnBuilder):
 
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
+        if not enable_thread:
+            self.extra_gn_options.append('chip_enable_openthread=false')
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
         if use_asan:
@@ -143,7 +155,8 @@ class TizenBuilder(GnBuilder):
     def flashbundle(self):
         if not self.app.is_tpk:
             return {}
-        tpk = f'{self.app.package_name}-{self.app.package_version}.tpk'
         return {
-            tpk: os.path.join(self.output_dir, 'package', 'out', tpk),
+            self.app.package: os.path.join(self.output_dir,
+                                           self.app.package_name, 'out',
+                                           self.app.package),
         }

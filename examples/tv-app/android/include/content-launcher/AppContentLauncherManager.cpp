@@ -18,6 +18,7 @@
 
 #include "AppContentLauncherManager.h"
 #include "../../java/ContentAppAttributeDelegate.h"
+#include <app/util/config.h>
 #include <json/json.h>
 
 using namespace std;

@@ -584,7 +584,7 @@ void Engine::Run(System::Layer * aSystemLayer, void * apAppState)
 
 CHIP_ERROR Engine::ScheduleRun()
 {
-    if (mRunScheduled)
+    if (IsRunScheduled())
     {
         return CHIP_NO_ERROR;
     }

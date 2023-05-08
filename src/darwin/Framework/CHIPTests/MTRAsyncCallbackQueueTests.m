@@ -46,6 +46,12 @@
     };
     [workQueue enqueueWorkItem:workItem1];
 
+    // Check for leaks.
+    MTRAsyncCallbackQueueWorkItem * __weak weakItem = workItem1;
+    [self addTeardownBlock:^() {
+        XCTAssertNil(weakItem);
+    }];
+
     [self waitForExpectationsWithTimeout:5 handler:nil];
 
     // see that it only ran once
@@ -168,6 +174,86 @@
     [workQueue enqueueWorkItem:workItem2];
 
     [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
+- (void)testRunItemNoHandlers
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Work item called"];
+
+    MTRAsyncCallbackWorkQueue * workQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:nil queue:dispatch_get_main_queue()];
+
+    MTRAsyncCallbackQueueWorkItem * workItem1 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackQueueWorkItem * workItem2 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+
+    __block int counter = 0;
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        counter++;
+        [workItem2 endWork];
+        [expectation fulfill];
+    };
+    workItem2.readyHandler = readyHandler;
+    workItem2.cancelHandler = ^{
+    };
+
+    // Check that trying to run workItem1 does not crash.
+    [workQueue enqueueWorkItem:workItem1];
+    [workQueue enqueueWorkItem:workItem2];
+
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+
+    // see that it only ran once
+    XCTAssertEqual(counter, 1);
+}
+
+- (void)testInvalidation
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Work item called"];
+    XCTestExpectation * cancelExpectation = [self expectationWithDescription:@"Work item canceled"];
+
+    MTRAsyncCallbackWorkQueue * workQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:nil queue:dispatch_get_main_queue()];
+
+    MTRAsyncCallbackQueueWorkItem * workItem1 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler1 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        // Give the code enqueing the other items a chance to run, so they can
+        // actually get canceled.
+        sleep(1);
+        [workQueue invalidate];
+        [workItem1 endWork];
+        [expectation fulfill];
+    };
+    workItem1.readyHandler = readyHandler1;
+    // No cancel handler on purpose.
+    [workQueue enqueueWorkItem:workItem1];
+
+    MTRAsyncCallbackQueueWorkItem * workItem2 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler2 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        // This should never get called.
+        XCTAssertFalse(YES);
+        [workItem2 endWork];
+    };
+    workItem2.readyHandler = readyHandler2;
+    // No cancel handler on purpose.
+    [workQueue enqueueWorkItem:workItem2];
+
+    MTRAsyncCallbackQueueWorkItem * workItem3 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler3 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        // This should never get called.
+        XCTAssertFalse(YES);
+        [workItem3 endWork];
+    };
+    dispatch_block_t cancelHandler3 = ^() {
+        [cancelExpectation fulfill];
+    };
+    workItem3.readyHandler = readyHandler3;
+    workItem3.cancelHandler = cancelHandler3;
+    [workQueue enqueueWorkItem:workItem3];
+
+    [self waitForExpectations:@[ expectation, cancelExpectation ] timeout:5];
 }
 
 @end

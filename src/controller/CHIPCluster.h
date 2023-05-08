@@ -50,7 +50,7 @@ template <typename T>
 using ReadResponseSuccessCallback     = void (*)(void * context, T responseData);
 using ReadResponseFailureCallback     = void (*)(void * context, CHIP_ERROR err);
 using ReadDoneCallback                = void (*)(void * context);
-using SubscriptionEstablishedCallback = void (*)(void * context);
+using SubscriptionEstablishedCallback = void (*)(void * context, SubscriptionId subscriptionId);
 using ResubscriptionAttemptCallback   = void (*)(void * context, CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec);
 using SubscriptionOnDoneCallback      = std::function<void(void)>;
 
@@ -298,10 +298,11 @@ public:
             }
         };
 
-        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient) {
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient,
+                                                                                SubscriptionId subscriptionId) {
             if (subscriptionEstablishedCb != nullptr)
             {
-                subscriptionEstablishedCb(context);
+                subscriptionEstablishedCb(context, subscriptionId);
             }
         };
 
@@ -377,10 +378,11 @@ public:
             }
         };
 
-        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient) {
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient,
+                                                                                SubscriptionId subscriptionId) {
             if (subscriptionEstablishedCb != nullptr)
             {
-                subscriptionEstablishedCb(context);
+                subscriptionEstablishedCb(context, subscriptionId);
             }
         };
 

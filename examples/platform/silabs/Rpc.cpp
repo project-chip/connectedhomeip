@@ -82,7 +82,7 @@ class Efr32Button final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
-        AppTask::GetAppTask().ButtonEventHandler(SL_SIMPLE_BUTTON_INSTANCE(request.idx) /* PB 0 or PB 1 */, request.pushed);
+        AppTask::GetAppTask().ButtonEventHandler(request.idx /* PB 0 or PB 1 */, request.pushed);
         return pw::OkStatus();
     }
 };
@@ -95,7 +95,7 @@ public:
     pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
         mRebootTimer = xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
-        xTimerStart(mRebootTimer, 0);
+        xTimerStart(mRebootTimer, pdMS_TO_TICKS(0));
         return pw::OkStatus();
     }
 

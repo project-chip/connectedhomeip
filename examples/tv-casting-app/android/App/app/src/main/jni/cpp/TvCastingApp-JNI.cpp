@@ -105,11 +105,11 @@ exit:
 
 JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
-    if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
-    {
-        JNIDACProvider * p = new JNIDACProvider(provider);
-        chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
-    }
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "JNI_METHOD setDACProvider called");
+
+    JNIDACProvider * p = new JNIDACProvider(provider);
+    chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
 }
 
 JNI_METHOD(jboolean, openBasicCommissioningWindow)
@@ -209,7 +209,7 @@ JNI_METHOD(jboolean, verifyOrEstablishConnection)
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getOnConnectionFailureHandler(true).Handle(err); },
         [](TargetEndpointInfo * endpoint) { TvCastingAppJNIMgr().getOnNewOrUpdatedEndpointHandler(true).Handle(endpoint); });
     VerifyOrExit(CHIP_NO_ERROR == err,
-                 ChipLogError(AppServer, "CastingServer::OpenBasicCommissioningWindow failed: %" CHIP_ERROR_FORMAT, err.Format()));
+                 ChipLogError(AppServer, "CastingServer::verifyOrEstablishConnection failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
 exit:
     return (err == CHIP_NO_ERROR);
@@ -298,6 +298,20 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "TVCastingApp-JNI::sendCommissioningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+    return true;
+}
+
+JNI_METHOD(jboolean, purgeCache)(JNIEnv * env, jobject)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "JNI_METHOD purgeCache called");
+
+    CHIP_ERROR err = CastingServer::GetInstance()->PurgeCache();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "TVCastingApp-JNI::purgeCache failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
     return true;
@@ -477,7 +491,7 @@ JNI_METHOD(jboolean, contentLauncher_1subscribeToSupportedStreamingProtocols)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ContentLauncher_SupportedStreamingProtocols).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) {
+        [](void * context, chip::SubscriptionId) {
             TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(ContentLauncher_SupportedStreamingProtocols).Handle();
         });
 
@@ -584,7 +598,9 @@ JNI_METHOD(jboolean, levelControl_1subscribeToCurrentLevel)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(LevelControl_CurrentLevel).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(LevelControl_CurrentLevel).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(LevelControl_CurrentLevel).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -628,7 +644,9 @@ JNI_METHOD(jboolean, levelControl_1subscribeToMinLevel)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(LevelControl_MinLevel).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(LevelControl_MinLevel).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(LevelControl_MinLevel).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -672,7 +690,9 @@ JNI_METHOD(jboolean, levelControl_1subscribeToMaxLevel)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(LevelControl_MaxLevel).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(LevelControl_MaxLevel).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(LevelControl_MaxLevel).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -944,6 +964,80 @@ exit:
     return (err == CHIP_NO_ERROR);
 }
 
+JNI_METHOD(jboolean, mediaPlayback_1previous)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
+{
+    return TvCastingAppJNIMgr().runCastingServerCommand(
+        env, contentApp, jResponseHandler, "MediaPlayback_Previous", MediaPlayback_Previous,
+        [](TargetEndpointInfo endpoint) -> CHIP_ERROR {
+            return CastingServer::GetInstance()->MediaPlayback_Previous(&endpoint, [](CHIP_ERROR err) {
+                TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Previous).Handle(err);
+            });
+        });
+}
+
+JNI_METHOD(jboolean, mediaPlayback_1rewind)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
+{
+    return TvCastingAppJNIMgr().runCastingServerCommand(
+        env, contentApp, jResponseHandler, "MediaPlayback_Rewind", MediaPlayback_Rewind,
+        [](TargetEndpointInfo endpoint) -> CHIP_ERROR {
+            return CastingServer::GetInstance()->MediaPlayback_Rewind(&endpoint, [](CHIP_ERROR err) {
+                TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_Rewind).Handle(err);
+            });
+        });
+}
+
+JNI_METHOD(jboolean, mediaPlayback_1fastForward)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
+{
+    return TvCastingAppJNIMgr().runCastingServerCommand(
+        env, contentApp, jResponseHandler, "MediaPlayback_FastForward", MediaPlayback_FastForward,
+        [](TargetEndpointInfo endpoint) -> CHIP_ERROR {
+            return CastingServer::GetInstance()->MediaPlayback_FastForward(&endpoint, [](CHIP_ERROR err) {
+                TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_FastForward).Handle(err);
+            });
+        });
+}
+
+JNI_METHOD(jboolean, mediaPlayback_1startOver)
+(JNIEnv * env, jobject, jobject contentApp, jobject jResponseHandler)
+{
+    return TvCastingAppJNIMgr().runCastingServerCommand(
+        env, contentApp, jResponseHandler, "MediaPlayback_StartOver", MediaPlayback_StartOver,
+        [](TargetEndpointInfo endpoint) -> CHIP_ERROR {
+            return CastingServer::GetInstance()->MediaPlayback_StartOver(&endpoint, [](CHIP_ERROR err) {
+                TvCastingAppJNIMgr().getMediaCommandResponseHandler(MediaPlayback_StartOver).Handle(err);
+            });
+        });
+}
+
+jboolean TvCastingAppJNI::runCastingServerCommand(JNIEnv * env, jobject contentApp, jobject jResponseHandler,
+                                                  const char * commandName, MediaCommandName command,
+                                                  const std::function<CHIP_ERROR(TargetEndpointInfo)> & commandRunner)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    ChipLogProgress(AppServer, "JNI_METHOD %s called", commandName);
+
+    TargetEndpointInfo endpoint;
+    CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Conversion from jobject contentApp to TargetEndpointInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+
+    err = TvCastingAppJNIMgr().getMediaCommandResponseHandler(command).SetUp(env, jResponseHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = commandRunner(endpoint);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "CastingServer.%s failed %" CHIP_ERROR_FORMAT, commandName, err.Format()));
+
+exit:
+    return (err == CHIP_NO_ERROR);
+}
+
 JNI_METHOD(jboolean, mediaPlayback_1subscribeToCurrentState)
 (JNIEnv * env, jobject, jobject contentApp, jobject jReadSuccessHandler, jobject jReadFailureHandler, jint minInterval,
  jint maxInterval, jobject jSubscriptionEstablishedHandler)
@@ -980,7 +1074,9 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToCurrentState)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_CurrentState).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_CurrentState).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_CurrentState).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1025,7 +1121,9 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToDuration)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_Duration).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_Duration).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_Duration).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1072,7 +1170,9 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToSampledPosition)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_SampledPosition).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_SampledPosition).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_SampledPosition).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1118,7 +1218,9 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToPlaybackSpeed)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_PlaybackSpeed).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_PlaybackSpeed).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_PlaybackSpeed).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1164,7 +1266,9 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToSeekRangeEnd)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_SeekRangeEnd).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_SeekRangeEnd).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_SeekRangeEnd).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1211,7 +1315,9 @@ JNI_METHOD(jboolean, mediaPlayback_1subscribeToSeekRangeStart)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(MediaPlayback_SeekRangeStart).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_SeekRangeStart).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(MediaPlayback_SeekRangeStart).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1393,7 +1499,9 @@ JNI_METHOD(jboolean, targetNavigator_1subscribeToCurrentTarget)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(TargetNavigator_CurrentTarget).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(TargetNavigator_CurrentTarget).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(TargetNavigator_CurrentTarget).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1439,7 +1547,9 @@ JNI_METHOD(jboolean, targetNavigator_1subscribeToTargetList)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(TargetNavigator_TargetList).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(TargetNavigator_TargetList).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(TargetNavigator_TargetList).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1513,7 +1623,9 @@ JNI_METHOD(jboolean, applicationBasic_1subscribeToVendorName)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ApplicationBasic_VendorName).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(ApplicationBasic_VendorName).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(ApplicationBasic_VendorName).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1559,7 +1671,9 @@ JNI_METHOD(jboolean, applicationBasic_1subscribeToVendorID)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ApplicationBasic_VendorID).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(ApplicationBasic_VendorID).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(ApplicationBasic_VendorID).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1606,7 +1720,9 @@ JNI_METHOD(jboolean, applicationBasic_1subscribeToApplicationName)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ApplicationBasic_ApplicationName).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(ApplicationBasic_ApplicationName).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(ApplicationBasic_ApplicationName).Handle();
+        });
 
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.applicationBasic_subscribeToApplicationName failed %" CHIP_ERROR_FORMAT,
@@ -1652,7 +1768,9 @@ JNI_METHOD(jboolean, applicationBasic_1subscribeToProductID)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ApplicationBasic_ProductID).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) { TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(ApplicationBasic_ProductID).Handle(); });
+        [](void * context, chip::SubscriptionId) {
+            TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(ApplicationBasic_ProductID).Handle();
+        });
 
     VerifyOrExit(
         CHIP_NO_ERROR == err,
@@ -1700,7 +1818,7 @@ JNI_METHOD(jboolean, applicationBasic_1subscribeToApplicationVersion)
             TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ApplicationBasic_ApplicationVersion).Handle(err);
         },
         static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-        [](void * context) {
+        [](void * context, chip::SubscriptionId) {
             TvCastingAppJNIMgr().getSubscriptionEstablishedHandler(ApplicationBasic_ApplicationVersion).Handle();
         });
 

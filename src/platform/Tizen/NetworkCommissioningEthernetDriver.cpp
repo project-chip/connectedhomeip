@@ -61,7 +61,8 @@ bool TizenEthernetDriver::EthernetNetworkIterator::Next(Network & item)
     VerifyOrReturnValue(mInterfacesIdx < mInterfaces.size(), false);
 
     const auto & iface = mInterfaces[mInterfacesIdx++];
-    item.networkIDLen  = std::min(iface.size(), kMaxNetworkIDLen);
+    static_assert(kMaxNetworkIDLen <= UINT8_MAX, "Our length won't fit in networkIDLen");
+    item.networkIDLen = static_cast<uint8_t>(std::min(iface.size(), kMaxNetworkIDLen));
     memcpy(item.networkID, iface.c_str(), item.networkIDLen);
     item.connected = true;
 

@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -202,7 +202,7 @@ CHIP_ERROR MTRStartSubscribeInteraction(BridgeType * _Nonnull bridge, MTRSubscri
     VerifyOrReturnError(readClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err;
-    if (params.resubscribeIfLost) {
+    if (params.resubscribeAutomatically) {
         readPaths.release();
 
         err = readClient->SendAutoResubscribeRequest(std::move(readPrepareParams));
@@ -368,7 +368,19 @@ protected:
         mOnError(mBridge, error);
     }
 
-    void OnDone(chip::app::CommandSender * commandSender) override { chip::Platform::Delete(this); }
+    void OnDone(chip::app::CommandSender * commandSender) override
+    {
+        if (!mCalledCallback) {
+            // This can happen if the server sends a response with an empty
+            // InvokeResponses list.  Since we are not sending wildcard command
+            // paths, that's not a valid response and we should treat it as an
+            // error.  Use the error we would have gotten if we in fact expected
+            // a nonempty list.
+            OnError(commandSender, CHIP_END_OF_TLV);
+        }
+
+        chip::Platform::Delete(this);
+    }
 
     InvokeBridgeType * _Nonnull mBridge;
 

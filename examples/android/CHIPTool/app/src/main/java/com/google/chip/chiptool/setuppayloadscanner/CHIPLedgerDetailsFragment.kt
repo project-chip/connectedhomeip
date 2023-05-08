@@ -30,79 +30,81 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.databinding.ChipLedgerInfoFragmentBinding
 import com.google.chip.chiptool.util.FragmentUtil
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.chip_ledger_info_fragment.view.vendorIdTv
-import kotlinx.android.synthetic.main.chip_ledger_info_fragment.view.productIdTv
-import kotlinx.android.synthetic.main.chip_ledger_info_fragment.view.commissioningFlowUrlTv
-import kotlinx.android.synthetic.main.chip_ledger_info_fragment.view.redirectBtn
 
 /** Show the [CHIPDeviceInfo] from Ledger */
 class CHIPLedgerDetailsFragment : Fragment() {
-
   private lateinit var deviceInfo: CHIPDeviceInfo
+  private var _binding: ChipLedgerInfoFragmentBinding? = null
+  private val binding get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-
+    _binding = ChipLedgerInfoFragmentBinding.inflate(inflater, container, false)
     deviceInfo = checkNotNull(requireArguments().getParcelable(ARG_DEVICE_INFO))
     val queue = Volley.newRequestQueue(context)
-    return inflater.inflate(R.layout.chip_ledger_info_fragment, container, false).apply {
+    // VID / PID
+    binding.vendorIdTv.text = "${deviceInfo.vendorId}"
+    binding.productIdTv.text = "${deviceInfo.productId}"
 
-      // VID / PID
-      vendorIdTv.text = "${deviceInfo.vendorId}"
-      productIdTv.text = "${deviceInfo.productId}"
+    // Ledger api url
+    val url = Uri.parse(context!!.getString(R.string.dcl_api_root_url))
+      .buildUpon()
+      .appendPath("${deviceInfo.vendorId}")
+      .appendPath("${deviceInfo.productId}")
+      .build().toString()
+    Log.d(TAG, "Dcl request Url: $url")
 
-      // Ledger api url
-      val url = Uri.parse(context.getString(R.string.dcl_api_root_url))
-        .buildUpon()
-        .appendPath("${deviceInfo.vendorId}")
-        .appendPath("${deviceInfo.productId}")
-        .build().toString()
-      Log.d(TAG, "Dcl request Url: $url")
+    // Ledger API call
+    val jsonObjectRequest = JsonObjectRequest(
+      Request.Method.GET, url, null,
+      { response ->
+        Log.d(TAG, "Response from dcl $response")
 
-      // Ledger API call
-      val jsonObjectRequest = JsonObjectRequest(
-        Request.Method.GET, url, null,
-        { response ->
-          Log.d(TAG, "Response from dcl $response")
+        // parse redirect Url
+        val responseJson = response.getJSONObject(context!!.getString(R.string.dcl_response_key))
+        val redirectUrl = responseJson.getString(context!!.getString(R.string.dcl_custom_flow_url_key))
+        Log.d(TAG, "Redirect Url from Ledger: $redirectUrl")
+        binding.commissioningFlowUrlTv.text = redirectUrl
 
-          // parse redirect Url
-          val responseJson = response.getJSONObject(context.getString(R.string.dcl_response_key))
-          val redirectUrl = responseJson.getString(context.getString(R.string.dcl_custom_flow_url_key))
-          Log.d(TAG, "Redirect Url from Ledger: $redirectUrl")
-          commissioningFlowUrlTv.text = redirectUrl
+        // generate redirect payload
+        val gson = Gson()
+        val payloadJson = gson.toJson(deviceInfo)
+        val payloadBase64 = Base64.encodeToString(payloadJson.toByteArray(), Base64.DEFAULT)
+        val redirectUrlWithPayload= Uri.parse(redirectUrl)
+          .buildUpon()
+          .appendQueryParameter("payload", payloadBase64)
+          .appendQueryParameter("returnUrl", context!!.getString(R.string.custom_flow_return_url))
+          .build()
+          .toString()
 
-          // generate redirect payload
-          val gson = Gson()
-          val payloadJson = gson.toJson(deviceInfo)
-          val payloadBase64 = Base64.encodeToString(payloadJson.toByteArray(), Base64.DEFAULT)
-          val redirectUrlWithPayload= Uri.parse(redirectUrl)
-              .buildUpon()
-              .appendQueryParameter("payload", payloadBase64)
-              .appendQueryParameter("returnUrl", context.getString(R.string.custom_flow_return_url))
-              .build()
-              .toString()
-
-          Log.d(TAG, "Redirect Url with Payload: $redirectUrlWithPayload")
-          redirectBtn.setOnClickListener {
-            FragmentUtil.getHost(this@CHIPLedgerDetailsFragment, Callback::class.java)
-              ?.handleCustomFlowRedirectClicked(redirectUrlWithPayload)
-          }
-
-          // enable redirect button
-          redirectBtn.visibility = View.VISIBLE
-        },
-        { error ->
-          Log.e(TAG, "Dcl request failed: $error")
-          commissioningFlowUrlTv.text = context.getString(R.string.chip_ledger_info_commissioning_flow_url_not_available)
+        Log.d(TAG, "Redirect Url with Payload: $redirectUrlWithPayload")
+        binding.redirectBtn.setOnClickListener {
+          FragmentUtil.getHost(this@CHIPLedgerDetailsFragment, Callback::class.java)
+            ?.handleCustomFlowRedirectClicked(redirectUrlWithPayload)
         }
-      )
-      queue.add(jsonObjectRequest)
-    }
+
+        // enable redirect button
+        binding.redirectBtn.visibility = View.VISIBLE
+      },
+      { error ->
+        Log.e(TAG, "Dcl request failed: $error")
+        binding.commissioningFlowUrlTv.text = context!!.getString(R.string.chip_ledger_info_commissioning_flow_url_not_available)
+      }
+    )
+    queue.add(jsonObjectRequest)
+
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   /** Interface for notifying the host. */

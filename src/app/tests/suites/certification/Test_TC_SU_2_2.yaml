@@ -28,14 +28,15 @@ config:
 tests:
     - label:
           "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable.
-          Set ImageURI to the location where the image is located."
+          QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable' Set ImageURI to the location where the image is
+          located."
       verification: |
           Run the OTA Provider App using the command:
 
           ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q updateAvailable
 
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -47,14 +48,14 @@ tests:
 
     - label:
           "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to Busy,
+          QueryImageResponse back to DUT. QueryStatus is set to 'Busy',
           DelayedActionTime is set to 60 seconds."
       verification: |
           Run the OTA Provider App using the command:
 
           ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q busy -t 60
 
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -63,14 +64,14 @@ tests:
 
     - label:
           "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to NotAvailable."
+          QueryImageResponse back to DUT. QueryStatus is set to 'NotAvailable'."
       verification: |
           Run the OTA Provider App using the command:
 
 
           ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q updateNotAvailable -t 60
 
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -78,17 +79,17 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends a QueryImage command to the TH/OTA-P.+ TH/OTA-P sends a
+          "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
           QueryImageResponse back to DUT. QueryStatus is set to Busy, Set
-          DelayedActionTime to 3 minutes. . On the subsequent QueryImage
-          command, TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus
-          is set to UpdateAvailable."
+          DelayedActionTime to 3 minutes. On the subsequent QueryImage command,
+          TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable'."
       verification: |
           Run the OTA Provider App using the command:
 
           ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q busy -t 180
 
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -98,9 +99,9 @@ tests:
 
     - label:
           "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable,
-          ImageURI should have the https url from where the image can be
-          downloaded."
+          QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable', ImageURI should have the https url from where the
+          image can be downloaded."
       PICS: MCORE.OTA.HTTPS
       verification: |
           Out of scope for V1.0
@@ -108,9 +109,9 @@ tests:
 
     - label:
           "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable,
-          Software Version should be set to the same or an older (numerically
-          lower) version."
+          QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable', Software Version should be set to the same or an
+          older (numerically lower) version."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -118,7 +119,7 @@ tests:
 
           Software Version of the SW_IMAGE_FILE used in above command should be the same or an older (numerically lower) version than the DUT.
 
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -127,14 +128,14 @@ tests:
 
     - label:
           "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to UpdateAvailable,
-          ImageURI field contains an invalid BDX ImageURI."
+          QueryImageResponse back to DUT. QueryStatus is set to
+          'UpdateAvailable', ImageURI field contains an invalid BDX ImageURI."
       verification: |
           Run the OTA Provider App using the command:
 
           ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -i bdx://0000000000000001
 
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 

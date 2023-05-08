@@ -20,14 +20,6 @@
 // Prevent multiple inclusion
 #pragma once
 
-// User options for plugin Binding Table Library
-#define EMBER_BINDING_TABLE_SIZE 10
-
-/**** Network Section ****/
-#define EMBER_SUPPORTED_NETWORKS (1)
-
-#define EMBER_APS_UNICAST_MESSAGE_COUNT 10
-
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_IDENTIFY_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUPS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -93,7 +85,6 @@
 #define EMBER_AF_APPLICATION_BASIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ACCOUNT_LOGIN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ELECTRICAL_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define EMBER_AF_CLIENT_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_UNIT_TESTING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
@@ -353,10 +344,6 @@
 // Use this macro to check if the client side of the Electrical Measurement cluster is included
 #define ZCL_USING_ELECTRICAL_MEASUREMENT_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ELECTRICAL_MEASUREMENT_CLIENT
-
-// Use this macro to check if the client side of the Client Monitoring cluster is included
-#define ZCL_USING_CLIENT_MONITORING_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_CLIENT_MONITORING_CLIENT
 
 // Use this macro to check if the client side of the Unit Testing cluster is included
 #define ZCL_USING_UNIT_TESTING_CLUSTER_CLIENT

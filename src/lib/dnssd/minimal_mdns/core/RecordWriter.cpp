@@ -135,7 +135,7 @@ void RecordWriter::RememberWrittenQnameOffset(size_t offset)
     {
         if (previousName == kInvalidOffset)
         {
-            previousName = offset;
+            previousName = static_cast<unsigned short>(offset);
             return;
         }
     }

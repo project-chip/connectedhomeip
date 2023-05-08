@@ -3446,7 +3446,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _requestedProtocol = @(0);
 
-        _transferFileDesignator = [NSData data];
+        _transferFileDesignator = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -3469,8 +3469,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: intent:%@; requestedProtocol:%@; transferFileDesignator:%@; >",
-                                             NSStringFromClass([self class]), _intent, _requestedProtocol,
-                                             [_transferFileDesignator base64EncodedStringWithOptions:0]];
+                                             NSStringFromClass([self class]), _intent, _requestedProtocol, _transferFileDesignator];
     return descriptionString;
 }
 
@@ -3484,9 +3483,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _logContent = [NSData data];
 
-        _utcTimeStamp = @(0);
+        _utcTimeStamp = nil;
 
-        _timeSinceBoot = @(0);
+        _timeSinceBoot = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -3527,12 +3526,12 @@ NS_ASSUME_NONNULL_BEGIN
     return self.logContent;
 }
 
-- (void)setTimeStamp:(NSNumber * _Nonnull)timeStamp
+- (void)setTimeStamp:(NSNumber * _Nullable)timeStamp
 {
     self.utcTimeStamp = timeStamp;
 }
 
-- (NSNumber * _Nonnull)timeStamp
+- (NSNumber * _Nullable)timeStamp
 {
     return self.utcTimeStamp;
 }

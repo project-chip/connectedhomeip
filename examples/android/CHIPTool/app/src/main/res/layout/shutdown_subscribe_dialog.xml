@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+  <TextView
+      android:id="@+id/titleText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/shutdown_dialog_title_text"
+      android:textSize="22sp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <TextView
+      android:id="@+id/titleFabricIndex"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/shutdown_dialog_fabric_index_hint"
+      android:textSize="16sp"
+      android:layout_marginTop="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/titleText"
+      />
+
+  <TextView
+      android:id="@+id/fabricIndexValue"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:textSize="16sp"
+      android:layout_marginTop="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/titleFabricIndex"
+      />
+
+  <TextView
+      android:id="@+id/titleSubscriptionId"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/shutdown_dialog_subscription_id_hint"
+      android:textSize="16sp"
+      android:layout_marginTop="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/fabricIndexValue"
+      />
+  <Spinner
+      android:id="@+id/subscribeIdSp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/shutdown_dialog_subscription_id_hint"
+      android:inputType="text"
+      android:spinnerMode="dropdown"
+      android:textSize="16sp"
+      android:layout_marginTop="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintBottom_toTopOf="@+id/shutdownBtn"
+      app:layout_constraintTop_toBottomOf="@id/titleSubscriptionId" />
+
+  <Button
+      android:id="@+id/shutdownBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:enabled="false"
+      android:text="@string/shutdown_dialog_shutdown_btn_text"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/shutdownAllBtn"
+      app:layout_constraintStart_toStartOf="parent" />
+
+  <Button
+      android:id="@+id/shutdownAllBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:enabled="false"
+      android:text="@string/shutdown_dialog_shutdown_all_btn_text"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toEndOf="@id/shutdownBtn"
+      app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

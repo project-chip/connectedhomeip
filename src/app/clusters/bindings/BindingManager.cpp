@@ -108,6 +108,8 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
 
     mLastSessionEstablishmentError = CHIP_NO_ERROR;
     auto * connectionCallback      = Platform::New<ConnectionCallback>(*this);
+    VerifyOrReturnError(connectionCallback != nullptr, CHIP_ERROR_NO_MEMORY);
+
     mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, connectionCallback->GetOnDeviceConnected(),
                                                             connectionCallback->GetOnDeviceConnectionFailure());
     if (mLastSessionEstablishmentError == CHIP_ERROR_NO_MEMORY)

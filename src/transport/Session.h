@@ -222,6 +222,8 @@ public:
 
     bool IsSecureSession() const { return GetSessionType() == SessionType::kSecure; }
 
+    bool IsUnauthenticatedSession() const { return GetSessionType() == SessionType::kUnauthenticated; }
+
     void DispatchSessionEvent(SessionDelegate::Event event)
     {
         // Holders might remove themselves when notified.
@@ -233,6 +235,11 @@ public:
             cur->DispatchSessionEvent(event);
         }
     }
+
+    // Return a session id that is usable for logging. This is the local session
+    // id for secure unicast sessions, 0 for non-secure unicast sessions, and
+    // the group id for group sessions.
+    uint16_t SessionIdForLogging() const;
 
 protected:
     // This should be called by sub-classes at the very beginning of the destructor, before any data field is disposed, such that
@@ -247,6 +254,10 @@ protected:
     }
 
     void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
+
+    const SecureSession * AsConstSecureSession() const;
+    const IncomingGroupSession * AsConstIncomingGroupSession() const;
+    const OutgoingGroupSession * AsConstOutgoingGroupSession() const;
 
     IntrusiveList<SessionHolder> mHolders;
 

@@ -88,11 +88,21 @@ void BLEManagerImpl::_Shutdown()
     }
 }
 
-CHIP_ERROR BLEManagerImpl::PrepareConnection()
+CHIP_ERROR BLEManagerImpl::StartScan(BleScannerDelegate * delegate)
 {
     if (mConnectionDelegate)
     {
-        static_cast<BleConnectionDelegateImpl *>(mConnectionDelegate)->PrepareConnection();
+        static_cast<BleConnectionDelegateImpl *>(mConnectionDelegate)->StartScan(delegate);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INCORRECT_STATE;
+}
+
+CHIP_ERROR BLEManagerImpl::StopScan()
+{
+    if (mConnectionDelegate)
+    {
+        static_cast<BleConnectionDelegateImpl *>(mConnectionDelegate)->StopScan();
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_INCORRECT_STATE;

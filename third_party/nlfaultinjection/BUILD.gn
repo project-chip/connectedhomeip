@@ -18,6 +18,13 @@ config("nlfaultinjection_config") {
   include_dirs = [ "repo/include" ]
 }
 
+config("nlfaultinjection_disable_warnings_config") {
+  cflags = [
+    # We are intentionally inducing faults with this library so it makes sense to ignore errors.
+    "-Wno-error=array-bounds",
+  ]
+}
+
 static_library("nlfaultinjection") {
   sources = [
     "repo/include/nlfaultinjection.hpp",
@@ -27,6 +34,7 @@ static_library("nlfaultinjection") {
   deps = [ "${nlassert_root}:nlassert" ]
 
   public_configs = [ ":nlfaultinjection_config" ]
+  configs += [ ":nlfaultinjection_disable_warnings_config" ]
 
   output_name = "libnlfaultinjection"
   output_dir = "${root_out_dir}/lib"

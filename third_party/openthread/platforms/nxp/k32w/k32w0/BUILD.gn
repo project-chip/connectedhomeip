@@ -37,7 +37,6 @@ config("openthread_k32w0_config") {
   defines = [
     "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
     "OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE=1",
-    "PDM_SAVE_IDLE=1",
     "K32W0_RADIO_NUM_OF_RX_BUFS=16",
   ]
 }
@@ -58,6 +57,7 @@ source_set("openthread_mbedtls_config_k32w0") {
 
 source_set("libopenthread-k32w0") {
   sources = [
+    "${openthread_nxp_root}/src/common/crypto.c",
     "${openthread_nxp_root}/src/common/ram_storage.c",
     "${openthread_nxp_root}/src/k32w0/platform/alarm.c",
     "${openthread_nxp_root}/src/k32w0/platform/diag.c",
@@ -72,6 +72,17 @@ source_set("libopenthread-k32w0") {
     "${openthread_nxp_root}/src/k32w0/platform/uart.c",
   ]
 
+  if (chip_crypto == "platform" && chip_crypto_flavor == "tinycrypt") {
+    sources +=
+        [ "${openthread_nxp_root}/src/common/crypto/ecdsa_tinycrypt.cpp" ]
+  }
+
+  if (chip_crypto == "platform" && chip_crypto_flavor == "NXP-Ultrafast-P256") {
+    sources += [
+      "${openthread_nxp_root}/src/k32w0/platform/ecdsa-nxp-ultrafast-p256.cpp",
+    ]
+  }
+
   if (chip_with_ot_cli == 1) {
     sources += [ "${openthread_root}/examples/apps/cli/cli_uart.cpp" ]
   }
@@ -79,6 +90,7 @@ source_set("libopenthread-k32w0") {
   public_deps = [
     ":openthread_core_config_k32w0",
     "${k32w0_sdk_build_root}:k32w0_sdk",
+    "${k32w0_sdk_build_root}:mbedtls",
     "${openthread_root}/src/core:libopenthread_core_headers",
     "../../..:libopenthread-platform",
     "../../..:libopenthread-platform-utils",

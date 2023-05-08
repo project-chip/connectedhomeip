@@ -1,6 +1,6 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
-#include "CHIPReadCallbacks.h"
+{{#if_enabled_clusters side='client'}}
+#include <jni/CHIPReadCallbacks.h>
 
 #include <zap-generated/CHIPClientCallbacks.h>
 
@@ -85,12 +85,13 @@ void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{ch
 {{/unless}}
 {{/chip_server_global_responses}}
 
-{{#chip_client_clusters}}
-{{#chip_server_cluster_attributes}}
+{{#all_user_clusters side='client'}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
 {{! TODO: Add support for struct-typed attributes }}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
+{{#if_unsupported_attribute_callback type isArray ../id}}
+{{else}}
 
-{{#if_basic_global_response}}
+{{#if_basic_attribute type ../id}}
 {{else}}
 CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
@@ -116,7 +117,7 @@ CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::
     }
     env->DeleteGlobalRef(javaCallbackRef);
 }
-{{/if_basic_global_response}}
+{{/if_basic_attribute}}
 
 {{#if isArray}}
 void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
@@ -138,13 +139,13 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    {{>decode_value source="list" target="arrayListObj" cluster=(asUpperCamelCase parent.name) depth=0}}
+    {{>decode_value source="list" target="arrayListObj" cluster=parent.name depth=0}}
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 {{else}}
-  {{#if_basic_global_response}}
+  {{#if_basic_attribute type ../id}}
   {{else}}
     void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} value)
     {
@@ -164,14 +165,14 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#if isArray}}{{else if isStruct}}{{else if isOptional}}Ljava/util/Optional;{{else if (isOctetString type)}}[B{{else if (isCharString type)}}Ljava/lang/String;{{else}}{{asJniSignatureBasic type true}}{{/if}})V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-        {{>decode_value source="value" target="javaValue" cluster=(asUpperCamelCase parent.name) depth=0}}
+        {{>decode_value source="value" target="javaValue" cluster=parent.name depth=0}}
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
     }
-  {{/if_basic_global_response}}
+  {{/if_basic_attribute}}
 {{/if}}
-{{/unless}}
-{{/chip_server_cluster_attributes}}
-{{/chip_client_clusters}}
+{{/if_unsupported_attribute_callback}}
+{{/zcl_attributes_server}}
+{{/all_user_clusters}}
 
-{{/if}}
+{{/if_enabled_clusters}}

@@ -25,14 +25,17 @@ arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
 
 mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
 
-chip_crypto = "tinycrypt"
+chip_crypto = "mbedtls"
 
 # Transitional CommissionableDataProvider not used anymore
-# examples/platform/efr32/EFR32DeviceDataProvider is now used.
+# examples/platform/silabs/SilabsDeviceDataProvider is now used.
 chip_use_transitional_commissionable_data_provider = false
 
-#lwip_platform = "external"
 lwip_platform = "silabs"
+
+# Use GSDK lwip instead of CHIP
+lwip_root = "${efr32_sdk_build_root}"
+
 lwip_ipv6 = true
 lwip_ipv4 = true
 lwip_api = true
@@ -40,7 +43,8 @@ lwip_ethernet = true
 
 chip_device_platform = "SiWx917"
 chip_enable_openthread = false
-chip_inet_config_enable_ipv4 = true
+
+chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_dns_resolver = false
 chip_inet_config_enable_tcp_endpoint = true
 

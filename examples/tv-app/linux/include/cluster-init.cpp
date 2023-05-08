@@ -25,7 +25,6 @@
 #include "target-navigator/TargetNavigatorManager.h"
 #include "wake-on-lan/WakeOnLanManager.h"
 
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>

@@ -212,10 +212,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
 {
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_RADIO));
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_SENSOR));
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_POWER_SOURCE));
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_USER_INTERFACE_FAULT));
+    ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kRadio)));
+    ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kSensor)));
+    ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kPowerSource)));
+    ReturnErrorOnFailure(hardwareFaults.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
 #endif
 
     return CHIP_NO_ERROR;
@@ -346,35 +346,41 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 }
 
 #if SL_WIFI
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
+    constexpr size_t bssIdSize = 6;
+    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     wfx_wifi_scan_result_t ap;
     int32_t err = wfx_get_ap_info(&ap);
-    static uint8_t bssid[6];
     if (err == 0)
     {
-        memcpy(bssid, ap.bssid, 6);
-        BssId = ByteSpan(bssid, 6);
+        memcpy(BssId.data(), ap.bssid, bssIdSize);
+        BssId.reduce_size(bssIdSize);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
     wfx_wifi_scan_result_t ap;
     int32_t err = wfx_get_ap_info(&ap);
     if (err == 0)
     {
-        securityType = ap.security;
+        // TODO: Is this actually right?  Do the wfx_wifi_scan_result_t values
+        // match the Matter spec ones?
+        securityType = static_cast<SecurityTypeEnum>(ap.security);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
-    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
+    wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kN;
     return CHIP_NO_ERROR;
 }
 

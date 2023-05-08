@@ -139,6 +139,13 @@ protected:
     static void FunctionTimerEventHandler(TimerHandle_t xTimer);
 
     /**
+     * @brief Factory reset trigger function
+     *        Trigger factory if called
+     *
+     */
+    static void FunctionFactoryReset(void);
+
+    /**
      * @brief Timer Event processing function
      *        Trigger factory if Press and Hold duration is respected
      *
