@@ -78,6 +78,10 @@ ChipDeviceScanner::~ChipDeviceScanner()
 {
     StopScan();
 
+    // The `#if CHIP_STACK_LOCK_TRACKING_ENABLED` code block below should be considered an anti-pattern,
+    // as such this should not be used in most cases, so do not use this as precedent.
+    //
+    // TODO, Provide a rational as to why we are doing this here
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     if (!DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread())
         // In case the timeout timer is still active
@@ -145,14 +149,19 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         return CHIP_ERROR_INTERNAL;
     }
 
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // The `#if CHIP_STACK_LOCK_TRACKING_ENABLED` code block below should be considered an anti-pattern,
+    // as such this should not be used in most cases, so do not use this as precedent.
+    //
+    // TODO, Provide a rational as to why we are doing this here
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     if (!DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread())
         DeviceLayer::PlatformMgr().LockChipStack();
-        CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
+        err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
         DeviceLayer::PlatformMgr().UnlockChipStack();
     }
 #else //CHIP_STACK_LOCK_TRACKING_ENABLED
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
+    err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
 #endif //CHIP_STACK_LOCK_TRACKING_ENABLED
 
     if (err != CHIP_NO_ERROR)
