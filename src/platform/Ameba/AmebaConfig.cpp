@@ -126,7 +126,7 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint64_t & val)
     err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", StringOrNullMarker(key.Namespace),
+        ChipLogProgress(DeviceLayer, "getPref_u64: %s/%s failed\n", StringOrNullMarker(key.Namespace),
                         StringOrNullMarker(key.Name));
     }
 
