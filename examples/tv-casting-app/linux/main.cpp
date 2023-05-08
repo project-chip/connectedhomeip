@@ -161,7 +161,7 @@ int main(int argc, char * argv[])
     }
 
     registerClusters(gCommands, &gCredIssuerCommands);
-    registerClusterSubscriptions(gCommands, &gCredIssuerCommands);
+    registerCommandsSubscriptions(gCommands, &gCredIssuerCommands);
 
     if (argc > 1)
     {

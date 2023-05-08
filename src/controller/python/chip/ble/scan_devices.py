@@ -20,7 +20,7 @@ from queue import Queue
 from typing import Generator
 
 from chip.ble.library_handle import _GetBleLibraryHandle
-from chip.ble.types import DeviceScannedCallback, ScanDoneCallback
+from chip.ble.types import DeviceScannedCallback, ScanDoneCallback, ScanErrorCallback
 
 
 @DeviceScannedCallback
@@ -34,7 +34,12 @@ def ScanDoneCallback(closure):
     closure.ScanCompleted()
 
 
-def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, adapter=None):
+@ScanErrorCallback
+def ScanErrorCallback(closure, errorCode: int):
+    closure.ScanErrorCallback(errorCode)
+
+
+def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, errorCallback, adapter=None):
     """Initiate a BLE discovery of devices with the given timeout.
 
     NOTE: devices are not guaranteed to be unique. New entries are returned
@@ -44,6 +49,7 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, adapter=None):
       timeoutMs:    scan will complete after this time
       scanCallback: callback when a device is found
       doneCallback: callback when the scan is complete
+      errorCallback: callback when error occurred during scan
       adapter:      what adapter to choose. Either an AdapterInfo object or
                     a string with the adapter address. If None, the first
                     adapter on the system is used.
@@ -72,6 +78,9 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, adapter=None):
                     doneCallback(*args)
                     ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
+                def ScanErrorCallback(self, *args):
+                    errorCallback(*args)
+
             closure = ScannerClosure()
             ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
 
@@ -79,7 +88,7 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, adapter=None):
                 ctypes.py_object(closure),
                 handle.pychip_ble_adapter_list_get_raw_adapter(
                     nativeList), timeoutMs,
-                ScanFoundCallback, ScanDoneCallback)
+                ScanFoundCallback, ScanDoneCallback, ScanErrorCallback)
 
             if scanner == 0:
                 raise Exception('Failed to initiate scan')
@@ -113,6 +122,12 @@ class _DeviceInfoReceiver:
     def ScanCompleted(self):
         self.queue.put(None)
 
+    def ScanError(self, errorCode):
+        # TODO need to determine what we do with this error. Most of the time this
+        # error is just a timeout introduced in PR #24873, right before we get a
+        # ScanCompleted.
+        pass
+
 
 def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, None]:
     """Discover BLE devices over the specified period of time. 
@@ -131,7 +146,7 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
 
     receiver = _DeviceInfoReceiver()
     DiscoverAsync(timeoutMs, receiver.DeviceFound,
-                  receiver.ScanCompleted, adapter)
+                  receiver.ScanCompleted, receiver.ScanError, adapter)
 
     while True:
         data = receiver.queue.get()

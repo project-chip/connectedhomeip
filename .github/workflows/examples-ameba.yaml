@@ -59,7 +59,7 @@ jobs:
                       .environment
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
             - name: Build example Ameba All Clusters App
               run: |
                   ./scripts/run_in_build_env.sh \

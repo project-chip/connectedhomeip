@@ -75,7 +75,7 @@ jobs:
                   integrations/docker/images/chip-build-cirque/run.sh \
                     -- sh -c " \
                        git config --global --add safe.directory '*' \
-                       && scripts/build/gn_bootstrap.sh \
+                       && bash scripts/bootstrap.sh \
                        && chown -R $(id -u):$(id -g) .environment \
                     "
 
