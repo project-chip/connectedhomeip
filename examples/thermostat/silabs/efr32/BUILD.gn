@@ -46,7 +46,8 @@ declare_args() {
 
   # Enable the temperature sensor
   # Some boards do not have a temperature sensor
-  use_temp_sensor = silabs_board != "BRD2703A" && silabs_board != "BRD4319A"
+  use_temp_sensor = silabs_board != "BRD2703A" && silabs_board != "BRD4319A" &&
+                    silabs_board != "BRD2704A"
 }
 
 efr32_sdk("sdk") {
@@ -105,11 +106,11 @@ silabs_executable("thermostat_app") {
   defines = []
 
   sources = [
+    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/SensorManager.cpp",
     "src/TemperatureManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
   ]
 
   if (use_temp_sensor) {

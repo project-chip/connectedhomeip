@@ -7024,6 +7024,93 @@
 - release: "TBD"
   versions: "future"
   introduced:
+      attributes:
+          BasicInformation:
+              - ProductAppearance
+          BridgedDeviceBasicInformation:
+              - ProductAppearance
+      structs:
+          BasicInformation:
+              - ProductAppearanceStruct
+          BridgedDeviceBasicInformation:
+              - ProductAppearanceStruct
+      struct fields:
+          BasicInformation:
+              ProductAppearanceStruct:
+                  - finish
+                  - primaryColor
+          BridgedDeviceBasicInformation:
+              ProductAppearanceStruct:
+                  - finish
+                  - primaryColor
+      enums:
+          BasicInformation:
+              - ColorEnum
+              - ProductFinishEnum
+          BridgedDeviceBasicInformation:
+              - ColorEnum
+              - ProductFinishEnum
+      enum values:
+          BasicInformation:
+              ColorEnum:
+                  - Black
+                  - Navy
+                  - Green
+                  - Teal
+                  - Maroon
+                  - Purple
+                  - Olive
+                  - Gray
+                  - Blue
+                  - Lime
+                  - Aqua
+                  - Red
+                  - Fuchsia
+                  - Yellow
+                  - White
+                  - Nickel
+                  - Chrome
+                  - Brass
+                  - Copper
+                  - Silver
+                  - Gold
+              ProductFinishEnum:
+                  - Matte
+                  - Satin
+                  - Polished
+                  - Rugged
+                  - Fabric
+                  - Other
+          BridgedDeviceBasicInformation:
+              ColorEnum:
+                  - Black
+                  - Navy
+                  - Green
+                  - Teal
+                  - Maroon
+                  - Purple
+                  - Olive
+                  - Gray
+                  - Blue
+                  - Lime
+                  - Aqua
+                  - Red
+                  - Fuchsia
+                  - Yellow
+                  - White
+                  - Nickel
+                  - Chrome
+                  - Brass
+                  - Copper
+                  - Silver
+                  - Gold
+              ProductFinishEnum:
+                  - Matte
+                  - Satin
+                  - Polished
+                  - Rugged
+                  - Fabric
+                  - Other
       bitmaps:
           Groups:
               - GroupsFeature
@@ -7060,6 +7147,30 @@
               - PressureFeature
           PumpConfigurationAndControl:
               - PumpFeature
+  removed:
+      attributes:
+          # The ProductAppearance bits never happened for the old Basic and
+          # BridgedDeviceBasic cluster names.
+          Basic:
+              - ProductAppearance
+          BridgedDeviceBasic:
+              - ProductAppearance
+      structs:
+          # The ProductAppearance bits never happened for the old Basic and
+          # BridgedDeviceBasic cluster names.
+          Basic:
+              - ProductAppearanceStruct
+          BridgedDeviceBasic:
+              - ProductAppearanceStruct
+      enums:
+          # The ProductAppearance bits never happened for the old Basic and
+          # BridgedDeviceBasic cluster names.
+          Basic:
+              - ProductFinishEnum
+              - ColorEnum
+          BridgedDeviceBasic:
+              - ProductFinishEnum
+              - ColorEnum
   renames:
       bitmaps:
           Groups:

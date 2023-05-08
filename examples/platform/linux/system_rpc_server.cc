@@ -92,6 +92,8 @@ Status Start()
                 // An out of range status indicates the remote end has disconnected.
                 // Start to serve the connection again, which will allow another
                 // remote to connect.
+                socket_stream.Close();
+                server_socket.Close();
                 PW_CHECK_OK(server_socket.Listen(socket_port));
                 auto accept_result = server_socket.Accept();
                 PW_CHECK_OK(accept_result.status());

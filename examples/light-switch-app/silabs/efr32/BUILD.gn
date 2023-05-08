@@ -91,9 +91,9 @@ silabs_executable("light_switch_app") {
   sources = [
     "${chip_root}/examples/light-switch-app/silabs/common/BindingHandler.cpp",
     "${chip_root}/examples/light-switch-app/silabs/common/LightSwitchMgr.cpp",
+    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
   ]
 
   deps = [

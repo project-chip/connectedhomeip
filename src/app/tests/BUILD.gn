@@ -54,17 +54,17 @@ source_set("binding-test-srcs") {
   ]
 }
 
-source_set("client-monitoring-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.cpp",
-    "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.h",
-  ]
+# source_set("client-monitoring-test-srcs") {
+#   sources = [
+#     "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.cpp",
+#     "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.h",
+#   ]
 
-  public_deps = [
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/lib/core",
-  ]
-}
+#   public_deps = [
+#     "${chip_root}/src/app/common:cluster-objects",
+#     "${chip_root}/src/lib/core",
+#   ]
+# }
 
 source_set("ota-requestor-test-srcs") {
   sources = [
@@ -108,7 +108,10 @@ chip_test_suite("tests") {
     "TestAttributeValueEncoder.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
-    "TestClientMonitoringRegistrationTable.cpp",
+
+    # Disable CM cluster table tests until update is done
+    # https://github.com/project-chip/connectedhomeip/issues/24425
+    # "TestClientMonitoringRegistrationTable.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -159,7 +162,10 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":binding-test-srcs",
-    ":client-monitoring-test-srcs",
+
+    # Disable CM cluster table tests until update is done
+    #https://github.com/project-chip/connectedhomeip/issues/24425
+    # ":client-monitoring-test-srcs",
     ":ota-requestor-test-srcs",
     ":scenes-table-test-srcs",
     "${chip_root}/src/app",

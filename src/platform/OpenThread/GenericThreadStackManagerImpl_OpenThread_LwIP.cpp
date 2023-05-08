@@ -36,7 +36,7 @@
 
 #include <credentials/GroupDataProvider.h>
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <transport/raw/PeerAddress.h>
 

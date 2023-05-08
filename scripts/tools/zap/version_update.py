@@ -51,6 +51,7 @@ ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)-nightly')
 USAGE_FILES_DEPENDING_ON_ZAP_VERSION = [
     'integrations/docker/images/chip-cert-bins/Dockerfile',
     'scripts/setup/zap.json',
+    'scripts/setup/zap.version',
 ]
 
 

@@ -18,10 +18,16 @@
 #include "init_efrPlatform.h"
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#include "sl_system_kernel.h"
+
 #ifdef ENABLE_WSTK_LEDS
 extern "C" {
 #include "sl_simple_led_instances.h"
 }
+#endif
+
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+#include "sl_simple_button_instances.h"
 #endif
 
 namespace chip {
@@ -29,6 +35,8 @@ namespace DeviceLayer {
 namespace Silabs {
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
+
+SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
@@ -73,6 +81,32 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
+
+void SilabsPlatform::StartScheduler()
+{
+    sl_system_kernel_start();
+}
+
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+extern "C" {
+void sl_button_on_change(const sl_button_t * handle)
+{
+    if (Silabs::GetPlatform().mButtonCallback == nullptr)
+    {
+        return;
+    }
+
+    for (uint8_t i = 0; i < SL_SIMPLE_BUTTON_COUNT; i++)
+    {
+        if (SL_SIMPLE_BUTTON_INSTANCE(i) == handle)
+        {
+            Silabs::GetPlatform().mButtonCallback(i, sl_button_get_state(handle));
+            break;
+        }
+    }
+}
+}
+#endif
 
 } // namespace Silabs
 } // namespace DeviceLayer

@@ -38,7 +38,8 @@ template <class T>
 class Span
 {
 public:
-    using pointer = T *;
+    using pointer   = T *;
+    using reference = T &;
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
     constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
@@ -74,6 +75,18 @@ public:
     constexpr bool empty() const { return size() == 0; }
     constexpr pointer begin() const { return data(); }
     constexpr pointer end() const { return data() + size(); }
+
+    // Element accessors, matching the std::span API.
+    // VerifyOrDie cannot be used inside a constexpr function, because it uses
+    // "static" on some platforms (e.g. when CHIP_PW_TOKENIZER_LOGGING is true)
+    // and that's not allowed in constexpr functions.
+    reference operator[](size_t index) const
+    {
+        VerifyOrDie(index < size());
+        return data()[index];
+    }
+    reference front() const { return (*this)[0]; }
+    reference back() const { return (*this)[size() - 1]; }
 
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
     bool data_equal(const Span<U> & other) const
@@ -142,7 +155,8 @@ template <class T, size_t N>
 class FixedSpan
 {
 public:
-    using pointer = T *;
+    using pointer   = T *;
+    using reference = T &;
 
     constexpr FixedSpan() : mDataBuf(nullptr) {}
 
@@ -187,6 +201,18 @@ public:
     constexpr bool empty() const { return data() == nullptr; }
     constexpr pointer begin() const { return mDataBuf; }
     constexpr pointer end() const { return mDataBuf + N; }
+
+    // Element accessors, matching the std::span API.
+    // VerifyOrDie cannot be used inside a constexpr function, because it uses
+    // "static" on some platforms (e.g. when CHIP_PW_TOKENIZER_LOGGING is true)
+    // and that's not allowed in constexpr functions.
+    reference operator[](size_t index) const
+    {
+        VerifyOrDie(index < size());
+        return data()[index];
+    }
+    reference front() const { return (*this)[0]; }
+    reference back() const { return (*this)[size() - 1]; }
 
     // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>

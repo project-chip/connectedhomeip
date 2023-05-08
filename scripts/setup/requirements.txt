@@ -1,6 +1,9 @@
 pip-tools
 virtualenv
 
+# core build requirements
+-r requirements.build.txt
+
 # esp-idf
 -c constraints.esp32.txt
 -r requirements.esp32.txt
@@ -66,14 +69,6 @@ cxxfilt
 ghapi
 pandas ; platform_machine != 'aarch64' and platform_machine != 'arm64'
 tabulate
-
-# scripts/build
-click
-
-# scripts/py_matter_idl/matter_idl
-lark
-# scripts/py_matter_idl/matter_idl and scripts/py_matter_yamtests/matter_yamltests
-stringcase
 
 cryptography
 

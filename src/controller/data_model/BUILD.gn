@@ -174,8 +174,11 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/ElectricalMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/UnitTestingClient-ReadImpl.cpp",
       "jni/UnitTestingClient-InvokeSubscribeImpl.cpp",
-      "jni/ClientMonitoringClient-ReadImpl.cpp",
-      "jni/ClientMonitoringClient-InvokeSubscribeImpl.cpp",
+
+      # Disable CM cluster table tests until update is done
+      # https://github.com/project-chip/connectedhomeip/issues/24425
+      #"jni/ClientMonitoringClient-ReadImpl.cpp",
+      #"jni/ClientMonitoringClient-InvokeSubscribeImpl.cpp",
     ]
 
     deps = [

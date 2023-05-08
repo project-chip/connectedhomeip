@@ -52,6 +52,12 @@ public:
      */
     virtual CHIP_ERROR ApplyCertificateValidityPolicy(const ChipCertificateData * cert, uint8_t depth,
                                                       CertificateValidityResult result) = 0;
+
+    /**
+     * Default policy that will be used if no other policy is defined.  This is
+     * exposed to allow other policies to explicitly delegate to it as needed.
+     */
+    static CHIP_ERROR ApplyDefaultPolicy(const ChipCertificateData * cert, uint8_t depth, CertificateValidityResult result);
 };
 
 } // namespace Credentials

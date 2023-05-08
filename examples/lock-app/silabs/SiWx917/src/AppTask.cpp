@@ -49,6 +49,8 @@
 
 #include <lib/support/CodeUtils.h>
 
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #include <platform/CHIPDeviceLayer.h>
 
 #define LOCK_STATE_LED 1
@@ -137,6 +139,8 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Lock-App", true);

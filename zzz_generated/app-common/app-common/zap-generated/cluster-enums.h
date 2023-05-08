@@ -370,7 +370,55 @@ enum class CommandBits : uint16_t
 };
 } // namespace Actions
 
-namespace BasicInformation {} // namespace BasicInformation
+namespace BasicInformation {
+
+// Enum for ColorEnum
+enum class ColorEnum : uint8_t
+{
+    kBlack   = 0x00,
+    kNavy    = 0x01,
+    kGreen   = 0x02,
+    kTeal    = 0x03,
+    kMaroon  = 0x04,
+    kPurple  = 0x05,
+    kOlive   = 0x06,
+    kGray    = 0x07,
+    kBlue    = 0x08,
+    kLime    = 0x09,
+    kAqua    = 0x0A,
+    kRed     = 0x0B,
+    kFuchsia = 0x0C,
+    kYellow  = 0x0D,
+    kWhite   = 0x0E,
+    kNickel  = 0x0F,
+    kChrome  = 0x10,
+    kBrass   = 0x11,
+    kCopper  = 0x12,
+    kSilver  = 0x13,
+    kGold    = 0x14,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 21,
+};
+
+// Enum for ProductFinishEnum
+enum class ProductFinishEnum : uint8_t
+{
+    kOther    = 0x00,
+    kMatte    = 0x01,
+    kSatin    = 0x02,
+    kPolished = 0x03,
+    kRugged   = 0x04,
+    kFabric   = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
+};
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 
@@ -1251,7 +1299,55 @@ enum class TimeSourceEnum : uint8_t
 };
 } // namespace TimeSynchronization
 
-namespace BridgedDeviceBasicInformation {} // namespace BridgedDeviceBasicInformation
+namespace BridgedDeviceBasicInformation {
+
+// Enum for ColorEnum
+enum class ColorEnum : uint8_t
+{
+    kBlack   = 0x00,
+    kNavy    = 0x01,
+    kGreen   = 0x02,
+    kTeal    = 0x03,
+    kMaroon  = 0x04,
+    kPurple  = 0x05,
+    kOlive   = 0x06,
+    kGray    = 0x07,
+    kBlue    = 0x08,
+    kLime    = 0x09,
+    kAqua    = 0x0A,
+    kRed     = 0x0B,
+    kFuchsia = 0x0C,
+    kYellow  = 0x0D,
+    kWhite   = 0x0E,
+    kNickel  = 0x0F,
+    kChrome  = 0x10,
+    kBrass   = 0x11,
+    kCopper  = 0x12,
+    kSilver  = 0x13,
+    kGold    = 0x14,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 21,
+};
+
+// Enum for ProductFinishEnum
+enum class ProductFinishEnum : uint8_t
+{
+    kOther    = 0x00,
+    kMatte    = 0x01,
+    kSatin    = 0x02,
+    kPolished = 0x03,
+    kRugged   = 0x04,
+    kFabric   = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
+};
+} // namespace BridgedDeviceBasicInformation
 
 namespace Switch {
 

@@ -36,7 +36,12 @@ public:
     virtual CHIP_ERROR SetGPIO(uint32_t port, uint32_t pin, bool state) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual bool GetGPIO(uint32_t port, uint32_t pin) { return false; }
 
+    // Scheduler
+    virtual void StartScheduler(void) = 0;
+
     // Buttons
+    typedef void (*SilabsButtonCb)(uint8_t, uint8_t);
+    virtual void SetButtonsCb(SilabsButtonCb callback) {}
 
     // LEDS
     virtual void InitLed(void) {}

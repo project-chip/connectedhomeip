@@ -135,6 +135,7 @@ def _GetInDevelopmentTests() -> Set[str]:
     """
     return {
         "Test_AddNewFabricFromExistingFabric.yaml",     # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
+        "TestClientMonitoringCluster.yaml"  # Client Monitoring Tests need a rework after the XML update
     }
 
 

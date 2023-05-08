@@ -35,6 +35,10 @@ pkg_config("glib") {
   ]
 }
 
+pkg_config("capi-system-info") {
+  packages = [ "capi-system-info" ]
+}
+
 if (chip_mdns == "platform") {
   pkg_config("nsd-dns-sd") {
     packages = [ "nsd-dns-sd" ]
@@ -64,6 +68,7 @@ source_set("tizen") {
     ":dlog",
     ":glib",
     ":capi-appfw-preference",
+    ":capi-system-info",
   ]
 
   if (chip_mdns == "platform") {

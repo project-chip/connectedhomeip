@@ -345,6 +345,9 @@ void DnssdServer::StartServer()
 
 void DnssdServer::StopServer()
 {
+    // Make sure we don't hold on to a dangling fabric table pointer.
+    mFabricTable = nullptr;
+
     DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY

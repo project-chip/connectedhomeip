@@ -29,7 +29,7 @@ extern "C" {
 
 #define SL_BIT_RATE_LCD 1100000
 #define SL_BIT_RATE_EXP_HDR 16000000
-#define SL_BIT_RATE_SPI_FLASH 16000000
+#define SL_BIT_RATE_SPI_FLASH 10000000
 #define SL_BIT_RATE_UART_CONSOLE 16000000
 
 extern SemaphoreHandle_t spi_sem_sync_hdl;
