@@ -29,7 +29,6 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     switch (category)
     {
     case kLogCategory_Error: {
-        if (esp_log_default_level >= ESP_LOG_ERROR)
         {
             printf(LOG_COLOR_E "E (%u) %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_ERROR, tag, msg, v);
@@ -40,7 +39,6 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
 
     case kLogCategory_Progress:
     default: {
-        if (esp_log_default_level >= ESP_LOG_INFO)
         {
             printf(LOG_COLOR_I "I (%u) %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_INFO, tag, msg, v);
@@ -50,7 +48,6 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     break;
 
     case kLogCategory_Detail: {
-        if (esp_log_default_level >= ESP_LOG_DEBUG)
         {
             printf(LOG_COLOR_D "D (%u) %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_DEBUG, tag, msg, v);
