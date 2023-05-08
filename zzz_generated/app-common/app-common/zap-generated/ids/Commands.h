@@ -480,9 +480,29 @@ static constexpr CommandId Id = 0x00000000;
 namespace TimeSynchronization {
 namespace Commands {
 
-namespace SetUtcTime {
+namespace SetUTCTime {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SetUtcTime
+} // namespace SetUTCTime
+
+namespace SetTrustedTimeSource {
+static constexpr CommandId Id = 0x00000001;
+} // namespace SetTrustedTimeSource
+
+namespace SetTimeZone {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SetTimeZone
+
+namespace SetTimeZoneResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace SetTimeZoneResponse
+
+namespace SetDSTOffset {
+static constexpr CommandId Id = 0x00000004;
+} // namespace SetDSTOffset
+
+namespace SetDefaultNTP {
+static constexpr CommandId Id = 0x00000005;
+} // namespace SetDefaultNTP
 
 } // namespace Commands
 } // namespace TimeSynchronization

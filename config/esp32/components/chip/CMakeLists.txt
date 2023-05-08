@@ -86,10 +86,29 @@ chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                ${is_debug})
 
 # Config the chip log level by IDF menuconfig
-chip_gn_arg_bool  ("chip_error_logging"        CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
-chip_gn_arg_bool  ("chip_progress_logging"     CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
-chip_gn_arg_bool  ("chip_detail_logging"       CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
-chip_gn_arg_bool  ("chip_automation_logging"   CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
+    chip_gn_arg_bool  ("chip_error_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_error_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
+    chip_gn_arg_bool  ("chip_progress_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_progress_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
+    chip_gn_arg_bool  ("chip_detail_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_detail_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
+    chip_gn_arg_bool  ("chip_automation_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_automation_logging" "false")
+endif()
 
 if(CONFIG_ENABLE_CHIPOBLE)
 chip_gn_arg_append("chip_config_network_layer_ble"           "true")
@@ -373,8 +392,10 @@ target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
 add_dependencies(${COMPONENT_LIB} chip_gn)
 
 if(CONFIG_ENABLE_PW_RPC)
-    set(WRAP_FUNCTIONS esp_log_write)
-    target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
+    set(WRAP_FUNCTIONS esp_log_write esp_log_writev)
+    foreach(func ${WRAP_FUNCTIONS})
+        target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${func}")
+    endforeach()
 endif()
 
 # Build Matter OTA image

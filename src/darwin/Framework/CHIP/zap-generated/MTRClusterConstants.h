@@ -2850,14 +2850,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeSourceID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000002,
-    MTRClusterTimeSynchronizationAttributeTrustedTimeNodeIdID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeNodeIdID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000003,
-    MTRClusterTimeSynchronizationAttributeDefaultNtpID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNtpID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000004,
     MTRClusterTimeSynchronizationAttributeTimeZoneID MTR_DEPRECATED(
         "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -2874,10 +2866,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneDatabaseID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000008,
-    MTRClusterTimeSynchronizationAttributeNtpServerPortID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeNtpServerPortID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000009,
     MTRClusterTimeSynchronizationAttributeGeneratedCommandListID MTR_DEPRECATED(
         "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeGeneratedCommandListID", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -2908,12 +2896,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeSourceID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000002,
-    MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeNodeIdID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000003,
-    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNtpID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000004,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeSourceID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNTPID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000005,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetID API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
@@ -2927,9 +2911,10 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneDatabaseID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000008,
-    MTRAttributeIDTypeClusterTimeSynchronizationAttributeNtpServerPortID API_AVAILABLE(
-        ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000009,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeNTPServerAvailableID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneListMaxSizeID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetListMaxSizeID MTR_NEWLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeSupportsDNSResolveID MTR_NEWLY_AVAILABLE = 0x0000000C,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -8573,14 +8558,14 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     = 0x00000000,
 
     // Cluster TimeSynchronization deprecated command id names
-    MTRClusterTimeSynchronizationCommandSetUtcTimeID MTR_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterTimeSynchronizationCommandSetUtcTimeID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000000,
 
     // Cluster TimeSynchronization commands
-    MTRCommandIDTypeClusterTimeSynchronizationCommandSetUtcTimeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000000,
+    MTRCommandIDTypeClusterTimeSynchronizationCommandSetUTCTimeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterTimeSynchronizationCommandSetTrustedTimeSourceID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterTimeSynchronizationCommandSetTimeZoneID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterTimeSynchronizationCommandSetTimeZoneResponseID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterTimeSynchronizationCommandSetDSTOffsetID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterTimeSynchronizationCommandSetDefaultNTPID MTR_NEWLY_AVAILABLE = 0x00000005,
 
     // Cluster AdministratorCommissioning deprecated command id names
     MTRClusterAdministratorCommissioningCommandOpenCommissioningWindowID MTR_DEPRECATED(
@@ -9787,6 +9772,12 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterWiFiNetworkDiagnosticsEventConnectionStatusID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000002,
+
+    MTREventIDTypeClusterTimeSynchronizationEventDSTTableEmptyID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterTimeSynchronizationEventDSTStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterTimeSynchronizationEventTimeZoneStatusID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTREventIDTypeClusterTimeSynchronizationEventTimeFailureID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTREventIDTypeClusterTimeSynchronizationEventMissingTrustedTimeSourceID MTR_NEWLY_AVAILABLE = 0x00000004,
 
     // Cluster BridgedDeviceBasic deprecated event names
     MTRClusterBridgedDeviceBasicEventStartUpID MTR_DEPRECATED(
