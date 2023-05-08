@@ -14534,14 +14534,15 @@ class AirQuality(Cluster):
             kUnknown = 0x00
             kGood = 0x01
             kFair = 0x02
-            kPoor = 0x03
-            kVeryPoor = 0x04
-            kExtremelyPoor = 0x05
+            kModerate = 0x03
+            kPoor = 0x04
+            kVeryPoor = 0x05
+            kExtremelyPoor = 0x06
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 7,
 
     class Bitmaps:
         class AirQualityFeature(IntFlag):

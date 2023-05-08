@@ -2542,9 +2542,10 @@ client cluster AirQuality = 91 {
     kUnknown = 0;
     kGood = 1;
     kFair = 2;
-    kPoor = 3;
-    kVeryPoor = 4;
-    kExtremelyPoor = 5;
+    kModerate = 3;
+    kPoor = 4;
+    kVeryPoor = 5;
+    kExtremelyPoor = 6;
   }
 
   bitmap AirQualityFeature : BITMAP32 {

@@ -20241,9 +20241,10 @@ typedef NS_ENUM(uint8_t, MTRAirQuality) {
     MTRAirQualityUnknown MTR_NEWLY_AVAILABLE = 0x00,
     MTRAirQualityGood MTR_NEWLY_AVAILABLE = 0x01,
     MTRAirQualityFair MTR_NEWLY_AVAILABLE = 0x02,
-    MTRAirQualityPoor MTR_NEWLY_AVAILABLE = 0x03,
-    MTRAirQualityVeryPoor MTR_NEWLY_AVAILABLE = 0x04,
-    MTRAirQualityExtremelyPoor MTR_NEWLY_AVAILABLE = 0x05,
+    MTRAirQualityModerate MTR_NEWLY_AVAILABLE = 0x03,
+    MTRAirQualityPoor MTR_NEWLY_AVAILABLE = 0x04,
+    MTRAirQualityVeryPoor MTR_NEWLY_AVAILABLE = 0x05,
+    MTRAirQualityExtremelyPoor MTR_NEWLY_AVAILABLE = 0x06,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRAirQualityFeature) {

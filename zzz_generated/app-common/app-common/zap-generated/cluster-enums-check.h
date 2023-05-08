@@ -1268,12 +1268,13 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AirQuality::AirQualityE
     case EnumType::kUnknown:
     case EnumType::kGood:
     case EnumType::kFair:
+    case EnumType::kModerate:
     case EnumType::kPoor:
     case EnumType::kVeryPoor:
     case EnumType::kExtremelyPoor:
         return val;
     default:
-        return static_cast<EnumType>(6);
+        return static_cast<EnumType>(7);
     }
 }
 
