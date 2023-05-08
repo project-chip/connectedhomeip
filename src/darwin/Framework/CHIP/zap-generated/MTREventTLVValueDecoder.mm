@@ -1505,6 +1505,126 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
+    case Clusters::HepaFilterMonitoring::Id: {
+        using namespace Clusters::HepaFilterMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::ActivatedCarbonFilterMonitoring::Id: {
+        using namespace Clusters::ActivatedCarbonFilterMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::CeramicFilterMonitoring::Id: {
+        using namespace Clusters::CeramicFilterMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::ElectrostaticFilterMonitoring::Id: {
+        using namespace Clusters::ElectrostaticFilterMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::UvFilterMonitoring::Id: {
+        using namespace Clusters::UvFilterMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::IonizingFilterMonitoring::Id: {
+        using namespace Clusters::IonizingFilterMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::ZeoliteFilterMonitoring::Id: {
+        using namespace Clusters::ZeoliteFilterMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::OzoneFilterMonitoring::Id: {
+        using namespace Clusters::OzoneFilterMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::WaterTankMonitoring::Id: {
+        using namespace Clusters::WaterTankMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::FuelTankMonitoring::Id: {
+        using namespace Clusters::FuelTankMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::InkCartridgeMonitoring::Id: {
+        using namespace Clusters::InkCartridgeMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case Clusters::TonerCartridgeMonitoring::Id: {
+        using namespace Clusters::TonerCartridgeMonitoring;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case Clusters::DoorLock::Id: {
         using namespace Clusters::DoorLock;
         switch (aPath.mEventId) {
