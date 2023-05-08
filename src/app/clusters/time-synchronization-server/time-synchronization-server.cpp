@@ -116,27 +116,31 @@ void TimeSynchronizationServer::Init()
 CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> tts)
 {
+    CHIP_ERROR err     = CHIP_NO_ERROR;
     mTrustedTimeSource = tts;
     if (!mTrustedTimeSource.IsNull())
     {
-        return mTimeSyncDataProvider.StoreTrustedTimeSource(mTrustedTimeSource.Value());
+        err = mTimeSyncDataProvider.StoreTrustedTimeSource(mTrustedTimeSource.Value());
     }
     else
     {
-        return mTimeSyncDataProvider.ClearTrustedTimeSource();
+        err = mTimeSyncDataProvider.ClearTrustedTimeSource();
     }
+    return err;
 }
 
 CHIP_ERROR TimeSynchronizationServer::SetDefaultNtp(DataModel::Nullable<chip::CharSpan> & dntp)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (!dntp.IsNull())
     {
-        return mTimeSyncDataProvider.StoreDefaultNtp(dntp.Value());
+        err = mTimeSyncDataProvider.StoreDefaultNtp(dntp.Value());
     }
     else
     {
-        return mTimeSyncDataProvider.ClearDefaultNtp();
+        err = mTimeSyncDataProvider.ClearDefaultNtp();
     }
+    return err;
 }
 
 CHIP_ERROR TimeSynchronizationServer::SetTimeZone(DataModel::DecodableList<TimeSynchronization::Structs::TimeZoneStruct::Type> tz)
@@ -265,17 +269,19 @@ CHIP_ERROR TimeSynchronizationAttrAccess::ReadTrustedTimeSource(EndpointId endpo
 
 CHIP_ERROR TimeSynchronizationAttrAccess::ReadDefaultNtp(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t buffer[DefaultNTP::TypeInfo::MaxLength()];
     MutableByteSpan dntp(buffer);
     if (TimeSynchronizationServer::Instance().GetDefaultNtp(dntp) == CHIP_NO_ERROR && dntp.size() != 0)
     {
         const char * charBuf = reinterpret_cast<const char *>(buffer);
-        return aEncoder.Encode(chip::CharSpan(charBuf, dntp.size()));
+        err                  = aEncoder.Encode(chip::CharSpan(charBuf, dntp.size()));
     }
     else
     {
-        return aEncoder.EncodeNull();
+        err = aEncoder.EncodeNull();
     }
+    return err;
 }
 
 CHIP_ERROR TimeSynchronizationAttrAccess::ReadTimeZone(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -490,13 +496,12 @@ bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
         Granularity::Set(commandPath.mEndpointId, granularity);
         TimeSource::Set(commandPath.mEndpointId, TimeSynchronization::TimeSourceEnum::kAdmin);
         commandObj->AddStatus(commandPath, Status::Success);
-        return true;
     }
     else
     {
         commandObj->AddClusterSpecificFailure(commandPath, to_underlying(TimeSynchronization::StatusCode::kTimeNotAccepted));
-        return true;
     }
+    return true;
 }
 
 bool emberAfTimeSynchronizationClusterSetTrustedTimeSourceCallback(
