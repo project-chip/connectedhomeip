@@ -792,6 +792,11 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
     {
         self->ReleaseCommissioneeDevice(device);
         self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
+
+	if (self->mPairingDelegate != nullptr)
+	{
+            self->mPairingDelegate(err);
+	}
     }
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
