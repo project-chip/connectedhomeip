@@ -28,13 +28,9 @@
 #include <platform/Ameba/SystemTimeSupport.h>
 #include <support/logging/CHIPLogging.h>
 
-#include "rtc_api.h"
 #include "task.h"
 #include <time.h>
-
-extern void rtc_init(void);
-extern time_t rtc_read(void);
-extern void rtc_write(time_t t);
+#include <chip_porting.h>
 
 struct rtkTimeVal
 {
@@ -69,7 +65,7 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & curTime)
     time_t seconds;
     struct rtkTimeVal tv;
 
-    seconds = rtc_read();
+    seconds = matter_rtc_read();
 
     tv.tv_sec  = (uint32_t) seconds;
     tv.tv_usec = 0;
@@ -98,8 +94,8 @@ CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
     struct rtkTimeVal tv;
     tv.tv_sec  = static_cast<uint32_t>(aNewCurTime.count() / UINT64_C(1000000));
     tv.tv_usec = static_cast<uint32_t>(aNewCurTime.count() % UINT64_C(1000000));
-    rtc_init();
-    rtc_write(tv.tv_sec);
+    matter_rtc_init();
+    matter_rtc_write(tv.tv_sec);
 
     return CHIP_NO_ERROR;
 }

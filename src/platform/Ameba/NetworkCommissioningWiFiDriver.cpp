@@ -304,7 +304,7 @@ void AmebaWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
 CHIP_ERROR AmebaWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
 {
     VerifyOrReturnError(event->Type == DeviceEventType::kRtkWiFiStationDisconnectedEvent, CHIP_ERROR_INVALID_ARGUMENT);
-    mLastDisconnectedReason = wifi_get_last_error(); // TODO: change this to wrapper
+    mLastDisconnectedReason = matter_wifi_get_last_error();
     return CHIP_NO_ERROR;
 }
 
