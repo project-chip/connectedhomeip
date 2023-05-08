@@ -247,26 +247,26 @@ void AppTaskCommon::InitButtons(void)
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_1, FactoryResetButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, StartBleAdvButtonEventHandler);
-#if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
-#endif
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
         sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_2, ExampleActionButtonEventHandler);
     }
 #endif
+#if APP_USE_THREAD_START_BUTTON
+    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
+#endif
 #else
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
-#if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
-#endif
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
         sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, ExampleActionButtonEventHandler);
     }
+#endif
+#if APP_USE_THREAD_START_BUTTON
+    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
 #endif
 #endif
 

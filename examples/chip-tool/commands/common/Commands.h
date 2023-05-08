@@ -30,14 +30,16 @@ class Commands
 public:
     using CommandsVector = ::std::vector<std::unique_ptr<Command>>;
 
-    void Register(const char * clusterName, commands_list commandsList);
+    void Register(const char * clusterName, commands_list commandsList, const char * helpText = nullptr);
     int Run(int argc, char ** argv);
     int RunInteractive(const char * command);
 
 private:
+    using ClusterMap = std::map<std::string, std::pair<CommandsVector, const char *>>;
+
     CHIP_ERROR RunCommand(int argc, char ** argv, bool interactive = false);
 
-    std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
+    ClusterMap::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
     Command * GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
     bool IsAttributeCommand(std::string commandName) const;
@@ -45,7 +47,7 @@ private:
     bool IsGlobalCommand(std::string commandName) const;
 
     void ShowClusters(std::string executable);
-    void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands);
+    void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands, const char * helpText);
     void ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowClusterEvents(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
@@ -54,7 +56,10 @@ private:
     bool DecodeArgumentsFromBase64EncodedJson(const char * encodedData, std::vector<std::string> & args);
     bool DecodeArgumentsFromStringStream(const char * command, std::vector<std::string> & args);
 
-    std::map<std::string, CommandsVector> mClusters;
+    // helpText may be null, in which case it's not shown.
+    static void ShowHelpText(const char * helpText);
+
+    ClusterMap mClusters;
 #ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE

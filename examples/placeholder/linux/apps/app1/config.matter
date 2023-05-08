@@ -3467,7 +3467,6 @@ endpoint 0 {
     callback attribute productLabel;
     callback attribute serialNumber;
     persist  attribute localConfigDisabled default = 0;
-    ram      attribute reachable default = 1;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     ram      attribute featureMap default = 0;
