@@ -236,8 +236,6 @@ public:
 
     MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity)
     {
-        MTRDeviceController * controller = GetCommissioner(identity);
-
         SetIdentity(identity);
         return mConnectedDevices[identity];
     }

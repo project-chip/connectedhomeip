@@ -154,7 +154,7 @@ def test_lock_ctrl(device, controller):
                                                                  LOCK_CTRL_TEST_PIN_CODE), requestTimeoutMs=1000)
     assert err == 0
 
-    ret = device.wait_for_output("Setting door lock state to \"Locked\" [endpointId={}]".format(LOCK_CTRL_TEST_ENDPOINT_ID))
+    ret = device.wait_for_output("setting door lock state to \"Locked\"")
     assert ret is not None and len(ret) > 0
 
     err, res = read_zcl_attribute(
@@ -167,7 +167,7 @@ def test_lock_ctrl(device, controller):
                                                                    LOCK_CTRL_TEST_PIN_CODE), requestTimeoutMs=1000)
     assert err == 0
 
-    ret = device.wait_for_output("Setting door lock state to \"Unlocked\" [endpointId={}]".format(LOCK_CTRL_TEST_ENDPOINT_ID))
+    ret = device.wait_for_output("setting door lock state to \"Unlocked\"")
     assert ret is not None and len(ret) > 0
 
     err, res = read_zcl_attribute(

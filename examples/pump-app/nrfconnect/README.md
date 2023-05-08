@@ -20,26 +20,6 @@ device works as a Thread Minimal End Device.
 
 <hr>
 
--   [Overview](#overview)
-    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
-    -   [Device Firmware Upgrade](#device-firmware-upgrade)
--   [Requirements](#requirements)
-    -   [Supported devices](#supported-devices)
--   [Device UI](#device-ui)
--   [Setting up the environment](#setting-up-the-environment)
-    -   [Using Docker container for setup](#using-docker-container-for-setup)
-    -   [Using native shell for setup](#using-native-shell-for-setup)
--   [Building](#building)
--   [Configuring the example](#configuring-the-example)
-    -   [Example build types](#example-build-types)
--   [Flashing and debugging](#flashing-and-debugging)
--   [Testing the example](#testing-the-example)
-    -   [Testing using Linux CHIPTool](#testing-using-linux-chiptool)
-    -   [Testing using Android CHIPTool](#testing-using-android-chiptool)
-
-<hr>
-
 ## Overview
 
 This example is running on the nRF Connect platform, which is based on Nordic

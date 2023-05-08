@@ -26,8 +26,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
@@ -127,7 +127,7 @@ extern "C" otError otPlatUartEnable(void)
 #ifdef PW_RPC_ENABLED
     return OT_ERROR_NOT_IMPLEMENTED;
 #else
-    uartConsoleInit();
+    // Uart Init is handled in init_efrPlatform.cpp
     return OT_ERROR_NONE;
 #endif
 }
@@ -153,7 +153,7 @@ extern "C" void efr32UartProcess(void)
 #if !defined(PW_RPC_ENABLED) && !defined(ENABLE_CHIP_SHELL)
     uint8_t tempBuf[128] = { 0 };
     // will read the data available up to 128bytes
-    uint16_t count = uartConsoleRead((char *) tempBuf, 128);
+    int16_t count = uartConsoleRead((char *) tempBuf, 128);
     if (count > 0)
     {
         // ot process Received data for CLI cmds

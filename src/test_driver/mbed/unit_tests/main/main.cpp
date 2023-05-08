@@ -17,9 +17,9 @@
  */
 
 #include "netsocket/WiFiInterface.h"
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/mbed/Logging.h>
-#include <support/UnitTestRegistration.h>
-#include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::Logging::Platform;

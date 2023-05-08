@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
 @class MTRDeviceControllerStartupParams;
+@class MTRFabricInfo;
 
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDeviceControllerFactoryParams : NSObject
@@ -104,6 +105,16 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * since then.
  */
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
+
+/**
+ * Returns the list of MTRFabricInfo representing the fabrics the
+ * MTRDeviceControllerFactory knows about and the corresponding node identities
+ * of the controller factory on those fabrics.  Returns nil if the factory is
+ * not running or if there is an error reading fabric information.
+ *
+ * All entries in this list will have a non-nil rootCertificate.
+ */
+@property (readonly, nonatomic, nullable) NSArray<MTRFabricInfo *> * knownFabrics;
 
 /**
  * Start the controller factory. Repeated calls to startControllerFactory

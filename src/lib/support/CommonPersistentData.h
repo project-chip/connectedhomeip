@@ -19,6 +19,7 @@
  *    @file
  *          Contains a class handling creation of linked list of stored persistent data.
  */
+#pragma once
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/PersistentData.h>

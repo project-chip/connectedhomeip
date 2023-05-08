@@ -1,6 +1,7 @@
 #pragma once
 
 #include <app/data-model/Nullable.h>
+#include <lib/assign/ValueAssign.h>
 
 #include <string>
 #include <vector>
@@ -15,9 +16,9 @@ struct {{struct.name}}
     chip::app::Clusters::detail::Structs::{{struct.name}}::DecodableType t;
     CHIP_ERROR err = t.Decode(reader);
     if(err == CHIP_NO_ERROR) {
-      {%-      for field in struct.fields %}
-      {{field.name}} = t.{{field.name}};
-      {%-      endfor  %}
+      {%- for field in struct.fields %}
+      chip::Value::Assign({{field.name}},  t.{{field.name}});
+      {%- endfor  %}
     }
     return err;
   }
@@ -25,9 +26,9 @@ struct {{struct.name}}
   CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
   {
     chip::app::Clusters::detail::Structs::{{struct.name}}::Type t;
-    {%-      for field in struct.fields %}
-    t.{{field.name}} = {{field.name}};
-    {%-      endfor  %}
+      {%- for field in struct.fields %}
+      chip::Value::Assign(t.{{field.name}},  {{field.name}});
+      {%- endfor  %}
     return t.Encode(writer, tag);
   }
 

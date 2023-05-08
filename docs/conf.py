@@ -12,7 +12,7 @@ sys.path.insert(0, str(MATTER_BASE / "docs" / "_extensions"))
 # -- Project information -----------------------------------------------------
 
 project = "Matter"
-copyright = "2022, Matter Contributors"
+copyright = "2020-2023, Matter Contributors"
 author = "Matter Contributors"
 version = "1.0.0"
 
@@ -31,6 +31,10 @@ exclude_patterns = [
     "examples/providers/README.md",
     "examples/thermostat/nxp/linux-se05x/README.md",
     "examples/common/m5stack-tft/repo",
+    "docs/guides/README.md",
+    "scripts/tools/memory/memdf/README.md",
+    "scripts/tools/memory/platform/README.md",
+    "scripts/tools/memory/README-GitHub-CI.md",
 ]
 
 
@@ -68,6 +72,8 @@ external_content_contents = [
     (MATTER_BASE, "examples/**/*.png"),
     (MATTER_BASE, "examples/**/*.jpg"),
     (MATTER_BASE, "examples/**/*.JPG"),
+    (MATTER_BASE, "src/tools/**/*.md"),
+    (MATTER_BASE, "scripts/tools/**/*.md"),
 ]
 external_content_link_prefixes = [
     "src/",

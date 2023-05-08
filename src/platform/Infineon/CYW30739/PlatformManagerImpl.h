@@ -26,7 +26,8 @@
 
 #include <hal/wiced_timer.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
-#include <wiced_rtos.h>
+
+#include "EventFlags.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -57,7 +58,6 @@ private:
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout durationMS);
     void _Shutdown(void);
 
-    void SetEventFlags(uint32_t flags);
     void HandleTimerEvent(void);
     void HandlePostEvent(void);
 
@@ -67,7 +67,7 @@ private:
     friend PlatformManagerImpl & PlatformMgrImpl(void);
 
     wiced_thread_t * mThread;
-    wiced_event_flags_t * mEventFlags;
+    EventFlags mEventFlags;
     wiced_queue_t * mEventQueue;
     wiced_timer_t mTimer;
     wiced_mutex_t * mMutex;

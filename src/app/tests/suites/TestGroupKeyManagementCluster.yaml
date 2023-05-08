@@ -177,6 +177,14 @@ tests:
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
                   { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0105, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0105, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0106, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0106, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0107, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0107, GroupKeySetID: 0x01a2 },
               ]
       response:
           error: FAILURE

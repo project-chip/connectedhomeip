@@ -110,11 +110,11 @@ class IdlEnumType:
 
     @property
     def byte_count(self):
-        return self.base_type.byte_count()
+        return self.base_type.byte_count
 
     @property
     def bits(self):
-        return self.base_type.bits()
+        return self.base_type.bits
 
 
 @dataclass
@@ -129,11 +129,11 @@ class IdlBitmapType:
 
     @property
     def byte_count(self):
-        return self.base_type.byte_count()
+        return self.base_type.byte_count
 
     @property
     def bits(self):
-        return self.base_type.bits()
+        return self.base_type.bits
 
 
 class IdlItemType(enum.Enum):
@@ -353,7 +353,7 @@ class TypeLookupContext:
         return any(map(lambda s: s.name == name, self.all_bitmaps))
 
 
-def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType]:
+def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType]:
     """
     Given a AST data type and a lookup context, match it to a type that can be later
     be used for generation.
@@ -379,7 +379,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     elif lowercase_name in ['enum8', 'enum16', 'enum32']:
         return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
     elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap24', 'bitmap32']:
-        return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
+        return IdlBitmapType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
 
     int_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)
     if int_type is not None:

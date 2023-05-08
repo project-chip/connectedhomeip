@@ -15,26 +15,25 @@
 # limitations under the License.
 
 try:
-    from .matter_idl_parser import CreateParser
-    from .matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage, Bitmap,
-                                   Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint,
-                                   Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, ParseMetaData,
-                                   ServerClusterInstantiation, Struct, StructQuality, StructTag)
-except ImportError:
+    from matter_idl.matter_idl_parser import CreateParser
+except ModuleNotFoundError:
     import os
     import sys
-    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+    sys.path.append(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))
 
-    from matter_idl_parser import CreateParser
-    from matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage, Bitmap,
-                                  Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint,
-                                  Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, ParseMetaData,
-                                  ServerClusterInstantiation, Struct, StructQuality, StructTag)
+    from matter_idl.matter_idl_parser import CreateParser
+
 import unittest
 
+from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage,
+                                         Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
+                                         Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+                                         ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
 
-def parseText(txt):
-    return CreateParser(skip_meta=True).parse(txt)
+
+def parseText(txt, skip_meta=True):
+    return CreateParser(skip_meta=skip_meta).parse(txt)
 
 
 class TestParser(unittest.TestCase):
@@ -144,6 +143,33 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_doc_comments(self):
+        actual = parseText("""
+            /** Documentation for MyCluster */
+            server cluster MyCluster = 0x321 {
+            }
+
+            /** Documentation for MyCluster #2 */
+            client cluster MyCluster = 0x321 {
+                /* NOT a doc comment */
+                command WithoutArg(): DefaultSuccess = 123;
+
+                /** Some command doc comment */
+                command InOutStuff(InParam): OutParam = 222;
+            }
+        """, skip_meta=False)
+
+        # meta_data may not match but is required for doc comments. Clean it up
+
+        # Metadata parsing varies line/column, so only check doc comments
+        self.assertEqual(
+            actual.clusters[0].description, "Documentation for MyCluster")
+        self.assertEqual(
+            actual.clusters[1].description, "Documentation for MyCluster #2")
+        self.assertIsNone(actual.clusters[1].commands[0].description)
+        self.assertEqual(
+            actual.clusters[1].commands[1].description, "Some command doc comment")
+
     def test_sized_attribute(self):
         actual = parseText("""
             server cluster MyCluster = 1 {
@@ -161,6 +187,33 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="char_string", max_length=11), code=1, name="attr1")),
                         Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
                             data_type=DataType(name="octet_string", max_length=33), code=2, name="attr2", is_list=True)),
+                    ]
+                    )])
+        self.assertEqual(actual, expected)
+
+    def test_timed_attributes(self):
+        actual = parseText("""
+            server cluster MyCluster = 1 {
+                attribute int32u attr1 = 1;
+                timedwrite attribute int32u attr2 = 2;
+                attribute int32u attr3 = 3;
+                timedwrite attribute octet_string<44> attr4[] = 4;
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="MyCluster",
+                    code=1,
+                    attributes=[
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=1, name="attr1")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE | AttributeQuality.TIMED_WRITE, definition=Field(
+                            data_type=DataType(name="int32u"), code=2, name="attr2")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=3, name="attr3")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE | AttributeQuality.TIMED_WRITE, definition=Field(
+                            data_type=DataType(name="octet_string", max_length=44), code=4, name="attr4", is_list=True)),
                     ]
                     )])
         self.assertEqual(actual, expected)
@@ -411,9 +464,9 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(clusters=[
-            Cluster(parse_meta=ParseMetaData(line=2, column=1),
+            Cluster(parse_meta=ParseMetaData(line=2, column=1, start_pos=1),
                     side=ClusterSide.SERVER, name="A", code=1),
-            Cluster(parse_meta=ParseMetaData(line=5, column=4),
+            Cluster(parse_meta=ParseMetaData(line=5, column=4, start_pos=87),
                     side=ClusterSide.CLIENT, name="B", code=2),
         ])
         self.assertEqual(actual, expected)

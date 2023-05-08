@@ -146,7 +146,7 @@ class TypedAttributePath:
                     break
 
             if (self.ClusterType is None or self.AttributeType is None):
-                raise Exception("Schema not found")
+                raise KeyError(f"No Schema found for Attribute {Path}")
 
         # Next, let's figure out the label.
         for field in self.ClusterType.descriptor.Fields:
@@ -156,7 +156,7 @@ class TypedAttributePath:
             self.AttributeName = field.Label
 
         if (self.AttributeName is None):
-            raise Exception("Schema not found")
+            raise KeyError(f"Unable to resolve name for Attribute {Path}")
 
         self.Path = Path
         self.ClusterId = self.ClusterType.id
@@ -745,8 +745,14 @@ class AsyncReadTransaction:
 
         if (self._subscription_handler is not None):
             for change in self._changedPathSet:
+                try:
+                    attribute_path = TypedAttributePath(Path=change)
+                except (KeyError, ValueError) as err:
+                    # path could not be resolved into a TypedAttributePath
+                    logging.getLogger(__name__).exception(err)
+                    continue
                 self._subscription_handler.OnAttributeChangeCb(
-                    TypedAttributePath(Path=change), self._subscription_handler)
+                    attribute_path, self._subscription_handler)
 
             # Clear it out once we've notified of all changes in this transaction.
         self._changedPathSet = set()

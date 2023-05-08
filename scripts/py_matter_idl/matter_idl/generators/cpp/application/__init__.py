@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
@@ -32,7 +33,7 @@ class CppApplicationGenerator(CodeGenerator):
         Inintialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.
         """
-        super().__init__(storage, idl)
+        super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
         self.jinja_env.filters['serverClustersOnly'] = serverClustersOnly
 
@@ -43,7 +44,7 @@ class CppApplicationGenerator(CodeGenerator):
 
         # Header containing a macro to initialize all cluster plugins
         self.internal_render_one_output(
-            template_path="cpp/application/PluginApplicationCallbacksHeader.jinja",
+            template_path="PluginApplicationCallbacksHeader.jinja",
             output_file_name="app/PluginApplicationCallbacks.h",
             vars={
                 'clusters': self.idl.clusters,
@@ -53,7 +54,7 @@ class CppApplicationGenerator(CodeGenerator):
         # Source for __attribute__(weak) implementations of all cluster
         # initialization methods
         self.internal_render_one_output(
-            template_path="cpp/application/CallbackStubSource.jinja",
+            template_path="CallbackStubSource.jinja",
             output_file_name="app/callback-stub.cpp",
             vars={
                 'clusters': self.idl.clusters,

@@ -23,12 +23,14 @@
 
 constexpr size_t kMaxCachedVideoPlayers = 32;
 
-class PersistenceManager
+class PersistenceManager : public chip::FabricTable::Delegate
 {
 public:
     CHIP_ERROR AddVideoPlayer(TargetVideoPlayerInfo * targetVideoPlayerInfo);
 
     CHIP_ERROR ReadAllVideoPlayers(TargetVideoPlayerInfo outVideoPlayers[]);
+
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex);
 
     CHIP_ERROR PurgeVideoPlayerCache();
 

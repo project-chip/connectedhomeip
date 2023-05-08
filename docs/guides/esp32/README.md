@@ -16,3 +16,4 @@ example on ESP32 series of SoCs
 -   [Flash and NVS encryption for securing factory data](flash_nvs_encryption.md)
 -   [RPC Console and Device Tracing](rpc_console.md)
 -   [Matter OTA](ota.md)
+-   [Generating and Using ESP Secure Cert Parttiton](secure_cert_partition.md)

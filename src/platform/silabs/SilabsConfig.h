@@ -26,8 +26,6 @@
 
 #include <functional>
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"
 
@@ -137,6 +135,14 @@ public:
     static constexpr Key kConfigKey_YearDaySchedules   = SilabsConfigKey(kMatterConfig_KeyBase, 0x16);
     static constexpr Key kConfigKey_HolidaySchedules   = SilabsConfigKey(kMatterConfig_KeyBase, 0x17);
     static constexpr Key kConfigKey_OpKeyMap           = SilabsConfigKey(kMatterConfig_KeyBase, 0x20);
+    static constexpr Key kConfigKey_Creds_KeyId        = SilabsConfigKey(kMatterConfig_KeyBase, 0x21);
+    static constexpr Key kConfigKey_Creds_Base_Addr    = SilabsConfigKey(kMatterConfig_KeyBase, 0x22);
+    static constexpr Key kConfigKey_Creds_DAC_Offset   = SilabsConfigKey(kMatterConfig_KeyBase, 0x23);
+    static constexpr Key kConfigKey_Creds_DAC_Size     = SilabsConfigKey(kMatterConfig_KeyBase, 0x24);
+    static constexpr Key kConfigKey_Creds_PAI_Offset   = SilabsConfigKey(kMatterConfig_KeyBase, 0x25);
+    static constexpr Key kConfigKey_Creds_PAI_Size     = SilabsConfigKey(kMatterConfig_KeyBase, 0x26);
+    static constexpr Key kConfigKey_Creds_CD_Offset    = SilabsConfigKey(kMatterConfig_KeyBase, 0x27);
+    static constexpr Key kConfigKey_Creds_CD_Size      = SilabsConfigKey(kMatterConfig_KeyBase, 0x28);
 
     static constexpr Key kConfigKey_GroupKeyMax =
         SilabsConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.

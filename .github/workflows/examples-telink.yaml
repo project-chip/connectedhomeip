@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.6.47
+            image: connectedhomeip/chip-build-telink:0.6.53
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -50,7 +50,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform telink
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform telink
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
@@ -68,7 +68,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
 
             - name: Build example Telink All Clusters App
               run: |
@@ -89,6 +89,18 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d all-clusters-minimal-app \
                     out/telink-tlsr9518adk80d-all-clusters-minimal/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
+
+            - name: Build example Telink Bridge App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-bridge' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d bridge-app \
+                    out/telink-tlsr9518adk80d-bridge/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
@@ -125,6 +137,21 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d lighting-app-rpc \
                     out/telink-tlsr9518adk80d-light-rpc/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
+
+            - name: Build example Telink Lighting App with Factory Data
+              run: |
+                  ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
+                  ./scripts/build/gn_gen.sh
+                  ./scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE chip-cert chip-tool spake2p"
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d lighting-app-factory-data \
+                    out/telink-tlsr9518adk80d-light-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output

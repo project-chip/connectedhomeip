@@ -59,6 +59,7 @@ target_include_directories(app PRIVATE
                            include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/window-app
+                           ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
 
@@ -68,9 +69,10 @@ add_definitions(
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/main.cpp
                src/ZclCallbacks.cpp
                src/WindowCovering.cpp
+               ${TELINK_COMMON}/common/src/mainCommon.cpp
+               ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
@@ -241,6 +243,7 @@ target_link_libraries(app PRIVATE
 target_link_options(app
   PUBLIC
     "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
+    "-L${PIGWEED_ROOT}/pw_tokenizer"
 )
 
 endif(CONFIG_CHIP_PW_RPC)

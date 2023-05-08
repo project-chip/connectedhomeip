@@ -589,7 +589,7 @@ tests:
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
-          Verify the "grouptable" does not have GroupName  Gp9 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+          Verify the "grouptable" does not have GroupName gp5 on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1674552384.204664][21058:21060] CHIP:DMG: }
           [1674552384.204841][21058:21060] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 1314349292

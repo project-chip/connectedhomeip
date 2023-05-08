@@ -90,6 +90,17 @@ struct SetupParams
     //
     bool enableServerInteractions = false;
 
+    /**
+     * Controls whether shutdown of the controller removes the corresponding
+     * entry from the fabric table.  For now the removal is just from the
+     * in-memory table, not from storage, which means that after controller
+     * shutdown the storage and the in-memory fabric table will be out of sync.
+     * This is acceptable for implementations that don't actually store any of
+     * the fabric table information, but if someone wants a true removal at some
+     * point another option will need to be added here.
+     */
+    bool removeFromFabricTableOnShutdown = true;
+
     Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
     CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
@@ -163,7 +174,7 @@ public:
     // created to permit retention of the underlying system state.
     //
     // NB: The system state will still be freed in Shutdown() regardless of this call.
-    void RetainSystemState() { (void) mSystemState->Retain(); }
+    void RetainSystemState();
 
     //
     // To initiate shutdown of the stack upon termination of all resident controllers in the
@@ -172,7 +183,7 @@ public:
     //
     // This should only be invoked if a matching call to RetainSystemState() was called prior.
     //
-    void ReleaseSystemState() { mSystemState->Release(); }
+    void ReleaseSystemState();
 
     //
     // Retrieve a read-only pointer to the system state object that contains pointers to key stack

@@ -546,6 +546,7 @@ static void UnknownOptionTest_UnknownLongOptionAfterArgs()
     VerifyArgErrorContains(0, "--barf");
 }
 
+#ifndef CHIP_CONFIG_NON_POSIX_LONG_OPT
 static void UnknownOptionTest_IgnoreUnknownLongOption()
 {
     bool res;
@@ -578,6 +579,7 @@ static void UnknownOptionTest_IgnoreUnknownLongOption()
     VerifyNonOptionArg(2, "non-opt-arg-1");
     VerifyNonOptionArg(3, "non-opt-arg-2");
 }
+#endif // !CHIP_CONFIG_NON_POSIX_LONG_OPT
 
 static void UnknownOptionTest_IgnoreUnknownShortOption()
 {

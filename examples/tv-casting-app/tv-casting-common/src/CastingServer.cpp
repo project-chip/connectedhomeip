@@ -57,6 +57,9 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
     // Initialize binding handlers
     ReturnErrorOnFailure(InitBindingHandlers());
 
+    // Set FabricDelegate
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&mPersistenceManager);
+
     // Add callback to send Content casting commands after commissioning completes
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
@@ -145,13 +148,36 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(chip::Transport::
     return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
 }
 
+chip::Inet::IPAddress * CastingServer::getIpAddressForUDCRequest(chip::Inet::IPAddress ipAddresses[], const size_t numIPs)
+{
+    size_t ipIndexToUse = 0;
+    for (size_t i = 0; i < numIPs; i++)
+    {
+        if (ipAddresses[i].IsIPv4())
+        {
+            ipIndexToUse = i;
+            ChipLogProgress(AppServer, "Found IPv4 address at index: %lu - prioritizing use of IPv4",
+                            static_cast<long>(ipIndexToUse));
+            break;
+        }
+
+        if (i == (numIPs - 1))
+        {
+            ChipLogProgress(AppServer, "Could not find an IPv4 address, defaulting to the first address in IP list");
+        }
+    }
+
+    return &ipAddresses[ipIndexToUse];
+}
+
 CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::DiscoveredNodeData * selectedCommissioner)
 {
     mUdcInProgress = true;
     // Send User Directed commissioning request
+    chip::Inet::IPAddress * ipAddressToUse =
+        getIpAddressForUDCRequest(selectedCommissioner->resolutionData.ipAddress, selectedCommissioner->resolutionData.numIPs);
     ReturnErrorOnFailure(SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
-        selectedCommissioner->resolutionData.ipAddress[0], selectedCommissioner->resolutionData.port,
-        selectedCommissioner->resolutionData.interfaceId)));
+        *ipAddressToUse, selectedCommissioner->resolutionData.port, selectedCommissioner->resolutionData.interfaceId)));
     mTargetVideoPlayerVendorId   = selectedCommissioner->commissionData.vendorId;
     mTargetVideoPlayerProductId  = selectedCommissioner->commissionData.productId;
     mTargetVideoPlayerDeviceType = selectedCommissioner->commissionData.deviceType;
@@ -188,6 +214,12 @@ CastingServer::GetDiscoveredCommissioner(int index, chip::Optional<TargetVideoPl
 void CastingServer::ReadServerClustersForNode(NodeId nodeId)
 {
     ChipLogProgress(NotSpecified, "ReadServerClustersForNode nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+    CHIP_ERROR err = Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Init error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
     for (const auto & binding : BindingTable::GetInstance())
     {
         ChipLogProgress(NotSpecified,
@@ -337,7 +369,7 @@ CHIP_ERROR CastingServer::VerifyOrEstablishConnection(TargetVideoPlayerInfo & ta
         onConnectionFailure);
 }
 
-CHIP_ERROR CastingServer::PurgeVideoPlayerCache()
+CHIP_ERROR CastingServer::PurgeCache()
 {
     return mPersistenceManager.PurgeVideoPlayerCache();
 }
@@ -448,6 +480,11 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
 // given a fabric index, try to determine the video-player nodeId by searching the binding table
 NodeId CastingServer::GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex)
 {
+    CHIP_ERROR err = Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "GetVideoPlayerNodeForFabricIndex Init error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
     for (const auto & binding : BindingTable::GetInstance())
     {
         ChipLogProgress(NotSpecified,
@@ -469,6 +506,11 @@ NodeId CastingServer::GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex)
 // given a nodeId, try to determine the video-player fabric index by searching the binding table
 FabricIndex CastingServer::GetVideoPlayerFabricIndexForNode(NodeId nodeId)
 {
+    CHIP_ERROR err = Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "GetVideoPlayerFabricIndexForNode Init error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
     for (const auto & binding : BindingTable::GetInstance())
     {
         ChipLogProgress(NotSpecified,

@@ -799,46 +799,6 @@ DeviceLayer::NetworkCommissioning::NetworkIterator * NullNetworkDriver::GetNetwo
 } // namespace app
 } // namespace chip
 
-// These functions are ember interfaces, they should never be implemented since all network commissioning cluster functions are
-// implemented in NetworkCommissioning::Instance.
-bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::AddOrUpdateThreadNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::AddOrUpdateWiFiNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterConnectNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              const Commands::ConnectNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                             const Commands::RemoveNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                            const Commands::ScanNetworks::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterReorderNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              const Commands::ReorderNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
 void MatterNetworkCommissioningPluginServerInitCallback()
 {
     // Nothing to do, the server init routine will be done in Instance::Init()

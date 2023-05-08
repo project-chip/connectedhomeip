@@ -107,7 +107,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 
 #endif /* WF200 */
 
-#ifndef RS911X_SOCKETS
 /* LwIP includes. */
 #include "lwip/apps/httpd.h"
 #include "lwip/ip_addr.h"
@@ -123,8 +122,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define SL_WFX_SCAN_START (1 << 5)
 #define SL_WFX_SCAN_COMPLETE (1 << 6)
 #define SL_WFX_RETRY_CONNECT (1 << 7)
-
-#endif /* RS911X_SOCKETS */
 
 #include "sl_status.h"
 #include "stdbool.h"
@@ -355,6 +352,10 @@ void wfx_ip_changed_notify(int got_ip);
 void wfx_ipv6_notify(int got_ip);
 
 #ifdef RS911X_WIFI
+/* RSI Power Save */
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+sl_status_t wfx_power_save();
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
 /* RSI for LWIP */
 void * wfx_rsi_alloc_pkt(void);
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);

@@ -112,17 +112,17 @@ DNSServiceProtocol GetProtocol(const chip::Inet::IPAddressType & addressType)
 namespace chip {
 namespace Dnssd {
 
-CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
+CHIP_ERROR GenericContext::FinalizeInternal(const char * errorStr, CHIP_ERROR err)
 {
     if (MdnsContexts::GetInstance().Has(this) == CHIP_NO_ERROR)
     {
-        if (kDNSServiceErr_NoError == err)
+        if (CHIP_NO_ERROR == err)
         {
             DispatchSuccess();
         }
         else
         {
-            DispatchFailure(err);
+            DispatchFailure(errorStr, err);
         }
     }
     else
@@ -130,7 +130,17 @@ CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
         chip::Platform::Delete(this);
     }
 
-    return Error::ToChipError(err);
+    return err;
+}
+
+CHIP_ERROR GenericContext::Finalize(CHIP_ERROR err)
+{
+    return FinalizeInternal(err.AsString(), err);
+}
+
+CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
+{
+    return FinalizeInternal(Error::ToString(err), Error::ToChipError(err));
 }
 
 MdnsContexts::~MdnsContexts()
@@ -289,10 +299,10 @@ RegisterContext::RegisterContext(const char * sType, const char * instanceName, 
     mInstanceName = instanceName;
 }
 
-void RegisterContext::DispatchFailure(DNSServiceErrorType err)
+void RegisterContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
-    callback(context, nullptr, nullptr, Error::ToChipError(err));
+    ChipLogError(Discovery, "Mdns: Register failure (%s)", errorStr);
+    callback(context, nullptr, nullptr, err);
     MdnsContexts::GetInstance().Remove(this);
 }
 
@@ -316,10 +326,10 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
     protocol = cbContextProtocol;
 }
 
-void BrowseContext::DispatchFailure(DNSServiceErrorType err)
+void BrowseContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Browse failure (%s)", Error::ToString(err));
-    callback(context, nullptr, 0, true, Error::ToChipError(err));
+    ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
+    callback(context, nullptr, 0, true, err);
     MdnsContexts::GetInstance().Remove(this);
 }
 
@@ -353,14 +363,14 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
 
 ResolveContext::~ResolveContext() {}
 
-void ResolveContext::DispatchFailure(DNSServiceErrorType err)
+void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Resolve failure (%s)", Error::ToString(err));
+    ChipLogError(Discovery, "Mdns: Resolve failure (%s)", errorStr);
     // Remove before dispatching, so calls back into
     // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
     bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
 
-    callback(context, nullptr, Span<Inet::IPAddress>(), Error::ToChipError(err));
+    callback(context, nullptr, Span<Inet::IPAddress>(), err);
 
     if (needDelete)
     {
@@ -410,7 +420,6 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
 
     chip::Inet::IPAddress ip;
     ReturnErrorOnFailure(chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip));
-    interfaces[interfaceId].addresses.push_back(ip);
 
 #ifdef CHIP_PROGRESS_LOGGING
     char addrStr[INET6_ADDRSTRLEN];
@@ -418,19 +427,18 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
     ChipLogProgress(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
 #endif // CHIP_PROGRESS_LOGGING
 
+    if (ip.IsIPv6LinkLocal() && interfaceId == kDNSServiceInterfaceIndexLocalOnly)
+    {
+        // We need a real interface to use a link-local address.  Just ignore
+        // this one, because trying to use it will simply lead to "No route to
+        // host" errors.
+        ChipLogProgress(Discovery, "Mdns: Ignoring link-local address with no usable interface");
+        return CHIP_NO_ERROR;
+    }
+
+    interfaces[interfaceId].addresses.push_back(ip);
+
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ResolveContext::OnNewLocalOnlyAddress()
-{
-    sockaddr_in6 sockaddr;
-    memset(&sockaddr, 0, sizeof(sockaddr));
-    sockaddr.sin6_len    = sizeof(sockaddr);
-    sockaddr.sin6_family = AF_INET6;
-    sockaddr.sin6_addr   = in6addr_loopback;
-    sockaddr.sin6_port   = htons((unsigned short) interfaces[kDNSServiceInterfaceIndexLocalOnly].service.mPort);
-
-    return OnNewAddress(kDNSServiceInterfaceIndexLocalOnly, reinterpret_cast<struct sockaddr *>(&sockaddr));
 }
 
 bool ResolveContext::HasAddress()

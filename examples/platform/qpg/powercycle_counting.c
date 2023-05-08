@@ -59,8 +59,9 @@ static void gpAppFramework_HardwareResetTriggered(void)
     size_t readBytesSize;
 
     status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0);
-    if (status == QV_STATUS_INVALID_DATA || readBytesSize != 0)
+    if (status == QV_STATUS_INVALID_DATA)
     {
+        // No reset count stored yet - create new key
         resetCounts = 0;
     }
     else if (status != QV_STATUS_NO_ERROR)
@@ -94,6 +95,7 @@ UInt8 gpAppFramework_Reset_GetResetCount(void)
     status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0);
     if (status == QV_STATUS_INVALID_DATA || readBytesSize != 1)
     {
+        // Reset count was not stored yet
         resetCounts = 0;
     }
     else if (status != QV_STATUS_NO_ERROR)

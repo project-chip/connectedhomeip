@@ -78,8 +78,16 @@ ChipDeviceScanner::~ChipDeviceScanner()
 {
     StopScan();
 
-    // In case the timeout timer is still active
-    chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
+    // mTimerExpired should only be set to true in the TimerExpiredCallback, which means we are in that callback
+    // right now so there is no need to cancel the timer. Doing so would result in deadlock trying to aquire the
+    // chip stack lock which we already currently have.
+    if (!mTimerExpired)
+    {
+        // In case the timeout timer is still active
+        DeviceLayer::PlatformMgr().LockChipStack();
+        chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+    }
 
     g_object_unref(mManager);
     g_object_unref(mCancellable);
@@ -123,7 +131,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     mIsScanning = true; // optimistic, to allow all callbacks to check this
-    if (PlatformMgrImpl().ScheduleOnGLibMainLoopThread(MainLoopStartScan, this, true) != CHIP_NO_ERROR)
+    if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStartScan, this) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan start.");
         mIsScanning = false;
@@ -136,7 +144,9 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         return CHIP_ERROR_INTERNAL;
     }
 
+    DeviceLayer::PlatformMgr().LockChipStack();
     CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
+    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if (err != CHIP_NO_ERROR)
     {
@@ -144,6 +154,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         StopScan();
         return err;
     }
+    mTimerExpired = false;
 
     return CHIP_NO_ERROR;
 }
@@ -151,6 +162,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState)
 {
     ChipDeviceScanner * chipDeviceScanner = static_cast<ChipDeviceScanner *>(appState);
+    chipDeviceScanner->MarkTimerExpired();
     chipDeviceScanner->mDelegate->OnScanError(CHIP_ERROR_TIMEOUT);
     chipDeviceScanner->StopScan();
 }
@@ -174,16 +186,21 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
         mInterfaceChangedSignal = 0;
     }
 
-    if (PlatformMgrImpl().ScheduleOnGLibMainLoopThread(MainLoopStopScan, this, true) != CHIP_NO_ERROR)
+    if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStopScan, this) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan stop.");
         return CHIP_ERROR_INTERNAL;
     }
 
+    ChipDeviceScannerDelegate * delegate = this->mDelegate;
+    // callback is explicitly allowed to delete the scanner (hence no more
+    // references to 'self' here)
+    delegate->OnScanComplete();
+
     return CHIP_NO_ERROR;
 }
 
-int ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
+CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
 {
     GError * error = nullptr;
 
@@ -192,14 +209,9 @@ int ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
         ChipLogError(Ble, "Failed to stop discovery %s", error->message);
         g_error_free(error);
     }
-    ChipDeviceScannerDelegate * delegate = self->mDelegate;
-    self->mIsScanning                    = false;
+    self->mIsScanning = false;
 
-    // callback is explicitly allowed to delete the scanner (hence no more
-    // references to 'self' here)
-    delegate->OnScanComplete();
-
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 void ChipDeviceScanner::SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self)
@@ -266,7 +278,7 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 * device)
     }
 }
 
-int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
+CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
     GError * error = nullptr;
 
@@ -308,7 +320,7 @@ int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
         self->mDelegate->OnScanComplete();
     }
 
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

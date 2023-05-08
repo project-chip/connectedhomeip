@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.chip.casting.DiscoveredNodeData;
@@ -76,6 +77,22 @@ public class CommissionerDiscoveryFragment extends Fragment {
     View.OnClickListener manualCommissioningButtonOnClickListener =
         v -> callback.handleCommissioningButtonClicked(null);
     manualCommissioningButton.setOnClickListener(manualCommissioningButtonOnClickListener);
+
+    Button purgeCacheButton = getView().findViewById(R.id.purgeCacheButton);
+    Context context = getContext().getApplicationContext();
+    View.OnClickListener purgeCacheOnClickListener =
+        new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            boolean status = tvCastingApp.purgeCache();
+            Toast.makeText(
+                    context,
+                    "Cache purge " + (status ? "successful!" : "failed!"),
+                    Toast.LENGTH_SHORT)
+                .show();
+          }
+        };
+    purgeCacheButton.setOnClickListener(purgeCacheOnClickListener);
 
     ArrayAdapter<DiscoveredNodeData> arrayAdapter =
         new VideoPlayerCommissionerAdapter(getActivity(), commissionerVideoPlayerList);

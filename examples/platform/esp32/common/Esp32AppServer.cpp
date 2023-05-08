@@ -35,6 +35,9 @@ namespace {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+#elif CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+static app::Clusters::NetworkCommissioning::Instance
+    sEthernetNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
 #endif
 
 #if CONFIG_TEST_EVENT_TRIGGER_ENABLED

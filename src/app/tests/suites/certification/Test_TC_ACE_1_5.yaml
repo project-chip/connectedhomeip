@@ -15,6 +15,10 @@
 
 name: 42.1.5. [TC-ACE-1.5] Multi-fabric
 
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - APPDEVICE.S
+
 config:
     nodeId: 0x12344321
     cluster: "Access Control"

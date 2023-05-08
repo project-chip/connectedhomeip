@@ -18,9 +18,9 @@ public:
 
     struct Credential
     {
-        bool set(DlCredentialStatus status, DlCredentialType type, chip::ByteSpan newData)
+        bool set(DlCredentialStatus status, CredentialTypeEnum type, chip::ByteSpan newData)
         {
-            if (newData.size() > kMaxDataLength || type != DlCredentialType::kPIN)
+            if (newData.size() > kMaxDataLength || type != CredentialTypeEnum::kPin)
                 return false;
             memcpy(data, newData.data(), newData.size());
             info = EmberAfPluginDoorLockCredentialInfo{
@@ -37,28 +37,29 @@ public:
 
     struct User
     {
-        void set(chip::CharSpan newName, uint32_t userId, DlUserStatus userStatus, DlUserType type, DlCredentialRule credentialRule)
+        void set(chip::CharSpan newName, uint32_t userId, UserStatusEnum userStatus, UserTypeEnum type,
+                 CredentialRuleEnum credentialRule)
         {
             size_t sz = std::min(sizeof(name), newName.size());
             memcpy(name, newName.data(), sz);
             info = EmberAfPluginDoorLockUserInfo{
-                chip::CharSpan(name, sz), chip::Span<const DlCredential>(), userId, userStatus, type, credentialRule,
+                chip::CharSpan(name, sz), chip::Span<const CredentialStruct>(), userId, userStatus, type, credentialRule,
             };
         }
-        bool addCredential(uint8_t type, uint16_t index)
+        bool addCredential(CredentialTypeEnum type, uint16_t index)
         {
             if (info.credentials.size() == kNumCredentialsPerUser)
                 return false;
             auto & cr          = credentialMap[info.credentials.size()];
-            cr.CredentialType  = type;
-            cr.CredentialIndex = index;
-            info.credentials   = chip::Span<const DlCredential>(credentialMap, info.credentials.size() + 1);
+            cr.credentialType  = type;
+            cr.credentialIndex = index;
+            info.credentials   = chip::Span<const CredentialStruct>(credentialMap, info.credentials.size() + 1);
             return true;
         }
 
-        EmberAfPluginDoorLockUserInfo info = { .userStatus = DlUserStatus::kAvailable };
+        EmberAfPluginDoorLockUserInfo info = { .userStatus = UserStatusEnum::kAvailable };
         char name[kMaxNameLength];
-        DlCredential credentialMap[kNumCredentialsPerUser];
+        CredentialStruct credentialMap[kNumCredentialsPerUser];
     };
 
     struct Endpoint
@@ -88,8 +89,8 @@ public:
     }
 
     bool setUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                 const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
-                 DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
+                 const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
+                 CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
     {
         auto ep = findEndpoint(endpointId);
         if (!ep)
@@ -102,11 +103,11 @@ public:
         ep->users[userIndex].info.modificationSource = DlAssetSource::kMatterIM;
         ep->users[userIndex].info.lastModifiedBy     = modifier;
         for (size_t i = 0; i < totalCredentials; i++)
-            ep->users[userIndex].addCredential(credentials[i].CredentialType, credentials[i].CredentialIndex);
+            ep->users[userIndex].addCredential(credentials[i].credentialType, credentials[i].credentialIndex);
         return true;
     }
 
-    bool getCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+    bool getCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential)
     {
         auto ep = findEndpoint(endpointId);
@@ -114,21 +115,22 @@ public:
             return false;
         if (credentialIndex >= kNumCredentialsPerEndpoint)
             return false;
-        if (credentialType != DlCredentialType::kPIN)
+        if (credentialType != CredentialTypeEnum::kPin)
             return false;
         credential = ep->credentials[credentialIndex].info;
         return true;
     }
 
     bool setCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                       DlCredentialStatus credentialStatus, DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                       const chip::ByteSpan & credentialData)
     {
         auto ep = findEndpoint(endpointId);
         if (!ep)
             return false;
         if (credentialIndex >= kNumCredentialsPerEndpoint)
             return false;
-        if (credentialType != DlCredentialType::kPIN)
+        if (credentialType != CredentialTypeEnum::kPin)
             return false;
         auto & credential = ep->credentials[credentialIndex];
         if (!credential.set(credentialStatus, credentialType, credentialData))
@@ -141,11 +143,11 @@ public:
     }
 
     bool checkPin(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
-                  chip::app::Clusters::DoorLock::DlOperationError & err)
+                  chip::app::Clusters::DoorLock::OperationErrorEnum & err)
     {
         if (!pinCode.HasValue())
         {
-            err = DlOperationError::kInvalidCredential;
+            err = OperationErrorEnum::kInvalidCredential;
             return false;
         }
         auto ep = findEndpoint(endpointId);
@@ -158,7 +160,7 @@ public:
                 return true;
             }
         }
-        err = DlOperationError::kInvalidCredential;
+        err = OperationErrorEnum::kInvalidCredential;
         return false;
     }
 
@@ -177,11 +179,10 @@ private:
     {
         endpoints[0].id = 1;
         uint8_t pin[6]  = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36 };
-        endpoints[0].credentials[chip::to_underlying(DlCredentialType::kPin)][0].set(DlCredentialStatus::kOccupied,
-                                                                                     DlCredentialType::kPin, chip::ByteSpan(pin));
-        endpoints[0].users[0].set(chip::CharSpan("default"), 1, DlUserStatus::kOccupiedEnabled, DlUserType::kUnrestrictedUser,
-                                  DlCredentialRule::kSingle);
-        endpoints[0].users[0].addCredential(chip::to_underlying(DlCredentialType::kPin), 1);
+        endpoints[0].credentials[0].set(DlCredentialStatus::kOccupied, CredentialTypeEnum::kPin, chip::ByteSpan(pin));
+        endpoints[0].users[0].set(chip::CharSpan("default"), 1, UserStatusEnum::kOccupiedEnabled, UserTypeEnum::kUnrestrictedUser,
+                                  CredentialRuleEnum::kSingle);
+        endpoints[0].users[0].addCredential(CredentialTypeEnum::kPin, 1);
     }
 
     Endpoint endpoints[kNumEndpoints];
@@ -208,14 +209,14 @@ bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userInde
 
 bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
                                   chip::FabricIndex modifier, const chip::CharSpan & userName, uint32_t uniqueId,
-                                  DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
-                                  const DlCredential * credentials, size_t totalCredentials)
+                                  UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
+                                  const CredentialStruct * credentials, size_t totalCredentials)
 {
     return LockManager::Instance().setUser(endpointId, userIndex - 1, creator, modifier, userName, uniqueId, userStatus, usertype,
                                            credentialRule, credentials, totalCredentials);
 }
 
-bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                         EmberAfPluginDoorLockCredentialInfo & credential)
 {
     return LockManager::Instance().getCredential(endpointId, credentialIndex - 1, credentialType, credential);
@@ -223,7 +224,7 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
 
 bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
                                         chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
-                                        DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+                                        CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData)
 {
     return LockManager::Instance().setCredential(endpointId, credentialIndex - 1, creator, modifier, credentialStatus,
                                                  credentialType, credentialData);

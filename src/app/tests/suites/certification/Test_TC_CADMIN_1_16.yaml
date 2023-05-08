@@ -150,6 +150,15 @@ tests:
               - name: "nodeId"
                 value: nodeId3
 
+    - label:
+          "TH3 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "gamma"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH3FabricIndex
+
     - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
       identity: "beta"
       cluster: "Operational Credentials"
@@ -272,6 +281,15 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
+    - label:
+          "TH2 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH2FabricIndex
+
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       identity: "alpha"
       PICS: OPCREDS.S.A0001
@@ -288,3 +306,25 @@ tests:
               ]
           constraints:
               type: list
+
+    - label: "Remove TH2 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH2FabricIndex
+
+    - label: "Remove TH3 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "gamma"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH3FabricIndex

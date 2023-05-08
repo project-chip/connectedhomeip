@@ -99,7 +99,7 @@ Silicon Labs platform.
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/window-app/silabs/efr32/ ./out/window-app BRD4161A
+          ./scripts/examples/gn_efr32_example.sh ./examples/window-app/silabs/efr32/ ./out/window-app BRD4187C
 
 -   To delete generated executable, libraries and object files use:
 
@@ -111,7 +111,7 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip/examples/window-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4161A
+          $ export SILABS_BOARD=BRD4187C
           $ gn gen out/debug
           $ ninja -C out/debug
 
@@ -122,22 +122,22 @@ Silicon Labs platform.
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/window-app/silabs/efr32/ ./out/window-app_SED BRD4161A --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/window-app/silabs/efr32/ ./out/window-app_SED BRD4187C --sed
 
     or use gn as previously mentioned but adding the following arguments:
 
-          $ gn gen out/debug '--args=silabs_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
+          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
 
 *   Build the example with pigweed RCP
 
-          $ ./scripts/examples/gn_efr32_example.sh examples/window-app/silabs/efr32/ out/window_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_efr32_example.sh examples/window-app/silabs/efr32/ out/window_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
           $ cd ~/connectedhomeip/examples/window-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4161A
+          $ export SILABS_BOARD=BRD4187C
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
 
@@ -154,6 +154,11 @@ arguments
           $ python3 out/debug/chip-efr32-window-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
+
+All EFR32 boards require a bootloader, see Silicon Labs documentation for more
+info. Pre-built bootloader binaries are available in the Assets section of the
+Releases page on
+[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
 
 ## Viewing Logging Output
 
@@ -274,19 +279,19 @@ combination with JLinkRTTClient as follows:
     established, look for the RTT log
 
     ```
-        [DL] Device Role: CHILD
-        [DL] Partition Id:0x6A7491B7
-        [DL] \_OnPlatformEvent default: event->Type = 32778
-        [DL] OpenThread State Changed (Flags: 0x00000001)
-        [DL] Thread Unicast Addresses:
-        [DL]    2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred
-        [DL]    FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc
-        [DL]    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred
-        [DL]    FE80::D8F2:592E:C109:CF00/64 valid preferred
-        [DL] LwIP Thread interface addresses updated
-        [DL] FE80::D8F2:592E:C109:CF00 IPv6 link-local address, preferred)
-        [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred)
-        [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
+        [DL] Device Role: CHILD
+        [DL] Partition Id:0x6A7491B7
+        [DL] \_OnPlatformEvent default: event->Type = 32778
+        [DL] OpenThread State Changed (Flags: 0x00000001)
+        [DL] Thread Unicast Addresses:
+        [DL]    2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred
+        [DL]    FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc
+        [DL]    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred
+        [DL]    FE80::D8F2:592E:C109:CF00/64 valid preferred
+        [DL] LwIP Thread interface addresses updated
+        [DL] FE80::D8F2:592E:C109:CF00 IPv6 link-local address, preferred)
+        [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred)
+        [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
     ```
 
     (you can verify that the device is on the thread network with the command

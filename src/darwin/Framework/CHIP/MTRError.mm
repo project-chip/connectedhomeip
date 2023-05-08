@@ -238,6 +238,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     }
 
     if (error.domain != MTRErrorDomain) {
+        ChipLogError(Controller, "Trying to convert non-Matter error %@ to a Matter error code", error);
         return CHIP_ERROR_INTERNAL;
     }
 

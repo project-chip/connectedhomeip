@@ -54,25 +54,22 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
     /**
-     * @brief Executes a callback in the GLib main loop thread.
+     * @brief Invoke a function on the Matter GLib context.
      *
-     * @param[in] callback The callback to execute.
-     * @param[in] userData User data to pass to the callback.
-     * @param[in] wait If true, the function will block until the callback has been executed.
-     * @returns CHIP_NO_ERROR if the callback was successfully executed.
+     * If execution of the function will have to be scheduled on other thread,
+     * this call will block the current thread until the function is executed.
+     *
+     * @param[in] function The function to call.
+     * @param[in] userData User data to pass to the function.
+     * @returns The result of the function.
      */
-    CHIP_ERROR RunOnGLibMainLoopThread(GSourceFunc callback, void * userData, bool wait = false);
-
-    /**
-     * @brief Convenience method to require less casts to void pointers.
-     */
-    template <class T>
-    CHIP_ERROR ScheduleOnGLibMainLoopThread(gboolean (*callback)(T *), T * userData, bool wait = false)
+    template <typename T>
+    CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        return RunOnGLibMainLoopThread(G_SOURCE_FUNC(callback), userData, wait);
+        return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
     }
 
 #endif
@@ -97,20 +94,23 @@ private:
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
-    class CallbackIndirection
+    struct GLibMatterContextInvokeData
     {
-    public:
-        CallbackIndirection(GSourceFunc callback, void * userData) : mCallback(callback), mUserData(userData) {}
-        void Wait(std::unique_lock<std::mutex> & lock);
-        static gboolean Callback(CallbackIndirection * self);
-
-    private:
-        GSourceFunc mCallback;
-        void * mUserData;
-        // Sync primitives to wait for the callback to be executed.
+        CHIP_ERROR (*mFunc)(void *);
+        void * mFuncUserData;
+        CHIP_ERROR mFuncResult;
+        // Sync primitives to wait for the function to be executed
         std::condition_variable mDoneCond;
         bool mDone = false;
     };
+
+    /**
+     * @brief Invoke a function on the Matter GLib context.
+     *
+     * @note This function does not provide type safety for the user data. Please,
+     *       use the GLibMatterContextInvokeSync() template function instead.
+     */
+    CHIP_ERROR _GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData);
 
     // XXX: Mutex for guarding access to glib main event loop callback indirection
     //      synchronization primitives. This is a workaround to suppress TSAN warnings.

@@ -37,6 +37,26 @@ _DEFINITION = '''<?xml version="1.0"?>
     <command source="server" code="0" name="GetCommissionerNodeIdResponse">
       <arg name="nodeId" type="node_id"/>
     </command>
+
+    <command source="client" code="3" name="GetCommissionerRootCertificate" response="GetCommissionerRootCertificateResponse">
+    </command>
+
+    <command source="server" code="1" name="GetCommissionerRootCertificateResponse">
+      <arg name="RCAC" type="OCTET_STRING"/>
+    </command>
+
+    <command source="client" code="4" name="IssueNocChain" response="IssueNocChainResponse">
+        <arg name="Elements" type="octet_string"/>
+        <arg name="nodeId" type="node_id"/>
+    </command>
+
+    <command source="server" code="2" name="IssueNocChainResponse">
+      <arg name="NOC" type="octet_string"/>
+      <arg name="ICAC" type="octet_string"/>
+      <arg name="RCAC" type="octet_string"/>
+      <arg name="IPK" type="octet_string"/>
+    </command>
+
 </cluster>
 </configurator>
 '''

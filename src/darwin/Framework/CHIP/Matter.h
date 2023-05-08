@@ -39,6 +39,7 @@
 #import <Matter/MTRDeviceControllerFactory.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRError.h>
+#import <Matter/MTRFabricInfo.h>
 #import <Matter/MTRKeypair.h>
 #import <Matter/MTRLogging.h>
 #import <Matter/MTRManualSetupPayloadParser.h>

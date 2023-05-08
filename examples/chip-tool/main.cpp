@@ -19,6 +19,7 @@
 #include "commands/common/Commands.h"
 #include "commands/example/ExampleCredentialIssuerCommands.h"
 
+#include "commands/clusters/SubscriptionsCommands.h"
 #include "commands/delay/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/group/Commands.h"
@@ -45,6 +46,7 @@ int main(int argc, char * argv[])
     registerCommandsTests(commands, &credIssuerCommands);
     registerCommandsGroup(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
+    registerCommandsSubscriptions(commands, &credIssuerCommands);
     registerCommandsStorage(commands);
 
     return commands.Run(argc, argv);

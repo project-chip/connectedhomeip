@@ -69,7 +69,7 @@ struct AbsoluteLimits
     uint16_t closed;
 };
 
-bool HasFeature(chip::EndpointId endpoint, Feature feature);
+bool HasFeature(chip::EndpointId endpoint, WindowCoveringFeature feature);
 bool HasFeaturePaLift(chip::EndpointId endpoint);
 bool HasFeaturePaTilt(chip::EndpointId endpoint);
 

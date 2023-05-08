@@ -68,6 +68,12 @@ public:
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             break;
         }
+
+        AddArgument("use-device-attestation-delegate", 0, 1, &mUseDeviceAttestationDelegate,
+                    "If true, use a device attestation delegate that always wants to be notified about attestation results.  "
+                    "Defaults to false.");
+        AddArgument("device-attestation-failsafe-time", 0, UINT16_MAX, &mDeviceAttestationFailsafeTime,
+                    "If set, the time to extend the failsafe to before calling the device attestation delegate");
     }
 
     /////////// CHIPCommandBridge Interface /////////
@@ -89,4 +95,6 @@ private:
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
     char * mOnboardingPayload;
+    chip::Optional<bool> mUseDeviceAttestationDelegate;
+    chip::Optional<uint16_t> mDeviceAttestationFailsafeTime;
 };

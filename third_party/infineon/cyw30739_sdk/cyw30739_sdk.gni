@@ -19,6 +19,9 @@ import("//build_overrides/cyw30739_sdk.gni")
 import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
+  # Enable sleepy end device
+  enable_sleepy_device = false
+
   # Location of the CYW30739 SDK.
   cyw30739_sdk_root = "${cyw30739_sdk_build_root}/repos"
   cyw30739_sdk_verbose = false
@@ -127,6 +130,10 @@ template("cyw30739_sdk") {
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
+    }
+    if (enable_sleepy_device) {
+      assert(!chip_openthread_ftd, "OpenThread SED must run with FTD disabled.")
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SED=1" ]
     }
 
     include_dirs += [
@@ -239,7 +246,10 @@ template("cyw30739_sdk_pre_build") {
       script_file,
     ]
 
-    sources = [ cyw30739_sdk_btp_file ]
+    sources = [
+      cyw30739_sdk_btp_file,
+      cyw30739_sdk_patch_sym_file,
+    ]
 
     outputs = [ invoker.ldscript_file ]
 

@@ -135,7 +135,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    if (hosal_ota_finish(1, 0) < 0)
+    if (hosal_ota_check() < 0)
     {
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         ChipLogProgress(SoftwareUpdate, "OTA image verification error");
@@ -157,8 +157,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         return;
     }
 
+    hosal_ota_apply(0);
     DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Seconds32(4),
+        System::Clock::Seconds32(OTA_AUTO_REBOOT_DELAY),
         [](Layer *, void *) {
             ChipLogProgress(SoftwareUpdate, "Rebooting...");
             hal_reboot();
@@ -174,7 +175,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    hosal_ota_finish(1, 0);
+    hosal_ota_abort();
 
     imageProcessor->ReleaseBlock();
 }

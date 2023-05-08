@@ -52,4 +52,4 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
-            - uses: igsekor/pyspelling-any@v0.0.2
+            - uses: igsekor/pyspelling-any@v1.0.4

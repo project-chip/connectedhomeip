@@ -23,12 +23,12 @@ extern "C" {
 #endif
 
 // DHCP client states
-#define DHCP_OFF (uint8_t) 0
-#define DHCP_START (uint8_t) 1
-#define DHCP_WAIT_ADDRESS (uint8_t) 2
-#define DHCP_ADDRESS_ASSIGNED (uint8_t) 3
-#define DHCP_TIMEOUT (uint8_t) 4
-#define DHCP_LINK_DOWN (uint8_t) 5
+#define DHCP_OFF ((uint8_t) 0)
+#define DHCP_START ((uint8_t) 1)
+#define DHCP_WAIT_ADDRESS ((uint8_t) 2)
+#define DHCP_ADDRESS_ASSIGNED ((uint8_t) 3)
+#define DHCP_TIMEOUT ((uint8_t) 4)
+#define DHCP_LINK_DOWN ((uint8_t) 5)
 
 /*****************************************************************************
  * @fn  void dhcpclient_set_link_state(int link_up)

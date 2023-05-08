@@ -1166,7 +1166,8 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPIN)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator,
+ jobject setupPinCode)
 {
     VerifyOrReturnValue(chip::CanCastTo<uint32_t>(iteration), false);
 
@@ -1182,10 +1183,17 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    Optional<uint32_t> pinCode = Optional<uint32_t>();
+    if (setupPinCode != nullptr)
+    {
+        jlong jsetupPinCode = chip::JniReferences::GetInstance().LongToPrimitive(setupPinCode);
+        pinCode             = MakeOptional(static_cast<uint32_t>(jsetupPinCode));
+    }
+
     chip::SetupPayload setupPayload;
     err = AutoCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
-        discriminator, MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, setupPayload);
+        discriminator, pinCode, NullOptional, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1224,8 +1232,8 @@ JNI_METHOD(jboolean, openPairingWindowCallback)
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode,
- jobject jcallback)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator,
+ jobject setupPinCode, jobject jcallback)
 {
     VerifyOrReturnValue(chip::CanCastTo<uint32_t>(iteration), false);
 
@@ -1241,10 +1249,17 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    Optional<uint32_t> pinCode = Optional<uint32_t>();
+    if (setupPinCode != nullptr)
+    {
+        jlong jsetupPinCode = chip::JniReferences::GetInstance().LongToPrimitive(setupPinCode);
+        pinCode             = MakeOptional(static_cast<uint32_t>(jsetupPinCode));
+    }
+
     chip::SetupPayload setupPayload;
     err = AndroidCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
-        discriminator, MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, jcallback, setupPayload);
+        discriminator, pinCode, NullOptional, jcallback, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1355,7 +1370,7 @@ exit:
 
 JNI_METHOD(void, subscribe)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs)
+ jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err               = CHIP_NO_ERROR;
@@ -1400,6 +1415,11 @@ JNI_METHOD(void, subscribe)
         params.mpAttributePathParamsList    = attributePaths.get();
         params.mAttributePathParamsListSize = numAttributePaths;
         attributePaths.release();
+    }
+
+    if (eventMin != nullptr)
+    {
+        params.mEventNumber.SetValue(static_cast<chip::EventNumber>(JniReferences::GetInstance().LongToPrimitive(eventMin)));
     }
 
     if (eventPathList != nullptr)
@@ -1458,7 +1478,7 @@ exit:
 
 JNI_METHOD(void, read)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jboolean isFabricFiltered, jint imTimeoutMs)
+ jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1486,6 +1506,11 @@ JNI_METHOD(void, read)
 
     params.mIsFabricFiltered = (isFabricFiltered != JNI_FALSE);
     params.mTimeout          = imTimeoutMs != 0 ? System::Clock::Milliseconds32(imTimeoutMs) : System::Clock::kZero;
+
+    if (eventMin != nullptr)
+    {
+        params.mEventNumber.SetValue(static_cast<chip::EventNumber>(JniReferences::GetInstance().LongToPrimitive(eventMin)));
+    }
 
     readClient = Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
                                                 callback->mClusterCacheAdapter.GetBufferedCallback(),

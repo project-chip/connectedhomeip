@@ -137,7 +137,7 @@
     }
     for (size_t i = 0; i < cppDiscoveredNodedata->resolutionData.numIPs; i++) {
         char addrCString[chip::Inet::IPAddress::kMaxStringLength];
-        cppDiscoveredNodedata->resolutionData.ipAddress->ToString(addrCString, chip::Inet::IPAddress::kMaxStringLength);
+        cppDiscoveredNodedata->resolutionData.ipAddress[i].ToString(addrCString, chip::Inet::IPAddress::kMaxStringLength);
         objCDiscoveredNodeData.ipAddresses[i] = [NSString stringWithCString:addrCString encoding:NSASCIIStringEncoding];
     }
     return objCDiscoveredNodeData;

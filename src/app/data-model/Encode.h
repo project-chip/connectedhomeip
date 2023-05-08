@@ -31,6 +31,18 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+namespace detail {
+// A way to detect whether an enum has a kUnknownEnumValue value, for use in enable_if.
+template <typename Enum, Enum value>
+using VoidType = void;
+
+template <typename, typename = void>
+constexpr bool HasUnknownValue = false;
+
+template <typename T>
+constexpr bool HasUnknownValue<T, VoidType<T, T::kUnknownEnumValue>> = true;
+} // namespace detail
+
 /*
  * @brief
  * Set of overloaded encode methods that based on the type of cluster element passed in,
@@ -48,9 +60,22 @@ CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
     return writer.Put(tag, x);
 }
 
-template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
+template <typename X, typename std::enable_if_t<std::is_enum<X>::value && !detail::HasUnknownValue<X>, int> = 0>
 CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
 {
+    return writer.Put(tag, x);
+}
+
+template <typename X, typename std::enable_if_t<std::is_enum<X>::value && detail::HasUnknownValue<X>, int> = 0>
+CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, X x)
+{
+#if !CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+    if (x == X::kUnknownEnumValue)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+#endif // !CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES
+
     return writer.Put(tag, x);
 }
 

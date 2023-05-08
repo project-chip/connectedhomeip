@@ -263,7 +263,7 @@ template("_chip_build_time_zapgen") {
 #     The ".matter" file to use to start the code generation
 #
 #   generator
-#     Name of the generator to use (e.g. java, cpp-app)
+#     Name of the generator to use (e.g. java-jni, java-class, cpp-app)
 #
 #   outputs
 #     Explicit names of the expected outputs. Enforced to validate that
@@ -296,7 +296,7 @@ template("_chip_build_time_zapgen") {
 #
 #  chip_codegen("java-jni-generate") {
 #    input = "controller-clusters.matter"
-#    generator = "java"
+#    generator = "java-jni"
 #
 #    outputs = [
 #       "jni/IdentifyClient-ReadImpl.cpp",
@@ -358,7 +358,7 @@ template("chip_codegen") {
 #     The ".matter" file to use to start the code generation
 #
 #   generator
-#     Name of the generator to use (e.g. java, cpp-app)
+#     Name of the generator to use (e.g. java-jni, java-class, cpp-app)
 #
 #   outputs
 #     Explicit names of the expected outputs. Enforced to validate that
@@ -391,7 +391,7 @@ template("chip_codegen") {
 #
 #  chip_codegen("java-jni-generate") {
 #    input = "controller-clusters.matter"
-#    generator = "java"
+#    generator = "java-jni"
 #
 #    outputs = [
 #       "jni/IdentifyClient-ReadImpl.cpp",

@@ -36,19 +36,17 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef ENABLE_WSTK_LEDS
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #include "LEDWidget.h"
 #define APP_ACTION_LED 1
-#endif // ENABLE_WSTK_LEDS
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
 
-#ifdef ENABLE_WSTK_LEDS
 LEDWidget sLightLED;
-#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -123,6 +121,9 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
+
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Lighting-App");
 #endif
@@ -143,10 +144,8 @@ CHIP_ERROR AppTask::Init()
 
     LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-#ifdef ENABLE_WSTK_LEDS
     sLightLED.Init(APP_ACTION_LED);
     sLightLED.Set(LightMgr().IsLightOn());
-#endif // ENABLE_WSTK_LEDS
 
     return err;
 }
@@ -246,7 +245,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         button_event.Handler = LightActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (button == SIWx917_BTN0)
+    else if (button == SIWx917_BTN0 && btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);

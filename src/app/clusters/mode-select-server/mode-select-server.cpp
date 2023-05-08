@@ -24,7 +24,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
-#include <app/clusters/on-off-server/on-off-server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -33,6 +32,10 @@
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
+
+#ifdef EMBER_AF_PLUGIN_ON_OFF
+#include <app/clusters/on-off-server/on-off-server.h>
+#endif // EMBER_AF_PLUGIN_ON_OFF
 
 using namespace std;
 using namespace chip;

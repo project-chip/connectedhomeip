@@ -36,7 +36,7 @@ limitations under the License.
     <attribute side="server" code="0x0014" define="PRESSURE_SCALE" type="INT8S" writable="false" optional="true" default="0">Scale</attribute>
   </cluster>
 
-  <bitmap name="PressureFeature" type="BITMAP32">
+  <bitmap name="PressureMeasurementFeature" type="BITMAP32">
     <cluster code="0x0403"/>
     <field name="Extended" mask="0x1"/>
   </bitmap>

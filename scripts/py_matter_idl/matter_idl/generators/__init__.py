@@ -15,7 +15,7 @@
 
 import logging
 import os
-from typing import Dict
+from typing import Dict, Optional
 
 import jinja2
 from matter_idl.matter_idl_types import Idl
@@ -106,16 +106,25 @@ class CodeGenerator:
     write time of files do not change and rebuilds are not triggered).
     """
 
-    def __init__(self, storage: GeneratorStorage, idl: Idl):
+    def __init__(self, storage: GeneratorStorage, idl: Idl, loader: Optional[jinja2.BaseLoader] = None, fs_loader_searchpath: Optional[str] = None):
         """
         A code generator will render a parsed IDL (a AST) into a given storage.
+
+        Args:
+           storage: Storage to use to read/save data
+           loader: if given, use a custom loader for templates
+           fs_loader_searchpath: if a loader is NOT given, this controls the search path
+              of a default FileSystemLoader that will be used
         """
+        if not loader:
+            if not fs_loader_searchpath:
+                fs_loader_searchpath = os.path.dirname(__file__)
+            loader = jinja2.FileSystemLoader(searchpath=fs_loader_searchpath)
+
         self.storage = storage
         self.idl = idl
         self.jinja_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(
-                searchpath=os.path.dirname(__file__)),
-            keep_trailing_newline=True)
+            loader=loader, keep_trailing_newline=True)
         self.dry_run = False
 
         RegisterCommonFilters(self.jinja_env.filters)

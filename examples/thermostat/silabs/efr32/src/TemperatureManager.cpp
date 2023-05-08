@@ -56,7 +56,7 @@ CHIP_ERROR TemperatureManager::Init()
     ThermAttr::SystemMode::Get(kThermostatEndpoint, &systemMode);
     PlatformMgr().UnlockChipStack();
 
-    mCurrentTempCelsius     = ConvertToPrintableTemp(temp.Value());
+    mCurrentTempCelsius     = ConvertToPrintableTemp((temp.IsNull()) ? static_cast<int16_t>(0.0) : temp.Value());
     mHeatingCelsiusSetPoint = ConvertToPrintableTemp(coolingSetpoint);
     mCoolingCelsiusSetPoint = ConvertToPrintableTemp(heatingSetpoint);
     mThermMode              = systemMode;

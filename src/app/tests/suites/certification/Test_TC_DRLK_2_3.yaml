@@ -138,7 +138,7 @@ tests:
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && ! DRLK.S.A0033
+      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -179,7 +179,7 @@ tests:
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT and Verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && ! DRLK.S.A0033
+      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -308,7 +308,7 @@ tests:
     - label:
           "TH reads the UserCodeTemporaryDisableTime attribute from the DUT and
           check attribute is triggered"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0031
+      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0031
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       response:

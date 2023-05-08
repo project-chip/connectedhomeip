@@ -33,6 +33,14 @@ namespace TLV {
 
 namespace Utilities {
 
+namespace {
+
+// Sets up a limit on recursion depth, to avoid any stack overflows
+// on very deep TLV structures. Embedded has limited stack space.
+constexpr size_t kMaxRecursionDepth = 10;
+
+} // namespace
+
 struct FindContext
 {
     const Tag & mTag;
@@ -62,6 +70,11 @@ struct FindContext
 static CHIP_ERROR Iterate(TLVReader & aReader, size_t aDepth, IterateHandler aHandler, void * aContext, bool aRecurse)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
+
+    if (aDepth >= kMaxRecursionDepth)
+    {
+        return CHIP_ERROR_RECURSION_DEPTH_LIMIT;
+    }
 
     if (aReader.GetType() == kTLVType_NotSpecified)
     {

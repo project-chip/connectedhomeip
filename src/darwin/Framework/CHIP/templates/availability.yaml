@@ -53,6 +53,17 @@
 #              NOTE: support for "removed" may not be complete in the templates.
 #              Please examine codegen carefully when using "removed" to make
 #              sure all the things that should have been removed have been.
+#
+# * "provisional": Can contain clusters, commands, attributes, etc as described
+#                  above for "introduced" and "deprecated".  Items can be
+#                  defined as provisional to prevent code generation for them.
+#                  If they are then listed as introduced in a release that is
+#                  later than the one where they were marked provisional,
+#                  they will start being code-generated.
+#                  NOTE: support for "provisional" may not be complete in the
+#                  templates. Please examine codegen carefully when using
+#                  "provisional" to make sure all the things that should have
+#                  been omitted have been.
 
 - release: "Initial release"
   versions:
@@ -4126,7 +4137,10 @@
               - DoorLockFeature
           WindowCovering:
               - ConfigStatus
-              - Feature
+              # WindowCoveringFeature was originally just named Feature, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              - WindowCoveringFeature
               - Mode
               - OperationalStatus
               - SafetyStatus
@@ -4349,7 +4363,10 @@
                   - TiltPositionAware
                   - LiftEncoderControlled
                   - TiltEncoderControlled
-              Feature:
+              # WindowCoveringFeature was originally just named Feature, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              WindowCoveringFeature:
                   - Lift
                   - Tilt
                   - PositionAwareLift
@@ -4571,6 +4588,14 @@
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
+  provisional:
+      clusters:
+          - PulseWidthModulation
+          - TimeSynchronization
+          - ProxyConfiguration
+          - ProxyDiscovery
+          - ProxyValid
+          - FaultInjection
 
 - release: "First dot-release"
   versions:
@@ -6136,9 +6161,6 @@
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
   removed:
-      clusters:
-          # Not ready to be public API yet.
-          - ClientMonitoring
       commands:
           BasicInformation:
               - MfgSpecificPing
@@ -6192,13 +6214,10 @@
                   - Dual
               CredentialRuleEnum:
                   - Double
-      bitmaps:
-          Scenes:
-              # All the other feature map bitmaps have names ending in
-              # "Feature", so let's not ship this one until it aligns
-              # with the others.
-              # See https://github.com/project-chip/connectedhomeip/issues/24681
-              - SceneFeatures
+  provisional:
+      clusters:
+          # Not ready to be public API yet.
+          - ClientMonitoring
   renames:
       clusters:
           UnitTesting: TestCluster
@@ -6541,11 +6560,16 @@
                   CoolSetpointPresent: CoolSetpointFieldPresent
 
 - release: "First after major API revamp"
-  versions: "future"
+  versions:
+      ios: "16.5"
+      macos: "13.4"
+      watchos: "9.5"
+      tvos: "16.5"
   introduced:
-      attributes:
-          TimeSynchronization:
-              - DSTOffset
+      ids:
+          attributes:
+              TimeSynchronization:
+                  - DSTOffset
       command fields:
           DiagnosticLogs:
               RetrieveLogsRequest:
@@ -6810,12 +6834,10 @@
           PumpConfigurationAndControl:
               PumpFeature:
                   - Local
-  removed:
+  provisional:
       global attributes:
-          # EventList is provisional for now.
           - EventList
       attributes:
-          # EventList is provisional for now.
           Scenes:
               - EventList
           OnOff:
@@ -6958,6 +6980,7 @@
               - EventList
           FaultInjection:
               - EventList
+  removed:
       enum values:
           DoorLock:
               DlLockDataType:
@@ -6997,3 +7020,162 @@
           PumpConfigurationAndControl:
               PumpFeature:
                   LocalOperation: Local
+
+- release: "TBD"
+  versions: "future"
+  introduced:
+      attributes:
+          BasicInformation:
+              - ProductAppearance
+          BridgedDeviceBasicInformation:
+              - ProductAppearance
+      structs:
+          BasicInformation:
+              - ProductAppearanceStruct
+          BridgedDeviceBasicInformation:
+              - ProductAppearanceStruct
+      struct fields:
+          BasicInformation:
+              ProductAppearanceStruct:
+                  - finish
+                  - primaryColor
+          BridgedDeviceBasicInformation:
+              ProductAppearanceStruct:
+                  - finish
+                  - primaryColor
+      enums:
+          BasicInformation:
+              - ColorEnum
+              - ProductFinishEnum
+          BridgedDeviceBasicInformation:
+              - ColorEnum
+              - ProductFinishEnum
+      enum values:
+          BasicInformation:
+              ColorEnum:
+                  - Black
+                  - Navy
+                  - Green
+                  - Teal
+                  - Maroon
+                  - Purple
+                  - Olive
+                  - Gray
+                  - Blue
+                  - Lime
+                  - Aqua
+                  - Red
+                  - Fuchsia
+                  - Yellow
+                  - White
+                  - Nickel
+                  - Chrome
+                  - Brass
+                  - Copper
+                  - Silver
+                  - Gold
+              ProductFinishEnum:
+                  - Matte
+                  - Satin
+                  - Polished
+                  - Rugged
+                  - Fabric
+                  - Other
+          BridgedDeviceBasicInformation:
+              ColorEnum:
+                  - Black
+                  - Navy
+                  - Green
+                  - Teal
+                  - Maroon
+                  - Purple
+                  - Olive
+                  - Gray
+                  - Blue
+                  - Lime
+                  - Aqua
+                  - Red
+                  - Fuchsia
+                  - Yellow
+                  - White
+                  - Nickel
+                  - Chrome
+                  - Brass
+                  - Copper
+                  - Silver
+                  - Gold
+              ProductFinishEnum:
+                  - Matte
+                  - Satin
+                  - Polished
+                  - Rugged
+                  - Fabric
+                  - Other
+      bitmaps:
+          Groups:
+              - GroupsFeature
+          PressureMeasurement:
+              - PressureMeasurementFeature
+          PumpConfigurationAndControl:
+              - PumpConfigurationAndControlFeature
+          Scenes:
+              - ScenesFeature
+      bitmap values:
+          Groups:
+              GroupsFeature:
+                  - GroupNames
+          PressureMeasurement:
+              PressureMeasurementFeature:
+                  - Extended
+          PumpConfigurationAndControl:
+              PumpConfigurationAndControlFeature:
+                  - ConstantPressure
+                  - CompensatedPressure
+                  - ConstantFlow
+                  - ConstantSpeed
+                  - ConstantTemperature
+                  - Automatic
+                  - LocalOperation
+          Scenes:
+              ScenesFeature:
+                  - SceneNames
+  deprecated:
+      bitmaps:
+          Groups:
+              - GroupClusterFeature
+          PressureMeasurement:
+              - PressureFeature
+          PumpConfigurationAndControl:
+              - PumpFeature
+  removed:
+      attributes:
+          # The ProductAppearance bits never happened for the old Basic and
+          # BridgedDeviceBasic cluster names.
+          Basic:
+              - ProductAppearance
+          BridgedDeviceBasic:
+              - ProductAppearance
+      structs:
+          # The ProductAppearance bits never happened for the old Basic and
+          # BridgedDeviceBasic cluster names.
+          Basic:
+              - ProductAppearanceStruct
+          BridgedDeviceBasic:
+              - ProductAppearanceStruct
+      enums:
+          # The ProductAppearance bits never happened for the old Basic and
+          # BridgedDeviceBasic cluster names.
+          Basic:
+              - ProductFinishEnum
+              - ColorEnum
+          BridgedDeviceBasic:
+              - ProductFinishEnum
+              - ColorEnum
+  renames:
+      bitmaps:
+          Groups:
+              GroupsFeature: GroupClusterFeature
+          PressureMeasurement:
+              PressureMeasurementFeature: PressureFeature
+          PumpConfigurationAndControl:
+              PumpConfigurationAndControlFeature: PumpFeature

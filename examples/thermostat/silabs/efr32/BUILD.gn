@@ -18,8 +18,8 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/silabs_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -46,7 +46,8 @@ declare_args() {
 
   # Enable the temperature sensor
   # Some boards do not have a temperature sensor
-  use_temp_sensor = silabs_board != "BRD2703A" && silabs_board != "BRD4319A"
+  use_temp_sensor = silabs_board != "BRD2703A" && silabs_board != "BRD4319A" &&
+                    silabs_board != "BRD2704A"
 }
 
 efr32_sdk("sdk") {
@@ -99,17 +100,17 @@ efr32_sdk("sdk") {
   }
 }
 
-efr32_executable("thermostat_app") {
+silabs_executable("thermostat_app") {
   output_name = "chip-efr32-thermostat-example.out"
   include_dirs = [ "include" ]
   defines = []
 
   sources = [
+    "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/SensorManager.cpp",
     "src/TemperatureManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
   ]
 
   if (use_temp_sensor) {

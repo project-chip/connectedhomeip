@@ -20,77 +20,80 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Account Login"
-    endpoint: 3
-    TempAccountIdentifier:
-        type: char_string
-        defaultValue: "1111"
-    catalogVendorId:
-        type: int16u
-        defaultValue: 123
-    applicationId:
-        type: char_string
-        defaultValue: "exampleid"
+    cluster: "BasicInformation"
+    endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+    - label:
+          "Make sure there is a Content App endpoint implementing the Account
+          Login cluster. Product maker may provide pre-setup steps"
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner).
 
-    - label: "Launch an app with the provided a application ID"
-      PICS: APPLAUNCHER.S.C00.Rsp
-      cluster: "Application Launcher"
-      command: "LaunchApp"
-      arguments:
-          values:
-              - name: "Data"
-                value: "Hello World"
-              - name: "Application"
-                value:
-                    {
-                        CatalogVendorID: catalogVendorId,
-                        ApplicationID: applicationId,
-                    }
-      response:
-          values:
-              - name: "Status"
-                value: 0
+          The following command on the example tv-app will launch a content app on endpoint 4:
+          ./chip-tool applicationlauncher launch-app "{"catalogVendorID": 123, "applicationID": "exampleid"}" 1 1
+          ./chip-tv-casting-app applicationlauncher launch-app "{"catalogVendorID": 123, "applicationID": "exampleid"}" 1 1
+
+          Verify in TH Log:
+          [1666779476.134292][24912:24917] CHIP:DMG: },
+          [1666779476.134332][24912:24917] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_050C Command=0x0000_0003
+          [1666779476.134353][24912:24917] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050C Command 0x0000_0003
+          [1666779476.134380][24912:24917] CHIP:TOO:   LauncherResponse: {
+          [1666779476.134392][24912:24917] CHIP:TOO:     status: 0
+          [1666779476.134409][24912:24917] CHIP:TOO:     data: 64617461
+          [1666779476.134415][24912:24917] CHIP:TOO:    }
+          [1666779476.134434][24912:24917] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1666779476.134475][24912:24917] CHIP:EM: <<< [E:15131i M:169249733 (Ack:166780493)] (S) Msg TX to 1:0000000000000001 [F894] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
 
     - label:
           "TH sends a GetSetupPIN command to the DUT with test values provided
           by the product maker."
       PICS: ALOGIN.S.C00.Rsp
-      command: "GetSetupPIN"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "TempAccountIdentifier"
-                value: TempAccountIdentifier
-      response:
-          values:
-              - name: "SetupPIN"
-                saveAs: setupPIN
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool accountlogin get-setup-pin 1111 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin get-setup-pin 1111 1 4 --timedInteractionTimeoutMs 1000
+
+          On TH Verify that the DUT responds with a valid GetSetupPINResponse.
+          [1666779483.473668][24918:24923] CHIP:DMG: Received Command Response Data, Endpoint=4 Cluster=0x0000_050E Command=0x0000_0001
+          [1666779483.473688][24918:24923] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_050E Command 0x0000_0001
+          [1666779483.473709][24918:24923] CHIP:TOO:   GetSetupPINResponse: {
+          [1666779483.473716][24918:24923] CHIP:TOO:     setupPIN: 34567890
+          [1666779483.473724][24918:24923] CHIP:TOO:    }
+          [1666779483.473741][24918:24923] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1666779483.473781][24918:24923] CHIP:EM: <<< [E:55844i M:50959985 (Ack:76245781)] (S) Msg TX to 1:0000000000000001 [F894] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1666779483.473794][24918:24923] CHIP:IN: (S) Sending msg 50959985 on secure session with LSID: 53816
+      disabled: true
 
     - label:
           "TH sends a Login command to the DUT with test values provided by the
           product maker."
       PICS: ALOGIN.S.C02.Rsp
-      command: "Login"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "TempAccountIdentifier"
-                value: TempAccountIdentifier
-              - name: "SetupPIN"
-                value: setupPIN
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin login 11111 34567890 1 4 --timedInteractionTimeoutMs 1000
+
+          On TH Verify that the DUT responds with a standard command response.
+          [1666779572.083273][24925:24930] CHIP:DMG: },
+          [1666779572.083314][24925:24930] CHIP:DMG: Received Command Response Status for Endpoint=4 Cluster=0x0000_050E Command=0x0000_0002 Status=0x0
+          [1666779572.083337][24925:24930] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1666779572.083380][24925:24930] CHIP:EM: <<< [E:20581i M:225012920 (Ack:11041406)] (S) Msg TX to 1:0000000000000001 [F894] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
 
     - label:
           "TH sends a Logout command to the DUT with test values provided by the
           product maker."
       PICS: ALOGIN.S.C03.Rsp
-      command: "Logout"
-      timedInteractionTimeoutMs: 10000
+      verification: |
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
+          ./chip-tool accountlogin logout  1 4 --timedInteractionTimeoutMs 1000
+          ./chip-tv-casting-app accountlogin logout  1 4 --timedInteractionTimeoutMs 1000
+
+          On TH Verify that the DUT responds with a standard command response.
+          [1666779601.381050][24938:24943] CHIP:DMG: },
+          [1666779601.381090][24938:24943] CHIP:DMG: Received Command Response Status for Endpoint=4 Cluster=0x0000_050E Command=0x0000_0003 Status=0x0
+          [1666779601.381112][24938:24943] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1666779601.381158][24938:24943] CHIP:EM: <<< [E:54914i M:17706756 (Ack:83004508)] (S) Msg TX to 1:0000000000000001 [F894] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true

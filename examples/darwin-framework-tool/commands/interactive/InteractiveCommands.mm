@@ -73,13 +73,18 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
 }
 } // namespace
 
-char * GetCommand(char * command)
+char * GetCommand(const chip::Optional<char *> & mAdditionalPrompt, char * command)
 {
     if (command != nullptr) {
         free(command);
         command = nullptr;
     }
 
+    if (mAdditionalPrompt.HasValue()) {
+        ClearLine();
+        printf("%s\n", mAdditionalPrompt.Value());
+        ClearLine();
+    }
     command = readline(kInteractiveModePrompt);
 
     // Do not save empty lines
@@ -118,7 +123,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
 
     char * command = nullptr;
     while (YES) {
-        command = GetCommand(command);
+        command = GetCommand(mAdditionalPrompt, command);
         if (command != nullptr && !ParseCommand(command)) {
             break;
         }

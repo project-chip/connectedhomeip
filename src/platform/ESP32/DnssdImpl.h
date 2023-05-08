@@ -32,57 +32,56 @@ enum class ContextType
 struct GenericContext
 {
     ContextType mContextType;
-    void * mCbContext;
     char mType[kDnssdTypeMaxSize + 1];
     DnssdServiceProtocol mProtocol;
     Inet::InterfaceId mInterfaceId;
-    mdns_search_once_t * mSearchHandle;
-    mdns_result_t * mResult;
+    void * mCbContext;
+    DnssdService * mService = nullptr;
+    size_t mServiceSize     = 0;
+    GenericContext(ContextType ctxType, const char * type, DnssdServiceProtocol protocol, Inet::InterfaceId ifId, void * cbCtx) :
+        mContextType(ctxType), mProtocol(protocol), mInterfaceId(ifId), mCbContext(cbCtx)
+    {
+        Platform::CopyString(mType, type);
+    }
+    ~GenericContext()
+    {
+        if (mService && mServiceSize > 0)
+        {
+            for (size_t serviceIndex = 0; serviceIndex < mServiceSize; serviceIndex++)
+            {
+                if (mService[serviceIndex].mTextEntries)
+                {
+                    chip::Platform::MemoryFree(mService[serviceIndex].mTextEntries);
+                }
+            }
+            chip::Platform::MemoryFree(mService);
+        }
+    }
 };
 
 struct BrowseContext : public GenericContext
 {
     DnssdBrowseCallback mBrowseCb;
     Inet::IPAddressType mAddressType;
-    DnssdService * mServices;
-    size_t mServiceSize;
-    BrowseContext(const char * type, DnssdServiceProtocol protocol, Inet::InterfaceId ifId, mdns_search_once_t * searchHandle,
-                  Inet::IPAddressType addrType, DnssdBrowseCallback cb, void * cbCtx)
+    mdns_search_once_t * mPtrQueryHandle;
+    mdns_result_t * mPtrQueryResult = nullptr;
+    BrowseContext(const char * type, DnssdServiceProtocol protocol, Inet::InterfaceId ifId, mdns_search_once_t * queryHandle,
+                  Inet::IPAddressType addrType, DnssdBrowseCallback cb, void * cbCtx) :
+        GenericContext(ContextType::Browse, type, protocol, ifId, cbCtx),
+        mBrowseCb(cb), mAddressType(addrType), mPtrQueryHandle(queryHandle)
 
-    {
-        Platform::CopyString(mType, type);
-        mContextType  = ContextType::Browse;
-        mAddressType  = addrType;
-        mProtocol     = protocol;
-        mBrowseCb     = cb;
-        mCbContext    = cbCtx;
-        mInterfaceId  = ifId;
-        mSearchHandle = searchHandle;
-        mResult       = nullptr;
-        mServices     = nullptr;
-        mServiceSize  = 0;
-    }
+    {}
 
     ~BrowseContext()
     {
-        if (mServices && mServiceSize > 0)
+        if (mPtrQueryResult)
         {
-            for (size_t serviceIndex = 0; serviceIndex < mServiceSize; serviceIndex++)
-            {
-                if (mServices[serviceIndex].mTextEntries)
-                {
-                    chip::Platform::MemoryFree(mServices[serviceIndex].mTextEntries);
-                }
-            }
-            chip::Platform::MemoryFree(mServices);
+            mdns_query_results_free(mPtrQueryResult);
         }
-        if (mResult)
+
+        if (mPtrQueryHandle)
         {
-            mdns_query_results_free(mResult);
-        }
-        if (mSearchHandle)
-        {
-            mdns_query_async_delete(mSearchHandle);
+            mdns_query_async_delete(mPtrQueryHandle);
         }
     }
 };
@@ -91,55 +90,51 @@ struct ResolveContext : public GenericContext
 {
     char mInstanceName[Common::kInstanceNameMaxLength + 1];
     DnssdResolveCallback mResolveCb;
-    DnssdService * mService;
-    Inet::IPAddress * mAddresses;
-    size_t mAddressCount;
+    Inet::IPAddress * mAddresses = nullptr;
+    size_t mAddressCount         = 0;
 
-    enum class ResolveState
-    {
-        QuerySrv,
-        QueryTxt,
-    } mResolveState;
+    mdns_search_once_t * mSrvQueryHandle;
+    mdns_result_t * mSrvQueryResult  = nullptr;
+    mdns_result_t * mAddrQueryResult = nullptr;
+    bool mSrvAddrQueryFinished       = false;
 
-    ResolveContext(DnssdService * service, Inet::InterfaceId ifId, mdns_search_once_t * searchHandle, DnssdResolveCallback cb,
-                   void * cbCtx)
+    mdns_search_once_t * mTxtQueryHandle;
+    mdns_result_t * mTxtQueryResult = nullptr;
+    bool mTxtQueryFinished          = false;
+
+    ResolveContext(DnssdService * service, Inet::InterfaceId ifId, mdns_search_once_t * srvQuery, mdns_search_once_t * txtQuery,
+                   DnssdResolveCallback cb, void * cbCtx) :
+        GenericContext(ContextType::Resolve, service->mType, service->mProtocol, ifId, cbCtx),
+        mResolveCb(cb), mSrvQueryHandle(srvQuery), mTxtQueryHandle(txtQuery)
     {
-        Platform::CopyString(mType, service->mType);
         Platform::CopyString(mInstanceName, service->mName);
-        mContextType  = ContextType::Resolve;
-        mProtocol     = service->mProtocol;
-        mResolveCb    = cb;
-        mCbContext    = cbCtx;
-        mInterfaceId  = ifId;
-        mSearchHandle = searchHandle;
-        mResolveState = ResolveState::QuerySrv;
-        mResult       = nullptr;
-        mService      = nullptr;
-        mAddresses    = nullptr;
-        mAddressCount = 0;
     }
 
     ~ResolveContext()
     {
-        if (mService)
-        {
-            if (mService->mTextEntries)
-            {
-                chip::Platform::MemoryFree(mService->mTextEntries);
-            }
-            chip::Platform::MemoryFree(mService);
-        }
         if (mAddresses)
         {
             chip::Platform::MemoryFree(mAddresses);
         }
-        if (mResult)
+        if (mSrvQueryResult)
         {
-            mdns_query_results_free(mResult);
+            mdns_query_results_free(mSrvQueryResult);
         }
-        if (mSearchHandle)
+        if (mAddrQueryResult && mAddrQueryResult != mSrvQueryResult)
         {
-            mdns_query_async_delete(mSearchHandle);
+            mdns_query_results_free(mAddrQueryResult);
+        }
+        if (mTxtQueryResult)
+        {
+            mdns_query_results_free(mTxtQueryResult);
+        }
+        if (mSrvQueryHandle)
+        {
+            mdns_query_async_delete(mSrvQueryHandle);
+        }
+        if (mTxtQueryHandle)
+        {
+            mdns_query_async_delete(mTxtQueryHandle);
         }
     }
 };

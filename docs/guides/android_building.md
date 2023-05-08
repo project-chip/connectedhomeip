@@ -103,8 +103,15 @@ JDK version on MacOS for Apple Silicon is 'openjdk 17.0.1' or above.
 
 Using JDK bundled with Android Studio will help with that.
 
+Android Studio Dolphin and below:
+
 ```shell
 export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home/
+```
+Android Studio Electric Eel 2022.1.1 and above:
+
+```shell
+export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jbr/Contents/Home/
 ```
 
 <hr>

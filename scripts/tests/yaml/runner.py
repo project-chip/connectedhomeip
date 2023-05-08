@@ -71,6 +71,10 @@ def test_runner_options(f):
                      help='Show additional logs provided by the adapter.')(f)
     f = click.option('--show_adapter_logs_on_error', type=bool, default=True, show_default=True,
                      help='Show additional logs provided by the adapter on error.')(f)
+    f = click.option('--use_test_harness_log_format', type=bool, default=False, show_default=True,
+                     help='Use the test harness log format.')(f)
+    f = click.option('--delay-in-ms', type=int, default=0, show_default=True,
+                     help='Add a delay between test suite steps.')(f)
     return f
 
 
@@ -85,6 +89,16 @@ def websocket_runner_options(f):
                      help='Path to a websocket server to run at launch.')(f)
     f = click.option('--server_arguments', type=str, default=None,
                      help='Optional arguments to pass to the websocket server at launch.')(f)
+    return f
+
+
+def chip_repl_runner_options(f):
+    f = click.option('--repl_storage_path', type=str, default='/tmp/repl-storage.json',
+                     help='Path to persistent storage configuration file.')(f)
+    f = click.option('--commission_on_network_dut', type=bool, default=False,
+                     help='Prior to running test should we try to commission DUT on network.')(f)
+    f = click.option('--runner', type=str, default=None, show_default=True,
+                     help='The runner to run the test with.')(f)
     return f
 
 
@@ -202,6 +216,10 @@ CONTEXT_SETTINGS = dict(
             'server_name': 'chip-app2',
             'server_arguments': '--interactive',
         },
+        'chip-repl': {
+            'adapter': 'matter_yamltest_repl_adapter.adapter',
+            'runner': 'matter_yamltest_repl_adapter.runner',
+        },
     },
     max_content_width=120,
 )
@@ -247,11 +265,11 @@ def dry_run(parser_group: ParserGroup):
 @runner_base.command()
 @test_runner_options
 @pass_parser_group
-def run(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool):
+def run(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int):
     """Run the test suite."""
     adapter = __import__(adapter, fromlist=[None]).Adapter(parser_group.builder_config.parser_config.definitions)
-    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number)
-    runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error)
+    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number, delay_in_ms)
+    runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 
     runner = TestRunner()
@@ -262,11 +280,11 @@ def run(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_wa
 @test_runner_options
 @websocket_runner_options
 @pass_parser_group
-def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, server_address: str, server_port: int, server_path: str, server_name: str, server_arguments: str):
+def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int, server_address: str, server_port: int, server_path: str, server_name: str, server_arguments: str):
     """Run the test suite using websockets."""
     adapter = __import__(adapter, fromlist=[None]).Adapter(parser_group.builder_config.parser_config.definitions)
-    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number)
-    runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error)
+    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number, delay_in_ms)
+    runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 
     if server_path is None and server_name:
@@ -278,6 +296,21 @@ def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
         server_address, server_port, server_path, server_arguments, websocket_runner_hooks)
 
     runner = WebSocketRunner(websocket_runner_config)
+    return runner.run(parser_group.builder_config, runner_config)
+
+
+@runner_base.command()
+@test_runner_options
+@chip_repl_runner_options
+@pass_parser_group
+def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int, runner: str, repl_storage_path: str, commission_on_network_dut: bool):
+    """Run the test suite using chip-repl."""
+    adapter = __import__(adapter, fromlist=[None]).Adapter(parser_group.builder_config.parser_config.definitions)
+    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number, delay_in_ms)
+    runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)
+    runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
+
+    runner = __import__(runner, fromlist=[None]).Runner(repl_storage_path, commission_on_network_dut)
     return runner.run(parser_group.builder_config, runner_config)
 
 

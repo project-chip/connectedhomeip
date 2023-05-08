@@ -23,6 +23,7 @@ from .builder import Builder
 class TelinkApp(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    BRIDGE = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
     SWITCH = auto()
@@ -39,6 +40,8 @@ class TelinkApp(Enum):
             return 'all-clusters-app'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
+        elif self == TelinkApp.BRIDGE:
+            return 'bridge-app'
         elif self == TelinkApp.CONTACT_SENSOR:
             return 'contact-sensor-app'
         elif self == TelinkApp.LIGHT:
@@ -67,6 +70,8 @@ class TelinkApp(Enum):
             return 'chip-telink-all-clusters-example'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-telink-all-clusters-minimal-example'
+        elif self == TelinkApp.BRIDGE:
+            return 'chip-telink-bridge-example'
         elif self == TelinkApp.CONTACT_SENSOR:
             return 'chip-telink-contact-sensor-example'
         elif self == TelinkApp.LIGHT:
@@ -108,11 +113,13 @@ class TelinkBuilder(Builder):
                  runner,
                  app: TelinkApp = TelinkApp,
                  board: TelinkBoard = TelinkBoard.TLSR9518ADK80D,
-                 enable_rpcs: bool = False):
+                 enable_rpcs: bool = False,
+                 enable_factory_data: bool = False):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
+        self.enable_factory_data = enable_factory_data
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -135,6 +142,9 @@ class TelinkBuilder(Builder):
         flags = []
         if self.enable_rpcs:
             flags.append("-DOVERLAY_CONFIG=rpc.overlay")
+
+        if self.enable_factory_data:
+            flags.append("-DOVERLAY_CONFIG=factory_data.overlay")
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")

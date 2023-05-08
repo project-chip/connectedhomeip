@@ -187,20 +187,14 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 
 CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
 {
-    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!mActiveLookups.Contains(&handle), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(handle.HasLookupResult(), CHIP_ERROR_WELL_EMPTY);
 
-    return mSystemLayer->ScheduleWork(&OnTryNextResult, static_cast<void *>(&handle));
-}
-
-void Resolver::OnTryNextResult(System::Layer * layer, void * context)
-{
-    auto handle   = static_cast<Impl::NodeLookupHandle *>(context);
-    auto listener = handle->GetListener();
-    auto peerId   = handle->GetRequest().GetPeerId();
-    auto result   = handle->TakeLookupResult();
+    auto listener = handle.GetListener();
+    auto peerId   = handle.GetRequest().GetPeerId();
+    auto result   = handle.TakeLookupResult();
     listener->OnNodeAddressResolved(peerId, result);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method)

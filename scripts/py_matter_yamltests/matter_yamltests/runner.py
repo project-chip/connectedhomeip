@@ -43,10 +43,14 @@ class TestRunnerOptions:
                     stop running the tests if a step index matches
                     the number. This is mostly useful when running
                     a single test file and for debugging purposes.
+
+    delay_in_ms:  If set to any value that is not zero the runner will
+                  wait for the given time between steps.
     """
     stop_on_error: bool = True
     stop_on_warning: bool = False
     stop_at_number: int = -1
+    delay_in_ms: int = 0
 
 
 @dataclass
@@ -139,7 +143,9 @@ class TestRunner(TestRunnerBase):
             if not parser or not runner_config:
                 continue
 
-            result = asyncio.run(self._run(parser, runner_config))
+            loop = asyncio.get_event_loop()
+            result = loop.run_until_complete(asyncio.wait_for(
+                self._run(parser, runner_config), parser.timeout))
             if isinstance(result, Exception):
                 raise (result)
             elif not result:
@@ -157,12 +163,12 @@ class TestRunner(TestRunnerBase):
             await self.start()
 
             hooks = config.hooks
-            hooks.test_start(parser.name, parser.tests.count)
+            hooks.test_start(parser.filename, parser.name, parser.tests.count)
 
             test_duration = 0
             for idx, request in enumerate(parser.tests):
                 if not request.is_pics_enabled:
-                    hooks.step_skipped(request.label)
+                    hooks.step_skipped(request.label, request.pics)
                     continue
                 elif not config.adapter:
                     hooks.step_start(request.label)
@@ -175,7 +181,9 @@ class TestRunner(TestRunnerBase):
                 if config.pseudo_clusters.supports(request):
                     responses, logs = await config.pseudo_clusters.execute(request)
                 else:
-                    responses, logs = config.adapter.decode(await self.execute(config.adapter.encode(request)))
+                    encoded_request = config.adapter.encode(request)
+                    encoded_response = await self.execute(encoded_request)
+                    responses, logs = config.adapter.decode(encoded_response)
                 duration = round((time.time() - start) * 1000, 2)
                 test_duration += duration
 
@@ -183,9 +191,9 @@ class TestRunner(TestRunnerBase):
 
                 if logger.is_failure():
                     hooks.step_failure(logger, logs, duration,
-                                       request.responses, responses)
+                                       request, responses)
                 else:
-                    hooks.step_success(logger, logs, duration)
+                    hooks.step_success(logger, logs, duration, request)
 
                 if logger.is_failure() and config.options.stop_on_error:
                     status = False
@@ -197,6 +205,9 @@ class TestRunner(TestRunnerBase):
 
                 if (idx + 1) == config.options.stop_at_number:
                     break
+
+                if config.options.delay_in_ms:
+                    await asyncio.sleep(config.options.delay_in_ms / 1000)
 
             hooks.test_stop(round(test_duration))
 

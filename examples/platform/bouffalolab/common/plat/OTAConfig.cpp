@@ -44,3 +44,12 @@ void OTAConfig::Init()
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 }
+
+void OTAConfig::InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState)
+{
+    if (!chip::GetRequestorInstance())
+    {
+        ChipLogProgress(NotSpecified, "Init OTA Requestor");
+        OTAConfig::Init();
+    }
+}

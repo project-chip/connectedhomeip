@@ -25,22 +25,6 @@ the following features are available:
 
 <hr>
 
--   [Overview](#overview)
--   [Requirements](#requirements)
-    -   [Supported devices](#supported-devices)
--   [Device UI](#device-ui)
--   [Setting up the environment](#setting-up-the-environment)
-    -   [Using Docker container for setup](#using-docker-container-for-setup)
-    -   [Using native shell for setup](#using-native-shell-for-setup)
--   [Building](#building)
--   [Configuring the example](#configuring-the-example)
--   [Flashing and debugging](#flashing-and-debugging)
-    -   [Flashing on the nRF52840 DK](#flashing-on-the-nrf52840-dk)
-    -   [Flashing on the nRF52840 Dongle](#flashing-on-the-nrf52840-dongle)
--   [Testing the example](#testing-the-example)
-
-<hr>
-
 ## Overview
 
 This example is running on the nRF Connect platform, which is based on the

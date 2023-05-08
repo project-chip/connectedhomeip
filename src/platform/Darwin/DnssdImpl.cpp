@@ -195,11 +195,12 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
     sdCtx = chip::Platform::New<RegisterContext>(type, name, callback, context);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
-    sdCtx->mHostNameRegistrar.Init(hostname, addressType, interfaceId);
+    auto err = sdCtx->mHostNameRegistrar.Init(hostname, addressType, interfaceId);
+    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     DNSServiceRef sdRef;
-    auto err = DNSServiceRegister(&sdRef, kRegisterFlags, interfaceId, name, type, kLocalDot, hostname, htons(port), record.size(),
-                                  record.data(), OnRegister, sdCtx);
+    err = DNSServiceRegister(&sdRef, kRegisterFlags, interfaceId, name, type, kLocalDot, hostname, htons(port), record.size(),
+                             record.data(), OnRegister, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
@@ -327,12 +328,6 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
     if (kDNSServiceErr_NoError == err)
     {
         sdCtx->OnNewInterface(interfaceId, fullname, hostname, port, txtLen, txtRecord);
-        if (kDNSServiceInterfaceIndexLocalOnly == interfaceId)
-        {
-            sdCtx->OnNewLocalOnlyAddress();
-            sdCtx->Finalize();
-            return;
-        }
     }
 
     if (!(flags & kDNSServiceFlagsMoreComing))
@@ -394,7 +389,12 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback successCallback, DnssdAsyncRet
     return CHIP_NO_ERROR;
 }
 
-void ChipDnssdShutdown() {}
+void ChipDnssdShutdown()
+{
+    // Drop our existing advertisements now, so they don't stick around while we
+    // are not actually in a responsive state.
+    ChipDnssdRemoveServices();
+}
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
@@ -416,6 +416,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
+    assertChipStackLockedByCurrentThread();
+
     auto err = MdnsContexts::GetInstance().RemoveAllOfType(ContextType::Register);
     if (CHIP_ERROR_KEY_NOT_FOUND == err)
     {
@@ -457,11 +459,11 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    // Just treat this as a timeout error.  Don't bother delivering the partial
+    // We have been canceled.  Don't bother delivering the partial
     // results we have queued up in the BrowseContext, if any.  In practice
     // there shouldn't be anything there long-term anyway.
     //
-    // Make sure to time out all the resolves first, before we time out the
+    // Make sure to cancel all the resolves first, before we cancel the
     // browse (just to avoid dangling pointers in the resolves, even though we
     // only use them for equality compares).
     std::vector<GenericContext *> resolves;
@@ -473,10 +475,10 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 
     for (auto & resolve : resolves)
     {
-        resolve->Finalize(kDNSServiceErr_Timeout);
+        resolve->Finalize(CHIP_ERROR_CANCELLED);
     }
 
-    ctx->Finalize(kDNSServiceErr_Timeout);
+    ctx->Finalize(CHIP_ERROR_CANCELLED);
     return CHIP_NO_ERROR;
 }
 
@@ -503,11 +505,11 @@ void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
     if (*existingCtx->consumerCounter == 0)
     {
         // No more consumers; clear out all of these resolves so they don't
-        // stick around.  Dispatch timeout failure on all of them to make sure
-        // whatever kicked them off cleans up resources as needed.
+        // stick around.  Dispatch a "cancelled" failure on all of them to make
+        // sure whatever kicked them off cleans up resources as needed.
         do
         {
-            existingCtx->Finalize(kDNSServiceErr_Timeout);
+            existingCtx->Finalize(CHIP_ERROR_CANCELLED);
             existingCtx = MdnsContexts::GetInstance().GetExistingResolveForInstanceName(instanceName);
         } while (existingCtx != nullptr);
     }

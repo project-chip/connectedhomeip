@@ -51,6 +51,8 @@ namespace DeviceLayer {
 
 CHIP_ERROR ConnectivityManagerImpl::InitEthernet()
 {
+    // Initialize TCP/IP network interface (should be called for all Ethernet boards)
+    ESP_ERROR_CHECK(esp_netif_init());
     esp_netif_config_t cfg  = ESP_NETIF_DEFAULT_ETH();
     esp_netif_t * eth_netif = esp_netif_new(&cfg);
 

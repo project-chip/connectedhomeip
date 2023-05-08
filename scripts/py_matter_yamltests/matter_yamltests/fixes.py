@@ -85,7 +85,11 @@ def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
     if s.startswith('hex:'):
         return binascii.unhexlify(s[4:])
 
-    # Step 2: convert non-hex-prefixed to bytes
+    # Step 2: handle explicit "base64:" prefix
+    if s.startswith('base64:'):
+        return binascii.a2b_base64(s[7:])
+
+    # Step 3: convert non-hex-prefixed to bytes
     # TODO(#23669): This does not properly support utf8 octet strings. We mimic
     # javascript codegen behavior. Behavior of javascript is:
     #   * Octet string character >= u+0200 errors out.

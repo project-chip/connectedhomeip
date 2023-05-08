@@ -122,6 +122,8 @@ void LayerImplSelect::Signal()
 
 CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = System::Clock::kZero);
@@ -167,6 +169,8 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
 
 void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturn(mLayerState.IsInitialized());
 
     TimerList::Node * timer = mTimerList.Remove(onComplete, appState);
@@ -194,6 +198,8 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
 
 CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH

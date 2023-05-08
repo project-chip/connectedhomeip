@@ -57,19 +57,13 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
- * 0xFFF1: Test vendor
  */
-//#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x130D
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x534B: BL602 lock-app
- * TODO: 3R
  */
-//#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xF001
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
 
 /**
@@ -140,3 +134,9 @@
 #define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 128
 
 #define CHIP_BLE_DEVICE_NAME "MatterLight"
+
+/** Please contact Bouffalo Lab for how to use factory data provider */
+// #define CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE 1
+// uncomment out the following macro to use factory test data
+// when CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE sets to 1
+// #define CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST

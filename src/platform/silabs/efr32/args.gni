@@ -20,7 +20,7 @@ import("${chip_root}/examples/platform/silabs/efr32/args.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 
 # ARM architecture flags will be set based on silabs_family.
-arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
+arm_platform_config = "${efr32_sdk_build_root}/silabs_arm.gni"
 
 mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
 
@@ -44,7 +44,7 @@ chip_with_lwip = false
 chip_build_tests = false
 
 # Transitional CommissionableDataProvider not used anymore
-# examples/platform/silabs/efr32/EFR32DeviceDataProvider is now used.
+# examples/platform/silabs/efr32/SilabsDeviceDataProvider is now used.
 chip_use_transitional_commissionable_data_provider = false
 
 openthread_root =

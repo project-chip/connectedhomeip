@@ -18,89 +18,38 @@
 
 #pragma once
 
-#include "AppConfig.h"
-#include "AppEvent.h"
+#include "AppTaskCommon.h"
 #include "WindowCovering.h"
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-#include "LEDWidget.h"
-#endif
-#include "PWMDevice.h"
-#include <platform/CHIPDeviceLayer.h>
-
-#if CONFIG_CHIP_FACTORY_DATA
-#include <platform/telink/FactoryDataProvider.h>
-#endif
 
 #ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
 #endif
 
-#include <cstdint>
-
-struct k_timer;
-struct Identify;
-
-class AppTask
+class AppTask : public AppTaskCommon
 {
-public:
-    CHIP_ERROR StartApp(void);
-
-    void PostEvent(AppEvent * aEvent);
-    void UpdateClusterState(void);
-
-    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
-
 private:
 #ifdef CONFIG_CHIP_PW_RPC
     friend class chip::rpc::TelinkButton;
 #endif
     friend AppTask & GetAppTask(void);
+    friend class AppTaskCommon;
+
     CHIP_ERROR Init(void);
 
-    static void ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor);
-    static void ActionIdentifyStateUpdateHandler(k_timer * timer);
-
-    void DispatchEvent(AppEvent * event);
-
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
-    static void LEDStateUpdateHandler(LEDWidget * ledWidget);
-    static void UpdateStatusLED();
-#endif
-    static void LightingActionButtonEventHandler(void);
     static void OpenActionAndToggleMoveTypeButtonEventHandler(void);
     static void CloseActionButtonEventHandler(void);
-    static void FactoryResetButtonEventHandler(void);
-    static void StartBleAdvButtonEventHandler(void);
 
-    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
-    static void FactoryResetTimerTimeoutCallback(k_timer * timer);
     static void OpenTimerTimeoutCallback(k_timer * timer);
     static void OpenTimerEventHandler(AppEvent * aEvent);
     static void ToggleMoveTypeHandler(AppEvent * aEvent);
-
-    static void FactoryResetTimerEventHandler(AppEvent * aEvent);
-    static void FactoryResetHandler(AppEvent * aEvent);
-    static void LightingActionEventHandler(AppEvent * aEvent);
-    static void StartBleAdvHandler(AppEvent * aEvent);
-    static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
 
     static void OpenHandler(AppEvent * aEvent);
     static void CloseHandler(AppEvent * aEvent);
     static void ToggleMoveType();
 
-    static void InitButtons(void);
-
-    static AppTask sAppTask;
-    PWMDevice mPwmIdentifyLed;
-
     OperationalState mMoveType{ OperationalState::MovingUpOrOpen };
 
-#if CONFIG_CHIP_FACTORY_DATA
-    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
-#endif
+    static AppTask sAppTask;
 };
 
 inline AppTask & GetAppTask(void)

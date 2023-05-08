@@ -109,6 +109,7 @@
 		3CF134AB289D8DF70017A19E /* MTRDeviceAttestationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CF134AA289D8DF70017A19E /* MTRDeviceAttestationInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3CF134AD289D8E570017A19E /* MTRDeviceAttestationInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CF134AC289D8E570017A19E /* MTRDeviceAttestationInfo.mm */; };
 		3CF134AF289D90FF0017A19E /* MTROperationalCertificateIssuer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CF134AE289D90FF0017A19E /* MTROperationalCertificateIssuer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D0C484B29DA4FA0006D811F /* MTRErrorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */; };
 		3D69868529383096007314E7 /* com.csa.matter.plist in Copy Logging Preferences */ = {isa = PBXBuildFile; fileRef = 3D69868029382EF4007314E7 /* com.csa.matter.plist */; };
 		3D843711294977000070D20A /* NSStringSpanConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370E294977000070D20A /* NSStringSpanConversion.h */; };
 		3D843712294977000070D20A /* MTRCallbackBridgeBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D84370F294977000070D20A /* MTRCallbackBridgeBase.h */; };
@@ -137,12 +138,19 @@
 		5136661628067D550025EDAE /* MTRDeviceControllerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136661228067D550025EDAE /* MTRDeviceControllerFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		513DDB862761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 513DDB852761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h */; };
 		513DDB8A2761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 513DDB892761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm */; };
+		5142E39829D377F000A206F0 /* MTROTAProviderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5142E39729D377F000A206F0 /* MTROTAProviderTests.m */; };
 		514304202914CED9004DC7FE /* generic-callback-stubs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */; };
 		51431AF927D2973E008A7943 /* MTRIMDispatch.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51431AF827D2973E008A7943 /* MTRIMDispatch.mm */; };
 		51431AFB27D29CA4008A7943 /* ota-provider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51431AFA27D29CA4008A7943 /* ota-provider.cpp */; };
 		515C1C6F284F9FFB00A48F0C /* MTRFramework.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */; };
 		515C1C70284F9FFB00A48F0C /* MTRFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = 515C1C6E284F9FFB00A48F0C /* MTRFramework.h */; };
 		51669AF02913204400F4AA36 /* MTRBackwardsCompatTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */; };
+		5173A47529C0E2ED00F67F48 /* MTRFabricInfo_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5173A47229C0E2ED00F67F48 /* MTRFabricInfo_Internal.h */; };
+		5173A47629C0E2ED00F67F48 /* MTRFabricInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5173A47329C0E2ED00F67F48 /* MTRFabricInfo.mm */; };
+		5173A47729C0E2ED00F67F48 /* MTRFabricInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 5173A47429C0E2ED00F67F48 /* MTRFabricInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5173A47929C0E82300F67F48 /* MTRFabricInfoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5173A47829C0E82300F67F48 /* MTRFabricInfoTests.m */; };
+		51742B4A29CB5FC1009974FE /* MTRTestResetCommissioneeHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 51742B4929CB5FC0009974FE /* MTRTestResetCommissioneeHelper.m */; };
+		51742B4E29CB6B88009974FE /* MTRPairingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51742B4D29CB6B88009974FE /* MTRPairingTests.m */; };
 		517BF3F0282B62B800A8B7DB /* MTRCertificates.h in Headers */ = {isa = PBXBuildFile; fileRef = 517BF3EE282B62B800A8B7DB /* MTRCertificates.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		517BF3F1282B62B800A8B7DB /* MTRCertificates.mm in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3EF282B62B800A8B7DB /* MTRCertificates.mm */; };
 		517BF3F3282B62CB00A8B7DB /* MTRCertificateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3F2282B62CB00A8B7DB /* MTRCertificateTests.m */; };
@@ -363,6 +371,7 @@
 		3CF134AA289D8DF70017A19E /* MTRDeviceAttestationInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceAttestationInfo.h; sourceTree = "<group>"; };
 		3CF134AC289D8E570017A19E /* MTRDeviceAttestationInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceAttestationInfo.mm; sourceTree = "<group>"; };
 		3CF134AE289D90FF0017A19E /* MTROperationalCertificateIssuer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTROperationalCertificateIssuer.h; sourceTree = "<group>"; };
+		3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRErrorTests.m; sourceTree = "<group>"; };
 		3D69868029382EF4007314E7 /* com.csa.matter.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = com.csa.matter.plist; sourceTree = "<group>"; };
 		3D84370E294977000070D20A /* NSStringSpanConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSStringSpanConversion.h; sourceTree = "<group>"; };
 		3D84370F294977000070D20A /* MTRCallbackBridgeBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCallbackBridgeBase.h; sourceTree = "<group>"; };
@@ -414,12 +423,20 @@
 		5136661228067D550025EDAE /* MTRDeviceControllerFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerFactory.h; sourceTree = "<group>"; };
 		513DDB852761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRAttributeTLVValueDecoder_Internal.h; sourceTree = "<group>"; };
 		513DDB892761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRAttributeTLVValueDecoder.mm; sourceTree = "<group>"; };
+		5142E39729D377F000A206F0 /* MTROTAProviderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTROTAProviderTests.m; sourceTree = "<group>"; };
 		5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "generic-callback-stubs.cpp"; path = "util/generic-callback-stubs.cpp"; sourceTree = "<group>"; };
 		51431AF827D2973E008A7943 /* MTRIMDispatch.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRIMDispatch.mm; sourceTree = "<group>"; };
 		51431AFA27D29CA4008A7943 /* ota-provider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ota-provider.cpp"; path = "clusters/ota-provider/ota-provider.cpp"; sourceTree = "<group>"; };
 		515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRFramework.mm; sourceTree = "<group>"; };
 		515C1C6E284F9FFB00A48F0C /* MTRFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRFramework.h; sourceTree = "<group>"; };
 		51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRBackwardsCompatTests.m; sourceTree = "<group>"; };
+		5173A47229C0E2ED00F67F48 /* MTRFabricInfo_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRFabricInfo_Internal.h; sourceTree = "<group>"; };
+		5173A47329C0E2ED00F67F48 /* MTRFabricInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRFabricInfo.mm; sourceTree = "<group>"; };
+		5173A47429C0E2ED00F67F48 /* MTRFabricInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRFabricInfo.h; sourceTree = "<group>"; };
+		5173A47829C0E82300F67F48 /* MTRFabricInfoTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRFabricInfoTests.m; sourceTree = "<group>"; };
+		51742B4829CB5F45009974FE /* MTRTestResetCommissioneeHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestResetCommissioneeHelper.h; sourceTree = "<group>"; };
+		51742B4929CB5FC0009974FE /* MTRTestResetCommissioneeHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestResetCommissioneeHelper.m; sourceTree = "<group>"; };
+		51742B4D29CB6B88009974FE /* MTRPairingTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRPairingTests.m; sourceTree = "<group>"; };
 		517BF3EE282B62B800A8B7DB /* MTRCertificates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCertificates.h; sourceTree = "<group>"; };
 		517BF3EF282B62B800A8B7DB /* MTRCertificates.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCertificates.mm; sourceTree = "<group>"; };
 		517BF3F2282B62CB00A8B7DB /* MTRCertificateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRCertificateTests.m; sourceTree = "<group>"; };
@@ -1004,6 +1021,9 @@
 				3D84370E294977000070D20A /* NSStringSpanConversion.h */,
 				5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */,
 				5117DD3629A931AD00FFA1AA /* MTROperationalBrowser.mm */,
+				5173A47229C0E2ED00F67F48 /* MTRFabricInfo_Internal.h */,
+				5173A47429C0E2ED00F67F48 /* MTRFabricInfo.h */,
+				5173A47329C0E2ED00F67F48 /* MTRFabricInfo.mm */,
 				3D69867E29382E58007314E7 /* Resources */,
 			);
 			path = CHIP;
@@ -1020,9 +1040,12 @@
 				51E24E72274E0DAC007CCF6E /* MTRErrorTestUtils.mm */,
 				51C8E3F72825CDB600D47D00 /* MTRTestKeys.m */,
 				51D10D2D2808E2CA00E8CA3D /* MTRTestStorage.m */,
+				51742B4829CB5F45009974FE /* MTRTestResetCommissioneeHelper.h */,
+				51742B4929CB5FC0009974FE /* MTRTestResetCommissioneeHelper.m */,
 				3DFCB3282966684500332B35 /* MTRCertificateInfoTests.m */,
 				99C65E0F267282F1003402F6 /* MTRControllerTests.m */,
 				5AE6D4E327A99041001F2493 /* MTRDeviceTests.m */,
+				3D0C484A29DA4FA0006D811F /* MTRErrorTests.m */,
 				5A6FEC9C27B5E48800F25F42 /* MTRXPCProtocolTests.m */,
 				5A7947DD27BEC3F500434CF2 /* MTRXPCListenerSampleTests.m */,
 				B2F53AF1245B0DCF0010745E /* MTRSetupPayloadParserTests.m */,
@@ -1031,6 +1054,9 @@
 				7596A8502878709F004DAE0E /* MTRAsyncCallbackQueueTests.m */,
 				51669AEF2913204400F4AA36 /* MTRBackwardsCompatTests.m */,
 				510CECA6297F72470064E0B3 /* MTROperationalCertificateIssuerTests.m */,
+				5173A47829C0E82300F67F48 /* MTRFabricInfoTests.m */,
+				51742B4D29CB6B88009974FE /* MTRPairingTests.m */,
+				5142E39729D377F000A206F0 /* MTROTAProviderTests.m */,
 				B202529D2459E34F00F97062 /* Info.plist */,
 			);
 			path = CHIPTests;
@@ -1094,6 +1120,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5173A47729C0E2ED00F67F48 /* MTRFabricInfo.h in Headers */,
 				517BF3F0282B62B800A8B7DB /* MTRCertificates.h in Headers */,
 				51E51FBF282AD37A00FC978D /* MTRDeviceControllerStartupParams.h in Headers */,
 				5136661628067D550025EDAE /* MTRDeviceControllerFactory.h in Headers */,
@@ -1106,6 +1133,7 @@
 				5A6FEC9227B5669C00F25F42 /* MTRDeviceControllerOverXPC.h in Headers */,
 				5117DD3929A931AE00FFA1AA /* MTROperationalBrowser.h in Headers */,
 				2C1B027B2641DB4E00780EF1 /* MTROperationalCredentialsDelegate.h in Headers */,
+				5173A47529C0E2ED00F67F48 /* MTRFabricInfo_Internal.h in Headers */,
 				3D843717294979230070D20A /* MTRClusters_Internal.h in Headers */,
 				7596A85728788557004DAE0E /* MTRClusters.h in Headers */,
 				99D466E12798936D0089A18F /* MTRCommissioningParameters.h in Headers */,
@@ -1389,6 +1417,7 @@
 				517BF3F1282B62B800A8B7DB /* MTRCertificates.mm in Sources */,
 				5A6FEC9627B5983000F25F42 /* MTRDeviceControllerXPCConnection.mm in Sources */,
 				511913FB28C100EF009235E9 /* MTRBaseSubscriptionCallback.mm in Sources */,
+				5173A47629C0E2ED00F67F48 /* MTRFabricInfo.mm in Sources */,
 				5ACDDD7D27CD16D200EFD68A /* MTRClusterStateCacheContainer.mm in Sources */,
 				513DDB8A2761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm in Sources */,
 				5117DD3829A931AE00FFA1AA /* MTROperationalBrowser.mm in Sources */,
@@ -1417,6 +1446,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51742B4E29CB6B88009974FE /* MTRPairingTests.m in Sources */,
 				51669AF02913204400F4AA36 /* MTRBackwardsCompatTests.m in Sources */,
 				51D10D2E2808E2CA00E8CA3D /* MTRTestStorage.m in Sources */,
 				7596A8512878709F004DAE0E /* MTRAsyncCallbackQueueTests.m in Sources */,
@@ -1425,12 +1455,16 @@
 				99C65E10267282F1003402F6 /* MTRControllerTests.m in Sources */,
 				1E5801C328941C050033A199 /* MTRTestOTAProvider.m in Sources */,
 				5A6FEC9D27B5E48900F25F42 /* MTRXPCProtocolTests.m in Sources */,
+				5173A47929C0E82300F67F48 /* MTRFabricInfoTests.m in Sources */,
+				3D0C484B29DA4FA0006D811F /* MTRErrorTests.m in Sources */,
+				51742B4A29CB5FC1009974FE /* MTRTestResetCommissioneeHelper.m in Sources */,
 				5AE6D4E427A99041001F2493 /* MTRDeviceTests.m in Sources */,
 				510CECA8297F72970064E0B3 /* MTROperationalCertificateIssuerTests.m in Sources */,
 				5A7947DE27BEC3F500434CF2 /* MTRXPCListenerSampleTests.m in Sources */,
 				B2F53AF2245B0DCF0010745E /* MTRSetupPayloadParserTests.m in Sources */,
 				3DFCB3292966684500332B35 /* MTRCertificateInfoTests.m in Sources */,
 				517BF3F3282B62CB00A8B7DB /* MTRCertificateTests.m in Sources */,
+				5142E39829D377F000A206F0 /* MTROTAProviderTests.m in Sources */,
 				51E24E73274E0DAC007CCF6E /* MTRErrorTestUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1604,12 +1638,6 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = (
-					"-Wformat",
-					"-Wformat-nonliteral",
-					"-Wformat-security",
-					"-Wconversion",
-				);
 				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
@@ -1617,6 +1645,12 @@
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+				WARNING_CFLAGS = (
+					"-Wformat",
+					"-Wformat-nonliteral",
+					"-Wformat-security",
+					"-Wconversion",
+				);
 			};
 			name = Debug;
 		};
@@ -1657,6 +1691,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
+				OTHER_CFLAGS = "-fmacro-prefix-map=$(SRCROOT)/CHIP/=";
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[sdk=*]" = (
 					"-framework",
@@ -1755,12 +1790,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = (
-					"-Wformat",
-					"-Wformat-nonliteral",
-					"-Wformat-security",
-					"-Wconversion",
-				);
 				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
@@ -1769,6 +1798,12 @@
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+				WARNING_CFLAGS = (
+					"-Wformat",
+					"-Wformat-nonliteral",
+					"-Wformat-security",
+					"-Wconversion",
+				);
 			};
 			name = Release;
 		};
@@ -1809,6 +1844,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
+				OTHER_CFLAGS = "-fmacro-prefix-map=$(SRCROOT)/CHIP/=";
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[sdk=*]" = (
 					"-framework",

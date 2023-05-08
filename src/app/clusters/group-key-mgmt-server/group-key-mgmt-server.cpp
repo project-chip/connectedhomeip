@@ -84,15 +84,12 @@ struct GroupTableCodec
         TLV::TLVType inner;
         ReturnErrorOnFailure(writer.StartContainer(TagEndpoints(), TLV::kTLVType_Array, inner));
         GroupDataProvider::GroupEndpoint mapping;
-        auto iter = mProvider->IterateEndpoints(mFabric);
+        auto iter = mProvider->IterateEndpoints(mFabric, MakeOptional(mInfo.group_id));
         if (nullptr != iter)
         {
             while (iter->Next(mapping))
             {
-                if (mapping.group_id == mInfo.group_id)
-                {
-                    ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id)));
-                }
+                ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id)));
             }
             iter->Release();
         }

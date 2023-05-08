@@ -167,8 +167,6 @@ tests:
                 value: 0x85
               - name: "UserIndex"
                 value: null
-              - name: "NextCredentialIndex"
-                value: 3
 
     - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
@@ -194,9 +192,8 @@ tests:
                 value: 0x02
               - name: "UserIndex"
                 value: null
-              - name: "NextCredentialIndex"
-                value: 3
 
+    # Need OR condition support
     - label:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
           Set Credential Response command with status as DUPLICATE or OCCUPIED"
@@ -253,11 +250,11 @@ tests:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
           Set Credential Response command with response as OCCUPIED if the
           CredentialIndex is repeated"
+      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       verification: |
           Mark as not applicable and proceed to next step
 
           ./chip-tool doorlock set-credential 2 '{ "credentialType" : 1, "credentialIndex" : 3 }' 1234567 1 null null 1 1 --timedInteractionTimeoutMs 1000
-
           Verify "DUT sends Set Credential Response command with response as OCCUPIED" on the TH(Chip-tool) Log:
 
           [1658473055.384297][2667:2672] CHIP:DMG: },
@@ -270,7 +267,6 @@ tests:
           [1658473055.384660][2667:2672] CHIP:TOO:    }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       arguments:
           values:
               - name: "message"
@@ -352,8 +348,6 @@ tests:
                 value: 0
               - name: "UserIndex"
                 value: null
-              - name: "NextCredentialIndex"
-                value: 2
 
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp

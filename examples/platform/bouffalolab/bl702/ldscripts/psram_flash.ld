@@ -143,10 +143,6 @@ SECTIONS
   {
     *(.rsvd_data)
     *(.ble_rsvd_mem)
-
-    KEEP(*AppTask.cpp.o(.bss.*appStack*))
-    KEEP(*main.cpp.o(.bss.*TimerTaskStack*))
-    
   } >hbnram
 
   .tcmcode : ALIGN(4)

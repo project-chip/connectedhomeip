@@ -60,6 +60,7 @@ class TestXmlParser(unittest.TestCase):
               <cluster>
                 <name>Test</name>
                 <code>0x1234</code>
+                <description>Test</description>
 
                 <attribute side="server" code="11" type="INT32U" min="0" max="2" isNullable="true" \
                     reportable="true" writable="false">SomeIntAttribute</attribute>
@@ -92,6 +93,7 @@ class TestXmlParser(unittest.TestCase):
                                  side=ClusterSide.CLIENT,
                                  name='Test',
                                  code=0x1234,
+                                 description="Test",
                                  attributes=[
                                      Attribute(definition=Field(
                                          data_type=DataType(name='INT32U'),
@@ -130,6 +132,7 @@ class TestXmlParser(unittest.TestCase):
                                  commands=[
                                      Command(name='GetSomeData', code=33,
                                              input_param='GetSomeDataRequest', output_param='GetSomeDataResponse',
+                                             description='This is just a test: client to server',
                                              invokeacl=AccessPrivilege.ADMINISTER)
                                  ])
                          ]))
@@ -307,6 +310,7 @@ Some copyright here... testing that we skip over comments
         self.assertEqual(idl,
                          Idl(clusters=[
                              Cluster(side=ClusterSide.CLIENT, name='WindowCovering', code=0x102,
+                                     description='Provides an interface for controlling and adjusting automatic window coverings. ',
                                      structs=[],
                                      attributes=[
                                          Attribute(

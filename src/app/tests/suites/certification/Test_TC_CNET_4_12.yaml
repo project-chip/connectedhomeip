@@ -245,7 +245,7 @@ tests:
           "TH sends AddOrUpdateThre adNetwork command to the DUT with the
           OperationalDatase t field set to PIXIT.CNET.THRE AD_2ND_OPERATI
           ONALDATASET and Breadcrumb field set to 1"
-      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      PICS: CNET.S.C03.Rsp && CNET.S.C05.Tx
       verification: |
           Mark as not applicable and proceed to next step
       disabled: true

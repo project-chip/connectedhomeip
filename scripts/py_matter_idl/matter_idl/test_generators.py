@@ -33,7 +33,7 @@ except ImportError:
 from matter_idl.generators import GeneratorStorage
 from matter_idl.generators.bridge import BridgeGenerator
 from matter_idl.generators.cpp.application import CppApplicationGenerator
-from matter_idl.generators.java import JavaGenerator
+from matter_idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 from matter_idl.matter_idl_types import Idl
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
@@ -116,8 +116,10 @@ class GeneratorTest:
             self.test_cases.append(test_case)
 
     def _create_generator(self, storage: GeneratorStorage, idl: Idl):
-        if self.generator_name.lower() == 'java':
-            return JavaGenerator(storage, idl)
+        if self.generator_name.lower() == 'java-jni':
+            return JavaJNIGenerator(storage, idl)
+        if self.generator_name.lower() == 'java-class':
+            return JavaClassGenerator(storage, idl)
         if self.generator_name.lower() == 'bridge':
             return BridgeGenerator(storage, idl)
         if self.generator_name.lower() == 'cpp-app':
@@ -126,7 +128,7 @@ class GeneratorTest:
             sys.path.append(os.path.abspath(
                 os.path.join(os.path.dirname(__file__), '../examples')))
             from matter_idl_plugin import CustomGenerator
-            return CustomGenerator(storage, idl)
+            return CustomGenerator(storage, idl, package='com.matter.example.proto')
         else:
             raise Exception("Unknown generator for testing: %s",
                             self.generator_name.lower())

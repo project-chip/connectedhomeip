@@ -127,32 +127,26 @@ tests:
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
           Example Log:
-          1674814516.624600][16608:16608] CHIP:DMG: ReportDataMessage =
-          [1674814516.624614][16608:16608] CHIP:DMG: {
-          [1674814516.624619][16608:16608] CHIP:DMG:         AttributeReportIBs =
-          [1674814516.624631][16608:16608] CHIP:DMG:         [
-          [1674814516.624639][16608:16608] CHIP:DMG:                 AttributeReportIB =
-          [1674814516.624651][16608:16608] CHIP:DMG:                 {
-          [1674814516.624659][16608:16608] CHIP:DMG:                         AttributeDataIB =
-          [1674814516.624668][16608:16608] CHIP:DMG:                         {
-          [1674814516.624677][16608:16608] CHIP:DMG:                                 DataVersion = 0xf6524906,
-          [1674814516.624696][16608:16608] CHIP:DMG:                                 AttributePathIB =
-          [1674814516.624705][16608:16608] CHIP:DMG:                                 {
-          [1674814516.624715][16608:16608] CHIP:DMG:                                         Endpoint = 0x3,
-          [1674814516.624724][16608:16608] CHIP:DMG:                                         Cluster = 0x39,
-          [1674814516.624745][16608:16608] CHIP:DMG:                                         Attribute = 0x0000_0005,
-          [1674814516.624759][16608:16608] CHIP:DMG:                                 }
-          [1674814516.624770][16608:16608] CHIP:DMG:
-          [1674814516.624781][16608:16608] CHIP:DMG:                                 Data = "Light 1" (7 chars),
-          [1674814516.624789][16608:16608] CHIP:DMG:                         },
-          [1674814516.624801][16608:16608] CHIP:DMG:
-          [1674814516.624808][16608:16608] CHIP:DMG:                 },
-          [1674814516.624820][16608:16608] CHIP:DMG:
-          [1674814516.624826][16608:16608] CHIP:DMG:         ],
-          [1674814516.624841][16608:16608] CHIP:DMG:
-          [1674814516.624849][16608:16608] CHIP:DMG:         SuppressResponse = true,
-          [1674814516.624858][16608:16608] CHIP:DMG:         InteractionModelRevision = 1
-          [1674814516.624863][16608:16608] CHIP:DMG: }
+          [1678082556.298595][4469:4469] CHIP:IM: Received Read request
+          [1678082556.298708][4469:4469] CHIP:DMG: ReadRequestMessage =
+          [1678082556.298741][4469:4469] CHIP:DMG: {
+          [1678082556.298765][4469:4469] CHIP:DMG:         AttributePathIBs =
+          [1678082556.298807][4469:4469] CHIP:DMG:         [
+          [1678082556.298834][4469:4469] CHIP:DMG:                 AttributePathIB =
+          [1678082556.298867][4469:4469] CHIP:DMG:                 {
+          [1678082556.298899][4469:4469] CHIP:DMG:                         Endpoint = 0x3,
+          [1678082556.298933][4469:4469] CHIP:DMG:                         Cluster = 0x39,
+          [1678082556.298966][4469:4469] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1678082556.298998][4469:4469] CHIP:DMG:                 }
+          [1678082556.299030][4469:4469] CHIP:DMG:
+          [1678082556.299059][4469:4469] CHIP:DMG:         ],
+          [1678082556.299089][4469:4469] CHIP:DMG:
+          [1678082556.299118][4469:4469] CHIP:DMG:         isFabricFiltered = true,
+          [1678082556.299145][4469:4469] CHIP:DMG:         InteractionModelRevision = 1
+          [1678082556.299171][4469:4469] CHIP:DMG: },
+          [1678082556.299247][4469:4469] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1678082556.299380][4469:4469] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1678082556.299413][4469:4469] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
       disabled: true
 
     - label: "DUT reads HardwareVersion from the TH"

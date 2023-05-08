@@ -58,6 +58,10 @@ function atomicType(arg)
     return 'chip::EventNumber';
   case 'fabric_idx':
     return 'chip::FabricIndex';
+  case 'status':
+    // We can't make this into InteractionModel::Status, since it might be a
+    // cluster-specific status.
+    return 'uint8_t';
   case 'octet_string':
   case 'long_octet_string':
     return 'chip::ByteSpan';

@@ -677,6 +677,8 @@ inline void chipDie(void)
 
 #if defined(__clang__)
 #define FALLTHROUGH [[clang::fallthrough]]
+#elif defined(__GNUC__)
+#define FALLTHROUGH __attribute__((fallthrough))
 #else
 #define FALLTHROUGH (void) 0
 #endif

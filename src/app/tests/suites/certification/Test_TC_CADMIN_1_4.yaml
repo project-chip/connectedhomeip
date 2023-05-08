@@ -63,6 +63,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label:
+          "TH1 reads CurrentFabricIndex attribute and save it for future use."
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH1FabricIndex
+
     - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
@@ -86,7 +94,7 @@ tests:
       verification: |
           On TH_CR1 send the below command
 
-          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          avahi-browse -rt _matterc._udp
           +   eth0 IPv6 B2822245F1F43570                              _matterc._udp        local
           =   eth0 IPv6 B2822245F1F43570                              _matterc._udp        local
             hostname = [E45F010F27530000.local]
@@ -147,6 +155,15 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
+    - label:
+          "TH2 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH2FabricIndex
+
     #Check for DNS-SD advertisement is not possible in YAML
     - label:
           "Verify DUT_CE is now discoverable over DNS-SD with two SRV Records"
@@ -155,7 +172,7 @@ tests:
 
           Verify if the DUT_CE is broadcasting using
 
-          ubuntu@ubuntu:~/may16_cntrl2/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          avahi-browse -rt _matter._tcp
           +   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
           +   eth0 IPv6 3C26C93CF201458F-0000000000000001             _matter._tcp         local
           =   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
@@ -185,7 +202,11 @@ tests:
       attribute: "Fabrics"
       fabricFiltered: false
       response:
-          value: [{ Label: "", NodeID: nodeId }, { Label: "", NodeID: nodeId2 }]
+          value:
+              [
+                  { Label: "", FabricIndex: TH1FabricIndex, NodeID: nodeId },
+                  { Label: "", FabricIndex: TH2FabricIndex, NodeID: nodeId2 },
+              ]
           constraints:
               type: list
 
@@ -197,7 +218,11 @@ tests:
       PICS: OPCREDS.S.A0001
       fabricFiltered: false
       response:
-          value: [{ Label: "", NodeID: nodeId }, { Label: "", NodeID: nodeId2 }]
+          value:
+              [
+                  { Label: "", FabricIndex: TH1FabricIndex, NodeID: nodeId },
+                  { Label: "", FabricIndex: TH2FabricIndex, NodeID: nodeId2 },
+              ]
           constraints:
               type: list
 
@@ -311,3 +336,21 @@ tests:
       response:
           error: FAILURE
           clusterError: 9
+
+    - label: "TH_CR2 revokes the commissioning window"
+      identity: "beta"
+      cluster: "Administrator Commissioning"
+      command: "RevokeCommissioning"
+      PICS: CADMIN.S.C02.Rsp && CADMIN.S.C01.Rsp
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Remove TH2 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH2FabricIndex

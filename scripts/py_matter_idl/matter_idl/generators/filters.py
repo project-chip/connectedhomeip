@@ -24,6 +24,31 @@ def normalize_acronyms(s: str) -> str:
     return s.replace('WiFi', 'Wifi').replace('WI_FI', 'WIFI')
 
 
+def lowfirst(s: str) -> str:
+    """Make the first letter lowercase. """
+    return s[0].lower() + s[1:]
+
+
+def upfirst(s: str) -> str:
+    """Make the first letter uppercase """
+    return s[0].upper() + s[1:]
+
+
+def lowfirst_except_acronym(s: str) -> str:
+    """Make the first letter lowercase assuming the string is already in
+       CamelCase.
+
+       Differs from lowfirst because it checks the string for starting with
+       several uppercase, which is the case for acronyms (HVAC, ACL, WIFI),
+       in which case it will NOT lowercase first
+    """
+    if len(s) >= 2:
+        if s[1].isupper():
+            return s
+
+    return lowfirst(s)
+
+
 def RegisterCommonFilters(filtermap):
     """
     Register filters that are NOT considered platform-generator specific.
@@ -42,3 +67,6 @@ def RegisterCommonFilters(filtermap):
     filtermap['spinalcase'] = stringcase.spinalcase
 
     filtermap['normalize_acronyms'] = normalize_acronyms
+    filtermap['lowfirst'] = lowfirst
+    filtermap['lowfirst_except_acronym'] = lowfirst_except_acronym
+    filtermap['upfirst'] = upfirst

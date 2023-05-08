@@ -1,0 +1,590 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 62.3.1. [TC-PS-3.1] Attributes with client as DUT
+
+PICS:
+    - PS.C
+    - PS.C.AM-READ
+    - PS.C.AO-READ
+    - PS.C.AM-WRITE
+    - PS.C.AO-WRITE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label:
+          "DUT reads all supported mandatory attributes from TH one at a time in
+          a manufacturer specific order"
+      PICS: PS.C.AM-READ
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool powersource read status 1 1
+
+          verify the " status response" on the TH (all-cluster-app) log:
+
+
+          [1646155382.977445][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:685127 on exchange 16568r
+          [1646155382.977534][33190:33190] CHIP:EM: Handling via exchange: 16568r, Delegate: 0xaaaace1730c8
+          [1646155382.978021][33190:33190] CHIP:IM: Received Read request
+          [1646155382.978109][33190:33190] CHIP:DMG: ReadRequestMessage =
+          [1646155382.978143][33190:33190] CHIP:DMG: {
+          [1646155382.978167][33190:33190] CHIP:DMG:         AttributePathIBs =
+          [1646155382.978204][33190:33190] CHIP:DMG:         [
+          [1646155382.978309][33190:33190] CHIP:DMG:                 AttributePathIB =
+          [1646155382.978369][33190:33190] CHIP:DMG:                 {
+          [1646155382.978408][33190:33190] CHIP:DMG:                         Endpoint = 0x1,
+          [1646155382.978459][33190:33190] CHIP:DMG:                         Cluster = 0x2f,
+          [1646155382.978513][33190:33190] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1646155382.978545][33190:33190] CHIP:DMG:                 }
+          [1646155382.978767][33190:33190] CHIP:DMG:
+          [1646155382.978804][33190:33190] CHIP:DMG:         ],
+          [1646155382.978836][33190:33190] CHIP:DMG:
+          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false,
+          [1646155382.978901][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
+          [1646155382.978927][33190:33190] CHIP:DMG: },
+          [1646155382.978998][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1646155382.979658][33190:33190] CHIP:DMG: <RE:Run> Cluster 2f, Attribute 0 is dirty
+          [1646155382.979729][33190:33190] CHIP:DMG: Reading attribute: Cluster=0x0000_002F Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1646155382.979764][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002F e=1 p=v
+          [1646010346.974150][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=v
+
+          ./chip-tool powersource read order 1 1
+
+          verify the " order response" on the TH (all-cluster-app) log:
+
+          [1653395573.862606][19412:19412] CHIP:IM: Received Read request
+          [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
+          [1653395573.862739][19412:19412] CHIP:DMG: {
+          [1653395573.862779][19412:19412] CHIP:DMG:         AttributePathIBs =
+          [1653395573.862827][19412:19412] CHIP:DMG:         [
+          [1653395573.862872][19412:19412] CHIP:DMG:                 AttributePathIB =
+          [1653395573.862928][19412:19412] CHIP:DMG:                 {
+          [1653395573.862980][19412:19412] CHIP:DMG:                         Endpoint = 0x1,
+          [1653395573.863037][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
+          [1653395573.863101][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1653395573.863161][19412:19412] CHIP:DMG:                 }
+          [1653395573.863217][19412:19412] CHIP:DMG:
+          [1653395573.863267][19412:19412] CHIP:DMG:         ],
+          [1653395573.863319][19412:19412] CHIP:DMG:
+          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true,
+          [1653395573.863413][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
+          [1653395573.863456][19412:19412] CHIP:DMG: },
+          [1653395573.863589][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
+
+          ./chip-tool powersource read description 1 1
+
+          verify the " description response" on the TH (all-cluster-app) log:
+
+          CHIP:IM: Received Read request
+          [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
+          [1653395620.020364][19412:19412] CHIP:DMG: {
+          [1653395620.020406][19412:19412] CHIP:DMG:         AttributePathIBs =
+          [1653395620.020463][19412:19412] CHIP:DMG:         [
+          [1653395620.020511][19412:19412] CHIP:DMG:                 AttributePathIB =
+          [1653395620.020576][19412:19412] CHIP:DMG:                 {
+          [1653395620.020635][19412:19412] CHIP:DMG:                         Endpoint = 0x1,
+          [1653395620.020703][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
+          [1653395620.020770][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1653395620.020833][19412:19412] CHIP:DMG:                 }
+          [1653395620.020893][19412:19412] CHIP:DMG:
+          [1653395620.020945][19412:19412] CHIP:DMG:         ],
+          [1653395620.020999][19412:19412] CHIP:DMG:
+          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true,
+          [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
+          [1653395620.021153][19412:19412] CHIP:DMG: },
+          [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          ./chip-tool powersource read bat-charge-level 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-app) log)
+
+          [1663140804.059599][2414:2414] CHIP:IM: Received Read request
+          [1663140804.059679][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663140804.059706][2414:2414] CHIP:DMG: {
+          [1663140804.059728][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663140804.059754][2414:2414] CHIP:DMG:         [
+          [1663140804.059779][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663140804.059828][2414:2414] CHIP:DMG:                 {
+          [1663140804.059861][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663140804.059913][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663140804.059946][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000E,
+          [1663140804.059976][2414:2414] CHIP:DMG:                 }
+          [1663140804.060006][2414:2414] CHIP:DMG:
+          [1663140804.060033][2414:2414] CHIP:DMG:         ],
+          [1663140804.060060][2414:2414] CHIP:DMG:
+          [1663140804.060087][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663140804.060111][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663140804.060136][2414:2414] CHIP:DMG: },
+
+
+          ./chip-tool powersource read bat-replacement-needed 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-app) log)
+
+          [1663141268.348233][2414:2414] CHIP:IM: Received Read request
+          [1663141268.348332][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663141268.348388][2414:2414] CHIP:DMG: {
+          [1663141268.348418][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663141268.348465][2414:2414] CHIP:DMG:         [
+          [1663141268.348498][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663141268.348545][2414:2414] CHIP:DMG:                 {
+          [1663141268.348584][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663141268.348637][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663141268.348685][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000F,
+          [1663141268.348735][2414:2414] CHIP:DMG:                 }
+          [1663141268.348774][2414:2414] CHIP:DMG:
+          [1663141268.348820][2414:2414] CHIP:DMG:         ],
+          [1663141268.348857][2414:2414] CHIP:DMG:
+          [1663141268.348904][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663141268.348938][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663141268.348982][2414:2414] CHIP:DMG: },
+          [1663141268.349086][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663141268.349214][2414:2414] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663141268.349251][2414:2414] CHIP:DMG: <RE:Run> Cluster 2f, Attribute f is dirty
+
+
+          ./chip-tool powersource read bat-replaceability 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-app) log
+
+
+          [1663141378.115928][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663141378.115978][2414:2414] CHIP:DMG: {
+          [1663141378.116006][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663141378.116050][2414:2414] CHIP:DMG:         [
+          [1663141378.116080][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663141378.116124][2414:2414] CHIP:DMG:                 {
+          [1663141378.116160][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663141378.116208][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663141378.116247][2414:2414] CHIP:DMG:                         Attribute = 0x0000_0010,
+          [1663141378.116294][2414:2414] CHIP:DMG:                 }
+          [1663141378.116330][2414:2414] CHIP:DMG:
+          [1663141378.116372][2414:2414] CHIP:DMG:         ],
+          [1663141378.116407][2414:2414] CHIP:DMG:
+          [1663141378.116450][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663141378.116481][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663141378.116521][2414:2414] CHIP:DMG: },
+          [1663141378.116621][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      PICS: PS.C.AO-READ
+      verification: |
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+
+
+          ./chip-tool powersource read wired-assessed-input-voltage 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+
+          ./chip-tool powersource read wired-assessed-input-frequency 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read wired-current-type 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read wired-assessed-current 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read wired-nominal-voltage 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read wired-maximum-current 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read wired-present 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read active-wired-faults 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read bat-voltage  1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read bat-percent-remaining 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read bat-time-remaining 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read bat-present 1 1
+
+          Verify on the TH Log:
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  "
+
+          ./chip-tool powersource read active-bat-faults 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+
+          ./chip-tool powersource read bat-replacement-description 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  "
+
+          ./chip-tool powersource read bat-common-designation 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE) "
+
+          ./chip-tool powersource read bat-ansidesignation 1 1
+
+          Verify on the TH Log:
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  "
+
+          ./chip-tool powersource read bat-iecdesignation 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+
+          ./chip-tool powersource read bat-approved-chemistry 1 1
+
+          Verify on the TH Log:
+
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  "
+
+          ./chip-tool powersource read bat-capacity 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  "
+
+
+          ./chip-tool powersource read bat-quantity 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  "
+
+          ./chip-tool powersource read bat-charge-state 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE) "
+
+          ./chip-tool powersource read bat-time-to-full-charge 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  "
+
+          ./chip-tool powersource read bat-functional-while-charging 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE) "
+
+          ./chip-tool powersource read bat-charging-current 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  "
+
+          ./chip-tool powersource read active-bat-charge-faults 1 1
+
+          Verify on the TH Log:
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH one at a time in a manufacturer specific order"
+      PICS: PS.C.AM-WRITE
+      verification: |
+          This cluster doesn"t have any writable attributes
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      PICS: PS.C.AO-WRITE
+      verification: |
+          This cluster doesn"t have any writable attributes
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server-side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH again"
+      PICS: ""
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          ./chip-tool powersource read feature-map 1 1
+          verify the " feature-map  response" on the TH (all-cluster-minimal-app) log:
+          [1678873672.092602][348369:348369] CHIP:IM: Received Read request
+          [1678873672.092651][348369:348369] CHIP:DMG: ReadRequestMessage =
+          [1678873672.092660][348369:348369] CHIP:DMG: {
+          [1678873672.092669][348369:348369] CHIP:DMG:         AttributePathIBs =
+          [1678873672.092680][348369:348369] CHIP:DMG:         [
+          [1678873672.092706][348369:348369] CHIP:DMG:                 AttributePathIB =
+          [1678873672.092715][348369:348369] CHIP:DMG:                 {
+          [1678873672.092724][348369:348369] CHIP:DMG:                         Endpoint = 0x1,
+          [1678873672.092735][348369:348369] CHIP:DMG:                         Cluster = 0x2f,
+          [1678873672.092747][348369:348369] CHIP:DMG:                         Attribute = 0x0000_FFFC,
+          [1678873672.092757][348369:348369] CHIP:DMG:                 }
+          [1678873672.092770][348369:348369] CHIP:DMG:
+          [1678873672.092777][348369:348369] CHIP:DMG:         ],
+          [1678873672.092791][348369:348369] CHIP:DMG:
+          [1678873672.092800][348369:348369] CHIP:DMG:         isFabricFiltered = true,
+          [1678873672.092810][348369:348369] CHIP:DMG:         InteractionModelRevision = 1
+          [1678873672.092818][348369:348369] CHIP:DMG: },
+          [1678873672.092858][348369:348369] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1678873672.092892][348369:348369] CHIP:DMG: Building Reports for ReadHandler
+
+
+          ./chip-tool powersource read attribute-list 1 0
+
+          verify the " attribute-list response" on the TH (all-cluster-minimal-app) log:
+
+          [1659596771.124636][2409:2409] CHIP:IM: Received Read request
+          [1659596771.124765][2409:2409] CHIP:DMG: ReadRequestMessage =
+          [1659596771.124795][2409:2409] CHIP:DMG: {
+          [1659596771.124814][2409:2409] CHIP:DMG:         AttributePathIBs =
+          [1659596771.124838][2409:2409] CHIP:DMG:         [
+          [1659596771.124859][2409:2409] CHIP:DMG:                 AttributePathIB =
+          [1659596771.124901][2409:2409] CHIP:DMG:                 {
+          [1659596771.124928][2409:2409] CHIP:DMG:                         Endpoint = 0x0,
+          [1659596771.124963][2409:2409] CHIP:DMG:                         Cluster = 0x2f,
+          [1659596771.124989][2409:2409] CHIP:DMG:                         Attribute = 0x0000_FFFB,
+          [1659596771.125020][2409:2409] CHIP:DMG:                 }
+          [1659596771.125045][2409:2409] CHIP:DMG:
+          [1659596771.125077][2409:2409] CHIP:DMG:         ],
+          [1659596771.125102][2409:2409] CHIP:DMG:
+          [1659596771.125134][2409:2409] CHIP:DMG:         isFabricFiltered = true,
+          [1659596771.125156][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
+          [1659596771.125177][2409:2409] CHIP:DMG: },
+
+
+
+          ./chip-tool powersource read status 1 1
+
+          verify the " status response" on the TH (all-cluster-minimal-app) log:
+
+          [1646155382.977534][33190:33190] CHIP:EM: Handling via exchange: 16568r, Delegate: 0xaaaace1730c8
+          [1646155382.978021][33190:33190] CHIP:IM: Received Read request
+          [1646155382.978109][33190:33190] CHIP:DMG: ReadRequestMessage =
+          [1646155382.978143][33190:33190] CHIP:DMG: {
+          [1646155382.978167][33190:33190] CHIP:DMG:         AttributePathIBs =
+          [1646155382.978204][33190:33190] CHIP:DMG:         [
+          [1646155382.978309][33190:33190] CHIP:DMG:                 AttributePathIB =
+          [1646155382.978369][33190:33190] CHIP:DMG:                 {
+          [1646155382.978408][33190:33190] CHIP:DMG:                         Endpoint = 0x1,
+          [1646155382.978459][33190:33190] CHIP:DMG:                         Cluster = 0x2f,
+          [1646155382.978513][33190:33190] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1646155382.978545][33190:33190] CHIP:DMG:                 }
+          [1646155382.978767][33190:33190] CHIP:DMG:
+          [1646155382.978804][33190:33190] CHIP:DMG:         ],
+          [1646155382.978836][33190:33190] CHIP:DMG:
+          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false,
+          [1646155382.978901][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
+          [1646155382.978927][33190:33190] CHIP:DMG: },
+          [1646155382.978998][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1646155382.979658][33190:33190] CHIP:DMG: <RE:Run> Cluster 2f, Attribute 0 is dirty
+          [1646155382.979729][33190:33190] CHIP:DMG: Reading attribute: Cluster=0x0000_002F Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1646155382.979764][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002F e=1 p=v
+          [1646010346.974150][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=v
+
+          ./chip-tool powersource read order 1 1
+
+          verify the " order response" on the TH (all-cluster-minimal-app) log:
+
+          [1653395573.862606][19412:19412] CHIP:IM: Received Read request
+          [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
+          [1653395573.862739][19412:19412] CHIP:DMG: {
+          [1653395573.862779][19412:19412] CHIP:DMG:         AttributePathIBs =
+          [1653395573.862827][19412:19412] CHIP:DMG:         [
+          [1653395573.862872][19412:19412] CHIP:DMG:                 AttributePathIB =
+          [1653395573.862928][19412:19412] CHIP:DMG:                 {
+          [1653395573.862980][19412:19412] CHIP:DMG:                         Endpoint = 0x1,
+          [1653395573.863037][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
+          [1653395573.863101][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1653395573.863161][19412:19412] CHIP:DMG:                 }
+          [1653395573.863217][19412:19412] CHIP:DMG:
+          [1653395573.863267][19412:19412] CHIP:DMG:         ],
+          [1653395573.863319][19412:19412] CHIP:DMG:
+          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true,
+          [1653395573.863413][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
+          [1653395573.863456][19412:19412] CHIP:DMG: },
+          [1653395573.863589][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
+
+          ./chip-tool powersource read description 1 1
+
+          verify the " description response" on the TH (all-cluster-minimal-app) log:
+
+          CHIP:IM: Received Read request
+          [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
+          [1653395620.020364][19412:19412] CHIP:DMG: {
+          [1653395620.020406][19412:19412] CHIP:DMG:         AttributePathIBs =
+          [1653395620.020463][19412:19412] CHIP:DMG:         [
+          [1653395620.020511][19412:19412] CHIP:DMG:                 AttributePathIB =
+          [1653395620.020576][19412:19412] CHIP:DMG:                 {
+          [1653395620.020635][19412:19412] CHIP:DMG:                         Endpoint = 0x1,
+          [1653395620.020703][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
+          [1653395620.020770][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1653395620.020833][19412:19412] CHIP:DMG:                 }
+          [1653395620.020893][19412:19412] CHIP:DMG:
+          [1653395620.020945][19412:19412] CHIP:DMG:         ],
+          [1653395620.020999][19412:19412] CHIP:DMG:
+          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true,
+          [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
+          [1653395620.021153][19412:19412] CHIP:DMG: },
+          [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          ./chip-tool powersource read bat-charge-level 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-minimal-app) log
+
+          [1663140804.059599][2414:2414] CHIP:IM: Received Read request
+          [1663140804.059679][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663140804.059706][2414:2414] CHIP:DMG: {
+          [1663140804.059728][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663140804.059754][2414:2414] CHIP:DMG:         [
+          [1663140804.059779][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663140804.059828][2414:2414] CHIP:DMG:                 {
+          [1663140804.059861][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663140804.059913][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663140804.059946][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000E,
+          [1663140804.059976][2414:2414] CHIP:DMG:                 }
+          [1663140804.060006][2414:2414] CHIP:DMG:
+          [1663140804.060033][2414:2414] CHIP:DMG:         ],
+          [1663140804.060060][2414:2414] CHIP:DMG:
+          [1663140804.060087][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663140804.060111][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663140804.060136][2414:2414] CHIP:DMG: },
+
+
+          ./chip-tool powersource read bat-replacement-needed 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-minimal-app) log
+
+          [1663141268.348233][2414:2414] CHIP:IM: Received Read request
+          [1663141268.348332][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663141268.348388][2414:2414] CHIP:DMG: {
+          [1663141268.348418][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663141268.348465][2414:2414] CHIP:DMG:         [
+          [1663141268.348498][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663141268.348545][2414:2414] CHIP:DMG:                 {
+          [1663141268.348584][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663141268.348637][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663141268.348685][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000F,
+          [1663141268.348735][2414:2414] CHIP:DMG:                 }
+          [1663141268.348774][2414:2414] CHIP:DMG:
+          [1663141268.348820][2414:2414] CHIP:DMG:         ],
+          [1663141268.348857][2414:2414] CHIP:DMG:
+          [1663141268.348904][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663141268.348938][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663141268.348982][2414:2414] CHIP:DMG: },
+          [1663141268.349086][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1663141268.349214][2414:2414] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1663141268.349251][2414:2414] CHIP:DMG: <RE:Run> Cluster 2f, Attribute f is dirty
+
+
+          ./chip-tool powersource read bat-replaceability 1 1
+
+          Verify the ReadRequestMessage on TH(all-clusters-minimal-app) log
+
+
+          [1663141378.115928][2414:2414] CHIP:DMG: ReadRequestMessage =
+          [1663141378.115978][2414:2414] CHIP:DMG: {
+          [1663141378.116006][2414:2414] CHIP:DMG:         AttributePathIBs =
+          [1663141378.116050][2414:2414] CHIP:DMG:         [
+          [1663141378.116080][2414:2414] CHIP:DMG:                 AttributePathIB =
+          [1663141378.116124][2414:2414] CHIP:DMG:                 {
+          [1663141378.116160][2414:2414] CHIP:DMG:                         Endpoint = 0x1,
+          [1663141378.116208][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
+          [1663141378.116247][2414:2414] CHIP:DMG:                         Attribute = 0x0000_0010,
+          [1663141378.116294][2414:2414] CHIP:DMG:                 }
+          [1663141378.116330][2414:2414] CHIP:DMG:
+          [1663141378.116372][2414:2414] CHIP:DMG:         ],
+          [1663141378.116407][2414:2414] CHIP:DMG:
+          [1663141378.116450][2414:2414] CHIP:DMG:         isFabricFiltered = true,
+          [1663141378.116481][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
+          [1663141378.116521][2414:2414] CHIP:DMG: },
+          [1663141378.116621][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      PICS: PS.C.AO-READ
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+
+
+          Verify TH(all-clusters-minimal-app) receives the read command, and responds that this attribute is not available and also DUT is aware that the optional attributes are not available, and does not issue read requests for the attributes which it did read in step 2
+
+
+          ./chip-tool powersource read bat-charge-level 1 1
+
+          on TH all-clusters-minimal-app verify status response a  UNSUPPORTED_ATTRIBUTE
+           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+
+
+          ./chip-tool powersource read bat-replacement-needed 1 1
+
+          on TH all-clusters-minimal-app verify status response a  UNSUPPORTED_ATTRIBUTE
+           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+
+
+          ./chip-tool powersource read bat-replaceability 1 1
+
+          on TH all-clusters-minimal-app verify status response a  UNSUPPORTED_ATTRIBUTE
+           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      PICS: PS.C.AO-WRITE
+      verification: |
+          This cluster doesn"t have any writable attributes
+      disabled: true

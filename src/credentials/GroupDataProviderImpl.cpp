@@ -1207,28 +1207,43 @@ void GroupDataProviderImpl::GroupInfoIteratorImpl::Release()
     mProvider.mGroupInfoIterators.ReleaseObject(this);
 }
 
-GroupDataProvider::EndpointIterator * GroupDataProviderImpl::IterateEndpoints(chip::FabricIndex fabric_index)
+GroupDataProvider::EndpointIterator * GroupDataProviderImpl::IterateEndpoints(chip::FabricIndex fabric_index,
+                                                                              Optional<GroupId> group_id)
 {
     VerifyOrReturnError(IsInitialized(), nullptr);
-    return mEndpointIterators.CreateObject(*this, fabric_index);
+    return mEndpointIterators.CreateObject(*this, fabric_index, group_id);
 }
 
-GroupDataProviderImpl::EndpointIteratorImpl::EndpointIteratorImpl(GroupDataProviderImpl & provider,
-                                                                  chip::FabricIndex fabric_index) :
+GroupDataProviderImpl::EndpointIteratorImpl::EndpointIteratorImpl(GroupDataProviderImpl & provider, chip::FabricIndex fabric_index,
+                                                                  Optional<GroupId> group_id) :
     mProvider(provider),
     mFabric(fabric_index)
 {
     FabricData fabric(fabric_index);
     VerifyOrReturn(CHIP_NO_ERROR == fabric.Load(provider.mStorage));
 
-    GroupData group(fabric_index, fabric.first_group);
-    VerifyOrReturn(CHIP_NO_ERROR == group.Load(provider.mStorage));
+    if (group_id.HasValue())
+    {
+        GroupData group(fabric_index, group_id.Value());
+        VerifyOrReturn(CHIP_NO_ERROR == group.Load(provider.mStorage));
 
-    mGroup         = fabric.first_group;
-    mFirstGroup    = fabric.first_group;
-    mGroupCount    = fabric.group_count;
-    mEndpoint      = group.first_endpoint;
-    mEndpointCount = group.endpoint_count;
+        mGroup         = group_id.Value();
+        mFirstGroup    = group_id.Value();
+        mGroupCount    = 1;
+        mEndpoint      = group.first_endpoint;
+        mEndpointCount = group.endpoint_count;
+    }
+    else
+    {
+        GroupData group(fabric_index, fabric.first_group);
+        VerifyOrReturn(CHIP_NO_ERROR == group.Load(provider.mStorage));
+
+        mGroup         = fabric.first_group;
+        mFirstGroup    = fabric.first_group;
+        mGroupCount    = fabric.group_count;
+        mEndpoint      = group.first_endpoint;
+        mEndpointCount = group.endpoint_count;
+    }
 }
 
 size_t GroupDataProviderImpl::EndpointIteratorImpl::Count()

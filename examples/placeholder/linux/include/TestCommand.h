@@ -111,7 +111,6 @@ public:
         TestCommand * command = reinterpret_cast<TestCommand *>(context);
         command->isRunning    = true;
         command->NextTest();
-        chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, context);
     }
 
     static void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -121,6 +120,7 @@ public:
         case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
             ChipLogProgress(chipTool, "Commissioning complete");
             chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleNextTest, arg);
+            chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, arg);
             break;
         }
     }
@@ -129,7 +129,7 @@ public:
     {
         if (commandPath == mCommandPath)
         {
-            NextTest();
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleNextTest, reinterpret_cast<intptr_t>(this));
             return;
         }
 
@@ -141,7 +141,7 @@ public:
     {
         if (attributePath == mAttributePath)
         {
-            NextTest();
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(ScheduleNextTest, reinterpret_cast<intptr_t>(this));
             return;
         }
 

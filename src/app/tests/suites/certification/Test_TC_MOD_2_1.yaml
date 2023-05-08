@@ -34,7 +34,7 @@ tests:
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          Verify on TH(chip-tool) logs supported modes provides a list of mode, each mode should be a struct containing a label and All of these values should be no larger than 16 bits and below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool) log SupportedModes provides a list of modes and each mode should be a struct containing a Label , Mode Number and SemanticTags. Also each entry in the semantics tag list, are structs containing a value field and manufacturer code. All of these values should be no larger than 16 bits and below is the sample log provided for the raspi platform:
 
 
           [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
@@ -75,7 +75,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on TH(chip-tool),  current modes provides a  mode Record for usage in steps 3 and below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool),  Current modes provides  mode number for usage in steps 3 and below is the sample log provided for the raspi platform:
 
           [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
 
@@ -103,7 +103,7 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          Verify on TH(chip-tool),  current modes provides integer provided in step 3a, not the integer from step 2 and below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool), Current modes attribute value is same as  value provided in step 3a, not the integer from step 2 and below is the sample log provided for the raspi platform:
 
           [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
 
@@ -117,7 +117,7 @@ tests:
       verification: |
           ./chip-tool modeselect change-to-mode 2 1 1
 
-          Verify on TH(chip-tool)logs , with a INVALID_COMMAND (hex value 0x85/decimal 133) and below is the sample log provided for the raspi platform:
+          Verify on TH(chip-tool)logs, Change to Mode Command responds with a INVALID_COMMAND (hex value 0x85/decimal 133) and below is the sample log provided for the raspi platform:
 
           CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x85
           CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)

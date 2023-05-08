@@ -25,7 +25,7 @@ get_filename_component(OPEN_IOT_SDK_SOURCE ${CHIP_ROOT}/third_party/open-iot-sdk
 get_filename_component(OPEN_IOT_SDK_STORAGE_SOURCE ${CHIP_ROOT}/third_party/open-iot-sdk/storage REALPATH)
 
 # Open IoT SDK targets passed to CHIP build
-list(APPEND EXTERNAL_TARGETS)
+list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS)
 
 # Additional Open IoT SDK build configuration 
 set(TFM_SUPPORT NO CACHE BOOL "Add Trusted Firmware-M (TF-M) support to application")
@@ -40,6 +40,22 @@ FetchContent_Declare(
     GIT_TAG        v3.2.1
     GIT_SHALLOW    ON
     GIT_PROGRESS   ON
+)
+
+# Apply a patch to TF-M to support GCC 12
+FetchContent_Declare(
+    trusted-firmware-m
+    GIT_REPOSITORY  https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git
+    GIT_TAG         d0c0a67f1b412e89d09b0987091c12998c4e4660
+    GIT_SHALLOW     OFF
+    GIT_PROGRESS    ON
+    # Note: This prevents FetchContent_MakeAvailable() from calling
+    # add_subdirectory() on the fetched repository. TF-M needs a
+    # standalone build because it relies on functions defined in its
+    # own toolchain files and contains paths that reference the
+    # top-level project instead of its own project.
+    SOURCE_SUBDIR   NONE
+    PATCH_COMMAND   git reset --hard --quiet && git clean --force -dx --quiet && git apply ${CMAKE_CURRENT_LIST_DIR}/tf-m.patch
 )
 
 # Open IoT SDK configuration
@@ -193,7 +209,7 @@ if(TARGET mbedtls-config)
 endif()
 
 if("mcu-driver-reference-platforms-for-arm" IN_LIST IOTSDK_FETCH_LIST)
-    list(APPEND EXTERNAL_TARGETS
+    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
         mcu-driver-bootstrap
         mcu-driver-hal
         mdh-arm-corstone-300-common
@@ -202,7 +218,7 @@ if("mcu-driver-reference-platforms-for-arm" IN_LIST IOTSDK_FETCH_LIST)
 endif()
 
 if("cmsis-5" IN_LIST IOTSDK_FETCH_LIST)
-    list(APPEND EXTERNAL_TARGETS
+    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
         cmsis-core
         cmsis-rtos-api
         iotsdk-ip-network-api
@@ -210,13 +226,13 @@ if("cmsis-5" IN_LIST IOTSDK_FETCH_LIST)
 endif()
 
 if("cmsis-freertos" IN_LIST IOTSDK_FETCH_LIST)
-    list(APPEND EXTERNAL_TARGETS
+    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
         freertos-cmsis-rtos
     )
 endif()
 
 if("mbedtls" IN_LIST IOTSDK_FETCH_LIST)
-    list(APPEND EXTERNAL_TARGETS
+    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
         mbedtls
         mbedtls-config
         mbedtls-threading-cmsis-rtos 
@@ -224,7 +240,7 @@ if("mbedtls" IN_LIST IOTSDK_FETCH_LIST)
 endif()
 
 if("lwip" IN_LIST IOTSDK_FETCH_LIST)
-    list(APPEND EXTERNAL_TARGETS
+    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
         lwipcore
         lwip-cmsis-port
         lwip-cmsis-sys
@@ -234,14 +250,14 @@ if("lwip" IN_LIST IOTSDK_FETCH_LIST)
 endif()
 
 if("cmsis-sockets-api" IN_LIST IOTSDK_FETCH_LIST)
-    list(APPEND EXTERNAL_TARGETS
+    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
         cmsis-sockets-api
         lwip-sockets
     )
 endif()
 
 if("trusted-firmware-m" IN_LIST IOTSDK_FETCH_LIST)
-    list(APPEND EXTERNAL_TARGETS
+    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
         tfm-ns-interface
         tfm-ns-interface-cmsis-rtos
     )
@@ -251,14 +267,14 @@ endif()
 
 # Add Open IoT SDK storage source
 add_subdirectory(${OPEN_IOT_SDK_STORAGE_SOURCE} ./sdk_storage_build)
-list(APPEND EXTERNAL_TARGETS
+list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
     iotsdk-blockdevice
     iotsdk-tdbstore
 )
 
 # Add custom storage library
 add_subdirectory(${OPEN_IOT_SDK_CONFIG}/storage storage_build)
-list(APPEND EXTERNAL_TARGETS
+list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
     openiotsdk-storage
 )
 

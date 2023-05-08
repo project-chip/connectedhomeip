@@ -220,6 +220,29 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
     DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+CHIP_ERROR ConnectivityManagerImpl::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & SEDIntervalsConfig)
+{
+    // For now Wi-Fi uses DTIM power save mode so it varies from AP to AP
+    // TODO: Change this to DTIM read from DUT once it is done. For now hardcoding it
+    SEDIntervalsConfig.ActiveIntervalMS = CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL;
+    SEDIntervalsConfig.IdleIntervalMS   = CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
+{
+    // not required
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_RequestSEDActiveMode(bool onOff, bool delayIdle)
+{
+    // not required
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+
 // == == == == == == == == == == ConnectivityManager Private Methods == == == == == == == == == ==
 
 void ConnectivityManagerImpl::DriveStationState()
@@ -262,7 +285,7 @@ void ConnectivityManagerImpl::DriveStationState()
         // If the WiFi station interface is no longer enabled, or no longer provisioned,
         // disconnect the station from the AP, unless the WiFi station mode is currently
         // under application control.
-#ifndef CHIP_ONNETWORK_PAIRING
+#ifndef SL_ONNETWORK_PAIRING
         // Incase of station interface disabled & provisioned, wifi_station should not be disconnected.
         // Device will try to reconnect.
         if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled &&
@@ -357,13 +380,24 @@ void ConnectivityManagerImpl::OnStationConnected()
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
     (void) PlatformMgr().PostEvent(&event);
-
+    // Setting the rs911x in the power save mode
+#if (CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI)
+    // TODO: Remove stop advertising after BLEManagerImpl is fixed
+#if RSI_BLE_ENABLE
+    chip::DeviceLayer::Internal::BLEManagerImpl().StopAdvertising();
+#endif /* RSI_BLE_ENABLE */
+    sl_status_t err = wfx_power_save();
+    if (err != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, "Power save config for Wifi failed");
+    }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED && RS911X_WIFI */
     UpdateInternetConnectivityState();
 }
 
 void ConnectivityManagerImpl::OnStationDisconnected()
 {
-    // TODO Invoke WARM to perform actions that occur when the WiFi station interface goes down.
+    // TODO: Invoke WARM to perform actions that occur when the WiFi station interface goes down.
 
     // Alert other components of the new state.
     ChipDeviceEvent event;
@@ -386,6 +420,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
+        NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
     }
 }
 

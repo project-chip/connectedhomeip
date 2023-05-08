@@ -50,13 +50,9 @@ uint8_t current_pin_set, prev_pin_set;
 /* ARGSUSED */
 void rsi_gpio_irq_cb(uint8_t irqnum)
 {
-
-    // WFX_RSI_LOG ("RSI: Got Int=%d", irqnum)
     if (irqnum != SL_WFX_HOST_PINOUT_SPI_IRQ)
         return;
     GPIO_IntClear(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
-
-    // WFX_RSI_LOG ("Got SPI intr, cb=%x", (uint32_t)call_back);
     if (call_back != NULL)
         (*call_back)();
 }
@@ -74,7 +70,7 @@ void rsi_gpio_irq_cb(uint8_t irqnum)
 void rsi_hal_intr_config(void (*rsi_interrupt_handler)(void))
 {
     call_back = rsi_interrupt_handler;
-    WFX_RSI_LOG("RSI:Set SPI intr CB to=%x", (uint32_t) call_back);
+    SILABS_LOG("RSI:Set SPI intr CB to=%x", (uint32_t) call_back);
 }
 
 /*===================================================*/
@@ -92,7 +88,7 @@ void rsi_hal_log_stats_intr_config(void (*rsi_give_wakeup_indication)())
 {
     gpio_callback = rsi_give_wakeup_indication;
 }
-#endif
+#endif /* LOGGING_STATS */
 
 /*===================================================*/
 /**
@@ -105,8 +101,6 @@ void rsi_hal_log_stats_intr_config(void (*rsi_give_wakeup_indication)())
  */
 void rsi_hal_intr_mask(void)
 {
-    // WFX_RSI_LOG ("RSI:Disable IRQ");
-    // NVIC_DisableIRQ(GPIO_ODD_IRQn);
     GPIO_IntDisable(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
 }
 
@@ -125,7 +119,6 @@ void rsi_hal_intr_unmask(void)
     NVIC_EnableIRQ(GPIO_ODD_IRQn);
     NVIC_EnableIRQ(GPIO_EVEN_IRQn);
     GPIO_IntEnable(1 << SL_WFX_HOST_PINOUT_SPI_IRQ);
-    // WFX_RSI_LOG ("RSI:Enable IRQ (mask=%x)", GPIO_IntGetEnabled ());
 }
 
 /*===================================================*/

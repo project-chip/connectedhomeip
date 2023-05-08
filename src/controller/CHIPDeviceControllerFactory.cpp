@@ -272,7 +272,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));
-    mSystemState->SetTempFabricTable(tempFabricTable);
+    mSystemState->SetTempFabricTable(tempFabricTable, params.enableServerInteractions);
     ChipLogDetail(Controller, "System State Initialized...");
     return CHIP_NO_ERROR;
 }
@@ -286,6 +286,7 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerICAC                       = params.controllerICAC;
     controllerParams.controllerRCAC                       = params.controllerRCAC;
     controllerParams.permitMultiControllerFabrics         = params.permitMultiControllerFabrics;
+    controllerParams.removeFromFabricTableOnShutdown      = params.removeFromFabricTableOnShutdown;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
@@ -339,6 +340,16 @@ CHIP_ERROR DeviceControllerFactory::ServiceEvents()
     return CHIP_NO_ERROR;
 }
 
+void DeviceControllerFactory::RetainSystemState()
+{
+    (void) mSystemState->Retain();
+}
+
+void DeviceControllerFactory::ReleaseSystemState()
+{
+    mSystemState->Release();
+}
+
 DeviceControllerFactory::~DeviceControllerFactory()
 {
     Shutdown();
@@ -367,6 +378,14 @@ void DeviceControllerSystemState::Shutdown()
     mHaveShutDown = true;
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
+
+    if (mTempFabricTable && mEnableServerInteractions)
+    {
+        // The DnssdServer is holding a reference to our temp fabric table,
+        // which we are about to destroy.  Stop it, so that it will stop trying
+        // to use it.
+        app::DnssdServer::Instance().StopServer();
+    }
 
     if (mFabricTableDelegate != nullptr)
     {

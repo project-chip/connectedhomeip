@@ -15,6 +15,12 @@
         android:padding="10sp">
 
         <Button
+            android:id="@+id/purgeCacheButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Purge Cache" />
+
+        <Button
             android:id="@+id/manualCommissioningButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

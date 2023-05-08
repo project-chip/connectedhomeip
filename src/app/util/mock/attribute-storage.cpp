@@ -184,6 +184,24 @@ chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint
     return chip::Optional<chip::ClusterId>(clusters[clusterIndex[emberAfIndexFromEndpoint(endpoint)] + n]);
 }
 
+// Returns number of clusters put into the passed cluster list
+// for the given endpoint and client/server polarity
+uint8_t emberAfGetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen, bool server)
+{
+    uint8_t cluster_count = emberAfClusterCount(endpoint, server);
+    uint8_t i;
+
+    if (cluster_count > listLen)
+    {
+        cluster_count = listLen;
+    }
+    for (i = 0; i < cluster_count; i++)
+    {
+        clusterList[i] = emberAfGetNthClusterId(endpoint, i, server).Value();
+    }
+    return cluster_count;
+}
+
 chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                                      uint16_t index)
 {

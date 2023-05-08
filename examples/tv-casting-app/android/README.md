@@ -12,15 +12,15 @@ the TV.
 -   [Matter TV Casting Android App Example](#matter-tv-casting-android-app-example)
     -   [Requirements for building](#requirements-for-building)
         -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
-        -   [Gradle & JDK Version](#gradle--jdk-version)
+        -   [Gradle \& JDK Version](#gradle--jdk-version)
     -   [Preparing for build](#preparing-for-build)
-    -   [Building & Installing the app](#building--installing-the-app)
+    -   [Building \& Installing the app](#building--installing-the-app)
 
 <hr>
 
 ## Requirements for building
 
-You need Android SDK 21 & NDK downloaded to your machine. Set the
+You need Android SDK 21 & NDK 23.2.8568313 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
 downloaded.

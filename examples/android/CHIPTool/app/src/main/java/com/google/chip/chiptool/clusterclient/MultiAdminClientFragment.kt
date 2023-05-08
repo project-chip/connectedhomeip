@@ -107,9 +107,14 @@ class MultiAdminClientFragment : Fragment() {
     val testIteration = 1000
     val devicePointer =
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+
+    var setupPinCode: Long? = null
+    if (!binding.setupPinCodeEd.text.toString().isEmpty()) {
+      setupPinCode = binding.setupPinCodeEd.text.toString().toULong().toLong()
+    }
     deviceController.openPairingWindowWithPINCallback(
       devicePointer, testDuration, testIteration.toLong(),
-      binding.discriminatorEd.text.toString().toInt(), binding.setupPinCodeEd.text.toString().toULong().toLong(),
+      binding.discriminatorEd.text.toString().toInt(), setupPinCode,
       object:OpenCommissioningCallback {
         override fun onError(status: Int, deviceId: Long) {
           showMessage("OpenCommissioning Fail! \nDevice ID : $deviceId\nErrorCode : $status")

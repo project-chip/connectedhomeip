@@ -343,6 +343,33 @@ void DnssdServer::StartServer()
     return StartServer(mode);
 }
 
+void DnssdServer::StopServer()
+{
+    // Make sure we don't hold on to a dangling fabric table pointer.
+    mFabricTable = nullptr;
+
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    if (mExtendedDiscoveryExpiration != kTimeoutCleared)
+    {
+        DeviceLayer::SystemLayer().CancelTimer(HandleExtendedDiscoveryExpiration, nullptr);
+        mExtendedDiscoveryExpiration = kTimeoutCleared;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
+    if (Dnssd::ServiceAdvertiser::Instance().IsInitialized())
+    {
+        auto err = Dnssd::ServiceAdvertiser::Instance().RemoveServices();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to remove advertised services: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        Dnssd::ServiceAdvertiser::Instance().Shutdown();
+    }
+}
+
 void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 {
     ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));

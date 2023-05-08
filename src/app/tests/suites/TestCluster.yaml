@@ -1068,11 +1068,8 @@ tests:
               - name: "arg2"
                 value: 101
       response:
-          values:
-              - name: "arg1"
-                value: 20003
-              - name: "arg2"
-                value: 4
+          # Attempting to echo back the invalid enum value should fail.
+          error: FAILURE
 
     # Tests for Struct
 

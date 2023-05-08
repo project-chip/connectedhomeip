@@ -20,20 +20,13 @@
 
 // ---- Window App Example Config ----
 
-// Buttons config
-#define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
+#define APP_USE_EXAMPLE_START_BUTTON 0
+#define APP_USE_THREAD_START_BUTTON 0
+#define APP_SET_DEVICE_INFO_PROVIDER 1
+#define APP_SET_NETWORK_COMM_ENDPOINT_SEC 0
+#define APP_USE_IDENTIFY_PWM 1 // APP_USE_IDENTIFY_PWM must be defined before including "AppConfigCommon.h"
 
-#define BUTTON_PIN_1 2
-#define BUTTON_PIN_3 3
-#define BUTTON_PIN_4 1
-#define BUTTON_PIN_2 0
-
-// LEDs config
-#define LEDS_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
-#define SYSTEM_STATE_LED 7
-#define LIFT_STATE_LED 6
-
-#define LIGHTING_PWM_SPEC_IDENTIFY_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3))
+#include "AppConfigCommon.h"
 #define LIGHTING_PWM_SPEC_RGB_BLUE PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0))
 
 // NOTE: pwm_led1 by default DTS is used by PE0, so get an external LED connected to that pin

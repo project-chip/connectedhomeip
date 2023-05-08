@@ -275,7 +275,9 @@ tests:
 
           verify you got the following message in the TH_CR3(chip-tool) log
 
-          CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
-          CHIP:TOO: Secure Pairing Failed
-          CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
+          [1678796869.645576][648903:648903] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
+          [1678796869.645584][648903:648903] CHIP:DL: Inet Layer shutdown
+          [1678796869.645589][648903:648903] CHIP:DL: BLE shutdown
+          [1678796869.645596][648903:648903] CHIP:DL: System Layer shutdown
+          [1678796869.645693][648903:648903] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:215: CHIP Error 0x00000003: Incorrect state
       disabled: true

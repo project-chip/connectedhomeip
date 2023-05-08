@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 133.2.3. [TC-ACL-2.4] Extension attribute
+name: 133.2.3. [TC-ACL-2.4] ACL attribute
 
 PICS:
     - ACL.S

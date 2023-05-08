@@ -184,12 +184,6 @@ chip::Optional<chip::ClusterId> LookupClusterByName(const char * name)
     return chip::Optional<chip::ClusterId>();
 }
 
-std::unique_ptr<GeneratedCluster> CreateCluster(const char * name)
-{
-    auto id = LookupClusterByName(name);
-    return id.HasValue() ? CreateCluster(id.Value()) : nullptr;
-}
-
 std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id)
 {
     for (const auto & cluster : clusters::kKnownClusters)
@@ -200,6 +194,12 @@ std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id)
         }
     }
     return nullptr;
+}
+
+std::unique_ptr<GeneratedCluster> CreateCluster(const char * name)
+{
+    auto id = LookupClusterByName(name);
+    return id.HasValue() ? CreateCluster(id.Value()) : nullptr;
 }
 
 CHIP_ERROR TLVWriteValue(chip::TLV::TLVWriter & wr, const Span<const char> & v)

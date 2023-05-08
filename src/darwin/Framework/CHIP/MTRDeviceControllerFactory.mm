@@ -25,6 +25,7 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
+#import "MTRFabricInfo_Internal.h"
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
 #import "MTROTAProviderDelegateBridge.h"
@@ -84,6 +85,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property (readonly) Credentials::PersistentStorageOpCertStore * opCertStore;
 @property (readonly) MTROperationalBrowser * operationalBrowser;
 @property () chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
+@property (readonly) BOOL advertiseOperational;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(MTRDeviceControllerStartupParams *)params
@@ -239,6 +241,54 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     }
 }
 
+- (nullable NSArray<MTRFabricInfo *> *)knownFabrics
+{
+    if (!self.isRunning) {
+        return nil;
+    }
+
+    __block NSMutableArray<MTRFabricInfo *> * fabricList;
+    __block BOOL listFilled = NO;
+    auto fillListBlock = ^{
+        FabricTable fabricTable;
+        CHIP_ERROR err = fabricTable.Init({ .storage = self->_persistentStorageDelegateBridge,
+            .operationalKeystore = self->_keystore,
+            .opCertStore = self->_opCertStore });
+        if (err != CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("Can't initialize fabric table when getting known fabrics: %s", err.AsString());
+            return;
+        }
+
+        fabricList = [NSMutableArray<MTRFabricInfo *> arrayWithCapacity:fabricTable.FabricCount()];
+        for (const auto & fabricInfo : fabricTable) {
+            auto * info = [[MTRFabricInfo alloc] initWithFabricTable:fabricTable fabricInfo:fabricInfo];
+            if (info == nil) {
+                // Failed to read one of our fabrics.
+                return;
+            }
+
+            [fabricList addObject:info];
+        }
+
+        listFilled = YES;
+    };
+
+    if ([_controllers count] > 0) {
+        // We have a controller running already, so our task queue is live.
+        // Make sure we run on that queue so we don't race against it.
+        dispatch_sync(_chipWorkQueue, fillListBlock);
+    } else {
+        // Not currently running the task queue; just run the block directly.
+        fillListBlock();
+    }
+
+    if (listFilled == NO) {
+        return nil;
+    }
+
+    return [NSArray arrayWithArray:fabricList];
+}
+
 - (BOOL)startControllerFactory:(MTRDeviceControllerFactoryParams *)startupParams error:(NSError * __autoreleasing *)error;
 {
     if ([self isRunning]) {
@@ -386,9 +436,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         if (startupParams.port != nil) {
             params.listenPort = [startupParams.port unsignedShortValue];
         }
-        if (startupParams.shouldStartServer == YES) {
-            params.enableServerInteractions = true;
-        }
+        params.enableServerInteractions = startupParams.shouldStartServer;
 
         params.groupDataProvider = _groupDataProvider;
         params.sessionKeystore = _sessionKeystore;
@@ -421,6 +469,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         _controllerFactory->RetainSystemState();
         _controllerFactory->ReleaseSystemState();
 
+        self->_advertiseOperational = startupParams.shouldStartServer;
         self->_running = YES;
     });
 
@@ -517,6 +566,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         params = [[MTRDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabricTable
                                                                              fabricIndex:fabric->GetFabricIndex()
                                                                                 keystore:_keystore
+                                                                    advertiseOperational:self.advertiseOperational
                                                                                   params:startupParams];
         if (params == nil) {
             fabricError = CHIP_ERROR_NO_MEMORY;
@@ -600,6 +650,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
         params = [[MTRDeviceControllerStartupParamsInternal alloc] initForNewFabric:fabricTable
                                                                            keystore:_keystore
+                                                               advertiseOperational:self.advertiseOperational
                                                                              params:startupParams];
         if (params == nil) {
             fabricError = CHIP_ERROR_NO_MEMORY;

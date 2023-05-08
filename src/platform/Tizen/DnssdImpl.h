@@ -49,12 +49,9 @@ struct GenericContext
 {
     ContextType mContextType;
     DnssdTizen * mInstance;
-    GMainLoop * mMainLoop = nullptr;
 
     GenericContext(ContextType contextType, DnssdTizen * instance) : mContextType(contextType), mInstance(instance) {}
-    virtual ~GenericContext() { MainLoopQuit(); };
-
-    void MainLoopQuit();
+    virtual ~GenericContext() = default;
 };
 
 struct RegisterContext : public GenericContext

@@ -75,7 +75,7 @@ static bool KeyExists(FabricIndex fabricIndex, GroupId groupId)
 
 static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, const CharSpan & groupName)
 {
-    VerifyOrReturnError(IsFabricGroupId(groupId), Status::ConstraintError);
+    VerifyOrReturnError(IsValidGroupId(groupId), Status::ConstraintError);
 
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, Status::NotFound);
@@ -99,7 +99,7 @@ static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId g
 
 static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
 {
-    VerifyOrReturnError(IsFabricGroupId(groupId), EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(IsValidGroupId(groupId), EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
     VerifyOrReturnError(GroupExists(fabricIndex, endpointId, groupId), EMBER_ZCL_STATUS_NOT_FOUND);
 
     GroupDataProvider * provider = GetGroupDataProvider();
@@ -129,7 +129,7 @@ void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
         ChipLogDetail(Zcl, "ERR: writing NameSupport %x", status);
     }
 
-    status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(GroupClusterFeature::kGroupNames));
+    status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(GroupsFeature::kGroupNames));
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogDetail(Zcl, "ERR: writing group feature map %x", status);
@@ -159,7 +159,7 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
 
-    VerifyOrExit(IsFabricGroupId(groupId), status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrExit(IsValidGroupId(groupId), status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
     VerifyOrExit(nullptr != provider, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(provider->HasEndpoint(fabricIndex, groupId, commandPath.mEndpointId), status = EMBER_ZCL_STATUS_NOT_FOUND);
 

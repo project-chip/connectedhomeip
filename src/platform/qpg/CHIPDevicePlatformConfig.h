@@ -65,8 +65,10 @@
 #define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 0
 #define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 0
 
-// Maps to 600ms interval
-#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX 960
+// To eliminate impact of random delay required in BLE spec,
+// lower max times to stay in Matter spec ranges.
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX 80  // 50ms
+#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX 960 // 600ms
 
 // ========== Platform-specific Cluster Overrides =========
 #define CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS 1

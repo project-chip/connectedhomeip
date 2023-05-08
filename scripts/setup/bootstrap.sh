@@ -30,6 +30,7 @@ _bootstrap_or_activate() {
 
     if [ -n "$PW_CONFIG_FILE" ]; then
         _CONFIG_FILE="$PW_CONFIG_FILE"
+        unset PW_CONFIG_FILE
     fi
 
     if [ ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then

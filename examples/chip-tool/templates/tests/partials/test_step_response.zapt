@@ -29,7 +29,7 @@ switch(mTestSubStepIndex)
         {{asDecodableType}} value;
         VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
         {{#chip_tests_item_response_parameters}}
-            {{>maybeCheckExpectedValue}}
+            {{>maybeCheckExpectedValue cluster=../cluster}}
             {{>maybeCheckExpectedConstraints}}
             {{>maybeSaveAs}}
         {{/chip_tests_item_response_parameters}}

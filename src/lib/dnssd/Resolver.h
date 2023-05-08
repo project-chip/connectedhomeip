@@ -38,8 +38,7 @@ namespace Dnssd {
 /// Node resolution data common to both operational and commissionable discovery
 struct CommonResolutionData
 {
-    // TODO: is this count OK? Sufficient space for IPv6 LL, GUA, ULA (and maybe IPv4 if enabled)
-    static constexpr unsigned kMaxIPAddresses = 5;
+    static constexpr unsigned kMaxIPAddresses = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES;
 
     Inet::InterfaceId interfaceId;
 

@@ -128,11 +128,23 @@ class RunnerStrings:
     error_header = click.style('\t\t    Error at step {index}:', fg='white', bold=True)
     error_line = click.style('\t\t    {error_line}', fg='white')
 
+    test_harness_test_start = '\t\t***** Test Start : {filename}'
+    test_harness_test_stop_success = '\t\t***** Test Complete: {filename}'
+    test_harness_step_skipped = '\t\t**** Skipping: {expression} == false'
+    test_harness_step_start = '\t\t***** Test Step {index} : {name}'
+    test_harness_step_failure = '\t\t***** Test Failure : {message}'
+    test_harness_setup_device_connection_success = '\t\t**** Test Setup: Device Connected'
+    test_harness_setup_device_connection_failure = '\t\t**** Test Setup: Device Connection Failure [deviceId={deviceId}. Error {message}]'
+    log = '\t\t{message}'
+    user_prompt = '\t\tUSER_PROMPT: {message}'
+
 
 class TestRunnerLogger(TestRunnerHooks):
-    def __init__(self, show_adapter_logs: bool = False, show_adapter_logs_on_error: bool = True):
+    def __init__(self, show_adapter_logs: bool = False, show_adapter_logs_on_error: bool = True, use_test_harness_log_format: bool = False):
         self.__show_adapter_logs = show_adapter_logs
         self.__show_adapter_logs_on_error = show_adapter_logs_on_error
+        self.__use_test_harness_log_format = use_test_harness_log_format
+        self.__filename = None
         self.__index = 1
         self.__successes = 0
         self.__warnings = 0
@@ -144,13 +156,16 @@ class TestRunnerLogger(TestRunnerHooks):
 
     def start(self, count: int):
         print(self.__strings.start)
-        pass
 
     def stop(self, duration: int):
         print(self.__strings.stop.format(runned=self.__runned, skipped=self.__skipped, duration=duration))
 
-    def test_start(self, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int):
         print(self.__strings.test_start.format(name=click.style(name, bold=True), count=click.style(count, bold=True)))
+
+        if self.__use_test_harness_log_format:
+            self.__filename = filename
+            print(self.__strings.test_harness_test_start.format(filename=filename))
 
     def test_stop(self, duration: int):
         if self.__errors:
@@ -160,18 +175,27 @@ class TestRunnerLogger(TestRunnerHooks):
         else:
             state = _SUCCESS
 
+        if self.__use_test_harness_log_format and (state == _SUCCESS or state == _WARNING):
+            print(self.__strings.test_harness_test_stop_success.format(filename=self.__filename))
+
         successes = click.style(self.__successes, bold=True)
         errors = click.style(self.__errors, bold=True)
         warnings = click.style(self.__warnings, bold=True)
         print(self.__strings.test_stop.format(state=state, successes=successes, errors=errors, warnings=warnings, duration=duration))
 
-    def step_skipped(self, name: str):
+    def step_skipped(self, name: str, expression: str):
         print(self.__strings.step_skipped.format(index=self.__index, name=_strikethrough(name)))
 
         self.__index += 1
         self.__skipped += 1
 
+        if self.__use_test_harness_log_format:
+            print(self.__strings.test_harness_step_skipped.format(expression=expression))
+
     def step_start(self, name: str):
+        if self.__use_test_harness_log_format:
+            print(self.__strings.test_harness_step_start.format(index=self.__index, name=name))
+
         print(self.__strings.step_start.format(index=self.__index, name=click.style(name, bold=True)), end='')
         # flushing stdout such that the previous print statement is visible on the screen for long running tasks.
         sys.stdout.flush()
@@ -183,10 +207,19 @@ class TestRunnerLogger(TestRunnerHooks):
 
         self.__runned += 1
 
-    def step_success(self, logger, logs, duration: int):
+    def step_success(self, logger, logs, duration: int, request):
         print(self.__strings.step_result.format(state=_SUCCESS, duration=duration))
 
         self.__print_results(logger)
+        if self.__use_test_harness_log_format:
+            if request.command == 'WaitForCommissionee':
+                print(self.__strings.test_harness_setup_device_connection_success)
+            elif request.command == 'Log':
+                message = request.arguments['values'][0]['value']
+                print(self.__strings.log.format(message=f'{message}'))
+            elif request.command == 'UserPrompt':
+                message = request.arguments['values'][0]['value']
+                print(self.__strings.user_prompt.format(message=f'{message}'))
 
         if self.__show_adapter_logs:
             self.__log_printer.print(logs)
@@ -196,7 +229,7 @@ class TestRunnerLogger(TestRunnerHooks):
         self.__errors += logger.errors
         self.__runned += 1
 
-    def step_failure(self, logger, logs, duration: int, expected, received):
+    def step_failure(self, logger, logs, duration: int, request, received):
         print(self.__strings.step_result.format(state=_FAILURE, duration=duration))
 
         self.__print_results(logger)
@@ -217,12 +250,23 @@ class TestRunnerLogger(TestRunnerHooks):
                 has_failures_without_exception = True
 
         if has_failures_without_exception:
-            self.__print_failure(expected, received)
+            self.__print_failure(request.responses, received)
 
         self.__successes += logger.successes
         self.__warnings += logger.warnings
         self.__errors += logger.errors
         self.__runned += 1
+
+        if self.__use_test_harness_log_format:
+            message = ''
+            for entry in logger.entries:
+                if entry.is_error():
+                    message = entry.message
+                    print(self.__strings.test_harness_step_failure.format(message=message))
+                    break
+
+            if request.command == 'WaitForCommissionee':
+                print(self.__strings.test_harness_setup_device_connection_failure.format(deviceId=request.node_id, message=message))
 
     def __print_step_exception(self, exception: TestStepError):
         if exception.context is None:
@@ -348,7 +392,7 @@ def parser():
 @simulate.command()
 def runner():
     """Simulate running tests."""
-    runner_logger = TestRunnerLogger()
+    runner_logger = TestRunnerLogger(use_test_harness_log_format=True)
 
     class TestLogger:
         def __init__(self, entries=[], successes=0, warnings=0, errors=0):
@@ -378,12 +422,12 @@ def runner():
     ]
 
     runner_logger.start(99)
-    runner_logger.test_start('test.yaml', 23)
+    runner_logger.test_start('Test_File', 'A test with multiple steps', 23)
     runner_logger.step_start('First Step')
     runner_logger.step_success(success_logger, empty_logs, 1234)
     runner_logger.step_start('Second Step')
     runner_logger.step_failure(error_logger, other_logs, 4321, expected_response, received_response)
-    runner_logger.step_skipped('Third Step')
+    runner_logger.step_skipped('Third Step', 'SHOULD_RUN')
     runner_logger.step_start('Fourth Step')
     runner_logger.step_unknown()
     runner_logger.test_stop(1234 + 4321)

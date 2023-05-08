@@ -86,10 +86,29 @@ chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                ${is_debug})
 
 # Config the chip log level by IDF menuconfig
-chip_gn_arg_bool  ("chip_error_logging"        CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
-chip_gn_arg_bool  ("chip_progress_logging"     CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
-chip_gn_arg_bool  ("chip_detail_logging"       CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
-chip_gn_arg_bool  ("chip_automation_logging"   CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
+    chip_gn_arg_bool  ("chip_error_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_error_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
+    chip_gn_arg_bool  ("chip_progress_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_progress_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
+    chip_gn_arg_bool  ("chip_detail_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_detail_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
+    chip_gn_arg_bool  ("chip_automation_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_automation_logging" "false")
+endif()
 
 if(CONFIG_ENABLE_CHIPOBLE)
 chip_gn_arg_append("chip_config_network_layer_ble"           "true")
@@ -155,12 +174,20 @@ if ((CONFIG_BT_ENABLED) AND (CONFIG_ENABLE_CHIPOBLE))
         endif()
 endif()
 
-if (CONFIG_OPENTHREAD_ENABLED)
+if (CONFIG_ENABLE_ESP32_BLE_CONTROLLER)
+    chip_gn_arg_append("chip_enable_ble_controller"             "true")
+endif()
+
+if (CONFIG_ENABLE_MATTER_OVER_THREAD)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
+else()
+    chip_gn_arg_append("chip_enable_openthread"                 "false")
 endif()
 
 if (CONFIG_OPENTHREAD_FTD)
     chip_gn_arg_append("chip_openthread_ftd"                    "true")
+else()
+    chip_gn_arg_append("chip_openthread_ftd"                    "false")
 endif()
 
 if (CONFIG_ENABLE_OTA_REQUESTOR)
@@ -174,6 +201,9 @@ endif()
 
 if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_device_platform"   "\"external\"")
+    if (CONFIG_ENABLE_CHIP_SHELL)
+        chip_gn_arg_append("chip_shell_platform"    "\"esp32\"")
+    endif()
     chip_gn_arg_append("chip_platform_target"   "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}\"")
 endif()
 
@@ -203,6 +233,11 @@ endif()
 if (CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER)
     chip_gn_arg_append("chip_use_device_info_provider"                     "true")
 endif()
+
+if (CONFIG_SEC_CERT_DAC_PROVIDER)
+    chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
+endif()
+
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
@@ -343,6 +378,11 @@ endif()
 idf_component_get_property(main_lib main COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
+if (CONFIG_SEC_CERT_DAC_PROVIDER)
+    idf_component_get_property(esp32_secure_cert_mgr_lib espressif__esp_secure_cert_mgr COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp32_secure_cert_mgr_lib}>)
+endif()
+
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
                                                 $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}>
@@ -352,8 +392,10 @@ target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
 add_dependencies(${COMPONENT_LIB} chip_gn)
 
 if(CONFIG_ENABLE_PW_RPC)
-    set(WRAP_FUNCTIONS esp_log_write)
-    target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
+    set(WRAP_FUNCTIONS esp_log_write esp_log_writev)
+    foreach(func ${WRAP_FUNCTIONS})
+        target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${func}")
+    endforeach()
 endif()
 
 # Build Matter OTA image

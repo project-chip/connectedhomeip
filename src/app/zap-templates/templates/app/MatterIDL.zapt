@@ -1,14 +1,15 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-{{#chip_shared_structs}}
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
 {{>idl_structure_definition extraIndent=0}}
 
-{{/chip_shared_structs}}
-{{!TODO: consider #chip_clusters as iteration point as well.
-{{!      Unsure about the differences}}
-{{#all_user_clusters}}
-  {{~side}} cluster {{asUpperCamelCase name}} = {{code}} {
+{{/if}}
+{{/zcl_structs}}
+{{#all_user_clusters~}}
+/** {{description}} */
+{{side}} cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
@@ -25,16 +26,16 @@
   }
 
   {{/zcl_bitmaps}}
-  {{#chip_cluster_specific_structs}}
-    {{~>idl_structure_definition extraIndent=1}}
+  {{#zcl_structs}}
+  {{~>idl_structure_definition extraIndent=1}}
 
-  {{/chip_cluster_specific_structs}}
+  {{/zcl_structs}}
   {{#zcl_events}}
   {{#if isFabricSensitive}}fabric_sensitive {{/if~}} {{priority}} event {{!ensure space}}
   {{~#chip_access_elements entity="event"~}}
       {{~#first~}}access({{~/first~}}
       {{~#not_first~}}, {{/not_first~}}
-        {{operation}}: {{role}} 
+        {{operation}}: {{role}}
       {{~#last}}) {{/last~}}
   {{~/chip_access_elements~}}
   {{asUpperCamelCase name}} = {{code}} {
@@ -45,38 +46,24 @@
   }
 
   {{/zcl_events}}
-  {{#chip_server_cluster_attributes}}
-  {{#unless isGlobalAttribute}}
-  {{! ensure indent }}{{#unless isWritableAttribute~}}
-    readonly {{!marker to place a space even with whitespace removal~}}
-  {{~/unless~}}
-  {{~!TODO: write only attributes should also be supported~}}
-  {{~#unless isReportableAttribute~}}
-    nosubscribe {{!marker to place a space even with whitespace removal~}}
-  {{~/unless~}}
-  {{~!Removes spaces~}} attribute {{!ensure space}}
-    {{~#chip_access_elements entity="attribute"~}}
-      {{~#first~}}access({{~/first~}}
-      {{~#not_first~}}, {{/not_first~}}
-        {{operation}}: {{role}} 
-      {{~#last}}) {{/last~}}
-    {{~/chip_access_elements~}}
-    {{~#if isNullable~}}
-      nullable {{!marker to place a space even with whitespace removal~}}
-    {{~/if~}} {{type}}
-    {{~#unless isArray~}}
-      {{~#if (isString type)~}}
-        {{~#if maxLength~}} 
-          <{{maxLength}}> 
-        {{~/if~}}
-      {{~/if~}}
-    {{/unless}} {{asLowerCamelCase name~}}
-    {{~#if isArray~}} [] {{~/if}} = {{code~}}
-    ;
-  {{/unless~}}
-  {{/chip_server_cluster_attributes~}}
+  {{#if (is_client side)}}
+    {{#zcl_attributes_server}}
+      {{#if clusterRef}}
+  {{! ensure indent }}{{>idl_attribute_definition}}
+      {{/if}}
+    {{/zcl_attributes_server}}
 
+  {{~else}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
+      {{#unless isGlobalAttribute}}
+  {{! ensure indent }}{{>idl_attribute_definition}}
+      {{/unless}}
+    {{/enabled_attributes_for_cluster_and_side~}}
+
+  {{~/if}}
   {{~!--Global attributes: spec 7.13 describes these as mandatory --}}
+  {{~!TODO(26053): global attributes are marked as optional,
+                   hence the exclusion above and re-add here.}}
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -92,17 +79,16 @@
   {{~!--Close:Generating command request structs for all incoming commands into server side--~}}
   {{~!--Open:Generating command request structs for all outgoing commands from client side--~}}
   {{#if (is_client side)}}
-    {{#all_outgoing_commands_for_cluster name side}}
+    {{#zcl_commands}}
+      {{#if (isStrEqual source "client")}}
       {{~>idl_command_request_struct}}
-    {{/all_outgoing_commands_for_cluster}}
+      {{else}}
+      {{~>idl_command_response_struct}}
+      {{/if}}
+    {{/zcl_commands}}
   {{/if}}
   {{~!--Close:Generating command request structs for all outgoing commands from client side--~}}
   {{~!--Open:Generating command response structs for all incoming commands into client side--~}}
-  {{#if (is_client side)}}
-    {{#all_incoming_commands_for_cluster name side}}
-      {{~>idl_command_response_struct}}
-    {{/all_incoming_commands_for_cluster}}
-  {{/if}}
   {{~!--Close:Generating command response structs for all incoming commands into client side--~}}
   {{~!--Open:Generating command response structs for all outgoing commands from server side--~}}
   {{#if (is_server side)}}
@@ -117,9 +103,9 @@
     {{/all_incoming_commands_for_cluster}}
   {{/if}}
   {{#if (is_client side)}}
-    {{#all_outgoing_commands_for_cluster name side}}
+    {{#zcl_commands_source_client}}
       {{~>idl_command_request_response}}{{~new_line 1~}}
-    {{/all_outgoing_commands_for_cluster}}
+    {{/zcl_commands_source_client}}
   {{/if}}
 }
 
@@ -148,7 +134,7 @@ endpoint {{endpointId}} {
       {{/if}}
     {{/user_cluster_events}} 
     {{#user_cluster_attributes}}
-      {{#if included}}
+       {{#if included}}
         {{~#if (is_str_equal storageOption "NVM")}}
     persist  {{!align~}}
         {{~else if (is_str_equal storageOption "External")}}
@@ -157,9 +143,9 @@ endpoint {{endpointId}} {
     ram      {{!align~}}
         {{~/if~}}
         attribute {{asLowerCamelCase name}}
-        {{~#if_is_non_zero_default defaultValue~}}
-           {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
-        {{~/if_is_non_zero_default~}}
+        {{~#if defaultValue~}} 
+          {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
+        {{~/if~}}
         ;
       {{/if}}
     {{/user_cluster_attributes}}

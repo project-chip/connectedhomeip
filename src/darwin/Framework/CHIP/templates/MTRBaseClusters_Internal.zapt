@@ -7,13 +7,13 @@
 
 #include <zap-generated/CHIPClusters.h>
 
-{{#chip_client_clusters includeAll=true}}
+{{#zcl_clusters}}
 
-{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
-{{/unless}}
+{{/if}}
 
-{{/chip_client_clusters}}
+{{/zcl_clusters}}

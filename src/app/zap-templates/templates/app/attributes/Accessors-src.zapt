@@ -25,8 +25,10 @@ namespace {{asUpperCamelCase parent.label}} {
 namespace Attributes {
 
 {{/first}}
+{{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
 {{#if_is_struct type}}
-{{else if (canHaveSimpleAccessors this)}}
+#error Attribute "{{name}}" in cluster "{{../name}}" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
+{{/if_is_struct}}
 namespace {{asUpperCamelCase label}} {
 
 {{#*inline "clusterId"}}Clusters::{{asUpperCamelCase parent.label}}::Id{{/inline}}
@@ -133,7 +135,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectTy
 
 } // namespace {{asUpperCamelCase label}}
 
-{{/if_is_struct}}
+{{/unless}}
 {{#last}}
 } // namespace Attributes
 } // {{asUpperCamelCase parent.label}}

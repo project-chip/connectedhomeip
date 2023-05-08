@@ -166,7 +166,7 @@ class OnOffClientFragment : Fragment() {
   private suspend fun sendLevelCommandClick() {
     val cluster = ChipClusters.LevelControlCluster(
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-      LEVEL_CONTROL_CLUSTER_ENDPOINT
+      addressUpdateFragment.endpointId
     )
     cluster.moveToLevel(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
@@ -223,8 +223,9 @@ class OnOffClientFragment : Fragment() {
 
   private suspend fun getOnOffClusterForDevice(): OnOffCluster {
     return OnOffCluster(
+
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
-      ON_OFF_CLUSTER_ENDPOINT
+      addressUpdateFragment.endpointId
     )
   }
 
@@ -238,6 +239,12 @@ class OnOffClientFragment : Fragment() {
     requireActivity().runOnUiThread {
       binding.reportStatusTv.text = msg
     }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    addressUpdateFragment.endpointId = ON_OFF_CLUSTER_ENDPOINT
+
   }
 
   companion object {

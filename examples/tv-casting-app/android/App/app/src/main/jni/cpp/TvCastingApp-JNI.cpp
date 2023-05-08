@@ -105,11 +105,11 @@ exit:
 
 JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
-    if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
-    {
-        JNIDACProvider * p = new JNIDACProvider(provider);
-        chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
-    }
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "JNI_METHOD setDACProvider called");
+
+    JNIDACProvider * p = new JNIDACProvider(provider);
+    chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
 }
 
 JNI_METHOD(jboolean, openBasicCommissioningWindow)
@@ -298,6 +298,20 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "TVCastingApp-JNI::sendCommissioningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+    return true;
+}
+
+JNI_METHOD(jboolean, purgeCache)(JNIEnv * env, jobject)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "JNI_METHOD purgeCache called");
+
+    CHIP_ERROR err = CastingServer::GetInstance()->PurgeCache();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "TVCastingApp-JNI::purgeCache failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
     return true;

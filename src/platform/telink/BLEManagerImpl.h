@@ -107,6 +107,7 @@ private:
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     PacketBufferHandle c3CharDataBufferHandle;
 #endif
+    bool mBLERadioInitialized;
 
     void DriveBLEState(void);
     CHIP_ERROR PrepareAdvertisingRequest(void);

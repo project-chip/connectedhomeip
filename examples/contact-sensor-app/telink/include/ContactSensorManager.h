@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "AppEvent.h"
+#include "AppEventCommon.h"
 
 class ContactSensorManager
 {

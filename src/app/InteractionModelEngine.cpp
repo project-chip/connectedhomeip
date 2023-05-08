@@ -441,6 +441,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         SubscribeRequestMessage::Parser subscribeRequestParser;
         VerifyOrReturnError(subscribeRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+        subscribeRequestParser.PrettyPrint();
+#endif
+
         VerifyOrReturnError(subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions) == CHIP_NO_ERROR,
                             Status::InvalidAction);
         if (!keepExistingSubscriptions)
@@ -538,6 +542,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         ReadRequestMessage::Parser readRequestParser;
         VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+        readRequestParser.PrettyPrint();
+#endif
         {
             size_t requestedAttributePathCount = 0;
             size_t requestedEventPathCount     = 0;

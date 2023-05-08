@@ -24,13 +24,11 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <system/SystemClock.h>
-#ifdef OTA_ENABLED
-#include "OTAConfig.h"
-#endif // OTA_ENABLED
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <NetworkCommissioningDriver.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <route_hook/bl_route_hook.h>
 #endif
 #include <PlatformManagerImpl.h>
 
@@ -46,6 +44,10 @@
 #include <utils_list.h>
 #endif
 
+#ifdef OTA_ENABLED
+#include "OTAConfig.h"
+#endif // OTA_ENABLED
+
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <ChipShellCollection.h>
 #include <lib/shell/Engine.h>
@@ -54,6 +56,11 @@
 #if PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #include "Rpc.h"
+#endif
+
+#include <DeviceInfoProviderImpl.h>
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+#include <platform/bouffalolab/common/FactoryDataProvider.h>
 #endif
 
 #if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
@@ -75,7 +82,97 @@ chip::app::Clusters::NetworkCommissioning::Instance
 }
 #endif
 
-void PlatformManagerImpl::PlatformInit(void)
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+namespace {
+FactoryDataProvider sFactoryDataProvider;
+}
+#endif
+
+void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kCHIPoBLEAdvertisingChange:
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        GetAppTask().mIsConnected = ConnectivityMgr().IsWiFiStationConnected();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        GetAppTask().mIsConnected = ConnectivityMgr().IsThreadAttached();
+#endif
+
+        if (ConnectivityMgr().NumBLEConnections())
+        {
+            GetAppTask().PostEvent(AppTask::APP_EVENT_SYS_BLE_CONN);
+        }
+        else
+        {
+            GetAppTask().PostEvent(AppTask::APP_EVENT_SYS_BLE_ADV);
+        }
+        ChipLogProgress(NotSpecified, "BLE adv changed, connection number: %d", ConnectivityMgr().NumBLEConnections());
+        break;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    case DeviceEventType::kThreadStateChange:
+
+        ChipLogProgress(NotSpecified, "Thread state changed, IsThreadAttached: %d", ConnectivityMgr().IsThreadAttached());
+        if (!GetAppTask().mIsConnected && ConnectivityMgr().IsThreadAttached())
+        {
+            GetAppTask().PostEvent(AppTask::APP_EVENT_SYS_PROVISIONED);
+            GetAppTask().mIsConnected = true;
+#ifdef OTA_ENABLED
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+#endif
+        }
+        break;
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    case DeviceEventType::kWiFiConnectivityChange:
+
+        ChipLogProgress(NotSpecified, "Wi-Fi state changed to %s.",
+                        ConnectivityMgr().IsWiFiStationConnected() ? "connected" : "disconnected");
+
+        chip::app::DnssdServer::Instance().StartServer();
+        NetworkCommissioning::BLWiFiDriver::GetInstance().SaveConfiguration();
+        if (!GetAppTask().mIsConnected && ConnectivityMgr().IsWiFiStationConnected())
+        {
+            GetAppTask().PostEvent(AppTask::APP_EVENT_SYS_PROVISIONED);
+            GetAppTask().mIsConnected = true;
+        }
+        break;
+
+    case DeviceEventType::kInterfaceIpAddressChanged:
+        if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
+            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
+        {
+            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
+            // will not trigger a 'internet connectivity change' as there is no internet
+            // connectivity. MDNS still wants to refresh its listening interfaces to include the
+            // newly selected address.
+            chip::app::DnssdServer::Instance().StartServer();
+        }
+
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
+        {
+            ChipLogProgress(NotSpecified, "Initializing route hook...");
+            bl_route_hook_init();
+
+#ifdef OTA_ENABLED
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+#endif
+        }
+        break;
+#endif
+    default:
+        break;
+    }
+}
+
+CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 {
 #if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
     uartInit();
@@ -92,12 +189,7 @@ void PlatformManagerImpl::PlatformInit(void)
 #endif
 
     ChipLogProgress(NotSpecified, "Initializing CHIP stack");
-    CHIP_ERROR ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
-        appError(ret);
-    }
+    ReturnLogErrorOnFailure(PlatformMgr().InitChipStack());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(CHIP_BLE_DEVICE_NAME);
 
@@ -108,79 +200,67 @@ void PlatformManagerImpl::PlatformInit(void)
 #endif
 
     ChipLogProgress(NotSpecified, "Initializing OpenThread stack");
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "ThreadStackMgr().InitThreadStack() failed");
-        appError(ret);
-    }
+    ReturnLogErrorOnFailure(ThreadStackMgr().InitThreadStack());
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    ReturnLogErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
 #else
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+    ReturnLogErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "ConnectivityMgr().SetThreadDeviceType() failed");
-        appError(ret);
-    }
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    ReturnLogErrorOnFailure(sWiFiNetworkCommissioningInstance.Init());
+#endif
 
-    ret = sWiFiNetworkCommissioningInstance.Init();
-    if (CHIP_NO_ERROR != ret)
+    // Initialize device attestation config
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+    if (CHIP_NO_ERROR == sFactoryDataProvider.Init())
     {
-        ChipLogError(NotSpecified, "sWiFiNetworkCommissioningInstance.Init() failed");
+        SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+        SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+        SetCommissionableDataProvider(&sFactoryDataProvider);
     }
+    else
+    {
+        ChipLogError(NotSpecified, "sFactoryDataProvider.Init() failed");
+    }
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXT_DISCOVERY_TIMEOUT_SECS);
 #endif
 
-    // Init ZCL Data Model
-    static chip::CommonCaseDeviceServerInitParams initParams;
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-    ret = chip::Server::GetInstance().Init(initParams);
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "chip::Server::GetInstance().Init(initParams) failed");
-        appError(ret);
-    }
+    ReturnLogErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 #if CHIP_ENABLE_OPENTHREAD
     ChipLogProgress(NotSpecified, "Starting OpenThread task");
     // Start OpenThread task
-    ret = ThreadStackMgrImpl().StartThreadTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "ThreadStackMgr().StartThreadTask() failed");
-        appError(ret);
-    }
+    ReturnLogErrorOnFailure(ThreadStackMgrImpl().StartThreadTask());
 #endif
 
     ConfigurationMgr().LogDeviceConfig();
 
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-    PlatformMgr().AddEventHandler(AppTask::ChipEventHandler, 0);
-
-#ifdef OTA_ENABLED
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    OTAConfig::Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-#endif // OTA_ENABLED
+    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();
 #endif
 
     vTaskResume(GetAppTask().sAppTaskHandle);
+
+    return CHIP_NO_ERROR;
 }

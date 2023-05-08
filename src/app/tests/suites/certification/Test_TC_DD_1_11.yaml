@@ -75,8 +75,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify the DUT follows the correct order of onboarding the TH devices
-          which must be from first to last starting from left to right."
+          "Verify the DUT indicates to the user the need to commission TH
+          devices one by one by scanning their individual QR codes."
       PICS:
           "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
           MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
@@ -94,6 +94,15 @@ tests:
       PICS:
           "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
           !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_2)"
+      verification: |
+          Out of Scope for V1.0 as Concatenated QR codes are not supported yet
+          https://github.com/project-chip/connectedhomeip/issues/5331
+          Vendor specific field testcase
+      disabled: true
+
+    - label:
+          "Scan QR code using concatenation (which supports the commissioning of
+          all the TH devices)"
       verification: |
           Out of Scope for V1.0 as Concatenated QR codes are not supported yet
           https://github.com/project-chip/connectedhomeip/issues/5331

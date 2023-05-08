@@ -194,10 +194,28 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
 
     {
+        // Wait for the GLib main loop to start. It is required that the context used
+        // by the main loop is acquired before any other GLib functions are called. Otherwise,
+        // the GLibMatterContextInvokeSync() might run functions on the wrong thread.
+
         std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
-        CallbackIndirection startedInd([](void *) { return G_SOURCE_REMOVE; }, nullptr);
-        g_idle_add(G_SOURCE_FUNC(&CallbackIndirection::Callback), &startedInd);
-        startedInd.Wait(lock);
+        GLibMatterContextInvokeData invokeData{};
+
+        auto * idleSource = g_idle_source_new();
+        g_source_set_callback(
+            idleSource,
+            [](void * userData_) {
+                auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
+                std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
+                data->mDone = true;
+                data->mDoneCond.notify_one();
+                return G_SOURCE_REMOVE;
+            },
+            &invokeData, nullptr);
+        g_source_attach(idleSource, g_main_loop_get_context(mGLibMainLoop));
+        g_source_unref(idleSource);
+
+        invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
     }
 
 #endif
@@ -248,68 +266,52 @@ void PlatformManagerImpl::_Shutdown()
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
     g_main_loop_quit(mGLibMainLoop);
-    g_main_loop_unref(mGLibMainLoop);
     g_thread_join(mGLibMainLoopThread);
+    g_main_loop_unref(mGLibMainLoop);
 #endif
 }
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-
-void PlatformManagerImpl::CallbackIndirection::Wait(std::unique_lock<std::mutex> & lock)
+CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData)
 {
-    mDoneCond.wait(lock, [this]() { return mDone; });
-}
+    // Because of TSAN false positives, we need to use a mutex to synchronize access to all members of
+    // the GLibMatterContextInvokeData object (including constructor and destructor). This is a temporary
+    // workaround until TSAN-enabled GLib will be used in our CI.
+    std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
 
-gboolean PlatformManagerImpl::CallbackIndirection::Callback(CallbackIndirection * self)
-{
-    // We can not access "self" before acquiring the lock, because TSAN will complain that
-    // there is a race condition between the thread that created the object and the thread
-    // that is executing the callback.
-    std::unique_lock<std::mutex> lock(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
-
-    auto callback = self->mCallback;
-    auto userData = self->mUserData;
+    GLibMatterContextInvokeData invokeData{ func, userData };
 
     lock.unlock();
-    auto result = callback(userData);
+
+    g_main_context_invoke_full(
+        g_main_loop_get_context(mGLibMainLoop), G_PRIORITY_HIGH_IDLE,
+        [](void * userData_) {
+            auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
+
+            // XXX: Temporary workaround for TSAN false positives.
+            std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
+
+            auto mFunc     = data->mFunc;
+            auto mUserData = data->mFuncUserData;
+
+            lock_.unlock();
+            auto result = mFunc(mUserData);
+            lock_.lock();
+
+            data->mDone       = true;
+            data->mFuncResult = result;
+            data->mDoneCond.notify_one();
+
+            return G_SOURCE_REMOVE;
+        },
+        &invokeData, nullptr);
+
     lock.lock();
 
-    self->mDone = true;
-    self->mDoneCond.notify_all();
+    invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
 
-    return result;
+    return invokeData.mFuncResult;
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-CHIP_ERROR PlatformManagerImpl::RunOnGLibMainLoopThread(GSourceFunc callback, void * userData, bool wait)
-{
-
-    GMainContext * context = g_main_loop_get_context(mGLibMainLoop);
-    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INTERNAL,
-                        ChipLogDetail(DeviceLayer, "Failed to get GLib main loop context"));
-
-    // If we've been called from the GLib main loop thread itself, there is no reason to wait
-    // for the callback, as it will be executed immediately by the g_main_context_invoke() call
-    // below. Using a callback indirection in this case would cause a deadlock.
-    if (g_main_context_is_owner(context))
-    {
-        wait = false;
-    }
-
-    if (wait)
-    {
-        std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
-        CallbackIndirection indirection(callback, userData);
-        g_main_context_invoke(context, G_SOURCE_FUNC(&CallbackIndirection::Callback), &indirection);
-        indirection.Wait(lock);
-        return CHIP_NO_ERROR;
-    }
-
-    g_main_context_invoke(context, callback, userData);
-    return CHIP_NO_ERROR;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
 } // namespace DeviceLayer

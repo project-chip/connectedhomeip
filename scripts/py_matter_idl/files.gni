@@ -8,6 +8,7 @@ matter_idl_generator_templates = [
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/bridge/BridgeClustersGlobalStructs.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ChipClustersCpp.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ChipClustersRead.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ClusterWriteMapping.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/CallbackStubSource.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/PluginApplicationCallbacksHeader.jinja",
 ]

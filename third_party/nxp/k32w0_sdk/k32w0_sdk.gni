@@ -455,7 +455,15 @@ template("k32w0_sdk") {
         "-Wno-parentheses-equality",
       ]
     } else {
-      cflags += [ "-fno-optimize-strlen" ]
+      cflags += [
+        "-fno-optimize-strlen",
+
+        # TODO After upgrading the compiler we started to see new error from address
+        # warning. To allow PR that rolls up compiler we have suppress this warning
+        # as an error temporarily.
+        # see https://github.com/project-chip/connectedhomeip/issues/26221
+        "-Wno-error=address",
+      ]
     }
 
     # Now add our "system-header" include dirs

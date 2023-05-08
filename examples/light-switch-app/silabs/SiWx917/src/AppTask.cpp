@@ -26,9 +26,7 @@
 #include "AppEvent.h"
 #include "BindingHandler.h"
 
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#endif // ENABLE_WSTK_LEDS
 
 #include "LightSwitchMgr.h"
 
@@ -53,6 +51,8 @@
 #include <setup_payload/SetupPayload.h>
 
 #include <app/clusters/identify-server/identify-server.h>
+
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 /**********************************************************
  * Defines and Constants
@@ -154,6 +154,9 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
+
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Light Switch");
 #endif
@@ -265,7 +268,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         button_event.Handler = SwitchActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (button == SIWx917_BTN0)
+    else if (button == SIWx917_BTN0 && btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);

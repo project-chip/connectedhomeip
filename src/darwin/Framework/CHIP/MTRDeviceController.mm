@@ -153,6 +153,14 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 // Clean up from a state where startup was called.
 - (void)cleanupAfterStartup
 {
+    // Invalidate our MTRDevice instances before we shut down our secure
+    // sessions and whatnot, so they don't start trying to resubscribe when we
+    // do the secure session shutdowns.
+    for (MTRDevice * device in [self.nodeIDToDeviceMap allValues]) {
+        [device invalidate];
+    }
+    [self.nodeIDToDeviceMap removeAllObjects];
+
     [_factory controllerShuttingDown:self];
 }
 
@@ -203,11 +211,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         delete _deviceControllerDelegateBridge;
         _deviceControllerDelegateBridge = nullptr;
     }
-
-    for (MTRDevice * device in [self.nodeIDToDeviceMap allValues]) {
-        [device invalidate];
-    }
-    [self.nodeIDToDeviceMap removeAllObjects];
 }
 
 - (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams
@@ -299,10 +302,34 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         } else {
             chip::MutableByteSpan noc(nocBuffer);
 
+            chip::CATValues cats = chip::kUndefinedCATs;
+            if (startupParams.caseAuthenticatedTags != nil) {
+                unsigned long long tagCount = startupParams.caseAuthenticatedTags.count;
+                if (tagCount > chip::kMaxSubjectCATAttributeCount) {
+                    MTR_LOG_ERROR("%llu CASE Authenticated Tags cannot be represented in a certificate.", tagCount);
+                    return;
+                }
+
+                size_t tagIndex = 0;
+                for (NSNumber * boxedTag in startupParams.caseAuthenticatedTags) {
+                    if (!chip::CanCastTo<chip::CASEAuthTag>(boxedTag.unsignedLongLongValue)) {
+                        MTR_LOG_ERROR("0x%llx is not a valid CASE Authenticated Tag value.", boxedTag.unsignedLongLongValue);
+                        return;
+                    }
+
+                    auto tag = static_cast<chip::CASEAuthTag>(boxedTag.unsignedLongLongValue);
+                    if (!chip::IsValidCASEAuthTag(tag)) {
+                        MTR_LOG_ERROR("0x%" PRIx32 " is not a valid CASE Authenticated Tag value.", tag);
+                        return;
+                    }
+
+                    cats.values[tagIndex++] = tag;
+                }
+            }
+
             if (commissionerParams.operationalKeypair != nullptr) {
                 errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeID.unsignedLongLongValue,
-                    startupParams.fabricID.unsignedLongLongValue, chip::kUndefinedCATs,
-                    commissionerParams.operationalKeypair->Pubkey(), noc);
+                    startupParams.fabricID.unsignedLongLongValue, cats, commissionerParams.operationalKeypair->Pubkey(), noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;
@@ -322,8 +349,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                     return;
                 }
 
-                errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeID.unsignedLongLongValue,
-                    startupParams.fabricID.unsignedLongLongValue, chip::kUndefinedCATs, pubKey, noc);
+                errorCode = _operationalCredentialsDelegate->GenerateNOC(
+                    startupParams.nodeID.unsignedLongLongValue, startupParams.fabricID.unsignedLongLongValue, cats, pubKey, noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;
@@ -332,6 +359,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             commissionerParams.controllerNOC = noc;
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorID unsignedShortValue]);
+        commissionerParams.enableServerInteractions = startupParams.advertiseOperational;
+        // We don't want to remove things from the fabric table on controller
+        // shutdown, since our controller setup depends on being able to fetch
+        // fabric information for the relevant fabric indices on controller
+        // bring-up.
+        commissionerParams.removeFromFabricTableOnShutdown = false;
         commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
@@ -430,6 +463,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         if (commissioningParams.threadOperationalDataset) {
             params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
         }
+        params.SetSkipCommissioningComplete(commissioningParams.skipCommissioningComplete);
         if (commissioningParams.wifiSSID) {
             chip::ByteSpan ssid = AsByteSpan(commissioningParams.wifiSSID);
             chip::ByteSpan credentials;
@@ -515,7 +549,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
-        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error], nil);
+        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:error], nil);
 
         return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
     };
@@ -534,7 +568,13 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     MTRDevice * deviceToReturn = self.nodeIDToDeviceMap[nodeID];
     if (!deviceToReturn) {
         deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
-        self.nodeIDToDeviceMap[nodeID] = deviceToReturn;
+        // If we're not running, don't add the device to our map.  That would
+        // create a cycle that nothing would break.  Just return the device,
+        // which will be in exactly the state it would be in if it were created
+        // while we were running and then we got shut down.
+        if ([self isRunning]) {
+            self.nodeIDToDeviceMap[nodeID] = deviceToReturn;
+        }
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 

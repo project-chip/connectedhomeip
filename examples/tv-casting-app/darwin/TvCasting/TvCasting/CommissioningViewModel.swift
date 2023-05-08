@@ -36,6 +36,27 @@ class CommissioningViewModel: ObservableObject {
     func prepareForCommissioning(selectedCommissioner: DiscoveredNodeData?) {
         if let castingServerBridge = CastingServerBridge.getSharedInstance()
         {
+            castingServerBridge.setDacHolder(ExampleDAC(), clientQueue: DispatchQueue.main, setDacHolderStatus: { (error: MatterError) -> () in
+                DispatchQueue.main.async {
+                    self.Log.info("CommissioningViewModel.setDacHolder status was \(error)")
+                    if(error.code == 0)
+                    {
+                        self.openBasicCommissioningWindow()
+                    }
+                }
+            })
+        }
+                
+        // Send User directed commissioning request if a commissioner with a known IP addr was selected
+        if(selectedCommissioner != nil && selectedCommissioner!.numIPs > 0)
+        {
+            sendUserDirectedCommissioningRequest(selectedCommissioner: selectedCommissioner)
+        }
+    }
+    
+    private func openBasicCommissioningWindow() {
+        if let castingServerBridge = CastingServerBridge.getSharedInstance()
+        {
             castingServerBridge.openBasicCommissioningWindow(DispatchQueue.main,
                 commissioningWindowRequestedHandler: { (result: Bool) -> () in
                     DispatchQueue.main.async {
@@ -52,14 +73,14 @@ class CommissioningViewModel: ObservableObject {
                     DispatchQueue.main.async {
                         self.connectionSuccess = true
                         self.connectionStatus = "Connected to \(String(describing: videoPlayer))"
-                        self.Log.info("ConnectionViewModel.verifyOrEstablishConnection.onConnectionSuccessCallback called with \(videoPlayer.nodeId)")
+                        self.Log.info("CommissioningViewModel.verifyOrEstablishConnection.onConnectionSuccessCallback called with \(videoPlayer.nodeId)")
                     }
                 },
                 onConnectionFailureCallback: { (error: MatterError) -> () in
                     DispatchQueue.main.async {
                         self.connectionSuccess = false
                         self.connectionStatus = "Failed to connect to video player!"
-                        self.Log.info("ConnectionViewModel.verifyOrEstablishConnection.onConnectionFailureCallback called with \(error)")
+                        self.Log.info("CommissioningViewModel.verifyOrEstablishConnection.onConnectionFailureCallback called with \(error)")
                     }
                 },
                 onNewOrUpdatedEndpointCallback: { (contentApp: ContentApp) -> () in
@@ -68,12 +89,7 @@ class CommissioningViewModel: ObservableObject {
                     }
                 })
         }
-                
-        // Send User directed commissioning request if a commissioner with a known IP addr was selected
-        if(selectedCommissioner != nil && selectedCommissioner!.numIPs > 0)
-        {
-            sendUserDirectedCommissioningRequest(selectedCommissioner: selectedCommissioner)
-        }
+        
     }
     
     private func sendUserDirectedCommissioningRequest(selectedCommissioner: DiscoveredNodeData?) {        

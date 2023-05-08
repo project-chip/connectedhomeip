@@ -183,7 +183,6 @@ public:
 
 private:
     static void OnResolveTimer(System::Layer * layer, void * context) { static_cast<Resolver *>(context)->HandleTimer(); }
-    static void OnTryNextResult(System::Layer * layer, void * context);
 
     /// Timer on lookup node events: min and max search times.
     void HandleTimer();

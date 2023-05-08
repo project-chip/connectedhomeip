@@ -92,7 +92,7 @@ tests:
               maxValue: 4
 
     - label: "TH reads CompensationText attribute from DUT"
-      PICS: CC.S.A0005
+      PICS: CC.S.A0006
       command: "readAttribute"
       attribute: "CompensationText"
       response:

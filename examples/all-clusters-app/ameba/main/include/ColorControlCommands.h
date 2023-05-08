@@ -505,8 +505,8 @@ void ProcessColorControlUnicastBindingCommand(BindingCommandData * data, const E
     case Clusters::ColorControl::Commands::ColorLoopSet::Id:
         colorLoopSetCommand.updateFlags =
             static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(data->args[0]);
-        colorLoopSetCommand.action          = static_cast<EmberAfColorLoopAction>(data->args[1]);
-        colorLoopSetCommand.direction       = static_cast<EmberAfColorLoopDirection>(data->args[2]);
+        colorLoopSetCommand.action          = static_cast<ColorLoopAction>(data->args[1]);
+        colorLoopSetCommand.direction       = static_cast<ColorLoopDirection>(data->args[2]);
         colorLoopSetCommand.time            = static_cast<uint16_t>(data->args[3]);
         colorLoopSetCommand.startHue        = static_cast<uint16_t>(data->args[4]);
         colorLoopSetCommand.optionsMask     = static_cast<uint8_t>(data->args[5]);
@@ -708,8 +708,8 @@ void ProcessColorControlGroupBindingCommand(BindingCommandData * data, const Emb
     case Clusters::ColorControl::Commands::ColorLoopSet::Id:
         colorLoopSetCommand.updateFlags =
             static_cast<chip::BitMask<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(data->args[0]);
-        colorLoopSetCommand.action          = static_cast<EmberAfColorLoopAction>(data->args[1]);
-        colorLoopSetCommand.direction       = static_cast<EmberAfColorLoopDirection>(data->args[2]);
+        colorLoopSetCommand.action          = static_cast<ColorLoopAction>(data->args[1]);
+        colorLoopSetCommand.direction       = static_cast<ColorLoopDirection>(data->args[2]);
         colorLoopSetCommand.time            = static_cast<uint16_t>(data->args[3]);
         colorLoopSetCommand.startHue        = static_cast<uint16_t>(data->args[4]);
         colorLoopSetCommand.optionsMask     = static_cast<uint8_t>(data->args[5]);

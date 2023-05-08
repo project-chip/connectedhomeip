@@ -33,7 +33,6 @@ tests:
 
     - label: "Precondition"
       verification: |
-          Group Member is commissioned with Admin
           Execute this step before executing the test steps.
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 1 0
@@ -327,6 +326,7 @@ tests:
     - label:
           "DUT reads GroupKeyMap Attribute from the GroupKeyManagement cluster
           from TH"
+      PICS: GRPKEY.C.A0000
       verification: |
           ./chip-tool groupkeymanagement read group-key-map 1 0
 
@@ -362,6 +362,7 @@ tests:
 
     - label:
           "DUT reads GroupTable attribute from GroupKeyManagement cluster on TH"
+      PICS: GRPKEY.C.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 

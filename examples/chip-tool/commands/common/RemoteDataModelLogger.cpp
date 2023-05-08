@@ -30,6 +30,10 @@ constexpr const char * kErrorIdKey        = "error";
 constexpr const char * kClusterErrorIdKey = "clusterError";
 constexpr const char * kValueKey          = "value";
 constexpr const char * kNodeIdKey         = "nodeId";
+constexpr const char * kNOCKey            = "NOC";
+constexpr const char * kICACKey           = "ICAC";
+constexpr const char * kRCACKey           = "RCAC";
+constexpr const char * kIPKKey            = "IPK";
 
 namespace {
 RemoteDataModelLoggerDelegate * gDelegate;
@@ -53,6 +57,7 @@ CHIP_ERROR LogError(Json::Value & value, const chip::app::StatusIB & status)
     auto valueStr = chip::JsonToString(value);
     return gDelegate->LogJSON(valueStr.c_str());
 }
+
 } // namespace
 
 namespace RemoteDataModelLogger {
@@ -160,6 +165,33 @@ CHIP_ERROR LogGetCommissionerNodeId(chip::NodeId value)
     Json::Value rootValue;
     rootValue[kValueKey]             = Json::Value();
     rootValue[kValueKey][kNodeIdKey] = value;
+
+    auto valueStr = chip::JsonToString(rootValue);
+    return gDelegate->LogJSON(valueStr.c_str());
+}
+
+CHIP_ERROR LogGetCommissionerRootCertificate(const char * value)
+{
+    VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
+
+    Json::Value rootValue;
+    rootValue[kValueKey]           = Json::Value();
+    rootValue[kValueKey][kRCACKey] = value;
+
+    auto valueStr = chip::JsonToString(rootValue);
+    return gDelegate->LogJSON(valueStr.c_str());
+}
+
+CHIP_ERROR LogIssueNOCChain(const char * noc, const char * icac, const char * rcac, const char * ipk)
+{
+    VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
+
+    Json::Value rootValue;
+    rootValue[kValueKey]           = Json::Value();
+    rootValue[kValueKey][kNOCKey]  = noc;
+    rootValue[kValueKey][kICACKey] = icac;
+    rootValue[kValueKey][kRCACKey] = rcac;
+    rootValue[kValueKey][kIPKKey]  = ipk;
 
     auto valueStr = chip::JsonToString(rootValue);
     return gDelegate->LogJSON(valueStr.c_str());

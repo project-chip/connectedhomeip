@@ -108,6 +108,14 @@ menu "CHIP Core"
             help
                 Build CHIP test binaries.
 
+        config DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS
+            int  "Set threshold in ms"
+            default 700
+            help
+                 Time threshold for warning that dispatched took too long. You can
+		 set this default set to 0 to to disable event dispatching time
+		 measurement and suppress the logs "Long dispatch time:...".
+
         # TODO: add log level selection
 
     endmenu # "General Options"
@@ -498,6 +506,13 @@ menu "CHIP Device Layer"
     menu "CHIP Thread Options"
         visible if OPENTHREAD_ENABLED
 
+        config ENABLE_MATTER_OVER_THREAD
+            bool "Enable Matter-over-Thread Support"
+            default y
+            depends on OPENTHREAD_ENABLED
+            help
+                Enables support for sending and receiving CHIP messages over a Thread Connection.
+
         config THREAD_TASK_STACK_SIZE
             int "Thread task stack size"
             default 5120
@@ -677,6 +692,13 @@ menu "CHIP Device Layer"
             default n
             help
                 Enable ESP32 Device LocationCapability
+
+        config SEC_CERT_DAC_PROVIDER
+            bool "Use Secure Cert DAC Provider"
+            default n
+            help
+                Use ESP32 Secure Cert DAC Provider which is  ESP32 DeviceAttestationCredentialsProvider implementation which reads attestation
+                information from the esp_secure_cert partition
 
     endmenu
 
@@ -894,13 +916,6 @@ menu "CHIP Device Layer"
             default n
             help
                 Enable esp32 as a BLE Commissioner.
-
-        config ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-            bool "Enable Commissionee and Commissioner mode"
-            default n
-            depends on ENABLE_ESP32_BLE_Controller
-            help
-                Enable including commissioner code (CHIPDeviceController.cpp) in the commissionee (Server.cpp) code.
 
     endmenu
 

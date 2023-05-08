@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# Don't warn about unreachable commands in this file:
+# shellcheck disable=SC2317
 
 SOURCE=${BASH_SOURCE[0]}
 SOURCE_DIR=$(cd "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
@@ -76,6 +78,7 @@ function __cirquetest_clean_flask() {
 function __cirquetest_build_ot() {
     echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Cache miss, build openthread simulation."
     script/cmake-build simulation -DOT_THREAD_VERSION=1.2 -DOT_MTD=OFF -DOT_FTD=OFF -DWEB_GUI=0 -DNETWORK_MANAGER=0 -DREST_API=0 -DNAT64=0
+    mkdir -p "$(dirname "$OT_SIMULATION_CACHE")"
     tar czf "$OT_SIMULATION_CACHE" build
     echo "$OPENTHREAD_CHECKOUT" >"$OT_SIMULATION_CACHE_STAMP_FILE"
 }
@@ -113,7 +116,7 @@ function cirquetest_bootstrap() {
 
     make NO_GRPC=1 install -j
 
-    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
+    if [[ "$GITHUB_ACTION_RUN" = "1" ]]; then
         # Note: This script will be invoked in docker on CI, We should add CHIP repo to safe directory to silent git error messages.
         git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
     fi
@@ -140,7 +143,7 @@ function cirquetest_run_test() {
 
     # After test finished, the container is perserved and networks will not be deleted
     # This is useful when running tests on local workstation, but not for CI.
-    if [[ "x$CLEANUP_DOCKER_FOR_CI" = "x1" ]]; then
+    if [[ "$CLEANUP_DOCKER_FOR_CI" = "1" ]]; then
         echo "Do docker container and network prune"
         # TODO: Filter cirque containers ?
         if ! grep docker.sock /proc/1/mountinfo; then
@@ -169,7 +172,7 @@ function cirquetest_run_all_tests() {
         fi
     done
 
-    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
+    if [[ "$GITHUB_ACTION_RUN" = "1" ]]; then
         echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Logs will be uploaded to artifacts."
     fi
 

@@ -19,8 +19,8 @@ import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/silabs_executable.gni")
 
 assert(current_os == "freertos")
 
@@ -68,7 +68,7 @@ efr32_sdk("sdk") {
   }
 }
 
-efr32_executable("window_app") {
+silabs_executable("window_app") {
   output_name = "chip-efr32-window-example.out"
   output_dir = root_out_dir
   include_dirs = [

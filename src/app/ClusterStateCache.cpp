@@ -24,6 +24,31 @@
 namespace chip {
 namespace app {
 
+namespace {
+
+// Determine how much space a StatusIB takes up on the wire.
+size_t SizeOfStatusIB(const StatusIB & aStatus)
+{
+    // 1 byte: anonymous tag control byte for struct.
+    // 1 byte: control byte for uint8 value.
+    // 1 byte: context-specific tag for uint8 value.
+    // 1 byte: the uint8 value.
+    // 1 byte: end of container.
+    size_t size = 5;
+
+    if (aStatus.mClusterStatus.HasValue())
+    {
+        // 1 byte: control byte for uint8 value.
+        // 1 byte: context-specific tag for uint8 value.
+        // 1 byte: the uint8 value.
+        size += 3;
+    }
+
+    return size;
+}
+
+} // anonymous namespace
+
 CHIP_ERROR ClusterStateCache::GetElementTLVSize(TLV::TLVReader * apData, size_t & aSize)
 {
     Platform::ScopedMemoryBufferWithSize<uint8_t> backingBuffer;
@@ -57,10 +82,11 @@ CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPat
 
     if (apData)
     {
+        size_t elementSize = 0;
+        ReturnErrorOnFailure(GetElementTLVSize(apData, elementSize));
+
         if (mCacheData)
         {
-            size_t elementSize = 0;
-            ReturnErrorOnFailure(GetElementTLVSize(apData, elementSize));
             Platform::ScopedMemoryBufferWithSize<uint8_t> backingBuffer;
             backingBuffer.Calloc(elementSize);
             VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -68,7 +94,11 @@ CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPat
             ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), *apData));
             ReturnErrorOnFailure(writer.Finalize(backingBuffer));
 
-            state.Set<Platform::ScopedMemoryBufferWithSize<uint8_t>>(std::move(backingBuffer));
+            state.Set<AttributeData>(std::move(backingBuffer));
+        }
+        else
+        {
+            state.Set<size_t>(elementSize);
         }
         //
         // Clear out the committed data version and only set it again once we have received all data for this cluster.
@@ -106,6 +136,10 @@ CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPat
         {
             state.Set<StatusIB>(aStatus);
         }
+        else
+        {
+            state.Set<size_t>(SizeOfStatusIB(aStatus));
+        }
     }
 
     //
@@ -117,9 +151,10 @@ CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPat
         mAddedEndpoints.push_back(aPath.mEndpointId);
     }
 
+    mCache[aPath.mEndpointId][aPath.mClusterId].mAttributes[aPath.mAttributeId] = std::move(state);
+
     if (mCacheData)
     {
-        mCache[aPath.mEndpointId][aPath.mClusterId].mAttributes[aPath.mAttributeId] = std::move(state);
         mChangedAttributeSet.insert(aPath);
     }
 
@@ -235,8 +270,12 @@ CHIP_ERROR ClusterStateCache::Get(const ConcreteAttributePath & path, TLV::TLVRe
         return CHIP_ERROR_IM_STATUS_CODE_RECEIVED;
     }
 
-    reader.Init(attributeState->Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().Get(),
-                attributeState->Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().AllocatedSize());
+    if (!attributeState->Is<AttributeData>())
+    {
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
+
+    reader.Init(attributeState->Get<AttributeData>().Get(), attributeState->Get<AttributeData>().AllocatedSize());
     return reader.Next();
 }
 
@@ -419,27 +458,25 @@ void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter
                 continue;
             }
             DataVersion dataVersion = clusterIter.second.mCommittedDataVersion.Value();
-            uint32_t clusterSize    = 0;
+            size_t clusterSize      = 0;
             ClusterId clusterId     = clusterIter.first;
 
             for (auto const & attributeIter : clusterIter.second.mAttributes)
             {
                 if (attributeIter.second.Is<StatusIB>())
                 {
-                    clusterSize +=
-                        5; // 1 byte: anonymous tag control byte for struct. 1 byte: control byte for uint8 value. 1 byte:
-                           // context-specific tag for uint8 value.1 byte: the uint8 value. 1 byte: end of container.
-                    if (attributeIter.second.Get<StatusIB>().mClusterStatus.HasValue())
-                    {
-                        clusterSize += 3; // 1 byte: control byte for uint8 value. 1 byte: context-specific tag for uint8 value. 1
-                                          // byte: the uint8 value.
-                    }
+                    clusterSize += SizeOfStatusIB(attributeIter.second.Get<StatusIB>());
+                }
+                else if (attributeIter.second.Is<size_t>())
+                {
+                    clusterSize += attributeIter.second.Get<size_t>();
                 }
                 else
                 {
+                    VerifyOrDie(attributeIter.second.Is<AttributeData>());
                     TLV::TLVReader bufReader;
-                    bufReader.Init(attributeIter.second.Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().Get(),
-                                   attributeIter.second.Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().AllocatedSize());
+                    bufReader.Init(attributeIter.second.Get<AttributeData>().Get(),
+                                   attributeIter.second.Get<AttributeData>().AllocatedSize());
                     ReturnOnFailure(bufReader.Next());
                     // Skip to the end of the element.
                     ReturnOnFailure(bufReader.Skip());
@@ -448,8 +485,11 @@ void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter
                     clusterSize += bufReader.GetLengthRead();
                 }
             }
+
             if (clusterSize == 0)
             {
+                // No data in this cluster, so no point in sending a dataVersion
+                // along at all.
                 continue;
             }
 
@@ -458,6 +498,7 @@ void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter
             aVector.push_back(std::make_pair(filter, clusterSize));
         }
     }
+
     std::sort(aVector.begin(), aVector.end(),
               [](const std::pair<DataVersionFilter, size_t> & x, const std::pair<DataVersionFilter, size_t> & y) {
                   return x.second > y.second;

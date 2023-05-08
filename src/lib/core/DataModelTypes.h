@@ -19,6 +19,7 @@
 
 #include <cstdint>
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp> // For VendorId
 #include <lib/core/GroupId.h>
 #include <lib/core/NodeId.h>
@@ -46,6 +47,7 @@ typedef uint32_t TransactionId;
 typedef uint16_t KeysetId;
 typedef uint8_t InteractionModelRevision;
 typedef uint32_t SubscriptionId;
+typedef uint8_t SceneId;
 
 constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
 constexpr FabricId kUndefinedFabricId                     = 0ULL;

@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    12.4.13. [TC-CNET-4.15] [Wi-Fi] NetworkIDNotFound returned in
-    LastNetworkingStatus field validation [DUT-Server]
+    12.4.13. [TC-CNET-4.15] [WiFi] NetworkIDNotFound value as
+    LastNetworkingStatus argument validation [DUT-Server]
 
 PICS:
     - CNET.S.F00
@@ -36,10 +36,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  ArmFailSafe  command to the  DUT with
-          the  ExpiryLengthSeco  nds field set to 900"
+          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds
+          field set to 900"
       verification: |
-          ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
+          ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
 
           Verify "ArmFailSafeResponse" on the TH(Chip-tool) Log:
 

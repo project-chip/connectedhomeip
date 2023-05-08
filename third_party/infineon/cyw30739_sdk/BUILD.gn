@@ -25,8 +25,13 @@ declare_args() {
 
 assert(cyw30739_sdk_target != "", "cyw30739_sdk_target must be specified")
 
+config("cyw30739_sdk_no_warn_rwx") {
+  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
+}
+
 group("cyw30739_sdk") {
   public_deps = [ cyw30739_sdk_target ]
+  all_dependent_configs = [ ":cyw30739_sdk_no_warn_rwx" ]
 }
 
 config("mbedtls_cyw30739_config") {

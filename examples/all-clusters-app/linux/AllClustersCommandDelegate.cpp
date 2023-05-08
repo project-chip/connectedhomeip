@@ -181,16 +181,16 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         GeneralFaults<kMaxHardwareFaults> previous;
         GeneralFaults<kMaxHardwareFaults> current;
 
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following hardware faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_RADIO));
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_POWER_SOURCE));
+        using GeneralDiagnostics::HardwareFaultEnum;
 
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_RADIO));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_SENSOR));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_POWER_SOURCE));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_USER_INTERFACE_FAULT));
-#endif
+        // On Linux Simulation, set following hardware faults statically.
+        ReturnOnFailure(previous.add(to_underlying(HardwareFaultEnum::kRadio)));
+        ReturnOnFailure(previous.add(to_underlying(HardwareFaultEnum::kPowerSource)));
+
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kRadio)));
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kSensor)));
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kPowerSource)));
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
         Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id)
@@ -198,7 +198,6 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         GeneralFaults<kMaxRadioFaults> previous;
         GeneralFaults<kMaxRadioFaults> current;
 
-#if CHIP_CONFIG_TEST
         // On Linux Simulation, set following radio faults statically.
         ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_ENUM_WI_FI_FAULT));
         ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT));
@@ -207,7 +206,6 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_ENUM_CELLULAR_FAULT));
         ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT));
         ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_ENUM_NFC_FAULT));
-#endif
         Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id)
@@ -215,7 +213,6 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         GeneralFaults<kMaxNetworkFaults> previous;
         GeneralFaults<kMaxNetworkFaults> current;
 
-#if CHIP_CONFIG_TEST
         // On Linux Simulation, set following radio faults statically.
         ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE));
         ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED));
@@ -223,7 +220,6 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE));
         ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED));
         ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED));
-#endif
         Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(previous, current);
     }
     else

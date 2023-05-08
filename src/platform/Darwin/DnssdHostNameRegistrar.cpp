@@ -256,20 +256,59 @@ void GetInterfaceAddresses(uint32_t interfaceId, chip::Inet::IPAddressType addre
 }
 } // namespace
 
-void HostNameRegistrar::Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId)
+HostNameRegistrar::~HostNameRegistrar()
+{
+    Unregister();
+    if (mLivenessTracker != nullptr)
+    {
+        *mLivenessTracker = false;
+    }
+}
+
+DNSServiceErrorType HostNameRegistrar::Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId)
 {
     mHostname         = hostname;
     mInterfaceId      = interfaceId;
     mAddressType      = addressType;
     mServiceRef       = nullptr;
     mInterfaceMonitor = nullptr;
+
+    mLivenessTracker = std::make_shared<bool>(true);
+    if (mLivenessTracker == nullptr)
+    {
+        return kDNSServiceErr_NoMemory;
+    }
+
+    return kDNSServiceErr_NoError;
 }
 
 CHIP_ERROR HostNameRegistrar::Register()
 {
-    // If the target interface is kDNSServiceInterfaceIndexLocalOnly, there are no interfaces to register against
-    // the dns daemon.
-    VerifyOrReturnError(!IsLocalOnly(), CHIP_NO_ERROR);
+    // If the target interface is kDNSServiceInterfaceIndexLocalOnly, just
+    // register the loopback addresses.
+    if (IsLocalOnly())
+    {
+        ReturnErrorOnFailure(ResetSharedConnection());
+
+        InetInterfacesVector inetInterfaces;
+        Inet6InterfacesVector inet6Interfaces;
+        // Instead of mInterfaceId (which will not match any actual interface),
+        // use kDNSServiceInterfaceIndexAny and restrict to loopback interfaces.
+        GetInterfaceAddresses(kDNSServiceInterfaceIndexAny, mAddressType, inetInterfaces, inet6Interfaces,
+                              true /* searchLoopbackOnly */);
+
+        // But we register the IPs with mInterfaceId, not the actual interface
+        // IDs, so that resolution code that is grouping addresses by interface
+        // ends up doing the right thing, since we registered our SRV record on
+        // mInterfaceId.
+        //
+        // And only register the IPv6 ones, for simplicity.
+        for (auto & interface : inet6Interfaces)
+        {
+            ReturnErrorOnFailure(RegisterInterface(mInterfaceId, interface.second, kDNSServiceType_AAAA));
+        }
+        return CHIP_NO_ERROR;
+    }
 
     return StartMonitorInterfaces(^(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6Interfaces) {
         ReturnOnFailure(ResetSharedConnection());
@@ -288,11 +327,10 @@ CHIP_ERROR HostNameRegistrar::RegisterInterface(uint32_t interfaceId, uint16_t r
 
 void HostNameRegistrar::Unregister()
 {
-    // If the target interface is kDNSServiceInterfaceIndexLocalOnly, there are no interfaces to register against
-    // the dns daemon.
-    VerifyOrReturn(!IsLocalOnly());
-
-    StopMonitorInterfaces();
+    if (!IsLocalOnly())
+    {
+        StopMonitorInterfaces();
+    }
     StopSharedConnection();
 }
 
@@ -303,7 +341,18 @@ CHIP_ERROR HostNameRegistrar::StartMonitorInterfaces(OnInterfaceChanges interfac
 
     nw_path_monitor_set_queue(mInterfaceMonitor, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
 
+    // Our update handler closes over "this", but can't keep us alive (because we
+    // are not refcounted).  Make sure it closes over a shared ref to our
+    // liveness tracker, which it _can_ keep alive, so it can bail out if we
+    // have been destroyed between when the task was queued and when it ran.
+    std::shared_ptr<bool> livenessTracker = mLivenessTracker;
     nw_path_monitor_set_update_handler(mInterfaceMonitor, ^(nw_path_t path) {
+        if (!*livenessTracker)
+        {
+            // The HostNameRegistrar has been destroyed; just bail out.
+            return;
+        }
+
 #if CHIP_PROGRESS_LOGGING
         LogDetails(path);
 #endif // CHIP_PROGRESS_LOGGING

@@ -14,6 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import asyncio
 import atexit
 import logging
 import os
@@ -54,9 +55,27 @@ _CLUSTER_XML_DIRECTORY_PATH = os.path.abspath(
     os.path.join(_DEFAULT_CHIP_ROOT, "src/app/zap-templates/zcl/data-model/"))
 
 
-def StackShutdown():
-    certificateAuthorityManager.Shutdown()
-    builtins.chipStack.Shutdown()
+async def execute_test(yaml, runner):
+    # Executing and validating test
+    for test_step in yaml.tests:
+        if not test_step.is_pics_enabled:
+            continue
+        test_action = runner.encode(test_step)
+        if test_action is None:
+            raise Exception(
+                f'Failed to encode test step {test_step.label}')
+
+        response = await runner.execute(test_action)
+        decoded_response = runner.decode(response)
+        post_processing_result = test_step.post_process_response(
+            decoded_response)
+        if not post_processing_result.is_success():
+            logging.warning(f"Test step failure in 'test_step.label'")
+            for entry in post_processing_result.entries:
+                if entry.state == PostProcessCheckStatus.SUCCESS:
+                    continue
+                logging.warning("%s: %s", entry.state, entry.message)
+            raise Exception(f'Test step failed {test_step.label}')
 
 
 @click.command()
@@ -118,27 +137,8 @@ def main(setup_code, yaml_path, node_id, pics_file):
             runner = ReplTestRunner(
                 clusters_definitions, certificate_authority_manager, dev_ctrl)
 
-            # Executing and validating test
-            for test_step in yaml.tests:
-                if not test_step.is_pics_enabled:
-                    continue
-                test_action = runner.encode(test_step)
-                # TODO if test_action is None we should see if it is a pseudo cluster.
-                if test_action is None:
-                    raise Exception(
-                        f'Failed to encode test step {test_step.label}')
+            asyncio.run(execute_test(yaml, runner))
 
-                response = runner.execute(test_action)
-                decoded_response = runner.decode(response)
-                post_processing_result = test_step.post_process_response(
-                    decoded_response)
-                if not post_processing_result.is_success():
-                    logging.warning(f"Test step failure in 'test_step.label'")
-                    for entry in post_processing_result.entries:
-                        if entry.state == PostProcessCheckStatus.SUCCESS:
-                            continue
-                        logging.warning("%s: %s", entry.state, entry.message)
-                    raise Exception(f'Test step failed {test_step.label}')
         except Exception:
             print(traceback.format_exc())
             exit(-2)

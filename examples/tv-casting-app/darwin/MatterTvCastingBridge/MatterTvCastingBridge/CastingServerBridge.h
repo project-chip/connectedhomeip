@@ -37,6 +37,10 @@
                             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                    initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler;
 
+- (void)setDacHolder:(DeviceAttestationCredentialsHolder * _Nonnull)deviceAttestationCredentials
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    setDacHolderStatus:(void (^_Nonnull)(MatterError * _Nonnull))setDacHolderStatus;
+
 /*!
  @brief Browse for on-network commissioner TVs
 
@@ -185,7 +189,16 @@
  */
 - (void)disconnect:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
 
-/**
+/*!
+ @brief Purge data cached by the Matter casting library
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param responseHandler Called when purgeCache completes
+ */
+- (void)purgeCache:(dispatch_queue_t _Nonnull)clientQueue responseHandler:(void (^_Nonnull)(MatterError * _Nonnull))responseHandler;
+
+/*!
  @brief Start the Matter server and reconnect to a previously connected Video Player (if any). This API is async
 
  @param clientQueue Queue to invoke callbacks on

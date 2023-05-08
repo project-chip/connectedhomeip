@@ -98,6 +98,13 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertNotNil(attestationInfo);
     XCTAssertEqual(controller, sController);
 
+    __auto_type * csrInfoCopy = [[MTROperationalCSRInfo alloc] initWithCSRElementsTLV:csrInfo.csrElementsTLV
+                                                                 attestationSignature:csrInfo.attestationSignature];
+    XCTAssertEqualObjects(csrInfoCopy.csr, csrInfo.csr);
+    XCTAssertEqualObjects(csrInfoCopy.csrNonce, csrInfo.csrNonce);
+    XCTAssertEqualObjects(csrInfoCopy.csrElementsTLV, csrInfo.csrElementsTLV);
+    XCTAssertEqualObjects(csrInfoCopy.attestationSignature, csrInfo.attestationSignature);
+
     completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeIntegrityCheckFailed userInfo:nil]);
 }
 

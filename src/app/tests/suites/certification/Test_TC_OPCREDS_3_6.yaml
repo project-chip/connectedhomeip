@@ -91,9 +91,26 @@ tests:
     - label:
           "DUT shouldnt be discoverable via both commissionable and operational
           advertisements"
+      PICS: " !MCORE.DD.EXTENDED_DISCOVERY "
       verification: |
           Verify DUT is not discoverable over DNS-SD in both TCP and UDP
 
           avahi-browse -rt _matter._tcp
           avahi-browse -rt _matter._udp
+      disabled: true
+
+    - label:
+          "DUT should be discoverable via commissionable service advertisements
+          but shall not be in the commissioning mode"
+      PICS: MCORE.DD.EXTENDED_DISCOVERY
+      verification: |
+          Verify that the DUT is discoverable over DNS-SD with service type _matterc._udp with no subtype _CM and text key for CM with value 0
+
+          avahi-browse -rt _matterc._udp
+
+          br-aa67f1f8401d IPv4 DC126952E0AC4BD5                              _matterc._udp        local
+          hostname = [E45F012EED550000.local]
+          address = [172.18.0.1]
+          port = [5540]
+          txt = [""PI="" ""PH=33"" ""CM=0"" ""D=3840"" ""T=1"" ""DN=Test Bulb"" ""DT=257"" ""VP=65521+32769""]
       disabled: true

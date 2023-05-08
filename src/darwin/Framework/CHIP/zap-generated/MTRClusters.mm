@@ -44,17 +44,20 @@ using chip::System::Clock::Timeout;
 
 static void MTRClustersLogEnqueue(NSString * logPrefix, MTRAsyncCallbackWorkQueue * workQueue)
 {
-    MTR_LOG_INFO("%@ enqueueWorkItem %@", logPrefix, workQueue);
+    MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, workQueue);
 }
 
 static void MTRClustersLogDequeue(NSString * logPrefix, MTRAsyncCallbackWorkQueue * workQueue)
 {
-    MTR_LOG_INFO("%@ dequeueWorkItem %@", logPrefix, workQueue);
+    MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, workQueue);
 }
 
 static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * error)
 {
-    MTR_LOG_INFO("%@ completion value %@ error %@ endWork", logPrefix, value, error);
+    // Log the data at the INFO level (not usually persisted permanently),
+    // but make sure we log the work completion at the DEFAULT level.
+    MTR_LOG_INFO("%@ received response: %@ error: %@", logPrefix, value, error);
+    MTR_LOG_DEFAULT("%@ endWork", logPrefix);
 }
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
@@ -5916,6 +5919,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
+- (NSDictionary<NSString *, id> *)readAttributeProductAppearanceWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeProductAppearanceID)
+                                             params:params];
+}
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
@@ -10341,6 +10352,15 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                           clusterID:@(MTRClusterIDTypeBridgedDeviceBasicInformationID)
                                         attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeUniqueIDID)
                                              params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeProductAppearanceWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBridgedDeviceBasicInformationID)
+                        attributeID:@(MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductAppearanceID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params

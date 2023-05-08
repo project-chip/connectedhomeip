@@ -112,17 +112,15 @@ void emberAf{{asUpperCamelCase label}}ClusterClientTickCallback(chip::EndpointId
 
 {{#zcl_clusters}}
 {{#zcl_commands}}
+{{#if (isClient source)}}
+{{#unless (isInConfigList (asUpperCamelCase parent.name) "CommandHandlerInterfaceOnlyClusters")}}
 /**
  * @brief {{parent.name}} Cluster {{name}} Command callback (from {{source}})
  */
- {{#if (isServer source)}}
-bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::EndpointId endpoint,
-       chip::app::CommandSender * commandObj
-       {{#zcl_command_arguments}}, {{#if isArray}}{{asUnderlyingZclType type}}{{else}}{{#if_is_struct type}}{{zapTypeToDecodableClusterObjectType type ns=parent.parent.label}}{{else}}{{asUnderlyingZclType type}}{{/if_is_struct}}{{/if}} {{asSymbol label}}{{/zcl_command_arguments}});
- {{else}}
 bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::app::CommandHandler * commandObj,
       const chip::app::ConcreteCommandPath & commandPath,
       const chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase name}}::DecodableType & commandData);
+{{/unless}}
 {{/if}}
 {{/zcl_commands}}
 {{/zcl_clusters}}
