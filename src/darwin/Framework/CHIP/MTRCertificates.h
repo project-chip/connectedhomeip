@@ -44,7 +44,11 @@ NS_ASSUME_NONNULL_BEGIN
  * If fabricID is not nil, it will be included in the subject DN of the
  * certificate.  In this case it must be a valid Matter fabric id.
  *
- * validityPeriod specifies when the certificate will be valid.
+ * validityPeriod specifies when the certificate will be valid. Note that
+ * there is currently no mechanism available in Matter to update or rotate
+ * the root certificate of a fabric installed on a device. A certificate with
+ * no expiration time can be created by specifying [NSDate distantFuture] for
+ * the end of the period.
  *
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
@@ -79,7 +83,9 @@ NS_ASSUME_NONNULL_BEGIN
  * If fabricID is not nil, it will be included in the subject DN of the
  * certificate.  In this case it must be a valid Matter fabric id.
  *
- * validityPeriod specifies when the certificate will be valid.
+ * validityPeriod specifies when the certificate will be valid. A certificate
+ * with no expiration time can be created by specifying [NSDate distantFuture]
+ * for the end of the period.
  *
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
@@ -123,7 +129,9 @@ NS_ASSUME_NONNULL_BEGIN
  * 3 numbers, which are expected to be 32-bit unsigned Case Authenticated Tag
  * values.
  *
- * validityPeriod specifies when the certificate will be valid.
+ * validityPeriod specifies when the certificate will be valid. A certificate
+ * with no expiration time can be created by specifying [NSDate distantFuture]
+ * for the end of the period.
  *
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.

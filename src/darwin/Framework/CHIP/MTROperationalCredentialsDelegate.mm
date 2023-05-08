@@ -89,7 +89,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::GenerateNOC(
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto * validityPeriod = [[NSDateInterval alloc] initWithStartDate:[NSDate now] duration:kCertificateValiditySecs];
+    auto * validityPeriod = [[NSDateInterval alloc] initWithStartDate:[NSDate now] duration:kCertificateDefaultValiditySecs];
     return GenerateNOC(*mIssuerKey, (mIntermediateCert != nil) ? mIntermediateCert : mRootCert, nodeId, fabricId, cats, pubkey,
         validityPeriod, noc);
 }

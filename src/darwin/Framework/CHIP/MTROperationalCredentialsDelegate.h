@@ -112,7 +112,7 @@ public:
         NSDateInterval * validityPeriod, NSData * _Nullable __autoreleasing * _Nonnull operationalCert);
 
     // 10 years.
-    static const uint32_t kCertificateValiditySecs = 10 * 365 * 24 * 60 * 60;
+    static const uint32_t kCertificateDefaultValiditySecs = 10 * 365 * 24 * 60 * 60;
 
 private:
     // notAfter times can represent "forever".

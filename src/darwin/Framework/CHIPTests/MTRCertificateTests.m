@@ -21,11 +21,24 @@
 
 #import "MTRTestKeys.h"
 
-@interface MatterCertificateTests : XCTestCase
+@interface MTRCertificateTests : XCTestCase
 
 @end
 
-@implementation MatterCertificateTests
+@implementation MTRCertificateTests
+
+/**
+ * Helper function for creating start dates rounded to the nearest second (and
+ * which can therefore be represented without data loss in certificates).
+ */
++ (NSDate *)startDateWithTimeIntervalSinceNow:(NSTimeInterval)interval
+{
+    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:interval];
+    // Round down to the nearest second, since the certificate bits will do that
+    // when they compute validity dates.
+    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
+    return [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+}
 
 - (void)testGenerateRootCert
 {
@@ -50,11 +63,7 @@
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:100];
-    // Round down to the nearest second, since the certificate bits will do that
-    // when it computes validity dates.
-    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
-    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * startDate = [MTRCertificateTests startDateWithTimeIntervalSinceNow:100];
     __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate duration:200];
 
     __auto_type * rootCert = [MTRCertificates createRootCertificate:testKeys
@@ -83,11 +92,7 @@
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:100];
-    // Round down to the nearest second, since the certificate bits will do that
-    // when it computes validity dates.
-    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
-    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * startDate = [MTRCertificateTests startDateWithTimeIntervalSinceNow:100];
     __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate endDate:[NSDate distantFuture]];
 
     __auto_type * rootCert = [MTRCertificates createRootCertificate:testKeys
@@ -151,11 +156,7 @@
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
 
-    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:300];
-    // Round down to the nearest second, since the certificate bits will do that
-    // when it computes validity dates.
-    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
-    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * startDate = [MTRCertificateTests startDateWithTimeIntervalSinceNow:300];
     __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate duration:400];
 
     __auto_type * intermediateCert = [MTRCertificates createIntermediateCertificate:rootKeys
@@ -192,11 +193,7 @@
     __auto_type * intermediateKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
 
-    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:300];
-    // Round down to the nearest second, since the certificate bits will do that
-    // when it computes validity dates.
-    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
-    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * startDate = [MTRCertificateTests startDateWithTimeIntervalSinceNow:300];
     __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate endDate:[NSDate distantFuture]];
 
     __auto_type * intermediateCert = [MTRCertificates createIntermediateCertificate:rootKeys
@@ -275,11 +272,7 @@
     [cats addObject:@0x00020001];
     [cats addObject:@0x0003FFFF];
 
-    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:1000];
-    // Round down to the nearest second, since the certificate bits will do that
-    // when it computes validity dates.
-    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
-    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * startDate = [MTRCertificateTests startDateWithTimeIntervalSinceNow:1000];
     __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate duration:500];
 
     __auto_type * operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
@@ -323,11 +316,7 @@
     [cats addObject:@0x00020001];
     [cats addObject:@0x0003FFFF];
 
-    __auto_type * startDate = [NSDate dateWithTimeIntervalSinceNow:1000];
-    // Round down to the nearest second, since the certificate bits will do that
-    // when it computes validity dates.
-    NSTimeInterval seconds = floor([startDate timeIntervalSinceReferenceDate]);
-    startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+    __auto_type * startDate = [MTRCertificateTests startDateWithTimeIntervalSinceNow:1000];
     __auto_type * validityPeriod = [[NSDateInterval alloc] initWithStartDate:startDate endDate:[NSDate distantFuture]];
 
     __auto_type * operationalCert = [MTRCertificates createOperationalCertificate:rootKeys
