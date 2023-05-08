@@ -172,8 +172,8 @@ Releases page on
 [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
 -   On the command line:
 
-          $ commander flash bootloader_binaries/bootloader-storage-internal-single-512k-BRD4187C-gsdk4.1.s37
 
+          $ commander flash bootloader_binaries/bootloader-storage-internal-single-512k-BRD4187C-gsdk4.1.s37
 
 ## Viewing Logging Output
 
