@@ -127,7 +127,7 @@ def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
         line, _, _ = raw.partition("#")
         line = line.strip()
 
-        if line == "":
+        if not line:
             continue
 
         key, _, val = line.partition("=")
@@ -153,19 +153,11 @@ def type_matches(received_value, desired_type):
         compares list value types for non-empty lists.
     """
     if typing.get_origin(desired_type) == typing.Union:
-        for t in typing.get_args(desired_type):
-            if type_matches(received_value, t):
-                return True
-        return False
+        return any(type_matches(received_value, t) for t in typing.get_args(desired_type))
     elif typing.get_origin(desired_type) == list:
-        # Assume an empty list is of the correct type
         if isinstance(received_value, list):
-            if received_value == []:
-                return True
-            for t in typing.get_args(desired_type):
-                if type_matches(received_value[0], t):
-                    return True
-                return False
+            # Assume an empty list is of the correct type
+            return True if received_value == [] else any(type_matches(received_value[0], t) for t in typing.get_args(desired_type))
         else:
             return False
     elif desired_type == uint:

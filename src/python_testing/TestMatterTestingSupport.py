@@ -133,6 +133,10 @@ class TestMatterTestingSupport(MatterBaseTest):
         pics_list = ['TEST.S.A0000=1',
                      'TEST.S.A0001=0',
                      'lower.s.a0000=1',
+                     '',
+                     ' ',
+                     '# comment',
+                     ' # comment',
                      ' SPACE.S.A0000 = 1']
         pics = parse_pics(pics_list)
         # force the parsed pics here to be in the config so we can check the check_pics function
