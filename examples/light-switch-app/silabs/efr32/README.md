@@ -221,7 +221,6 @@ combination with JLinkRTTClient as follows:
 
           $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
 
-
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
