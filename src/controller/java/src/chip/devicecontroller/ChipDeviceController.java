@@ -175,6 +175,15 @@ public class ChipDeviceController {
         deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce);
   }
 
+  /**
+   * Pair a device connected using the scanned QR code or manual entry code.
+   *
+   * @param deviceId the node ID to assign to the device
+   * @param setupCode the scanned QR code or manual entry code
+   * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
+   *     generated CSR nonce.
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   */
   public void pairDeviceWithCode(
       long deviceId,
       String setupCode,
