@@ -26,7 +26,7 @@ bflb-crypto-plus==1.0
     # via bflb-iot-tool
 bflb-iot-tool==1.8.3
     # via -r requirements.bouffalolab.txt
-bitstring==4.0.1
+bitstring==3.1.9
     # via -r requirements.esp32.txt
 brotli==1.0.9
     # via flask-compress
