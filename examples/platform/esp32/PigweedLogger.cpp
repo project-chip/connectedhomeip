@@ -102,6 +102,12 @@ static const char * getLogColorForLevel(esp_log_level_t level)
     }
 }
 
+// ESP_LOGx(...) logs are funneled to esp_log_write() and it has the specific format. It contains color codes,
+// log level character, timestamp, tag, and actual log message. Everything here is part of format and variadic argument.
+//
+// ChipLogx(...) logs are funneled to esp_log_writev() will only have actual log message without color codes, log level
+// character, timestamp, and tag. So, to match up __wrap_esp_log_writev() adds those details when sending log to pigweed
+// logger.
 extern "C" void __wrap_esp_log_write(esp_log_level_t level, const char * tag, const char * format, ...)
 {
     va_list v;
