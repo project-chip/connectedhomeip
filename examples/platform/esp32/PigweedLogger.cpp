@@ -94,11 +94,11 @@ static const char * getLogColorForLevel(esp_log_level_t level)
         return LOG_COLOR_E "E";
 
     case ESP_LOG_INFO:
-        return LOG_COLOR_E "I";
+        return LOG_COLOR_I "I";
 
     default:
         // default is kept as ESP_LOG_DEBUG
-        return LOG_COLOR_E "D";
+        return LOG_COLOR_D "D";
     }
 }
 
