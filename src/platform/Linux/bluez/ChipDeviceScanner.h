@@ -71,9 +71,6 @@ public:
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
 
-    /// Should only be called by TimerExpiredCallback.
-    void MarkTimerExpired() { mTimerExpired = true; }
-
     /// Create a new device scanner
     ///
     /// Convenience method to allocate any required variables.
@@ -104,8 +101,6 @@ private:
     gulong mInterfaceChangedSignal        = 0;
     bool mIsScanning                      = false;
     bool mIsStopping                      = false;
-    /// Used to track if timer has alread expired and doesn't need to be canceled.
-    bool mTimerExpired = false;
 };
 
 } // namespace Internal

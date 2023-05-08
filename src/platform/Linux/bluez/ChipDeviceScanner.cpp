@@ -78,15 +78,16 @@ ChipDeviceScanner::~ChipDeviceScanner()
 {
     StopScan();
 
-    // mTimerExpired should only be set to true in the TimerExpiredCallback, which means we are in that callback
-    // right now so there is no need to cancel the timer. Doing so would result in deadlock trying to aquire the
-    // chip stack lock which we already currently have.
-    if (!mTimerExpired)
-    {
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+    if (!DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread())
         // In case the timeout timer is still active
         DeviceLayer::PlatformMgr().LockChipStack();
         chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
         DeviceLayer::PlatformMgr().UnlockChipStack();
+    }
+#else //CHIP_STACK_LOCK_TRACKING_ENABLED
+    chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
+#endif //CHIP_STACK_LOCK_TRACKING_ENABLED
     }
 
     g_object_unref(mManager);
@@ -144,9 +145,15 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         return CHIP_ERROR_INTERNAL;
     }
 
-    DeviceLayer::PlatformMgr().LockChipStack();
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+    if (!DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread())
+        DeviceLayer::PlatformMgr().LockChipStack();
+        CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+    }
+#else //CHIP_STACK_LOCK_TRACKING_ENABLED
     CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
-    DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif //CHIP_STACK_LOCK_TRACKING_ENABLED
 
     if (err != CHIP_NO_ERROR)
     {
@@ -154,7 +161,6 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         StopScan();
         return err;
     }
-    mTimerExpired = false;
 
     return CHIP_NO_ERROR;
 }
@@ -162,7 +168,6 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState)
 {
     ChipDeviceScanner * chipDeviceScanner = static_cast<ChipDeviceScanner *>(appState);
-    chipDeviceScanner->MarkTimerExpired();
     chipDeviceScanner->mDelegate->OnScanError(CHIP_ERROR_TIMEOUT);
     chipDeviceScanner->StopScan();
 }
