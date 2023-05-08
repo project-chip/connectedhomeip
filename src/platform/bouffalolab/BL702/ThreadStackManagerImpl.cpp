@@ -17,7 +17,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
 
 #include <platform/OpenThread/OpenThreadUtils.h>

@@ -96,6 +96,8 @@ Silicon Labs platform.
     -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+    -   BRD2703A / MG24 Explorer Kit
+    -   BRD2704A / SparkFun Thing Plus MGM240P board
 
 *   Build the example application:
 
@@ -276,11 +278,10 @@ combination with JLinkRTTClient as follows:
 
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
 
-    Here is an example with the CHIPTool:
+    Here is an example with the chip-tool:
 
-    chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
-
-    chip-tool onoff on 1 1
+          $ chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
+          $ chip-tool onoff on 1 1
 
 ### Notes
 

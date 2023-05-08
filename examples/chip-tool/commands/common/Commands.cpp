@@ -119,11 +119,12 @@ static void DetectAndLogMismatchedDoubleQuotes(int argc, char ** argv)
 
 } // namespace
 
-void Commands::Register(const char * clusterName, commands_list commandsList)
+void Commands::Register(const char * clusterName, commands_list commandsList, const char * helpText)
 {
+    mClusters[clusterName].second = helpText;
     for (auto & command : commandsList)
     {
-        mClusters[clusterName].push_back(std::move(command));
+        mClusters[clusterName].first.push_back(std::move(command));
     }
 }
 
@@ -186,7 +187,6 @@ int Commands::RunInteractive(const char * command)
 
 CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
 {
-    std::map<std::string, CommandsVector>::iterator cluster;
     Command * command = nullptr;
 
     if (argc <= 1)
@@ -196,29 +196,32 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    cluster = GetCluster(argv[1]);
-    if (cluster == mClusters.end())
+    auto clusterIter = GetCluster(argv[1]);
+    if (clusterIter == mClusters.end())
     {
         ChipLogError(chipTool, "Unknown cluster: %s", argv[1]);
         ShowClusters(argv[0]);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    auto & commandList = clusterIter->second.first;
+    auto * clusterHelp = clusterIter->second.second;
+
     if (argc <= 2)
     {
         ChipLogError(chipTool, "Missing command name");
-        ShowCluster(argv[0], argv[1], cluster->second);
+        ShowCluster(argv[0], argv[1], commandList, clusterHelp);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     bool isGlobalCommand = IsGlobalCommand(argv[2]);
     if (!isGlobalCommand)
     {
-        command = GetCommand(cluster->second, argv[2]);
+        command = GetCommand(commandList, argv[2]);
         if (command == nullptr)
         {
             ChipLogError(chipTool, "Unknown command: %s", argv[2]);
-            ShowCluster(argv[0], argv[1], cluster->second);
+            ShowCluster(argv[0], argv[1], commandList, clusterHelp);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
@@ -227,15 +230,15 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
         if (argc <= 3)
         {
             ChipLogError(chipTool, "Missing event name");
-            ShowClusterEvents(argv[0], argv[1], argv[2], cluster->second);
+            ShowClusterEvents(argv[0], argv[1], argv[2], commandList);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        command = GetGlobalCommand(cluster->second, argv[2], argv[3]);
+        command = GetGlobalCommand(commandList, argv[2], argv[3]);
         if (command == nullptr)
         {
             ChipLogError(chipTool, "Unknown event: %s", argv[3]);
-            ShowClusterEvents(argv[0], argv[1], argv[2], cluster->second);
+            ShowClusterEvents(argv[0], argv[1], argv[2], commandList);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
@@ -244,15 +247,15 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
         if (argc <= 3)
         {
             ChipLogError(chipTool, "Missing attribute name");
-            ShowClusterAttributes(argv[0], argv[1], argv[2], cluster->second);
+            ShowClusterAttributes(argv[0], argv[1], argv[2], commandList);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        command = GetGlobalCommand(cluster->second, argv[2], argv[3]);
+        command = GetGlobalCommand(commandList, argv[2], argv[3]);
         if (command == nullptr)
         {
             ChipLogError(chipTool, "Unknown attribute: %s", argv[3]);
-            ShowClusterAttributes(argv[0], argv[1], argv[2], cluster->second);
+            ShowClusterAttributes(argv[0], argv[1], argv[2], commandList);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
@@ -271,7 +274,7 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
     return interactive ? command->RunAsInteractive() : command->Run();
 }
 
-std::map<std::string, Commands::CommandsVector>::iterator Commands::GetCluster(std::string clusterName)
+Commands::ClusterMap::iterator Commands::GetCluster(std::string clusterName)
 {
     for (auto & cluster : mClusters)
     {
@@ -342,14 +345,21 @@ void Commands::ShowClusters(std::string executable)
         std::transform(clusterName.begin(), clusterName.end(), clusterName.begin(),
                        [](unsigned char c) { return std::tolower(c); });
         fprintf(stderr, "  | * %-82s|\n", clusterName.c_str());
+        ShowHelpText(cluster.second.second);
     }
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
 }
 
-void Commands::ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands)
+void Commands::ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands, const char * helpText)
 {
     fprintf(stderr, "Usage:\n");
     fprintf(stderr, "  %s %s command_name [param1 param2 ...]\n", executable.c_str(), clusterName.c_str());
+
+    if (helpText)
+    {
+        fprintf(stderr, "\n%s\n", helpText);
+    }
+
     fprintf(stderr, "\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Commands:                                                                           |\n");
@@ -399,23 +409,7 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
         if (shouldPrint)
         {
             fprintf(stderr, "  | * %-82s|\n", command->GetName());
-            const char * helpText = command->GetHelpText();
-            if (command->GetHelpText())
-            {
-                // We leave 82 chars for command names.  The help text starts
-                // two chars further to the right, so there are 80 chars left
-                // for it.
-                if (strlen(helpText) > 80)
-                {
-                    // Add "..." at the end to indicate truncation, and only
-                    // show the first 77 chars, since that's what will fit.
-                    fprintf(stderr, "  |   - %.77s...|\n", helpText);
-                }
-                else
-                {
-                    fprintf(stderr, "  |   - %-80s|\n", helpText);
-                }
-            }
+            ShowHelpText(command->GetHelpText());
         }
     }
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
@@ -541,16 +535,18 @@ bool Commands::DecodeArgumentsFromBase64EncodedJson(const char * json, std::vect
     auto commandName = jsonValue[kJsonCommandKey].asString();
     auto arguments   = jsonValue[kJsonArgumentsKey].asString();
 
-    auto cluster = GetCluster(clusterName);
-    VerifyOrReturnValue(cluster != mClusters.end(), false,
+    auto clusterIter = GetCluster(clusterName);
+    VerifyOrReturnValue(clusterIter != mClusters.end(), false,
                         ChipLogError(chipTool, "Cluster '%s' is not supported.", clusterName.c_str()));
 
-    auto command = GetCommand(cluster->second, commandName);
+    auto & commandList = clusterIter->second.first;
+
+    auto command = GetCommand(commandList, commandName);
 
     if (jsonValue.isMember(kJsonCommandSpecifierKey) && IsGlobalCommand(commandName))
     {
         auto commandSpecifierName = jsonValue[kJsonCommandSpecifierKey].asString();
-        command                   = GetGlobalCommand(cluster->second, commandName, commandSpecifierName);
+        command                   = GetGlobalCommand(commandList, commandName, commandSpecifierName);
     }
     VerifyOrReturnValue(nullptr != command, false, ChipLogError(chipTool, "Unknown command."));
 
@@ -601,4 +597,26 @@ bool Commands::DecodeArgumentsFromStringStream(const char * command, std::vector
     }
 
     return true;
+}
+
+void Commands::ShowHelpText(const char * helpText)
+{
+    if (helpText == nullptr)
+    {
+        return;
+    }
+
+    // We leave 82 chars for command/cluster names.  The help text starts
+    // two chars further to the right, so there are 80 chars left
+    // for it.
+    if (strlen(helpText) > 80)
+    {
+        // Add "..." at the end to indicate truncation, and only
+        // show the first 77 chars, since that's what will fit.
+        fprintf(stderr, "  |   - %.77s...|\n", helpText);
+    }
+    else
+    {
+        fprintf(stderr, "  |   - %-80s|\n", helpText);
+    }
 }

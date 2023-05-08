@@ -24,7 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 #include <platform/telink/ThreadStackManagerImpl.h>
 
 #include <inet/UDPEndPointImpl.h>

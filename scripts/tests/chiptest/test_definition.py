@@ -283,7 +283,7 @@ class TestDefinition:
                 # happen if the relevant application does not exist.  It's
                 # non-fatal as long as we are not trying to run any tests that
                 # need that application.
-                if len(path) == 1 and path[0] is None:
+                if path[-1] is None:
                     continue
 
                 # For the app indicated by self.target, give it the 'default' key to add to the register

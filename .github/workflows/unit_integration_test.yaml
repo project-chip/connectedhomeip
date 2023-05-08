@@ -58,7 +58,7 @@ jobs:
               timeout-minutes: 10
               run: |
                   mkdir -p /tmp/log_output ;
-                  scripts/build/gn_bootstrap.sh ;
+                  bash scripts/bootstrap.sh ;
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
