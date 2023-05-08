@@ -44,8 +44,9 @@ limitations under the License.
     <item value="0" name="Unknown" />
     <item value="1" name="Good" />
     <item value="2" name="Fair" />
-    <item value="3" name="Poor" />
-    <item value="4" name="Very poor" />
-    <item value="5" name="Extremely poor" />
+    <item value="3" name="Moderate" />
+    <item value="4" name="Poor" />
+    <item value="5" name="Very poor" />
+    <item value="6" name="Extremely poor" />
   </enum>
 </configurator>
