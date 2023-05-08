@@ -34,8 +34,8 @@ limitations under the License.
     <cluster code="0x005B" />
     <field name="Fair" mask="0x01" />
     <field name="Moderate" mask="0x02" />
-    <field name="Very poor" mask="0x04" />
-    <field name="Extremely poor" mask="0x08" />
+    <field name="VeryPoor" mask="0x04" />
+    <field name="ExtremelyPoor" mask="0x08" />
   </bitmap>
 
   <!-- Cluster Data Types -->
