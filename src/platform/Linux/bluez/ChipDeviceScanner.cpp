@@ -83,7 +83,7 @@ ChipDeviceScanner::~ChipDeviceScanner()
     //
     // TODO, Provide a rational as to why we are doing this here
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-    if (!DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread())
+    if (!DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread()) {
         // In case the timeout timer is still active
         DeviceLayer::PlatformMgr().LockChipStack();
         chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
@@ -155,7 +155,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
     //
     // TODO, Provide a rational as to why we are doing this here
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-    if (!DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread())
+    if (!DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread()) {
         DeviceLayer::PlatformMgr().LockChipStack();
         err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
         DeviceLayer::PlatformMgr().UnlockChipStack();
