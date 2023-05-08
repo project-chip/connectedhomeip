@@ -25,6 +25,8 @@ limitations under the License.
     <field name="TimeSyncClient" mask="0x8"/>
   </bitmap>
 
+  <!-- NOTE: This type is not defined as an enum in the spec, but the Status Codes section
+  of this cluster defines these status codes, and we're choosing to represent them as an enum. -->
   <enum name="StatusCode" type="ENUM8">
     <cluster code="0x0038"/>
      <item name="TimeNotAccepted" value="0x02"/>
