@@ -97,7 +97,7 @@ Silicon Labs platform.
 -   Flashing requires the
     [SiWx917](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs) SoC
     device to be configured in the Ozone Debugger.
-    
+
 -   Once it's configured, it can be run with the Ozone Debugger by loading the
     .out file.
     -   > For detailed instructions, please refer to
