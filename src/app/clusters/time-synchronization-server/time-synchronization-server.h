@@ -79,6 +79,10 @@ public:
     DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> & GetTimeZone(void);
     DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & GetDSTOffset(void);
 
+    CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
+                          TimeSynchronization::TimeSourceEnum source);
+    CHIP_ERROR GetLocalTime(chip::EndpointId ep, uint64_t & localTime);
+
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 
 private:

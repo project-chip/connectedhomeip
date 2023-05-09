@@ -93,9 +93,9 @@ CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const TimeZone & timeZoneList)
     writer.Init(buffer);
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
 
-    for (auto const & timeZoneIter : timeZoneList)
+    for (auto const & timeZone : timeZoneList)
     {
-        ReturnErrorOnFailure(timeZoneIter.Encode(writer, TLV::AnonymousTag()));
+        ReturnErrorOnFailure(timeZone.Encode(writer, TLV::AnonymousTag()));
     }
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));
