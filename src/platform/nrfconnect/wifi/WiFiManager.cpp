@@ -286,16 +286,13 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
 
     if (status.state >= WIFI_STATE_ASSOCIATED)
     {
-        uint8_t mac_string_buf[sizeof("xx:xx:xx:xx:xx:xx")];
-        net_sprint_ll_addr_buf(reinterpret_cast<const uint8_t *>(status.bssid), WIFI_MAC_ADDR_LEN,
-                               reinterpret_cast<char *>(mac_string_buf), sizeof(mac_string_buf));
-        info.mBssId        = ByteSpan(mac_string_buf, sizeof(mac_string_buf));
         info.mSecurityType = MapToMatterSecurityType(status.security);
         info.mWiFiVersion  = MapToMatterWiFiVersionCode(status.link_mode);
         info.mRssi         = static_cast<int8_t>(status.rssi);
         info.mChannel      = static_cast<uint16_t>(status.channel);
         info.mSsidLen      = status.ssid_len;
         memcpy(info.mSsid, status.ssid, status.ssid_len);
+        memcpy(info.mBssId, status.bssid, sizeof(status.bssid));
 
         return CHIP_NO_ERROR;
     }

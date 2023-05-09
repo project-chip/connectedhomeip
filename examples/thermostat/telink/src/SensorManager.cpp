@@ -62,7 +62,7 @@ void SensorManager::SensorTimerEventHandler(AppEvent * aEvent)
 
     static uint8_t nbOfRepetition = 0;
     static uint8_t simulatedIndex = 0;
-    if (simulatedIndex >= sizeof(mSimulatedTemp))
+    if (simulatedIndex >= ArraySize(mSimulatedTemp))
     {
         simulatedIndex = 0;
     }

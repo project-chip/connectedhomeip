@@ -63,8 +63,8 @@ private val testTlvSampleData: ByteArray =
     .map { it.toByte() }
     .toByteArray()
 
-private val testVendorId: UShort = 0xAABBu
-private val testProductId: UShort = 0xCCDDu
+private const val TEST_VENDOR_ID: UShort = 0xAABBu
+private const val TEST_PRODUCT_ID: UShort = 0xCCDDu
 
 private val testLargeString: String =
   """
@@ -86,8 +86,8 @@ class TlvReadWriteTest {
   @Test
   fun testTlvSampleData_write() {
     TlvWriter().apply {
-      startStructure(FullyQualifiedTag(6, testVendorId, testProductId, 1u))
-      put(FullyQualifiedTag(6, testVendorId, testProductId, 2u), true)
+      startStructure(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 1u))
+      put(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 2u), true)
       put(ImplicitProfileTag(2, 2u), false)
       startArray(ContextSpecificTag(0))
       put(AnonymousTag, 42)
@@ -97,7 +97,7 @@ class TlvReadWriteTest {
       startStructure(AnonymousTag)
       endStructure()
       startList(AnonymousTag)
-      putNull(FullyQualifiedTag(6, testVendorId, testProductId, 17u))
+      putNull(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 17u))
       putNull(ImplicitProfileTag(4, 900000u))
       putNull(AnonymousTag)
       startStructure(ImplicitProfileTag(4, 4000000000u))
@@ -105,7 +105,7 @@ class TlvReadWriteTest {
       endStructure()
       endList()
       endArray()
-      put(FullyQualifiedTag(6, testVendorId, testProductId, 5u), "This is a test")
+      put(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 5u), "This is a test")
       put(ImplicitProfileTag(2, 65535u), 17.9f)
       put(ImplicitProfileTag(4, 65536u), 17.9)
       endStructure()
@@ -117,8 +117,8 @@ class TlvReadWriteTest {
   @Test
   fun testTlvSampleData_read() {
     TlvReader(testTlvSampleData).apply {
-      enterStructure(FullyQualifiedTag(6, testVendorId, testProductId, 1u))
-      assertThat(getBool(FullyQualifiedTag(6, testVendorId, testProductId, 2u))).isEqualTo(true)
+      enterStructure(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 1u))
+      assertThat(getBool(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 2u))).isEqualTo(true)
       assertThat(getBool(ImplicitProfileTag(2, 2u))).isEqualTo(false)
       enterArray(ContextSpecificTag(0))
       assertThat(getInt(AnonymousTag)).isEqualTo(42)
@@ -128,7 +128,7 @@ class TlvReadWriteTest {
       enterStructure(AnonymousTag)
       exitContainer()
       enterList(AnonymousTag)
-      getNull(FullyQualifiedTag(6, testVendorId, testProductId, 17u))
+      getNull(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 17u))
       getNull(ImplicitProfileTag(4, 900000u))
       getNull(AnonymousTag)
       enterStructure(ImplicitProfileTag(4, 4000000000u))
@@ -136,7 +136,7 @@ class TlvReadWriteTest {
       exitContainer()
       exitContainer()
       exitContainer()
-      assertThat(getUtf8String(FullyQualifiedTag(6, testVendorId, testProductId, 5u)))
+      assertThat(getUtf8String(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 5u)))
         .isEqualTo("This is a test")
       assertThat(getFloat(ImplicitProfileTag(2, 65535u))).isEqualTo(17.9f)
       assertThat(getDouble(ImplicitProfileTag(4, 65536u))).isEqualTo(17.9)
@@ -149,13 +149,13 @@ class TlvReadWriteTest {
   @Test
   fun testTlvSampleData_read_useSkipElementAndExitContinerInTheMiddle() {
     TlvReader(testTlvSampleData).apply {
-      enterStructure(FullyQualifiedTag(6, testVendorId, testProductId, 1u))
+      enterStructure(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 1u))
       skipElement()
       assertThat(getBool(ImplicitProfileTag(2, 2u))).isEqualTo(false)
       enterArray(ContextSpecificTag(0))
       assertThat(getInt(AnonymousTag)).isEqualTo(42)
       exitContainer()
-      assertThat(getUtf8String(FullyQualifiedTag(6, testVendorId, testProductId, 5u)))
+      assertThat(getUtf8String(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 5u)))
         .isEqualTo("This is a test")
       assertThat(getFloat(ImplicitProfileTag(2, 65535u))).isEqualTo(17.9f)
       assertThat(getDouble(ImplicitProfileTag(4, 65536u))).isEqualTo(17.9)
@@ -163,6 +163,77 @@ class TlvReadWriteTest {
       assertThat(getLengthRead()).isEqualTo(testTlvSampleData.size)
       assertThat(isEndOfTlv()).isEqualTo(true)
     }
+  }
+
+  @Test
+  fun testTlvSampleData_copyElement() {
+    val reader = TlvReader(testTlvSampleData)
+    val encoding = TlvWriter().copyElement(reader).validateTlv().getEncoded()
+    assertThat(encoding).isEqualTo(testTlvSampleData)
+  }
+
+  @Test
+  fun testTlvSampleData_copyElementWithTag() {
+    val reader = TlvReader(testTlvSampleData)
+    val encoding =
+      TlvWriter()
+        .copyElement(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 1u), reader)
+        .validateTlv()
+        .getEncoded()
+    assertThat(encoding).isEqualTo(testTlvSampleData)
+  }
+
+  @Test
+  fun testCopyElement_throwsIllegalArgumentException() {
+    val encoding =
+      TlvWriter().startStructure(AnonymousTag).endStructure().validateTlv().getEncoded()
+    val reader = TlvReader(encoding)
+    reader.skipElement()
+
+    // Throws exception because the reader is positioned at the end of container element
+    assertFailsWith<IllegalArgumentException> { TlvWriter().copyElement(reader) }
+  }
+
+  @Test
+  fun testCopyElement_replaceTag() {
+    val tag = CommonProfileTag(2, 1000u)
+    val encoding =
+      TlvWriter().startStructure(AnonymousTag).endStructure().validateTlv().getEncoded()
+    val expectedEncoding = TlvWriter().startStructure(tag).endStructure().validateTlv().getEncoded()
+
+    assertThat(TlvWriter().copyElement(tag, TlvReader(encoding)).validateTlv().getEncoded())
+      .isEqualTo(expectedEncoding)
+  }
+
+  @Test
+  fun testCopyElementUInt_replaceTag() {
+    val value = 42U
+    val tag1 = CommonProfileTag(2, 1u)
+    val tag2 = CommonProfileTag(2, 2u)
+    val encoding = TlvWriter().put(tag1, value).validateTlv().getEncoded()
+    val expectedEncoding = TlvWriter().put(tag2, value).validateTlv().getEncoded()
+
+    assertThat(TlvWriter().copyElement(tag2, TlvReader(encoding)).validateTlv().getEncoded())
+      .isEqualTo(expectedEncoding)
+  }
+
+  @Test
+  fun testTlvSampleData_copyElementsOneByOne() {
+    val reader = TlvReader(testTlvSampleData)
+    reader.skipElement()
+    val encoding =
+      TlvWriter()
+        .startStructure(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 1u))
+        .copyElement(reader)
+        .copyElement(reader)
+        .copyElement(reader)
+        .copyElement(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 5u), reader)
+        .copyElement(reader)
+        .copyElement(reader)
+        .endStructure()
+        .validateTlv()
+        .getEncoded()
+    assertThat(encoding).isEqualTo(testTlvSampleData)
   }
 
   @Test
@@ -378,7 +449,7 @@ class TlvReadWriteTest {
 
     // Throws exception because the encoded value has AnonymousTag tag
     assertFailsWith<IllegalArgumentException> {
-      TlvReader(encoding).getLong(FullyQualifiedTag(6, testVendorId, testProductId, 5u))
+      TlvReader(encoding).getLong(FullyQualifiedTag(6, TEST_VENDOR_ID, TEST_PRODUCT_ID, 5u))
     }
   }
 
@@ -821,6 +892,16 @@ class TlvReadWriteTest {
   }
 
   @Test
+  fun encodeAnonymousTagInStructure_throwsIllegalArgumentException() {
+    // Anonymous tag 1, Unsigned Integer, 1-octet value, {1 = 42U}
+    TlvWriter().apply {
+      startStructure(AnonymousTag)
+      // anonymous tags are not allowed within structure elements
+      assertFailsWith<IllegalArgumentException> { put(AnonymousTag, 42U) }
+    }
+  }
+
+  @Test
   fun encodeContextTag_withinList() {
     // Context tag 1, Unsigned Integer, 1-octet value, [[1 = 42U]]
     val value = 42U
@@ -847,7 +928,7 @@ class TlvReadWriteTest {
     val value = 42U
     var tag = ContextSpecificTag(1)
 
-    // Array elements SHALL be of anonumous type
+    // Array elements SHALL be of anonymous type
     TlvWriter().apply {
       startArray(AnonymousTag)
       assertFailsWith<IllegalArgumentException> { put(tag, value) }
@@ -965,7 +1046,7 @@ class TlvReadWriteTest {
 
   @Test
   fun putSignedLongArray() {
-    // Anonumous Array of Signed Integers, [42, -17, -170000, 40000000000]
+    // Anonymous Array of Signed Integers, [42, -17, -170000, 40000000000]
     val values = longArrayOf(42, -17, -170000, 40000000000)
     val encoding = "16 00 2a 00 ef 02 f0 67 fd ff 03 00 90 2f 50 09 00 00 00 18".octetsToByteArray()
 
@@ -986,7 +1067,7 @@ class TlvReadWriteTest {
 
   @Test
   fun putUnsignedLongArray() {
-    // Anonumous Array of Signed Integers, [42, 170000, 40000000000]
+    // Anonymous Array of Signed Integers, [42, 170000, 40000000000]
     val values = longArrayOf(42, 170000, 40000000000)
     val encoding = "16 04 2a 06 10 98 02 00 07 00 90 2f 50 09 00 00 00 18".octetsToByteArray()
 

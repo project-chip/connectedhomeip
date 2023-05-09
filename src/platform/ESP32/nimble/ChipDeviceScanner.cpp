@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-
 #include "blecent.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -153,4 +151,3 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
