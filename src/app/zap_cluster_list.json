@@ -177,7 +177,7 @@
         ],
         "TIME_CLUSTER": [],
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
-        "TIME_SYNCHRONIZATION_CLUSTER": [],
+        "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
         "USER_LABEL_CLUSTER": ["user-label-server"],

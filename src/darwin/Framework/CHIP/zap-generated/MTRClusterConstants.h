@@ -8569,12 +8569,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     = 0x00000000,
 
     // Cluster TimeSynchronization commands
-    MTRCommandIDTypeClusterTimeSynchronizationCommandSetUTCTimeID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterTimeSynchronizationCommandSetTrustedTimeSourceID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterTimeSynchronizationCommandSetTimeZoneID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterTimeSynchronizationCommandSetTimeZoneResponseID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRCommandIDTypeClusterTimeSynchronizationCommandSetDSTOffsetID MTR_NEWLY_AVAILABLE = 0x00000004,
-    MTRCommandIDTypeClusterTimeSynchronizationCommandSetDefaultNTPID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterTimeSynchronizationCommandSetUtcTimeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+    = 0x00000000,
 
     // Cluster AdministratorCommissioning deprecated command id names
     MTRClusterAdministratorCommissioningCommandOpenCommissioningWindowID MTR_DEPRECATED(
@@ -9781,12 +9777,6 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterWiFiNetworkDiagnosticsEventConnectionStatusID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000002,
-
-    MTREventIDTypeClusterTimeSynchronizationEventDSTTableEmptyID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterTimeSynchronizationEventDSTStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTREventIDTypeClusterTimeSynchronizationEventTimeZoneStatusID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTREventIDTypeClusterTimeSynchronizationEventTimeFailureID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTREventIDTypeClusterTimeSynchronizationEventMissingTrustedTimeSourceID MTR_NEWLY_AVAILABLE = 0x00000004,
 
     // Cluster BridgedDeviceBasic deprecated event names
     MTRClusterBridgedDeviceBasicEventStartUpID MTR_DEPRECATED(
