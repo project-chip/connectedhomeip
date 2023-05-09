@@ -54,6 +54,7 @@ enum TestCert
     kNode02_06 = 14,
     kNode02_07 = 15,
     kNode02_08 = 16,
+    kRoot03    = 17,
 };
 
 // Special flags to alter how certificates are fetched/loaded.
@@ -105,6 +106,19 @@ extern const uint8_t sTestCert_Root02_SubjectKeyId[];
 extern const size_t sTestCert_Root02_SubjectKeyId_Len;
 extern const uint8_t sTestCert_Root02_AuthorityKeyId[];
 extern const size_t sTestCert_Root02_AuthorityKeyId_Len;
+
+extern const uint8_t sTestCert_Root03_Chip[];
+extern const size_t sTestCert_Root03_Chip_Len;
+extern const uint8_t sTestCert_Root03_DER[];
+extern const size_t sTestCert_Root03_DER_Len;
+extern const uint8_t sTestCert_Root03_PublicKey[];
+extern const size_t sTestCert_Root03_PublicKey_Len;
+extern const uint8_t sTestCert_Root03_PrivateKey[];
+extern const size_t sTestCert_Root03_PrivateKey_Len;
+extern const uint8_t sTestCert_Root03_SubjectKeyId[];
+extern const size_t sTestCert_Root03_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Root03_AuthorityKeyId[];
+extern const size_t sTestCert_Root03_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_ICA01_Chip[];
 extern const size_t sTestCert_ICA01_Chip_Len;
