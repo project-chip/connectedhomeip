@@ -326,20 +326,21 @@ bool MTROperationalCredentialsDelegate::ToChipEpochTime(NSDate * date, uint32_t 
     NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents * components = [calendar componentsInTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0] fromDate:date];
 
-    if (!CanCastTo<uint16_t>(components.year)) {
-        MTR_LOG_ERROR(
-            "Year %lu is too large for Matter epoch time.  Please use [NSDate distantFuture] to represent \"never expires\".",
-            static_cast<unsigned long>(components.year));
-        return false;
+    if (CanCastTo<uint16_t>(components.year)) {
+        uint16_t year = static_cast<uint16_t>([components year]);
+        uint8_t month = static_cast<uint8_t>([components month]);
+        uint8_t day = static_cast<uint8_t>([components day]);
+        uint8_t hour = static_cast<uint8_t>([components hour]);
+        uint8_t minute = static_cast<uint8_t>([components minute]);
+        uint8_t second = static_cast<uint8_t>([components second]);
+        if (chip::CalendarToChipEpochTime(year, month, day, hour, minute, second, epoch)) {
+            return true;
+        }
     }
 
-    uint16_t year = static_cast<uint16_t>([components year]);
-    uint8_t month = static_cast<uint8_t>([components month]);
-    uint8_t day = static_cast<uint8_t>([components day]);
-    uint8_t hour = static_cast<uint8_t>([components hour]);
-    uint8_t minute = static_cast<uint8_t>([components minute]);
-    uint8_t second = static_cast<uint8_t>([components second]);
-    return chip::CalendarToChipEpochTime(year, month, day, hour, minute, second, epoch);
+    MTR_LOG_ERROR("Year %lu is too large for Matter epoch time.  Please use [NSDate distantFuture] to represent \"never expires\".",
+        static_cast<unsigned long>(components.year));
+    return false;
 }
 
 namespace {
