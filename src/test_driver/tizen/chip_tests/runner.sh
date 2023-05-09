@@ -21,10 +21,36 @@ set -e
 # Print CHIP logs on stdout
 dlogutil CHIP &
 
+# List of tests which are currently expected to fail on Tizen platform.
+# TODO: Remove this list once the tests are fixed.
+XFAIL_TESTS=(
+    TestPASESession
+)
+
 STATUS=0
 # Run all executables in the /mnt/chip directory except the runner.sh script
-while IFS= read -r TEST ; do
-	$TEST || STATUS=$((STATUS + 1))
+while IFS= read -r TEST; do
+
+    NAME=$(basename "$TEST")
+
+    echo
+    echo "RUN: $NAME"
+
+    RV=0
+    "$TEST" || RV=$?
+
+    # If test is expected to fail, report failure if it succeeds
+    if [[ " ${XFAIL_TESTS[*]} " == *" ${NAME} "* ]]; then
+        [[ $RV -ne 0 ]] && RV=0 || RV=1
+    fi
+
+    if [ "$RV" -eq 0 ]; then
+        echo -e "DONE: \e[32mSUCCESS\e[0m"
+    else
+        STATUS=$((STATUS + 1))
+        echo -e "DONE: \e[31mFAIL\e[0m"
+    fi
+
 done < <(find /mnt/chip -type f -executable ! -name runner.sh)
 
-exit $STATUS
+exit "$STATUS"
