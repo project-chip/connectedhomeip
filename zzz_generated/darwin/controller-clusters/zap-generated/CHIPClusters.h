@@ -366,6 +366,15 @@ public:
     ~ModeSelectCluster() {}
 };
 
+class DLL_EXPORT DishwasherModeSelectCluster : public ClusterBase
+{
+public:
+    DishwasherModeSelectCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~DishwasherModeSelectCluster() {}
+};
+
 class DLL_EXPORT DoorLockCluster : public ClusterBase
 {
 public:

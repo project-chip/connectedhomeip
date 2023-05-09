@@ -2536,6 +2536,80 @@ client cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options for a dishwasher. */
+client cluster DishwasherModeSelect = 89 {
+  enum DishwashwerModeSelectResponseStatusEnum : ENUM8 {
+    kSuccess = 0;
+    kUnsupportedMode = 1;
+    kGenericFailure = 2;
+  }
+
+  enum DishwashwerModeSelectSemanticTagValueEnum : ENUM16 {
+    kAuto = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
+    kNormal = 16384;
+    kHeavy = 16385;
+    kLight = 16386;
+  }
+
+  bitmap DishwasherModeSelectFeature : BITMAP32 {
+    kDeponoff = 0x1;
+    kExt = 0x1;
+  }
+
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    SemanticTagStruct semanticTags[] = 2;
+  }
+
+  readonly attribute char_string<32> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute optional nullable int8u startUpMode = 4;
+  attribute optional nullable int8u onMode = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeResponseRequest {
+    ENUM8 status = 0;
+    CHAR_STRING statusText = 1;
+  }
+
+  /** On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, 
+        otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  /** On receipt of this command the server SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): DefaultSuccess = 1;
+  /** This command is sent by the server on receipt of the ChangeToModeWithStatus command. */
+  command ChangeToModeResponse(ChangeToModeResponseRequest): DefaultSuccess = 2;
+}
+
 /** An interface to a generic way to secure a door */
 client cluster DoorLock = 257 {
   enum AlarmCodeEnum : ENUM8 {
@@ -5454,6 +5528,7 @@ endpoint 1 {
   binding cluster UserLabel;
   binding cluster BooleanState;
   binding cluster ModeSelect;
+  binding cluster DishwasherModeSelect;
   binding cluster DoorLock;
   binding cluster WindowCovering;
   binding cluster BarrierControl;
