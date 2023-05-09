@@ -745,6 +745,11 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    mConnectivityFlag.ClearAll();
+    mWpaSupplicant = GDBusWpaSupplicant{};
+
     CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(_StartWiFiManagement, this);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start WiFi management"));
 }
@@ -1705,13 +1710,7 @@ CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement(ConnectivityManagerImpl
     // all D-Bus signals will be delivered to the GLib global default main context.
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
-    std::lock_guard<std::mutex> lock(self->mWpaSupplicantMutex);
-
-    self->mConnectivityFlag.ClearAll();
-    self->mWpaSupplicant = GDBusWpaSupplicant{};
-
     ChipLogProgress(DeviceLayer, "wpa_supplicant: Start WiFi management");
-
     wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
                                                 kWpaSupplicantObjectPath, nullptr, self->_OnWpaProxyReady, nullptr);
 
