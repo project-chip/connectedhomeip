@@ -606,6 +606,7 @@ GroupKeyManagement
 groupKeySecurityPolicy
 groupKeySetID
 groupsettings
+gsdk
 gtk
 GUA
 Gv

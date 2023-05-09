@@ -49,28 +49,66 @@ constexpr char ThreadStackManagerImpl::kOpenthreadDeviceRoleLeader[];
 
 constexpr char ThreadStackManagerImpl::kPropertyDeviceRole[];
 
+namespace {
+
+struct SetActiveDatasetContext
+{
+    OpenthreadIoOpenthreadBorderRouter * proxy;
+    ByteSpan netInfo;
+};
+
+CHIP_ERROR GLibMatterContextSetActiveDataset(SetActiveDatasetContext * context)
+{
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
+    std::unique_ptr<GBytes, GBytesDeleter> bytes(g_bytes_new(context->netInfo.data(), context->netInfo.size()));
+    if (!bytes)
+        return CHIP_ERROR_NO_MEMORY;
+    std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
+    if (!value)
+        return CHIP_ERROR_NO_MEMORY;
+    openthread_io_openthread_border_router_set_active_dataset_tlvs(context->proxy, value.release());
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
+
 ThreadStackManagerImpl::ThreadStackManagerImpl() : mAttached(false) {}
+
+CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self)
+{
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
+    std::unique_ptr<GError, GErrorDeleter> err;
+    self->mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(
+        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr,
+        &MakeUniquePointerReceiver(err).Get()));
+    VerifyOrReturnError(
+        self->mProxy != nullptr, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error"));
+
+    g_signal_connect(self->mProxy.get(), "g-properties-changed", G_CALLBACK(OnDbusPropertiesChanged), self);
+
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
-    std::unique_ptr<GError, GErrorDeleter> err;
-    mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
-                                                                               kDBusOpenThreadService, kDBusOpenThreadObjectPath,
-                                                                               nullptr, &MakeUniquePointerReceiver(err).Get()));
-    if (!mProxy)
-    {
-        ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error");
-        return CHIP_ERROR_INTERNAL;
-    }
+    CHIP_ERROR err;
 
-    g_signal_connect(mProxy.get(), "g-properties-changed", G_CALLBACK(OnDbusPropertiesChanged), this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(GLibMatterContextInitThreadStack, this);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "openthread: failed to init dbus proxy"));
 
     // If get property is called inside dbus thread (we are going to make it so), XXX_get_XXX can be used instead of XXX_dup_XXX
     // which is a little bit faster and the returned object doesn't need to be freed. Same for all following get properties.
     std::unique_ptr<gchar, GFree> role(openthread_io_openthread_border_router_dup_device_role(mProxy.get()));
     if (role)
     {
-        ThreadDevcieRoleChangedHandler(role.get());
+        ThreadDeviceRoleChangedHandler(role.get());
     }
 
     return CHIP_NO_ERROR;
@@ -102,13 +140,13 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
                 if (value_str == nullptr)
                     continue;
                 ChipLogProgress(DeviceLayer, "Thread role changed to: %s", StringOrNullMarker(value_str));
-                me->ThreadDevcieRoleChangedHandler(value_str);
+                me->ThreadDeviceRoleChangedHandler(value_str);
             }
         }
     }
 }
 
-void ThreadStackManagerImpl::ThreadDevcieRoleChangedHandler(const gchar * role)
+void ThreadStackManagerImpl::ThreadDeviceRoleChangedHandler(const gchar * role)
 {
     bool attached = strcmp(role, kOpenthreadDeviceRoleDetached) != 0 && strcmp(role, kOpenthreadDeviceRoleDisabled) != 0;
 
@@ -217,16 +255,9 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(Thread::OperationalDataset::IsValid(netInfo), CHIP_ERROR_INVALID_ARGUMENT);
 
-    {
-        std::unique_ptr<GBytes, GBytesDeleter> bytes(g_bytes_new(netInfo.data(), netInfo.size()));
-        if (!bytes)
-            return CHIP_ERROR_NO_MEMORY;
-        std::unique_ptr<GVariant, GVariantDeleter> value(
-            g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
-        if (!value)
-            return CHIP_ERROR_NO_MEMORY;
-        openthread_io_openthread_border_router_set_active_dataset_tlvs(mProxy.get(), value.release());
-    }
+    SetActiveDatasetContext context = { mProxy.get(), netInfo };
+    CHIP_ERROR err                  = PlatformMgrImpl().GLibMatterContextInvokeSync(GLibMatterContextSetActiveDataset, &context);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "openthread: failed to set active dataset"));
 
     // post an event alerting other subsystems about change in provisioning state
     ChipDeviceEvent event;
@@ -345,12 +376,20 @@ bool ThreadStackManagerImpl::_IsThreadAttached() const
     return mAttached;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallAttach(ThreadStackManagerImpl * self)
+{
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+    openthread_io_openthread_border_router_call_attach(self->mProxy.get(), nullptr, _OnThreadBrAttachFinished, self);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
 {
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
     if (val)
     {
-        openthread_io_openthread_border_router_call_attach(mProxy.get(), nullptr, _OnThreadBrAttachFinished, this);
+        CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(GLibMatterContextCallAttach, this);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "openthread: failed to attach"));
     }
     else
     {
@@ -572,12 +611,20 @@ void ThreadStackManagerImpl::_SetRouterPromotion(bool val)
     // Set Router Promotion is not supported on linux
 }
 
+CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallScan(ThreadStackManagerImpl * self)
+{
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+    openthread_io_openthread_border_router_call_scan(self->mProxy.get(), nullptr, _OnNetworkScanFinished, self);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(ThreadDriver::ScanCallback * callback)
 {
     // There is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mpScanCallback = callback;
-    openthread_io_openthread_border_router_call_scan(mProxy.get(), nullptr, _OnNetworkScanFinished, this);
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(GLibMatterContextCallScan, this);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "openthread: failed to start scan"));
     return CHIP_NO_ERROR;
 }
 

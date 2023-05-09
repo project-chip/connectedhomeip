@@ -267,6 +267,7 @@
         "Test_TC_G_1_1",
         "Test_TC_G_2_1"
     ],
+    "Scenes": ["Test_TC_S_1_1"],
     "collection": [
         "AccessControl",
         "AccessControlEnforcement",
