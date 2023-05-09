@@ -82,7 +82,7 @@ def test_type_matching_for_type(test_type, test_nullable: bool = False, test_opt
         for i in v:
             asserts.assert_false(type_matches(i, match_type), "{} falsely matched to type {}".format(i, match_type))
 
-    # Test the nullables or optionsl that aren't supposed to work
+    # Test the nullables or optionals that aren't supposed to work
     if not test_nullable:
         asserts.assert_false(type_matches(NullValue, match_type), "NullValue falsely matched to {}".format(match_type))
 

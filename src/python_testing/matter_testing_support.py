@@ -147,7 +147,7 @@ def read_pics_from_file(filename: str) -> dict[str, bool]:
 
 
 def type_matches(received_value, desired_type):
-    """ Checks if the value recived matches the expected type.
+    """ Checks if the value received matches the expected type.
 
         Handles unpacking Nullable and Optional types and
         compares list value types for non-empty lists.
