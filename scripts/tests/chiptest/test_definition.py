@@ -15,6 +15,8 @@
 
 import logging
 import os
+import shutil
+import tempfile
 import threading
 import time
 import typing
@@ -259,6 +261,8 @@ class TestDefinition:
         """
         runner.capture_delegate = ExecutionCapture()
 
+        tool_storage_dir = None
+
         try:
             if self.target == TestTarget.ALL_CLUSTERS:
                 target_app = paths.all_clusters_app
@@ -302,16 +306,8 @@ class TestDefinition:
 
             tool_cmd = paths.chip_tool if test_runtime != TestRunTime.CHIP_TOOL_PYTHON else paths.chip_tool_with_python_cmd
 
-            files_to_unlink = [
-                '/tmp/chip_tool_config.ini',
-                '/tmp/chip_tool_config.alpha.ini',
-                '/tmp/chip_tool_config.beta.ini',
-                '/tmp/chip_tool_config.gamma.ini',
-            ]
-
-            for f in files_to_unlink:
-                if os.path.exists(f):
-                    os.unlink(f)
+            tool_storage_dir = tempfile.mkdtemp()
+            tool_storage_args = ['--storage-directory', tool_storage_dir]
 
             # Only start and pair the default app
             app = apps_register.get('default')
@@ -319,8 +315,13 @@ class TestDefinition:
             pairing_cmd = tool_cmd + ['pairing', 'code', TEST_NODE_ID, app.setupCode]
             test_cmd = tool_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
             if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                pairing_cmd += ['--server_path'] + [paths.chip_tool[-1]]
-                test_cmd += ['--server_path'] + [paths.chip_tool[-1]]
+                server_args = ['--server_path', paths.chip_tool[-1]] + \
+                    ['--server_arguments', 'interactive server ' + ' '.join(tool_storage_args)]
+                pairing_cmd += server_args
+                test_cmd += server_args
+            else:
+                pairing_cmd += tool_storage_args
+                test_cmd += tool_storage_args
 
             if dry_run:
                 logging.info(" ".join(pairing_cmd))
@@ -348,3 +349,5 @@ class TestDefinition:
             apps_register.killAll()
             apps_register.factoryResetAll()
             apps_register.removeAll()
+            if tool_storage_dir is not None:
+                shutil.rmtree(tool_storage_dir, ignore_errors=True)
