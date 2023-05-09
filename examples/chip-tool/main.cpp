@@ -19,12 +19,14 @@
 #include "commands/common/Commands.h"
 #include "commands/example/ExampleCredentialIssuerCommands.h"
 
+#include "commands/clusters/SubscriptionsCommands.h"
 #include "commands/delay/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/group/Commands.h"
 #include "commands/interactive/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
+#include "commands/session-management/Commands.h"
 #include "commands/storage/Commands.h"
 
 #include <zap-generated/cluster/Commands.h>
@@ -45,7 +47,9 @@ int main(int argc, char * argv[])
     registerCommandsTests(commands, &credIssuerCommands);
     registerCommandsGroup(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
+    registerCommandsSubscriptions(commands, &credIssuerCommands);
     registerCommandsStorage(commands);
+    registerCommandsSessionManagement(commands, &credIssuerCommands);
 
     return commands.Run(argc, argv);
 }

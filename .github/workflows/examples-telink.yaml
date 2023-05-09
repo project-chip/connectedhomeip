@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.6.53
+            image: connectedhomeip/chip-build-telink:0.7.2
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -68,7 +68,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
 
             - name: Build example Telink All Clusters App
               run: |

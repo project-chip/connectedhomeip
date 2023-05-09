@@ -47,7 +47,10 @@ argument of the `gn gen` command.
 # Generate test target
 gn gen --check --fail-on-unused-args \
     --root="$PWD/src/test_driver/tizen" \
-    --args="target_os=\"tizen\" target_cpu=\"arm\" chip_config_network_layer_ble=false" \
+    --args="target_os=\"tizen\" target_cpu=\"arm\" \
+        tizen_sdk_root=\"$TIZEN_SDK_ROOT\" \
+        tizen_sdk_sysroot=\"$TIZEN_SDK_SYSROOT\"
+        chip_config_network_layer_ble=false" \
     out/tizen-check
 # Run Tizen QEMU-based tests
 ninja -C out/tizen-check check
