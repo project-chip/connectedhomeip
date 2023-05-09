@@ -164,6 +164,12 @@ public class ChipDeviceController {
     }
   }
 
+  public void pairDeviceWithCode(
+      long deviceId, String setUpCode, boolean discoverOnce, boolean useOnlyOnNetworkDiscovery) {
+    pairDeviceWithCode(
+        deviceControllerPtr, deviceId, setUpCode, discoverOnce, useOnlyOnNetworkDiscovery);
+  }
+
   public void pairDeviceWithAddress(
       long deviceId,
       String address,
@@ -1003,6 +1009,13 @@ public class ChipDeviceController {
       long pinCode,
       @Nullable byte[] csrNonce,
       NetworkCredentials networkCredentials);
+
+  private native void pairDeviceWithCode(
+      long deviceControllerPtr,
+      long deviceId,
+      String setUpCode,
+      boolean discoverOnce,
+      boolean useOnlyOnNetworkDiscovery);
 
   private native void pairDeviceWithAddress(
       long deviceControllerPtr,

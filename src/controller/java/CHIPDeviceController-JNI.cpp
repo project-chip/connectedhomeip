@@ -610,6 +610,44 @@ JNI_METHOD(void, pairDevice)
     }
 }
 
+JNI_METHOD(void, pairDeviceWithCode)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring setUpCode, jboolean discoverOnce,
+ jboolean useOnlyOnNetworkDiscovery)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "pairDeviceWithCode() called");
+
+    JniUtfString setUpCodeJniString(env, setUpCode);
+
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+
+    auto discoveryType = DiscoveryType::kAll;
+    if (useOnlyOnNetworkDiscovery)
+    {
+        discoveryType = DiscoveryType::kDiscoveryNetworkOnly;
+    }
+
+    if (discoverOnce)
+    {
+        discoveryType = DiscoveryType::kDiscoveryNetworkOnlyWithoutPASEAutoRetry;
+    }
+
+    if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
+    {
+        commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
+    }
+    err = wrapper->Controller()->PairDevice(deviceId, setUpCodeJniString.c_str(), commissioningParams, discoveryType);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to pair the device.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
 JNI_METHOD(void, pairDeviceWithAddress)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jint discriminator, jlong pinCode,
  jbyteArray csrNonce)

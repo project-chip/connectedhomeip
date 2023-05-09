@@ -123,6 +123,19 @@ class Argument {
         isValidArgument = value == str
       }
 
+      ArgumentType.STRING -> {
+        val strBuf = this.value as StringBuffer
+        strBuf.setLength(0)
+        strBuf.append(value)
+        isValidArgument = true
+      }
+
+      ArgumentType.BOOL -> {
+        val booleanValue = this.value as AtomicBoolean
+        booleanValue.set(value.toBoolean())
+        isValidArgument = true
+      }      
+
       ArgumentType.NUMBER_INT16 -> {
         val numShort = this.value as AtomicInteger
         numShort.set(value.toInt())
