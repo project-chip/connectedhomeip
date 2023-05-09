@@ -58,12 +58,12 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/platformAbstraction/WiseMcuSpam.cpp",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
+    "../rs911x/BLEManagerImpl.cpp",
+    "../rs911x/rsi_ble_config.h",
+    "../rs911x/wfx_sl_ble_init.c",
+    "../rs911x/wfx_sl_ble_init.h",
     "ConfigurationManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
-    "bluetooth/rsi_ble_config.h",
-    "bluetooth/wfx_sl_ble_init.c",
-    "bluetooth/wfx_sl_ble_init.h",
   ]
 
   # TODO: OTA on CCP platform
