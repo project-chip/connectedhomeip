@@ -24,7 +24,7 @@
 #include <arpa/inet.h>
 
 #ifndef BYTE_ORDER
-#error Endianess not defined
+#error Endianness not defined
 #endif
 
 #else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -34,7 +34,7 @@
 #include <lwip/opt.h>
 
 #ifndef BYTE_ORDER
-#error Endianess not defined
+#error Endianness not defined
 #endif
 
 #if defined(LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS)
@@ -64,7 +64,7 @@
 #elif defined(__BYTE_ORDER__)
 #define BYTE_ORDER __BYTE_ORDER__
 #else
-#error Endianess not defined is not defined
+#error Endianness not defined is not defined
 #endif
 #endif // BYTE_ORDER
 
