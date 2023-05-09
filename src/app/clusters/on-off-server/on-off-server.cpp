@@ -33,12 +33,14 @@
 #include <app/clusters/level-control/level-control.h>
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
+#ifdef EMBER_AF_PLUGIN_MODE_SELECT
+#include <app/clusters/mode-select-server/mode-select-server.h>
+#endif
+
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
 #include <app/InteractionModelEngine.h>
-
-#include <app/clusters/mode-select-server/mode-select-server.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
