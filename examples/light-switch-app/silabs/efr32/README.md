@@ -169,7 +169,12 @@ arguments
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
 info. Pre-built bootloader binaries are available in the Assets section of the
 Releases page on
-[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
+[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases).
+
+-   On the command line:
+
+
+          $ commander flash bootloader_binaries/bootloader-storage-internal-single-512k-BRD4187C-gsdk4.1.s37
 
 ## Viewing Logging Output
 
