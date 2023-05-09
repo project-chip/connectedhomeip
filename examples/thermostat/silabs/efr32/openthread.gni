@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/config/standalone/args.gni")
+import("${chip_root}/src/platform/silabs/efr32/args.gni")
 
-chip_ble_project_config_include = "<CHIPProjectConfig.h>"
-chip_device_project_config_include = "<CHIPProjectConfig.h>"
-chip_project_config_include = "<CHIPProjectConfig.h>"
-chip_inet_project_config_include = "<CHIPProjectConfig.h>"
-chip_system_project_config_include = "<CHIPProjectConfig.h>"
+silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-declare_args() {
-  app_data_model = ""
-  use_base_app = true
-}
+app_data_model = "${chip_root}/examples/thermostat/thermostat-common"
+chip_enable_ota_requestor = true
+chip_enable_openthread = true
+
+openthread_external_platform =
+    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
