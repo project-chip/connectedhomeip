@@ -23,12 +23,19 @@
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <arpa/inet.h>
 
+#ifndef BYTE_ORDER
+#error Endianess not defined
+#endif
+
 #else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-
 #include <lwip/def.h>
 #include <lwip/opt.h>
+
+#ifndef BYTE_ORDER
+#error Endianess not defined
+#endif
 
 #if defined(LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS)
 #ifndef htons
@@ -48,6 +55,26 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+
+#ifndef BYTE_ORDER
+#if defined(__LITTLE_ENDIAN__)
+#define BYTE_ORDER LITTLE_ENDIAN
+#elif defined(__BIG_ENDIAN__)
+#define BYTE_ORDER BIG_ENDIAN
+#elif defined(__BYTE_ORDER__)
+#define BYTE_ORDER __BYTE_ORDER__
+#else
+#error Endianess not defined is not defined
+#endif
+#endif // BYTE_ORDER
+
+#ifndef BIG_ENDIAN
+#define BIG_ENDIAN __ORDER_BIG_ENDIAN__
+#endif
+
+#ifndef LITTLE_ENDIAN
+#define LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
+#endif
 
 #if BYTE_ORDER == BIG_ENDIAN
 #ifndef htons
