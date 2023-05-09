@@ -32,7 +32,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-minimal:0.7.2
+            image: connectedhomeip/chip-build-minimal:0.7.3
 
         steps:
             - name: Checkout
