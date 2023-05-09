@@ -87,6 +87,7 @@
         "wake-on-lan-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
+        "replacable-monitoring-cluster.xml",
         "matter-devices.xml",
         "types/color-control.xml",
         "types/door-lock.xml",
