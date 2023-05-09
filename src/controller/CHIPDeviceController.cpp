@@ -795,7 +795,7 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
 
 	if (self->mPairingDelegate != nullptr)
 	{
-            self->mPairingDelegate(err);
+            self->mPairingDelegate->OnPairingComplete(err);
 	}
     }
 }
