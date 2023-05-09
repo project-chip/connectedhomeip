@@ -23,20 +23,20 @@
 using namespace chip;
 using namespace chip::Protocols;
 
-CHIP_ERROR CloseSessionCommand::RunCommand()
+CHIP_ERROR SendCloseSessionCommand::RunCommand()
 {
     CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
-    if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
+    if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationNodeId, &commissioneeDeviceProxy))
     {
         VerifyOrReturnError(commissioneeDeviceProxy->GetSecureSession().HasValue(), CHIP_ERROR_INCORRECT_STATE);
         return CloseSession(*commissioneeDeviceProxy->GetExchangeManager(), commissioneeDeviceProxy->GetSecureSession().Value());
     }
 
-    return CurrentCommissioner().GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback,
+    return CurrentCommissioner().GetConnectedDevice(mDestinationNodeId, &mOnDeviceConnectedCallback,
                                                     &mOnDeviceConnectionFailureCallback);
 }
 
-CHIP_ERROR CloseSessionCommand::CloseSession(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+CHIP_ERROR SendCloseSessionCommand::CloseSession(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     // TODO perhaps factor out this code into something on StatusReport that
     // takes an exchange and maybe a SendMessageFlags?
@@ -60,6 +60,10 @@ CHIP_ERROR CloseSessionCommand::CloseSession(Messaging::ExchangeManager & exchan
         exchange->SendMessage(SecureChannel::MsgType::StatusReport, std::move(msg), Messaging::SendMessageFlags::kNoAutoRequestAck);
     if (err == CHIP_NO_ERROR)
     {
+        if (mEvictLocalSession.ValueOr(true))
+        {
+            sessionHandle->AsSecureSession()->MarkForEviction();
+        }
         SetCommandExitStatus(CHIP_NO_ERROR);
     }
     else
@@ -70,21 +74,32 @@ CHIP_ERROR CloseSessionCommand::CloseSession(Messaging::ExchangeManager & exchan
     return err;
 }
 
-void CloseSessionCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                              const SessionHandle & sessionHandle)
+void SendCloseSessionCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                                  const SessionHandle & sessionHandle)
 {
-    auto * command = reinterpret_cast<CloseSessionCommand *>(context);
+    auto * command = reinterpret_cast<SendCloseSessionCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
 
     CHIP_ERROR err = command->CloseSession(exchangeMgr, sessionHandle);
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
-void CloseSessionCommand::OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR err)
+void SendCloseSessionCommand::OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR err)
 {
     LogErrorOnFailure(err);
 
-    auto * command = reinterpret_cast<CloseSessionCommand *>(context);
+    auto * command = reinterpret_cast<SendCloseSessionCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectionFailureFn: context is null"));
     command->SetCommandExitStatus(err);
+}
+
+CHIP_ERROR EvictLocalCASESessionsCommand::RunCommand()
+{
+    auto & controller   = CurrentCommissioner();
+    auto sessionManager = controller.SessionMgr();
+
+    sessionManager->ExpireAllSessions(ScopedNodeId(mDestinationNodeId, controller.GetFabricIndex()));
+
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
 }

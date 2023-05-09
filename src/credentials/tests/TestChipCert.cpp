@@ -1345,6 +1345,23 @@ static void TestChipCert_GenerateRootCert(nlTestSuite * inSuite, void * inContex
     NL_TEST_ASSERT(inSuite, ConvertX509CertToChipCert(signed_cert_span2, outCert) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, DecodeChipCert(outCert, certData) == CHIP_NO_ERROR);
 
+    // Test with no defined notAfter time.
+    {
+        X509CertRequestParams root_params3 = { .SerialNumber  = 1234,
+                                               .ValidityStart = 631161876,
+                                               .ValidityEnd   = kNullCertTime,
+                                               .SubjectDN     = root_dn,
+                                               .IssuerDN      = root_dn };
+        MutableByteSpan signed_cert_span_no_expiry(signed_cert);
+
+        NL_TEST_ASSERT(inSuite, NewRootX509Cert(root_params3, keypair, signed_cert_span_no_expiry) == CHIP_NO_ERROR);
+        outCert = MutableByteSpan(outCertBuf);
+
+        NL_TEST_ASSERT(inSuite, ConvertX509CertToChipCert(signed_cert_span_no_expiry, outCert) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, DecodeChipCert(outCert, certData) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, certData.mNotAfterTime == kNullCertTime);
+    }
+
     // Test error case: root cert subject provided ICA OID Attribute.
     root_params.SubjectDN.Clear();
     NL_TEST_ASSERT(inSuite, root_params.SubjectDN.AddAttribute_MatterICACId(0xabcdabcd) == CHIP_NO_ERROR);
