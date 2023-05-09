@@ -45,6 +45,9 @@ using Protocols::InteractionModel::Status;
 constexpr uint32_t kMaxBdxBlockSize = 1024;
 constexpr uint32_t kMaxBDXURILen = 256;
 
+// The BDX transfer timeout (OTA Spec mandates >= 5 minutes)
+static constexpr System::Clock::Timeout kBdxTransferTimeout = chip::System::Clock::Seconds32(5 * 60);
+
 // Since the BDX timeout is 5 minutes and we are starting this after query image is available and before the BDX init comes,
 // we just double the timeout to give enough time for the BDX init to come in a reasonable amount of time.
 constexpr System::Clock::Timeout kBdxInitReceivedTimeout = System::Clock::Seconds16(10 * 60);
@@ -57,8 +60,6 @@ constexpr System::Clock::Timeout kBdxInitReceivedTimeout = System::Clock::Second
 // OTA.
 constexpr uint32_t kDelayedActionTimeSeconds = 600;
 
-constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
-constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Milliseconds32(50);
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
 class BdxOTASender : public bdx::Responder {
@@ -76,7 +77,7 @@ public:
         ReturnErrorOnFailure(ConfigureState(fabricIndex, nodeId));
 
         BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
-        return Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollIntervalMs);
+        return Responder::PrepareForTransfer(kBdxRole, flags, kMaxBdxBlockSize);
     }
 
     CHIP_ERROR Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr)
@@ -147,11 +148,13 @@ public:
         }
         if (mSystemLayer) {
             mSystemLayer->CancelTimer(HandleBdxInitReceivedTimeoutExpired, this);
+            mSystemLayer->CancelTimer(HandleBdxTransferTimeoutExpired, this);
         }
         // TODO: Check if this can be removed. It seems like we can close the exchange context and reset transfer regardless.
         if (!mInitialized) {
             return;
         }
+        mPrevBlockCounter = 0;
         Responder::ResetTransfer();
         ++mTransferGeneration;
         mFabricIndex.ClearValue();
@@ -173,6 +176,39 @@ private:
     {
         VerifyOrReturn(state != nullptr);
         static_cast<BdxOTASender *>(state)->ResetState();
+    }
+
+    bool HasTransferTimedOut()
+    {
+        uint32_t curBlockCounter = mTransfer.GetNextBlockNum();
+
+        if (curBlockCounter > mPrevBlockCounter) {
+            mPrevBlockCounter = curBlockCounter;
+            return false;
+        }
+
+        ChipLogError(BDX, "BDX transfer timeout");
+        return true;
+    }
+
+    /**
+     * Timer callback called when the BDX transfer timeout expires. If BDX is still ongoing, restart the timer.
+     * If BDX is stalled, ResetState to reset the provider.
+     */
+    static void HandleBdxTransferTimeoutExpired(chip::System::Layer * systemLayer, void * state)
+    {
+        VerifyOrReturn(state != nullptr);
+        VerifyOrReturn(systemLayer != nullptr);
+        BdxOTASender * sender = static_cast<BdxOTASender *>(state);
+
+        if (sender->HasTransferTimedOut()) {
+            sender->ResetState();
+        } else {
+            CHIP_ERROR err = systemLayer->StartTimer(kBdxTransferTimeout, HandleBdxTransferTimeoutExpired, state);
+            if (err != CHIP_NO_ERROR) {
+                ChipLogError(BDX, "Failed to restart the BDX transfer timeout");
+            }
+        }
     }
 
     CHIP_ERROR OnMessageToSend(TransferSession::OutputEvent & event)
@@ -225,6 +261,14 @@ private:
         // Once we receive the BDX init, cancel the BDX Init timeout and start the BDX session
         if (mSystemLayer) {
             mSystemLayer->CancelTimer(HandleBdxInitReceivedTimeoutExpired, this);
+        }
+
+        // Start a timer for the BDX transfer timeout
+        if (mSystemLayer) {
+            CHIP_ERROR err = mSystemLayer->StartTimer(kBdxTransferTimeout, HandleBdxTransferTimeoutExpired, this);
+            LogErrorOnFailure(err);
+
+            ReturnErrorOnFailure(err);
         }
 
         VerifyOrReturnError(mFabricIndex.HasValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -479,6 +523,7 @@ private:
     }
 
     bool mInitialized = false;
+    uint32_t mPrevBlockCounter;
     Optional<FabricIndex> mFabricIndex;
     Optional<NodeId> mNodeId;
     id<MTROTAProviderDelegate> mDelegate = nil;

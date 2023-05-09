@@ -21,16 +21,11 @@
 #include <lib/support/BitFlags.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <protocols/bdx/BdxTransferSession.h>
 #include <system/SystemClock.h>
-#include <system/SystemLayer.h>
 
 namespace chip {
 namespace bdx {
-
-constexpr System::Clock::Timeout TransferFacilitator::kDefaultPollFreq;
-constexpr System::Clock::Timeout TransferFacilitator::kImmediatePollDelay;
 
 CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
                                                   chip::System::PacketBufferHandle && payload)
@@ -42,18 +37,19 @@ CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeConte
 
     ChipLogDetail(BDX, "%s: message " ChipLogFormatMessageType " protocol " ChipLogFormatProtocolId, __FUNCTION__,
                   payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
-    CHIP_ERROR err =
-        mTransfer.HandleMessageReceived(payloadHeader, std::move(payload), System::SystemClock().GetMonotonicTimestamp());
+    CHIP_ERROR err = mTransfer.HandleMessageReceived(payloadHeader, std::move(payload));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "failed to handle message: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    // Almost every BDX message will follow up with a response on the exchange. Even messages that might signify the end of a
-    // transfer could necessitate a response if they are received at the wrong time.
-    // For this reason, it is left up to the application logic to call ExchangeContext::Close() when it has determined that the
-    // transfer is finished.
-    mExchangeCtx->WillSendMessage();
+    // Almost every BDX message except BlockAckEOF will follow up with a response on the exchange. Even messages that might signify
+    // the end of a transfer could necessitate a response if they are received at the wrong time. For this reason, it is left up to
+    // the application logic to call ExchangeContext::Close() when it has determined that the transfer is finished.
+    if (mExchangeCtx != nullptr && !payloadHeader.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
+    {
+        mExchangeCtx->WillSendMessage();
+    }
 
     return err;
 }
@@ -65,70 +61,30 @@ void TransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
     mTransfer.Reset();
 }
 
-void TransferFacilitator::PollTimerHandler(chip::System::Layer * systemLayer, void * appState)
+void TransferFacilitator::OnOutputEventReceived(void * context, TransferSession::OutputEvent & event)
 {
-    VerifyOrReturn(appState != nullptr);
-    static_cast<TransferFacilitator *>(appState)->PollForOutput();
-}
-
-void TransferFacilitator::PollForOutput()
-{
-    TransferSession::OutputEvent outEvent;
-    mTransfer.PollOutput(outEvent, System::SystemClock().GetMonotonicTimestamp());
-    HandleTransferSessionOutput(outEvent);
-
-    VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
-    if (!mStopPolling)
+    ChipLogProgress(BDX, "OnOutputEventReceived %s", event.ToString(event.EventType));
+    TransferFacilitator * facilitator = static_cast<TransferFacilitator *>(context);
+    if (facilitator)
     {
-        mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
-    }
-    else
-    {
-        mSystemLayer->CancelTimer(PollTimerHandler, this);
-        mStopPolling = false;
+        facilitator->HandleTransferSessionOutput(event);
     }
 }
 
-void TransferFacilitator::ScheduleImmediatePoll()
+CHIP_ERROR Responder::PrepareForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize)
 {
-    VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
-    mSystemLayer->StartTimer(System::Clock::Milliseconds32(kImmediatePollDelay), PollTimerHandler, this);
-}
-
-CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
-                                         uint16_t maxBlockSize, System::Clock::Timeout timeout, System::Clock::Timeout pollFreq)
-{
-    VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    mPollFreq    = pollFreq;
-    mSystemLayer = layer;
-
-    ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeout));
-
-    ChipLogProgress(BDX, "Start polling for messages");
-    mStopPolling = false;
-    mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
+    ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, OnOutputEventReceived, this));
     return CHIP_NO_ERROR;
 }
 
 void Responder::ResetTransfer()
 {
     mTransfer.Reset();
-    ChipLogProgress(BDX, "Stop polling for messages");
-    mStopPolling = true;
 }
 
-CHIP_ERROR Initiator::InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
-                                       System::Clock::Timeout timeout, System::Clock::Timeout pollFreq)
+CHIP_ERROR Initiator::InitiateTransfer(TransferRole role, const TransferSession::TransferInitData & initData)
 {
-    VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    mPollFreq    = pollFreq;
-    mSystemLayer = layer;
-
-    ReturnErrorOnFailure(mTransfer.StartTransfer(role, initData, timeout));
-
-    mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
+    ReturnErrorOnFailure(mTransfer.StartTransfer(role, initData, OnOutputEventReceived, this));
     return CHIP_NO_ERROR;
 }
 

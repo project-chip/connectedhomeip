@@ -107,7 +107,8 @@ public:
 
     /**
      * @brief
-     *   All output data processed by the TransferSession object will be passed to the caller using this struct via PollOutput().
+     *   All output data processed by the TransferSession object will be passed to the caller using this struct via the
+     * OutputEventCallback.
      *
      *   NOTE: Some sub-structs may contain pointers to data in a PacketBuffer (see Blockdata). In this case, the MsgData field MUST
      *   be populated with a PacketBufferHandle that encapsulates the respective PacketBuffer, in order to ensure valid memory
@@ -146,39 +147,33 @@ public:
 
     /**
      * @brief
-     *   Indicates the presence of pending output and includes any data for the caller to take action on.
-     *
-     *   This method should be called frequently in order to be notified about any messages received. It should also be called after
-     *   most other methods in order to notify the user of any message that needs to be sent, or errors that occurred internally.
-     *
-     *   It is possible that consecutive calls to this method may emit different outputs depending on the state of the
-     *   TransferSession object.
-     *
-     *   Note that if the type outputted is kMsgToSend, the caller is expected to send the message immediately, and the session
-     *   timeout timer will begin at curTime.
+     *   Callback that the session calls to notify the caller about any messages received or messages that need to be send
+     *   or errors that occurred internally.
      *
      *   See OutputEventType for all possible output event types.
      *
-     * @param event     Reference to an OutputEvent struct that will be filled out with any pending output data
-     * @param curTime   Current time
+     * @param event     Reference to an OutputEvent struct that will be filled out with
+     *                  the generated output event
      */
-    void PollOutput(OutputEvent & event, System::Clock::Timestamp curTime);
+    using OutputEventCallback = void (*)(void * context, OutputEvent & event);
 
     /**
      * @brief
-     *   Initializes the TransferSession object and prepares a TransferInit message (emitted via PollOutput()).
+     *   Initializes the TransferSession object and prepares a TransferInit message.
      *
      *   A TransferSession object must be initialized with either StartTransfer() or WaitForTransfer().
      *
      * @param role      Inidcates whether this object will be sending or receiving data
      * @param initData  Data for initializing this object and for populating a TransferInit message
      *                  The role parameter will determine whether to populate a ReceiveInit or SendInit
-     * @param timeout   The amount of time to wait for a response before considering the transfer failed
+     * @param callback  OutputEventCallback that is to be registered with the transfer session and gets called when Output events
+     *                  are generated.
+     * @param context   Reference to the caller of this method
      *
      * @return CHIP_ERROR Result of initialization and preparation of a TransferInit message. May also indicate if the
      *                    TransferSession object is unable to handle this request.
      */
-    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, System::Clock::Timeout timeout);
+    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, OutputEventCallback callback, void * context);
 
     /**
      * @brief
@@ -189,13 +184,15 @@ public:
      * @param role            Inidcates whether this object will be sending or receiving data
      * @param xferControlOpts Indicates all supported control modes. Used to respond to a TransferInit message
      * @param maxBlockSize    The max Block size that this object supports.
-     * @param timeout         The amount of time to wait for a response before considering the transfer failed
+     * @param callback        OutputEventCallback that is to be registered with the transfer session and gets called when Output
+     * events are generated.
+     * @param context         Reference to the caller of this method
      *
      * @return CHIP_ERROR Result of initialization. May also indicate if the TransferSession object is unable to handle this
      *                    request.
      */
     CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
-                               System::Clock::Timeout timeout);
+                               OutputEventCallback callback, void * context);
 
     /**
      * @brief
@@ -284,13 +281,11 @@ public:
      * @param payloadHeader A PayloadHeader containing the Protocol type and Message Type
      * @param msg           A PacketBufferHandle pointing to the message buffer to process. May be BDX or StatusReport protocol.
      *                      Buffer is expected to start at data (not header).
-     * @param curTime       Current time
      *
      * @return CHIP_ERROR Indicates any problems in decoding the message, or if the message is not of the BDX or StatusReport
      *                    protocols.
      */
-    CHIP_ERROR HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg,
-                                     System::Clock::Timestamp curTime);
+    CHIP_ERROR HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg);
 
     TransferControlFlags GetControlMode() const { return mControlMode; }
     uint64_t GetStartOffset() const { return mStartOffset; }
@@ -347,11 +342,51 @@ private:
      */
     CHIP_ERROR VerifyProposedMode(const BitFlags<TransferControlFlags> & proposed);
 
+    void SendStatusReportWithError(StatusReportData statusReportData);
     void PrepareStatusReport(StatusCode code);
     bool IsTransferLengthDefinite() const;
 
+    template <typename MessageType>
+    void PrepareOutgoingMessageEvent(MessageType messageType);
+
+    /**
+     * @brief
+     *   Register a callback with the transfer session. The callback will be called to notify the caller about any messages received
+     *   or messages that need to be send or errors that occurred internally.
+     *
+     * @param callback    OutputEventCallback that is to be registered with the transfer session and gets called when Output events
+     *                    are generated.
+     * @param context     Reference to the caller of this method
+     */
+    void RegisterOutputEventCallback(OutputEventCallback callback, void * context);
+
+    /**
+     * @brief
+     *   Unregister the OutputEventCallback previously registered with the transfer session.
+     *
+     */
+    void UnregisterOutputEventCallback();
+
+    /**
+     * @brief
+     *   Sends the generated output event from the transfer session - BDX messages, status reports, etc to
+     *   the consumers of the messages who register the OutputEventCallback with it.
+     */
+    void SendOutputEvent(chip::bdx::TransferSession::OutputEvent & outputEvent);
+
+    /**
+     * The context that is passed in along with the callback. When the output event is generated, the context is passed when the
+     * OutputEventCallback is called.
+     */
+    void * mContext;
     OutputEventType mPendingOutput = OutputEventType::kNone;
-    TransferState mState           = TransferState::kUnitialized;
+
+    /**
+     * The output event callback that is registered with the transfer session and which gets called when any messages are received
+     * or messages that need to be send or errors that occurred internally.
+     */
+    OutputEventCallback mOutputEventCallback;
+    TransferState mState = TransferState::kUnitialized;
     TransferRole mRole;
 
     // Indicate supported options pre- transfer accept
@@ -365,14 +400,9 @@ private:
     uint64_t mTransferLength       = 0; ///< 0 represents indefinite length
     uint16_t mTransferMaxBlockSize = 0;
 
-    // Used to store event data before it is emitted via PollOutput()
+    // Used to store event data send via the OutputEventCallback
     System::PacketBufferHandle mPendingMsgHandle;
-    StatusReportData mStatusReportData;
     TransferInitData mTransferRequestData;
-    TransferAcceptData mTransferAcceptData;
-    BlockData mBlockEventData;
-    MessageTypeData mMsgTypeData;
-    TransferSkipData mBytesToSkip;
 
     size_t mNumBytesProcessed = 0;
 
@@ -381,10 +411,7 @@ private:
     uint32_t mLastQueryNum = 0;
     uint32_t mNextQueryNum = 0;
 
-    System::Clock::Timeout mTimeout            = System::Clock::kZero;
-    System::Clock::Timestamp mTimeoutStartTime = System::Clock::kZero;
-    bool mShouldInitTimeoutStart               = true;
-    bool mAwaitingResponse                     = false;
+    bool mAwaitingResponse = false;
 };
 
 } // namespace bdx

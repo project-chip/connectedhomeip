@@ -55,9 +55,7 @@ constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string ne
 constexpr size_t kOtaHeaderMaxSize   = 1024;
 
 // Arbitrary BDX Transfer Params
-constexpr uint32_t kMaxBdxBlockSize                = 1024;
-constexpr chip::System::Clock::Timeout kBdxTimeout = chip::System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
-constexpr uint32_t kBdxServerPollIntervalMillis    = 50;                                     // poll every 50ms by default
+constexpr uint32_t kMaxBdxBlockSize = 1024;
 
 void GetUpdateTokenString(const chip::ByteSpan & token, char * buf, size_t bufSize)
 {
@@ -89,7 +87,6 @@ OTAProviderExample::OTAProviderExample()
     mDelayedApplyActionTimeSec = 0;
     mUserConsentDelegate       = nullptr;
     mUserConsentNeeded         = false;
-    mPollInterval              = kBdxServerPollIntervalMillis;
     mCandidates.clear();
 }
 
@@ -274,9 +271,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         if (mBdxOtaSender.InitializeTransfer(commandObj->GetSubjectDescriptor().fabricIndex,
                                              commandObj->GetSubjectDescriptor().subject) == CHIP_NO_ERROR)
         {
-            CHIP_ERROR error =
-                mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
-                                                 kMaxBdxBlockSize, kBdxTimeout, chip::System::Clock::Milliseconds32(mPollInterval));
+            CHIP_ERROR error = mBdxOtaSender.PrepareForTransfer(chip::bdx::TransferRole::kSender, bdxFlags, kMaxBdxBlockSize);
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Cannot prepare for transfer: %" CHIP_ERROR_FORMAT, error.Format());
@@ -358,6 +353,22 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
             OTAImageHeader header;
             VerifyOrDie(ParseOTAHeader(parser, mOTAFilePath, header) == true);
             VerifyOrDie(sizeof(mSoftwareVersionString) > header.mSoftwareVersionString.size());
+            // Return Image not available if we already updated to the version that's available
+            if (header.mSoftwareVersion <= commandData.softwareVersion)
+            {
+                ChipLogDetail(SoftwareUpdate,
+                              "Available update version %" PRIu32 " is <= current version %" PRIu32 ", update ignored",
+                              header.mSoftwareVersion, commandData.softwareVersion);
+                mQueryImageStatus = OTAQueryStatus::kNotAvailable;
+
+                // Guarantees that either a response or an error status is sent
+                SendQueryImageResponse(commandObj, commandPath, commandData);
+
+                // After the first response is sent, default to these values for subsequent queries
+                mQueryImageStatus          = OTAQueryStatus::kUpdateAvailable;
+                mDelayedQueryActionTimeSec = 0;
+                return;
+            }
             mSoftwareVersion = header.mSoftwareVersion;
             memcpy(mSoftwareVersionString, header.mSoftwareVersionString.data(), header.mSoftwareVersionString.size());
             parser.Clear();

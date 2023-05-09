@@ -147,6 +147,12 @@ private:
                 Reset();
             }
 
+            if (!sendFlags.Has(chip::Messaging::SendMessageFlags::kExpectResponse))
+            {
+                // If no response is expected, exchange context gets closed so set mExchangeCtx to null
+                mExchangeCtx = nullptr;
+            }
+
             return err;
         }
 
