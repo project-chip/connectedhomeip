@@ -71,11 +71,11 @@ asr_executable("lighting_app") {
   output_name = "chip-asr-lighting-example.out"
 
   sources = [
-    "${examples_plat_dir}/ASRUtils.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_Matter.cpp",
     "${examples_plat_dir}/init_asrPlatform.cpp",
+    "${examples_plat_dir}/shell/matter_shell.cpp",
     "src/AppTask.cpp",
     "src/DeviceCallbacks.cpp",
     "src/main.cpp",

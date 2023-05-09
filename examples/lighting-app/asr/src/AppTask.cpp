@@ -34,11 +34,10 @@
 #include <platform/ASR/NetworkCommissioningDriver.h>
 
 #include "init_Matter.h"
-
+#if CONFIG_ENABLE_CHIP_SHELL
+#include "matter_shell.h"
+#endif
 #include <app-common/zap-generated/attributes/Accessors.h>
-
-#define APP_TASK_STACK_SIZE (1024 * 4)
-#define MATTER_DEVICE_NAME "ASR-Lighting"
 
 namespace {
 lega_thread_t sAppTaskHandle;
@@ -161,7 +160,9 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     /* get led onoff status and level value */
     led_startup_status();
-
+#if CONFIG_ENABLE_CHIP_SHELL
+    RegisterLightCommands();
+#endif
     /* Delete task */
     lega_rtos_delete_thread(NULL);
 }

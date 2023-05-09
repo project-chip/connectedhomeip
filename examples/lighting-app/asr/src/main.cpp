@@ -37,11 +37,35 @@
 #include "init_asrPlatform.h"
 #include <app/server/Server.h>
 
-#include "ASRUtils.h"
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+
+volatile int apperror_cnt;
+// ================================================================================
+// App Error
+//=================================================================================
+void appError(int err)
+{
+    ASR_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
+    lega_rtos_declare_critical();
+    lega_rtos_enter_critical();
+    while (1)
+        ;
+}
+
+void appError(CHIP_ERROR error)
+{
+    appError(static_cast<int>(error.AsInteger()));
+}
+
+// ================================================================================
+// FreeRTOS Callbacks
+// ================================================================================
+extern "C" void vApplicationIdleHook(void)
+{
+    // FreeRTOS Idle callback
+}
 
 // ================================================================================
 // Main Code

@@ -16,6 +16,11 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file provides the function to initialize the ASR platform.
+ */
+
 #include "AppConfig.h"
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>

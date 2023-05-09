@@ -29,7 +29,10 @@
 
 #define LIGHT_LED PWM_OUTPUT_CH4
 
-// ASR Logging
+#define APP_TASK_STACK_SIZE (1024 * 4)
+
+#define MATTER_DEVICE_NAME "ASR-Lighting"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
