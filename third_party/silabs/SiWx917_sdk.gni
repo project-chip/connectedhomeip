@@ -69,6 +69,7 @@ template("siwx917_sdk") {
       "${wisemcu_sdk_root}/third_party/freertos/include",
       "${wisemcu_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F",
       "${examples_plat_dir}/device/inc",
+      "${chip_root}/src/platform/silabs/rs911x",
     ]
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
