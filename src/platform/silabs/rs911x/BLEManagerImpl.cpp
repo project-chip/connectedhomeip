@@ -496,12 +496,11 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 
 void BLEManagerImpl::DriveBLEState(void)
 {
-		SILABS_LOG("%s starting", __func__);
+    SILABS_LOG("%s starting", __func__);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized ( TODO )
     VerifyOrExit(mFlags.Has(Flags::kEFRBLEStackInitialized), /* */);
-
 
     // Start advertising if needed...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled) &&
@@ -526,7 +525,7 @@ void BLEManagerImpl::DriveBLEState(void)
     }
 
 exit:
-		SILABS_LOG("%s End", __func__);
+    SILABS_LOG("%s End", __func__);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
@@ -670,19 +669,20 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 
     if (mFlags.Has(Flags::kAdvertising))
     {
-			// Since DriveBLEState is not called the device is still advertising
-	    status = rsi_ble_stop_advertising();
-	    if (status != RSI_SUCCESS)
-	    {
-	      mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
-	      mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-	      advertising_set_handle = 0xff;
-	      CancelBleAdvTimeoutTimer();
-	    } else {
-	      ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
-	    }
-
-		}
+        // Since DriveBLEState is not called the device is still advertising
+        status = rsi_ble_stop_advertising();
+        if (status != RSI_SUCCESS)
+        {
+            mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
+            mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+            advertising_set_handle = 0xff;
+            CancelBleAdvTimeoutTimer();
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
+        }
+    }
     return err;
 }
 
@@ -711,7 +711,7 @@ void BLEManagerImpl::UpdateMtu(rsi_ble_event_mtu_t evt)
 
 void BLEManagerImpl::HandleBootEvent(void)
 {
-		ChipLogProgress(DeviceLayer, "HandleBootEvent started");
+    ChipLogProgress(DeviceLayer, "HandleBootEvent started");
     mFlags.Set(Flags::kEFRBLEStackInitialized);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
