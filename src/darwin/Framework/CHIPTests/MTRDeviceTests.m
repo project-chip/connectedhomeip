@@ -762,6 +762,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test011_ReadCachedAttribute
 {
+    //    fprintf(stderr, "\n\nPID: %d\n\n\n", getpid());
+    //    sleep(10);
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];

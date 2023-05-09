@@ -338,7 +338,8 @@ bool MTROperationalCredentialsDelegate::ToChipEpochTime(NSDate * date, uint32_t 
         }
     }
 
-    MTR_LOG_ERROR("Year %lu is too large for Matter epoch time.  Please use [NSDate distantFuture] to represent \"never expires\".",
+    MTR_LOG_ERROR(
+        "Year %lu is out of range for Matter epoch time.  Please use [NSDate distantFuture] to represent \"never expires\".",
         static_cast<unsigned long>(components.year));
     return false;
 }
