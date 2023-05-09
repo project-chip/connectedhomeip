@@ -2850,11 +2850,11 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000002,
     MTRClusterTimeSynchronizationAttributeTrustedTimeNodeIdID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeNodeIdID", ios(16.1, 16.4), macos(13.0, 13.3),
+        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeSourceID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000003,
     MTRClusterTimeSynchronizationAttributeDefaultNtpID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNtpID", ios(16.1, 16.4), macos(13.0, 13.3),
+        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNTPID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000004,
     MTRClusterTimeSynchronizationAttributeTimeZoneID MTR_DEPRECATED(
@@ -2874,7 +2874,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000008,
     MTRClusterTimeSynchronizationAttributeNtpServerPortID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeNtpServerPortID", ios(16.1, 16.4), macos(13.0, 13.3),
+        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeNTPServerAvailableID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000009,
     MTRClusterTimeSynchronizationAttributeGeneratedCommandListID MTR_DEPRECATED(
@@ -2907,12 +2907,14 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeSourceID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000002,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeSourceID MTR_NEWLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeNodeIdID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000003,
+    = MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeSourceID,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNTPID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNtpID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000004,
+    = MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNTPID,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000005,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetID API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
@@ -2926,9 +2928,10 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneDatabaseID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000008,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeNTPServerAvailableID MTR_NEWLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeNtpServerPortID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000009,
+    = MTRAttributeIDTypeClusterTimeSynchronizationAttributeNTPServerAvailableID,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -8561,7 +8564,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster TimeSynchronization deprecated command id names
     MTRClusterTimeSynchronizationCommandSetUtcTimeID MTR_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterTimeSynchronizationCommandSetUtcTimeID", ios(16.1, 16.4), macos(13.0, 13.3),
+        "Please use MTRCommandIDTypeClusterTimeSynchronizationCommandSetUTCTimeID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000000,
 

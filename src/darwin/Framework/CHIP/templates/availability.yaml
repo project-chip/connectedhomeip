@@ -7139,6 +7139,12 @@
           Scenes:
               ScenesFeature:
                   - SceneNames
+      ids:
+          attributes:
+              TimeSynchronization:
+                  - TrustedTimeSource
+                  - DefaultNTP
+                  - NTPServerAvailable
   deprecated:
       bitmaps:
           Groups:
@@ -7172,6 +7178,29 @@
               - ProductFinishEnum
               - ColorEnum
   renames:
+      attributes:
+          TimeSynchronization:
+              TrustedTimeSource: TrustedTimeNodeId
+              DefaultNTP: DefaultNtp
+              NTPServerAvailable: NtpServerPort
+      commands:
+          TimeSynchronization:
+              SetUTCTime: SetUtcTime
+      enum values:
+          TimeSynchronization:
+              TimeSourceEnum:
+                  NonMatterSNTP: NonFabricSntp
+                  NonMatterNTP: NonFabricNtp
+                  MatterSNTP: FabricSntp
+                  MatterNTP: FabricNtp
+                  MixedNTP: MixedNtp
+                  NonMatterSNTPNTS: NonFabricSntpNts
+                  NonMatterNTPNTS: NonFabricNtpNts
+                  MatterSNTPNTS: FabricSntpNts
+                  MatterNTPNTS: FabricNtpNts
+                  MixedNTPNTS: MixedNtpNts
+                  PTP: Ptp
+                  GNSS: Gnss
       bitmaps:
           Groups:
               GroupsFeature: GroupClusterFeature
@@ -7179,3 +7208,42 @@
               PressureMeasurementFeature: PressureFeature
           PumpConfigurationAndControl:
               PumpConfigurationAndControlFeature: PumpFeature
+  provisional:
+      # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
+      # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
+      ids:
+          attributes:
+              TimeSynchronization:
+                  - TimeZoneListMaxSize
+                  - DSTOffsetListMaxSize
+                  - SupportsDNSResolve
+          commands:
+              TimeSynchronization:
+                  - SetUTCTime
+                  - SetTrustedTimeSource
+                  - SetTimeZone
+                  - SetTimeZoneResponse
+                  - SetDSTOffset
+                  - SetDefaultNTP
+          events:
+              TimeSynchronization:
+                  - DSTTableEmpty
+                  - DSTStatus
+                  - TimeZoneStatus
+                  - TimeFailure
+                  - MissingTrustedTimeSource
+      enum values:
+          TimeSynchronization:
+              TimeSourceEnum:
+                  - NonMatterSNTP
+                  - NonMatterNTP
+                  - MatterSNTP
+                  - MatterNTP
+                  - MixedNTP
+                  - NonMatterSNTPNTS
+                  - NonMatterNTPNTS
+                  - MatterSNTPNTS
+                  - MatterNTPNTS
+                  - MixedNTPNTS
+                  - PTP
+                  - GNSS

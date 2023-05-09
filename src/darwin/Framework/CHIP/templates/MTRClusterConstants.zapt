@@ -157,6 +157,15 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID {{availability cluster co
 {{/inline}}
 {{> commandIdDecl cluster=(asUpperCamelCase ../clusterName preserveAcronyms=true)
                   command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{! Anything which has an old name, and the new name was introduced in the "First after major API revamp" release or later
+    (or just after the "First major API revamp" release, but we don't have a good way to test for that),
+    we need to generate the new-form id for the old name too, as long as it was not removed. }}
+{{#if (and (hasOldName (asUpperCamelCase ../clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForIds=true)
+           (not (wasIntroducedBeforeRelease "First after major API revamp" (asUpperCamelCase ../clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForIds=true))
+           (isSupported (compatClusterNameRemapping ../clusterName) command=(compatCommandNameRemapping ../clusterName name) isForIds=true))}}
+{{> commandIdDecl cluster=(compatClusterNameRemapping ../clusterName)
+                  command=(compatCommandNameRemapping ../clusterName name)}}
+{{/if}}
 {{#last}}
 
 {{/last}}
