@@ -97,7 +97,7 @@ void sl_ble_init()
     rsi_ble_app_init_events();
 
     SILABS_LOG("StartAdvertising");
-    chip::DeviceLayer::Internal::BLEManagerImpl().StartAdvertising(); // TODO:: Called on after init of module
+    chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
     SILABS_LOG("%s  Ended", __func__);
 }
 
@@ -235,7 +235,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     CHIP_ERROR err;
     rsi_semaphore_create(&sl_rs_ble_init_sem, 0);
     rsi_semaphore_create(&sl_ble_event_sem, 0);
-    ChipLogProgress(DeviceLayer, "%s Start ", __func__);
 
     wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) sl_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL, 1,
                                          wfxBLETaskStack, &rsiBLETaskStruct);
@@ -263,12 +262,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-#ifdef SIWX_917
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
-#endif
 
 exit:
-    ChipLogProgress(DeviceLayer, "%s END ", __func__);
     return err;
 }
 
@@ -295,9 +291,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
-#ifdef SIWX_917
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
-#endif
     }
 
 exit:
@@ -318,9 +312,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kRestartAdvertising);
-#ifdef SIWX_917
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
-#endif
     return CHIP_NO_ERROR;
 }
 
@@ -358,9 +350,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     {
         mDeviceName[0] = 0;
     }
-#ifdef SIWX_917
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
-#endif
     ChipLogProgress(DeviceLayer, "_SetDeviceName Ended");
     return CHIP_NO_ERROR;
 }
@@ -506,23 +496,22 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 
 void BLEManagerImpl::DriveBLEState(void)
 {
-    ChipLogProgress(DeviceLayer, "DriveBLEState starting");
+		SILABS_LOG("%s starting", __func__);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized ( TODO )
-    // VerifyOrExit(mFlags.Has(Flags::kEFRBLEStackInitialized),);
+    VerifyOrExit(mFlags.Has(Flags::kEFRBLEStackInitialized), /* */);
 
-    ChipLogProgress(DeviceLayer, "Start advertising if needed...");
+
     // Start advertising if needed...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled) &&
         NumConnections() < kMaxConnections)
     {
-
-        ChipLogProgress(DeviceLayer, "Start/re-start advertising if not already started, or if there is a pending change");
         // Start/re-start advertising if not already started, or if there is a pending change
         // to the advertising configuration.
         if (!mFlags.Has(Flags::kAdvertising) || mFlags.Has(Flags::kRestartAdvertising))
         {
+            SILABS_LOG("Start Advertising");
             err = StartAdvertising();
             SuccessOrExit(err);
         }
@@ -531,12 +520,13 @@ void BLEManagerImpl::DriveBLEState(void)
     // Otherwise, stop advertising if it is enabled.
     else if (mFlags.Has(Flags::kAdvertising))
     {
+        SILABS_LOG("Stop Advertising");
         err = StopAdvertising();
         SuccessOrExit(err);
     }
 
 exit:
-    ChipLogProgress(DeviceLayer, "DriveBLEState End");
+		SILABS_LOG("%s End", __func__);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
@@ -677,19 +667,22 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t status = 0;
-    // TODO: add the below code in a condition if (mFlags.Has(Flags::kAdvertising))
-    // Since DriveBLEState is not called the device is still advertising
-    mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
-    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-    status = rsi_ble_stop_advertising();
-    if (status != RSI_SUCCESS)
-    {
-        ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
-    }
-    advertising_set_handle = 0xff;
-    CancelBleAdvTimeoutTimer();
 
-    // exit:
+    if (mFlags.Has(Flags::kAdvertising))
+    {
+			// Since DriveBLEState is not called the device is still advertising
+	    status = rsi_ble_stop_advertising();
+	    if (status != RSI_SUCCESS)
+	    {
+	      mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
+	      mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+	      advertising_set_handle = 0xff;
+	      CancelBleAdvTimeoutTimer();
+	    } else {
+	      ChipLogProgress(DeviceLayer, "advertising failed to stop, with status = 0x%lx", status);
+	    }
+
+		}
     return err;
 }
 
@@ -718,19 +711,16 @@ void BLEManagerImpl::UpdateMtu(rsi_ble_event_mtu_t evt)
 
 void BLEManagerImpl::HandleBootEvent(void)
 {
+		ChipLogProgress(DeviceLayer, "HandleBootEvent started");
     mFlags.Set(Flags::kEFRBLEStackInitialized);
-#ifdef SIWX_917
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
-#endif
 }
 
 void BLEManagerImpl::HandleConnectEvent(void)
 {
     ChipLogProgress(DeviceLayer, "Connect Event for handle : %d", event_msg.connectionHandle);
     AddConnection(event_msg.connectionHandle, event_msg.bondingHandle);
-#ifdef SIWX_917
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
-#endif
 }
 
 // TODO:: Implementation need to be done.
@@ -772,15 +762,10 @@ void BLEManagerImpl::HandleConnectionCloseEvent(uint16_t reason)
 
 void BLEManagerImpl::HandleWriteEvent(rsi_ble_event_write_t evt)
 {
-    // RSI_BLE_WRITE_REQUEST_EVENT
     ChipLogProgress(DeviceLayer, "Char Write Req, packet type %d", evt.pkt_type);
-    // uint8_t attribute = (uint8_t) event_msg.rsi_ble_measurement_hndl;
-
-    SILABS_LOG("event_msg.rsi_ble_gatt_server_client_config_hndl = %d", event_msg.rsi_ble_gatt_server_client_config_hndl);
 
     if (evt.handle[0] == (uint8_t) event_msg.rsi_ble_gatt_server_client_config_hndl) // TODO:: compare the handle exactly
     {
-        SILABS_LOG("Inside HandleTXCharCCCDWrite ");
         HandleTXCharCCCDWrite(&evt);
     }
     else
