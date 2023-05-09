@@ -200,13 +200,14 @@ namespace {
     using SemanticTagStructType = chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type;
     using ModeOptionStructType = chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type;
 
+    constexpr SemanticTagStructType semanticTagZero[] = { { .value = 0 } };
     List<const SemanticTagStructType> noSemanticTags;
 
     // Mode Select
     std::vector<ModeOptionStructType> coffeeOptions = {
-        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Black", 0, noSemanticTags),
-        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Cappuccino", 4, noSemanticTags),
-        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Espresso", 7, noSemanticTags)
+        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Black", 0, List<const SemanticTagStructType>(semanticTagZero)),
+        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Cappuccino", 4, List<const SemanticTagStructType>(semanticTagZero)),
+        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Espresso", 7, List<const SemanticTagStructType>(semanticTagZero))
     };
     Clusters::ModeSelect::ModeSelectDelegate modeSelectDelegate(coffeeOptions);
     Clusters::ModeSelect::Instance modeSelectInstance(0x1, Clusters::ModeSelect::Id, &modeSelectDelegate);
