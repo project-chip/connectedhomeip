@@ -46,7 +46,7 @@ jobs:
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Bootstrap cache
               uses: actions/cache@v3
-              timeout-minutes: 10
+              timeout-minutes: 20
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -82,7 +82,7 @@ jobs:
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform esp32
             - name: Bootstrap cache
               uses: actions/cache@v3
-              timeout-minutes: 10
+              timeout-minutes: 20
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -118,7 +118,7 @@ jobs:
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform nrfconnect
             - name: Bootstrap cache
               uses: actions/cache@v3
-              timeout-minutes: 10
+              timeout-minutes: 20
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
