@@ -39,11 +39,13 @@ using namespace chip::Credentials;
 + (MTRCertificateDERBytes _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
                                                  issuerID:(NSNumber * _Nullable)issuerID
                                                  fabricID:(NSNumber * _Nullable)fabricID
+                                           validityPeriod:(NSDateInterval *)validityPeriod
                                                     error:(NSError * __autoreleasing *)error
 {
     MTR_LOG_DEFAULT("Generating root certificate");
     NSData * rootCert = nil;
-    CHIP_ERROR err = MTROperationalCredentialsDelegate::GenerateRootCertificate(keypair, issuerID, fabricID, &rootCert);
+    CHIP_ERROR err
+        = MTROperationalCredentialsDelegate::GenerateRootCertificate(keypair, issuerID, fabricID, validityPeriod, &rootCert);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:err];
     }
@@ -55,17 +57,29 @@ using namespace chip::Credentials;
     return rootCert;
 }
 
++ (MTRCertificateDERBytes _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
+                                                 issuerID:(NSNumber * _Nullable)issuerID
+                                                 fabricID:(NSNumber * _Nullable)fabricID
+                                                    error:(NSError * __autoreleasing *)error
+{
+    auto * validityPeriod =
+        [[NSDateInterval alloc] initWithStartDate:[NSDate now]
+                                         duration:MTROperationalCredentialsDelegate::kCertificateDefaultValiditySecs];
+    return [self createRootCertificate:keypair issuerID:issuerID fabricID:fabricID validityPeriod:validityPeriod error:error];
+}
+
 + (MTRCertificateDERBytes _Nullable)createIntermediateCertificate:(id<MTRKeypair>)rootKeypair
                                                   rootCertificate:(MTRCertificateDERBytes)rootCertificate
                                             intermediatePublicKey:(SecKeyRef)intermediatePublicKey
                                                          issuerID:(NSNumber * _Nullable)issuerID
                                                          fabricID:(NSNumber * _Nullable)fabricID
+                                                   validityPeriod:(NSDateInterval *)validityPeriod
                                                             error:(NSError * __autoreleasing *)error
 {
     MTR_LOG_DEFAULT("Generating intermediate certificate");
     NSData * intermediate = nil;
     CHIP_ERROR err = MTROperationalCredentialsDelegate::GenerateIntermediateCertificate(
-        rootKeypair, rootCertificate, intermediatePublicKey, issuerID, fabricID, &intermediate);
+        rootKeypair, rootCertificate, intermediatePublicKey, issuerID, fabricID, validityPeriod, &intermediate);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:err];
     }
@@ -77,18 +91,38 @@ using namespace chip::Credentials;
     return intermediate;
 }
 
++ (MTRCertificateDERBytes _Nullable)createIntermediateCertificate:(id<MTRKeypair>)rootKeypair
+                                                  rootCertificate:(MTRCertificateDERBytes)rootCertificate
+                                            intermediatePublicKey:(SecKeyRef)intermediatePublicKey
+                                                         issuerID:(NSNumber * _Nullable)issuerID
+                                                         fabricID:(NSNumber * _Nullable)fabricID
+                                                            error:(NSError * __autoreleasing *)error
+{
+    auto * validityPeriod =
+        [[NSDateInterval alloc] initWithStartDate:[NSDate now]
+                                         duration:MTROperationalCredentialsDelegate::kCertificateDefaultValiditySecs];
+    return [self createIntermediateCertificate:rootKeypair
+                               rootCertificate:rootCertificate
+                         intermediatePublicKey:intermediatePublicKey
+                                      issuerID:issuerID
+                                      fabricID:fabricID
+                                validityPeriod:validityPeriod
+                                         error:error];
+}
+
 + (MTRCertificateDERBytes _Nullable)createOperationalCertificate:(id<MTRKeypair>)signingKeypair
                                               signingCertificate:(MTRCertificateDERBytes)signingCertificate
                                             operationalPublicKey:(SecKeyRef)operationalPublicKey
                                                         fabricID:(NSNumber *)fabricID
                                                           nodeID:(NSNumber *)nodeID
                                            caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                                  validityPeriod:(NSDateInterval *)validityPeriod
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
     MTR_LOG_DEFAULT("Generating operational certificate");
     NSData * opcert = nil;
     CHIP_ERROR err = MTROperationalCredentialsDelegate::GenerateOperationalCertificate(
-        signingKeypair, signingCertificate, operationalPublicKey, fabricID, nodeID, caseAuthenticatedTags, &opcert);
+        signingKeypair, signingCertificate, operationalPublicKey, fabricID, nodeID, caseAuthenticatedTags, validityPeriod, &opcert);
     if (error) {
         *error = [MTRError errorForCHIPErrorCode:err];
     }
@@ -98,6 +132,27 @@ using namespace chip::Credentials;
     }
 
     return opcert;
+}
+
++ (MTRCertificateDERBytes _Nullable)createOperationalCertificate:(id<MTRKeypair>)signingKeypair
+                                              signingCertificate:(MTRCertificateDERBytes)signingCertificate
+                                            operationalPublicKey:(SecKeyRef)operationalPublicKey
+                                                        fabricID:(NSNumber *)fabricID
+                                                          nodeID:(NSNumber *)nodeID
+                                           caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                                           error:(NSError * __autoreleasing _Nullable * _Nullable)error
+{
+    auto * validityPeriod =
+        [[NSDateInterval alloc] initWithStartDate:[NSDate now]
+                                         duration:MTROperationalCredentialsDelegate::kCertificateDefaultValiditySecs];
+    return [self createOperationalCertificate:signingKeypair
+                           signingCertificate:signingCertificate
+                         operationalPublicKey:operationalPublicKey
+                                     fabricID:fabricID
+                                       nodeID:nodeID
+                        caseAuthenticatedTags:caseAuthenticatedTags
+                               validityPeriod:validityPeriod
+                                        error:error];
 }
 
 + (BOOL)keypair:(id<MTRKeypair>)keypair matchesCertificate:(NSData *)certificate
