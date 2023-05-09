@@ -249,12 +249,13 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseClientPool   = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
     CASEClientInitParams sessionInitParams = {
-        .sessionManager           = stateParams.sessionMgr,
-        .sessionResumptionStorage = stateParams.sessionResumptionStorage.get(),
-        .exchangeMgr              = stateParams.exchangeMgr,
-        .fabricTable              = stateParams.fabricTable,
-        .groupDataProvider        = stateParams.groupDataProvider,
-        .mrpLocalConfig           = GetLocalMRPConfig(),
+        .sessionManager            = stateParams.sessionMgr,
+        .sessionResumptionStorage  = stateParams.sessionResumptionStorage.get(),
+        .certificateValidityPolicy = stateParams.certificateValidityPolicy,
+        .exchangeMgr               = stateParams.exchangeMgr,
+        .fabricTable               = stateParams.fabricTable,
+        .groupDataProvider         = stateParams.groupDataProvider,
+        .mrpLocalConfig            = GetLocalMRPConfig(),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
