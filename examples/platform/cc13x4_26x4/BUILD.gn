@@ -21,7 +21,6 @@ config("chip_examples_project_config") {
 source_set("openthread_core_config_cc13x4_26x4_chip_examples") {
   sources = [ "project_include/OpenThreadConfig.h" ]
   public_configs = [ ":chip_examples_project_config" ]
-
 }
 
 config("attestation-credentials-config") {

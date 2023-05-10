@@ -47,7 +47,8 @@ template("ti_simplelink_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
 
   #used for OTA image creator for the cc13xx
-  if ((ti_simplelink_device_family == "cc13x2x7_26x2x7") || (ti_simplelink_device_family == "cc13x4_26x4")) {
+  if (ti_simplelink_device_family == "cc13x2x7_26x2x7" ||
+      ti_simplelink_device_family == "cc13x4_26x4") {
     objcopy_image_name = output_base_name + ".hex"
     objcopy_image_format = "ihex"
   } else {

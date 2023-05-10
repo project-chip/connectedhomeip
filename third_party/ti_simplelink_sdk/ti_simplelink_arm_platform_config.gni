@@ -36,7 +36,6 @@ if (ti_simplelink_device_family == "cc13x2_26x2" ||
   arm_float_abi = "soft"
   arm_fpu = ""
   arm_use_thumb = true
-}
- else {
+} else {
   assert(false, "ti_simplelink_device_family must be specified")
 }
