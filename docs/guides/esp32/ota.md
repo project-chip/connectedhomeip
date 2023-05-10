@@ -35,11 +35,24 @@ control list.
 
 ### Using Console
 
-After commissioning is successful, press Enter in requestor device console and
-type below query.
+After commissioning is successful, read the default-ota-providers list of
+requestor using the command below.
 
 ```
->matter ota query 1 <PROVIDER NODE ID> 0
+./out/debug/chip-tool otasoftwareupdaterequestor read default-otaproviders <REQUESTOR NODE ID> 0
+```
+
+If the list does not have your provider, write into default-ota-providers list
+of requestor using the command below.
+
+```
+./out/debug/chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": <PROVIDER_NODE_ID_1>, "endpoint": 0}, {"fabricIndex": 1, "providerNodeID": <PROVIDER_NODE_ID_2>, "endpoint": 0}]' <REQUESTOR_NODE_ID> 0
+```
+
+Press Enter in requestor device console and type below query.
+
+```
+>matter ota query
 ```
 
 Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to
