@@ -14,16 +14,12 @@
 using namespace chip;
 using namespace chip::app;
 
-id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    switch (aPath.mClusterId)
-    {
-    {{#zcl_clusters}}
-    {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
-    case Clusters::{{asUpperCamelCase name}}::Id: {
-        using namespace Clusters::{{asUpperCamelCase name}};
-        switch (aPath.mAttributeId)
-        {
+    using namespace Clusters::{{asUpperCamelCase name}};
+    switch (aAttributeId) {
         {{#zcl_attributes_server removeKeys='isOptional'}}
         {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         case Attributes::{{asUpperCamelCase name}}::Id: {
@@ -40,18 +36,31 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
         }
         {{/if}}
         {{/zcl_attributes_server}}
-        default:
-          *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
-          break;
+        default: {
+            break;
         }
-        break;
     }
-    {{/if}}
-    {{/zcl_clusters}}
-    default: {
-      *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
-      break;
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+{{/if}}
+{{/zcl_clusters}}
+
+id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    switch (aPath.mClusterId) {
+        {{#zcl_clusters}}
+        {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+        case Clusters::{{asUpperCamelCase name}}::Id: {
+            return DecodeAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aPath.mAttributeId, aReader, aError);
+        }
+        {{/if}}
+        {{/zcl_clusters}}
+        default: {
+            break;
+        }
     }
-    }
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
