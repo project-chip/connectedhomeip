@@ -28,6 +28,46 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+
+// Defining mode values as constants
+namespace ModeSelect {
+const uint8_t ModeBlack = 0;
+const uint8_t ModeCappuccino = 4;
+const uint8_t ModeEspresso = 7;
+}
+
+namespace RvcRun {
+const uint8_t ModeIdle = 0;
+const uint8_t ModeCleaning = 1;
+const uint8_t ModeMapping = 2;
+}
+
+namespace RvcClean {
+const uint8_t ModeVacuum = 0;
+const uint8_t ModeWash = 1;
+const uint8_t ModeDeepClean = 2;
+}
+
+namespace DishwasherModeSelect {
+const uint8_t ModeNormal = 0;
+const uint8_t ModeHeavy = 1;
+const uint8_t ModeLight = 2;
+}
+
+namespace LaundryWasher {
+const uint8_t ModeNormal = 0;
+const uint8_t ModeDelicate = 1;
+const uint8_t ModeHeavy = 2;
+const uint8_t ModeWhites = 3;
+}
+
+namespace RefrigeratorAndTemperatureControlledCabinet {
+const uint8_t ModeNormal = 0;
+const uint8_t ModeRapidCool = 1;
+const uint8_t ModeRapidFreeze = 2;
+}
+
+// Defining mode select delegates for all mode select aliased clusters.
 namespace ModeSelect {
 
 /// This is an application level delegate to handle ModeSelect commands according to the specific business logic.

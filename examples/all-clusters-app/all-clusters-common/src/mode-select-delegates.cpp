@@ -49,10 +49,10 @@ void ModeSelectDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::C
 
     // We add our business logic that doesn't allow a transition from mode 0 to 7. If this is attempted, a descriptive
     // response is sent.
-    if (currentMode == 0 && mode == 7)
+    if (currentMode == ModeBlack && mode == ModeEspresso)
     {
         response.status = int8_t(ChangeToModeResponseStatus::kGenericFailure);
-        response.statusText.SetValue(chip::CharSpan("Cannot change to mode 7 from mode 0", 35));
+        response.statusText.SetValue(chip::CharSpan("Cannot change to Espresso from mode Black", 41));
         return;
     }
 }
@@ -81,7 +81,7 @@ void RvcRunDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::Chang
     }
 
     // Our business logic states that we can only switch into the mapping state from the idle state.
-    if (mode == 2 && currentMode != 0)
+    if (mode == RvcRun::ModeMapping && currentMode != RvcRun::ModeIdle)
     {
         response.status = int8_t(ChangeToModeResponseStatus::kGenericFailure);
         response.statusText.SetValue(chip::CharSpan("Change to the mapping state is only allowed from idle", 53));
@@ -103,8 +103,8 @@ Status RvcCleanDelegate::HandleChangeToMode(uint8_t mode)
 
 void RvcCleanDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::ChangeToModeResponse::Type &response)
 {
-    uint8_t currentMode;
-    EmberAfStatus status = RvcRun::Attributes::CurrentMode::Get(0x1, &currentMode);
+    uint8_t rvcRunCurrentMode;
+    EmberAfStatus status = RvcRun::Attributes::CurrentMode::Get(0x1, &rvcRunCurrentMode);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -113,7 +113,7 @@ void RvcCleanDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::Cha
         return;
     }
 
-    if (currentMode == 1)
+    if (rvcRunCurrentMode == RvcRun::ModeCleaning)
     {
         response.status = int8_t(RvcClean::ChangeToModeResponseStatus::kCleaningInProgress);
         response.statusText.SetValue(chip::CharSpan("Cannot change the cleaning mode during a clean", 60));
