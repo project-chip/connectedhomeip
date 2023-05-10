@@ -223,7 +223,7 @@ class TestXmlParser(unittest.TestCase):
     def testEnum(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
             <configurator>
-              <cluster><name>Test1</name><code>0x000A</code></cluster>
+              <cluster><name>Test1</name><code>10</code></cluster>
               <cluster><name>Test2</name><code>20</code></cluster>
 
               <enum name="GlobalEnum" type="ENUM8">
