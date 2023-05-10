@@ -30,7 +30,7 @@ if (lwip_platform == "") {
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13xx_26xx" || lwip_platform == "cc32xx" ||
-           lwip_platform == "efr32" || lwip_platform == "k32w0" ||
+           lwip_platform == "silabs" || lwip_platform == "k32w0" ||
            lwip_platform == "qpg" || lwip_platform == "mbed" ||
            lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
            lwip_platform == "bl602" || lwip_platform == "mw320" ||
