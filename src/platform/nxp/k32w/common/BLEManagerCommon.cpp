@@ -387,7 +387,7 @@ bool BLEManagerCommon::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_RE
 
 void BLEManagerCommon::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    BLEMgrImpl().blekw_stop_connection_internal(conId);
+    BLEMgrImpl().CloseConnection(conId);
 }
 
 bool BLEManagerCommon::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
@@ -808,7 +808,7 @@ void BLEManagerCommon::DriveBLEState(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized
-    VerifyOrExit(BLEManagerCommon::mFlags.Has(BLEManagerCommon::Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mFlags.Has(Flags::kK32WBLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
     // Start advertising if needed...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled))

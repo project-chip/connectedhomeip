@@ -91,8 +91,6 @@ protected:
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
 
-
-
     // ===== Private members reserved for use by this class only.
 
     enum class Flags : uint8_t
@@ -172,8 +170,6 @@ protected:
     } blekw_att_read_data_t;
 
     CHIPoBLEServiceMode mServiceMode;
-    uint16_t mNumGAPCons;
-    uint8_t mAdvHandle;
     char mDeviceName[kMaxDeviceNameLength + 1];
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     chip::System::PacketBufferHandle c3AdditionalDataBufferHandle;
@@ -181,25 +177,16 @@ protected:
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertising(void);
+    CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
-    void HandleSoftDeviceBLEEvent(const ChipDeviceEvent * event);
+
     void HandleConnectEvent(blekw_msg_t * msg);
-    void HandleConnectEvent(uint8_t connId);
     void HandleConnectionCloseEvent(blekw_msg_t * msg);
-    void HandleConnectionCloseEvent(uint8_t connId);
     void HandleWriteEvent(blekw_msg_t * msg);
     void HandleRXCharWrite(blekw_msg_t * msg);
     void HandleTXCharCCCDWrite(blekw_msg_t * msg);
-    CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleGAPDisconnect(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleTXComplete(const ChipDeviceEvent * event);
-    CHIP_ERROR SetSubscribed(uint16_t conId);
-    bool UnsetSubscribed(uint16_t conId);
-    bool IsSubscribed(uint16_t conId);
-    CHIP_ERROR ConfigureAdvertisingData(void);
+
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     CHIP_ERROR EncodeAdditionalDataTlv();
     void HandleC3ReadRequest(blekw_msg_t * msg);
@@ -207,18 +194,14 @@ protected:
     BLEManagerCommon::ble_err_t blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data, uint32_t len);
 
     static void DriveBLEState(intptr_t arg);
-    static void HandleWriteEvent(intptr_t arg);
-    static void HandleDisconnectEvent(intptr_t arg);
-    static void HandleAdvIntervalChange(intptr_t arg);
-
-    static void blekw_connection_timeout_cb(TimerHandle_t timer);
-    static CHIP_ERROR blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data);
-    static void blekw_new_data_received_notification(uint32_t mask);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     static void CancelBleAdvTimeoutTimer(void);
     static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
+
+    static void blekw_connection_timeout_cb(TimerHandle_t timer);
     static void blekw_generic_cb(gapGenericEvent_t * pGenericEvent);
     static void blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t * pServerEvent);
+    static CHIP_ERROR blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data);
     static CHIP_ERROR blekw_msg_add_u16(blekw_msg_type_t type, uint16_t data);
     static CHIP_ERROR blekw_msg_add_att_written(blekw_msg_type_t type, uint8_t device_id, uint16_t handle, uint8_t * data,
                                                 uint16_t length);
@@ -230,11 +213,11 @@ protected:
     static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t * pConnectionEvent);
     static void blekw_start_connection_timeout(void);
     static void blekw_stop_connection_timeout(void);
+    static bool blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
 
 public:
     virtual CHIP_ERROR InitHostController(ble_generic_cb_fp cb_fp) = 0;
     virtual BLEManagerCommon* GetImplInstance() = 0;
-    static bool blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
     void DoBleProcessing(void);
 };
 
