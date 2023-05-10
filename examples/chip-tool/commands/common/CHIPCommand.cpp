@@ -93,7 +93,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(mBleAdapterId.ValueOr(0), true));
 #endif
 
-    ReturnLogErrorOnFailure(mDefaultStorage.Init());
+    ReturnLogErrorOnFailure(mDefaultStorage.Init(nullptr, GetStorageDirectory().ValueOr(nullptr)));
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
 
@@ -326,7 +326,7 @@ CHIP_ERROR CHIPCommand::GetIdentityNodeId(std::string identity, chip::NodeId * n
         return CHIP_NO_ERROR;
     }
 
-    ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.c_str()));
+    ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.c_str(), GetStorageDirectory().ValueOr(nullptr)));
 
     *nodeId = mCommissionerStorage.GetLocalNodeId();
 
@@ -419,7 +419,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         // TODO - OpCreds should only be generated for pairing command
         //        store the credentials in persistent storage, and
         //        generate when not available in the storage.
-        ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.mName.c_str()));
+        ReturnLogErrorOnFailure(mCommissionerStorage.Init(identity.mName.c_str(), GetStorageDirectory().ValueOr(nullptr)));
         if (mUseMaxSizedCerts.HasValue())
         {
             auto option = CredentialIssuerCommands::CredentialIssuerOptions::kMaximizeCertificateSizes;

@@ -32,12 +32,13 @@ public:
 
     void Register(const char * clusterName, commands_list commandsList, const char * helpText = nullptr);
     int Run(int argc, char ** argv);
-    int RunInteractive(const char * command);
+    int RunInteractive(const char * command, const chip::Optional<char *> & storageDirectory = chip::NullOptional);
 
 private:
     using ClusterMap = std::map<std::string, std::pair<CommandsVector, const char *>>;
 
-    CHIP_ERROR RunCommand(int argc, char ** argv, bool interactive = false);
+    CHIP_ERROR RunCommand(int argc, char ** argv, bool interactive = false,
+                          const chip::Optional<char *> & interactiveStorageDirectory = chip::NullOptional);
 
     ClusterMap::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
