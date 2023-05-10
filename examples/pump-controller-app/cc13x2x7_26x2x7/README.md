@@ -166,8 +166,9 @@ Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
 extension. For OTA enabled applications, the standalone image will instead end
 with the `*-bim.hex` file extension. This this is a combined image with
-application and and `BIM` included. The flag to enable or disable the OTA feature
-is determined by "chip_enable_ota_requestor" in the application's args.gni file.
+application and and `BIM` included. The flag to enable or disable the OTA
+feature is determined by "chip_enable_ota_requestor" in the application's
+args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
