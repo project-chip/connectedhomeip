@@ -110,7 +110,7 @@ class TIBuilder(GnBuilder):
             'ti_simplelink_board="%s"' % self.board.BoardName(),
         ]
 
-        if self.openthread_ftd == None:
+        if self.openthread_ftd is None:
             pass
         elif self.openthread_ftd:
             args.append('chip_openthread_ftd=true')

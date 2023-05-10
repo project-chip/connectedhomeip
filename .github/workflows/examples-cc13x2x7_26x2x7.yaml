@@ -35,11 +35,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-<<<<<<< HEAD
             image: connectedhomeip/chip-build-ti:0.7.3
-=======
-            image: connectedhomeip/chip-build-ti:0.5.99
->>>>>>> remotes/tot-ti-fork/v1.0-ti-branch
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -52,11 +48,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-<<<<<<< HEAD
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform cc13x2_26x2
-=======
-              run: scripts/checkout_submodules.py --shallow --platform cc13xx_26xx
->>>>>>> remotes/tot-ti-fork/v1.0-ti-branch
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform cc13xx_26xx
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
               env:

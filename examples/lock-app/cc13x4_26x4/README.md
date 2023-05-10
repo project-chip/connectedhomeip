@@ -14,7 +14,6 @@ Instruments CC13XX_26XX family of Wireless MCUs.
     -   [Programming](#programming)
         -   [Code Composer Studio](#code-composer-studio)
         -   [UniFlash](#uniflash)
-    -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Example](#running-the-example)
         -   [Provisioning](#provisioning)
             -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
