@@ -17,7 +17,7 @@
  */
 
 #pragma once
-#include "LockManager.h"
+
 #include <app/clusters/door-lock-server/door-lock-server.h>
 
 #include <stdbool.h>

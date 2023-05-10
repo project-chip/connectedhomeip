@@ -35,7 +35,7 @@ int PumpManager::Init()
     if (NULL == mTimerHandle)
     {
         PLAT_LOG("failed to create pump timer");
-        while (1)
+        while (true)
             ;
     }
 

@@ -30,7 +30,5 @@ void cc13xx_26xxLog(const char * aFormat, ...);
 #ifdef __cplusplus
 }
 
-#include <lib/core/CHIPError.h>
-void appError(CHIP_ERROR error);
 #endif
 #endif // APP_CONFIG_H

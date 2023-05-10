@@ -27,8 +27,6 @@
 #include "AppConfig.h"
 #include "PumpManager.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Dnssd.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
@@ -76,7 +74,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         PLAT_LOG("## Operational network enabled");
         break;
 
-    case DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceEventType::kDnssdInitialized:
         PLAT_LOG("## Dnssd platform initialized");
         break;
 
