@@ -792,6 +792,13 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
     {
         self->ReleaseCommissioneeDevice(device);
         self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
+
+        // Callback is required when BLE discovery fails, otherwise the caller will always be in a suspended state
+        // A better way to handle it should define a new error code
+        if (self->mPairingDelegate != nullptr)
+        {
+            self->mPairingDelegate->OnPairingComplete(err);
+        }
     }
 }
 #endif // CONFIG_NETWORK_LAYER_BLE

@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Project CHIP Authors
+# Copyright (c) 2020-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -200,6 +200,39 @@ kotlin_library("tlv_read_write_test") {
   ]
 
   sources = [ "tests/chip/tlv/TlvReadWriteTest.kt" ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_library("json") {
+  output_name = "libCHIPJson.jar"
+
+  deps = [
+    ":tlv",
+    "${chip_root}/third_party/java_deps:gson",
+  ]
+
+  sources = [
+    "src/chip/json/JsonToTlv.kt",
+    "src/chip/json/TlvToJson.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_library("json_to_tlv_to_json_test") {
+  output_name = "JsonToTlvToJsonTest.jar"
+
+  deps = [
+    ":json",
+    ":tlv",
+    "${chip_root}/third_party/java_deps:gson",
+    "${chip_root}/third_party/java_deps:junit-4",
+    "${chip_root}/third_party/java_deps:kotlin-test",
+    "${chip_root}/third_party/java_deps:truth",
+  ]
+
+  sources = [ "tests/chip/json/JsonToTlvToJsonTest.kt" ]
 
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
