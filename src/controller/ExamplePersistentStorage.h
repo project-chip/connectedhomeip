@@ -26,7 +26,18 @@
 class PersistentStorage : public chip::PersistentStorageDelegate
 {
 public:
-    CHIP_ERROR Init(const char * name = nullptr);
+    /**
+     * name is the name of the storage to use.  If null, defaults to
+     * "chip_tool_config.ini".
+     *
+     * directory is the directory the storage file should be placed in.  If
+     * null, falls back to getenv("TMPDIR") and if that is not set falls back
+     * to /tmp.
+     *
+     * If non-null values are provided, the memory they point to is expected to
+     * outlive this object.
+     */
+    CHIP_ERROR Init(const char * name = nullptr, const char * directory = nullptr);
 
     /////////// PersistentStorageDelegate Interface /////////
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
@@ -55,7 +66,8 @@ public:
     CHIP_ERROR SyncClearAll();
 
 private:
-    CHIP_ERROR CommitConfig(const char * name);
+    CHIP_ERROR CommitConfig(const char * directory, const char * name);
     inipp::Ini<char> mConfig;
     const char * mName;
+    const char * mDirectory;
 };
