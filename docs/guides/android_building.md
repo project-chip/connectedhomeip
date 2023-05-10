@@ -42,7 +42,7 @@ directory.
 
 ## Requirements for building
 
-You need Android SDK 21 & NDK 23.2.8568313 downloaded to your machine. Set the
+You need Android SDK 26 & NDK 23.2.8568313 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
 downloaded. The build also requires `kotlinc` to be in your `$PATH`.
@@ -57,9 +57,9 @@ downloaded. The build also requires `kotlinc` to be in your `$PATH`.
     1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
        (latest)
     2. Apply
-4. Install SDK 21:
-    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 5.0 (Lollipop) SDK
-       Level 21
+4. Install SDK 26:
+    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 8.0 (Oreo) SDK Level
+       26
     2. Apply
 5. Install Emulator:
     1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 31
