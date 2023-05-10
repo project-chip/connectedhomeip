@@ -42,7 +42,7 @@ directory.
 
 ## Requirements for building
 
-You need Android SDK 21 & NDK 21.4.7075529 downloaded to your machine. Set the
+You need Android SDK 21 & NDK 23.2.8568313 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
 downloaded. The build also requires `kotlinc` to be in your `$PATH`.
@@ -51,7 +51,7 @@ downloaded. The build also requires `kotlinc` to be in your `$PATH`.
 2. Install NDK:
     1. Tools -> SDK Manager -> SDK Tools Tab
     2. Click [x] Show Package Details
-    3. Select NDK (Side by Side) -> 21.4.7075529
+    3. Select NDK (Side by Side) -> 23.2.8568313
     4. Apply
 3. Install Command Line Tools:
     1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
@@ -69,14 +69,14 @@ downloaded. The build also requires `kotlinc` to be in your `$PATH`.
 
 ```
 export ANDROID_HOME=~/Android/Sdk
-export ANDROID_NDK_HOME=~/Android/Sdk/ndk/21.4.7075529
+export ANDROID_NDK_HOME=~/Android/Sdk/ndk/23.2.8568313
 ```
 
 ### MacOS
 
 ```
 export ANDROID_HOME=~/Library/Android/sdk
-export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/21.4.7075529
+export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/23.2.8568313
 ```
 
 <a name="abi"></a>
@@ -108,6 +108,7 @@ Android Studio Dolphin and below:
 ```shell
 export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home/
 ```
+
 Android Studio Electric Eel 2022.1.1 and above:
 
 ```shell
