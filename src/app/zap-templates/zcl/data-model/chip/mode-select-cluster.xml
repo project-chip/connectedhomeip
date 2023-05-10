@@ -98,7 +98,7 @@ limitations under the License.
 
   <bitmap name="ModeSelectFeature" type="BITMAP32">
     <cluster code="0x0050"/>
-    <field name="DEPONOFF" mask="0x1"/>
-    <field name="EXT" mask="0x2"/>
+    <field name="On/Off" mask="0x1"/>
+    <field name="Extended Status" mask="0x2"/>
   </bitmap>
 </configurator>
