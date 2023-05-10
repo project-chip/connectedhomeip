@@ -61,11 +61,45 @@ public:
 
     virtual CHIP_ERROR Init() = 0;
 
+    /**
+     * This function returns true if the mode value given matches one of the supported modes, otherwise it returns false.
+     *
+     * @param mode
+     */
     bool IsSupportedMode(uint8_t mode);
 
+    /**
+     * If the mode value given is supported, this function will update modeOption to the ModeOptionStructType for the mode with
+     * the matching value and returns success. If the mode value given is not supported, the modeOption remains untouched and
+     * returns an InvalidCommand status.
+     *
+     * @param mode
+     * @param modeOption
+     */
     Status GetMode(uint8_t mode, ModeOptionStructType & modeOption);
 
+    /**
+     * When a ChangeToMode command is received, if the NewMode value is a supported made, this function is called to decide if we
+     * should go ahead with transitioning to this mode. If this function returns a success status, the change request is accepted
+     * and the CurrentMode is set to the NewMode. Else, the CurrentMode is left untouched and the returned status in added to the
+     * CommandHandler.
+     *
+     * This function is to be overridden by a user implemented function that makes this decision based on the application logic.
+     * @param mode
+     */
     virtual Status HandleChangeToMode(uint8_t mode);
+
+    /**
+     * When a ChangeToModeWithStatus command is received, if the NewMode value is a supported made, this function is called to
+     * 1) decide if we should go ahead with transitioning to this mode and 2) formulate the ChangeToModeResponse that will be
+     * sent back to the client. If this function returns a response.status of ChangeToModeResponseStatus success, the change
+     * request is accepted and the CurrentMode is set to the NewMode. Else, the CurrentMode is left untouched. The response is
+     * sent as a ChangeToModeResponse command.
+     *
+     * This function is to be overridden by a user implemented function that makes this decision based on the application logic.
+     * @param mode
+     * @param response
+     */
     virtual void HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type & response);
 
     virtual ~Delegate() = default;

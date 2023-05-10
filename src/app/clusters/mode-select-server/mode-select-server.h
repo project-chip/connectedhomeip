@@ -72,6 +72,13 @@ private:
     void HandleChangeToModeWithStatus(HandlerContext & ctx, const Commands::ChangeToModeWithStatus::DecodableType & req);
 
 public:
+    /**
+     * Creates a mode select cluster instance. The Init() function needs to be called for this instance to be registered and
+     * called by the interaction model at the appropriate times.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aClusterId The ID of the ModeSelect aliased cluster to be instantiated.
+     * @param aDelegate A pointer to a delegate that will handle application layer logic.
+     */
     Instance(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId)
