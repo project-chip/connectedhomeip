@@ -81,7 +81,9 @@ public class ClusterReadMapping {
      
        return result;
     }
+    @SuppressWarnings("serial")
     public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
+
         return new HashMap<String, Map<String, InteractionInfo>>(){{
             put("first", readFirstInteractionInfo());
             put("second", readSecondInteractionInfo());

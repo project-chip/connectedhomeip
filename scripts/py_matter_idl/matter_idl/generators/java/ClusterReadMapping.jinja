@@ -46,7 +46,9 @@ public class ClusterReadMapping {
     }
 
 {%- endfor %}
+    @SuppressWarnings("serial")
     public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
+
         return new HashMap<String, Map<String, InteractionInfo>>(){% raw %}{{{% endraw %}
     {%- for cluster in clientClusters | sort(attribute='code') %}
             put("{{cluster.name | lowfirst_except_acronym}}", read{{cluster.name}}InteractionInfo());
