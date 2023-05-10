@@ -82,7 +82,7 @@ public class ClusterReadMapping {
        return result;
     }
     public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
-        return new HashMap<>(){{
+        return new HashMap<String, Map<String, InteractionInfo>>(){{
             put("first", readFirstInteractionInfo());
             put("second", readSecondInteractionInfo());
             put("third", readThirdInteractionInfo());}};

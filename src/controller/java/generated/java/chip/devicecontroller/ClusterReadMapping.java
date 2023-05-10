@@ -16416,7 +16416,7 @@ public class ClusterReadMapping {
   }
 
   public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
-    return new HashMap<>() {
+    return new HashMap<String, Map<String, InteractionInfo>>() {
       {
         put("identify", readIdentifyInteractionInfo());
         put("groups", readGroupsInteractionInfo());
