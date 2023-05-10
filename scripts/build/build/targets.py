@@ -392,6 +392,7 @@ def BuildK32WTarget():
 
     return target
 
+
 def BuildTITargets():
     target = BuildTarget('ti', TIBuilder)
 

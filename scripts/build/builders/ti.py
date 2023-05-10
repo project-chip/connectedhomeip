@@ -93,7 +93,7 @@ class TIBuilder(GnBuilder):
     def __init__(self,
                  root,
                  runner,
-                 board = TIBoard.LP_CC2652R7,
+                 board=TIBoard.LP_CC2652R7,
                  app: TIApp = TIApp.LOCK,
                  openthread_ftd: bool = None):
         super(TIBuilder, self).__init__(
