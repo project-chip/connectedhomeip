@@ -143,6 +143,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         runtime = TestRunTime.CHIP_REPL_PYTHON
     elif runner == 'chip_tool_python':
         runtime = TestRunTime.CHIP_TOOL_PYTHON
+    elif chip_tool is not None and os.path.basename(chip_tool) == "darwin-framework-tool":
+        runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_BUILTIN
 
     if chip_tool is None and not runtime == TestRunTime.CHIP_REPL_PYTHON:
         # non yaml tests REQUIRE chip-tool. Yaml tests should not require chip-tool

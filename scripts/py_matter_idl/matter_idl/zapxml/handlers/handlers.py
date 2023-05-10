@@ -248,7 +248,10 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
 
     def __init__(self, context: Context, attrs):
         super().__init__(context)
-        self._cluster_code = None  # if set, enum belongs to a specific cluster
+
+        # no cluster codes means global. Note that at the time
+        # of writing this, no global enums were defined in XMLs
+        self._cluster_codes = set()
         self._enum = Enum(name=attrs['name'],
                           base_type=attrs['type'], entries=[])
 
@@ -260,10 +263,7 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
             ))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'cluster':
-            if self._cluster_code is not None:
-                raise Exception(
-                    'Multiple cluster codes for enum %s' % self._enum.name)
-            self._cluster_code = ParseInt(attrs['code'])
+            self._cluster_codes.add(ParseInt(attrs['code']))
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         else:
             return BaseHandler(self.context)
@@ -273,18 +273,18 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
         #   - inside a cluster if a code exists
         #   - inside top level if a code does not exist
 
-        if self._cluster_code is None:
+        if not self._cluster_codes:
             idl.enums.append(self._enum)
         else:
-            found = False
+            found = set()
             for c in idl.clusters:
-                if c.code == self._cluster_code:
+                if c.code in self._cluster_codes:
                     c.enums.append(self._enum)
-                    found = True
+                    found.add(c.code)
 
-            if not found:
-                LOGGER.error('Enum %s could not find its cluster (code %d/0x%X)' %
-                             (self._enum.name, self._cluster_code, self._cluster_code))
+            if found != self._cluster_codes:
+                LOGGER.error('Enum %s could not find its clusters (codes: %r)' %
+                             (self._enum.name, self._cluster_codes - found))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
