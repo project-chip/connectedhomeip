@@ -825,6 +825,7 @@ void BLEManagerImpl::OnScanComplete()
 
 void BLEManagerImpl::OnScanError(CHIP_ERROR err)
 {
+    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
     ChipLogError(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
