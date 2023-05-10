@@ -49,7 +49,7 @@
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 #ifndef __BYTE_ORDER__
-#error Endianness not defined is not defined
+#error Endianness is not defined
 #endif // BYTE_ORDER
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -83,8 +83,8 @@
 #endif
 
 #else
-#error Unknown endiannes set to _BYTE_ORDER__
-#endif // _BYTE_ORDER__ ==
+#error __BYTE_ORDER__ value not recognized
+#endif // __BYTE_ORDER__ ==
 
 #endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
