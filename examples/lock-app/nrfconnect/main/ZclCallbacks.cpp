@@ -126,9 +126,5 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     logOnFailure(DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set(endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER),
                  "number of credentials per user");
 
-    // Set FeatureMap to (kUser|kPinCredential), default is:
-    // (kUser|kAccessSchedules|kRfidCredential|kPinCredential) 0x113
-    logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101), "feature map");
-
     AppTask::Instance().UpdateClusterState(BoltLockMgr().GetState(), BoltLockManager::OperationSource::kUnspecified);
 }

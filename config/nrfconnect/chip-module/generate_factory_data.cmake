@@ -180,7 +180,7 @@ endfunction()
 #
 function(nrfconnect_generate_factory_data)
 
-find_package(Python REQUIRED)
+find_package(Python3 REQUIRED)
 
 # CHIP_ROOT must be provided as a reference set all localization of scripts
 if(NOT CHIP_ROOT)

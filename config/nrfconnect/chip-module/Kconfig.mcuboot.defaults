@@ -140,6 +140,9 @@ config FLASH_SIMULATOR_STATS
 config ENABLE_MGMT_PERUSER
     default y
 
+config ZCBOR
+    default y
+
 config BOOT_MGMT_CUSTOM_STORAGE_ERASE
     default y
 
