@@ -77,7 +77,6 @@ using namespace ::chip::DeviceLayer::Internal;
 
 void sl_ble_init()
 {
-    SILABS_LOG("%s starting", __func__);
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
@@ -88,24 +87,17 @@ void sl_ble_init()
                                     rsi_ble_on_mtu_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                                     rsi_ble_on_event_indication_confirmation, NULL);
 
-    SILABS_LOG("registering rsi_ble_add_service");
-
     //  Exchange of GATT info with BLE stack
     rsi_ble_add_matter_service();
 
     //  initializing the application events map
     rsi_ble_app_init_events();
-
-    SILABS_LOG("StartAdvertising");
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
-    SILABS_LOG("%s  Ended", __func__);
 }
 
 void sl_ble_event_handling_task(void)
 {
     int32_t event_id;
-
-    SILABS_LOG("%s starting", __func__);
 
     //! This semaphore is waiting for wifi module initialization.
     rsi_semaphore_wait(&sl_rs_ble_init_sem, 0);
@@ -166,8 +158,6 @@ void sl_ble_event_handling_task(void)
             break;
         }
     }
-
-    SILABS_LOG("%s Ended", __func__);
 }
 
 namespace chip {
@@ -241,7 +231,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     if (wfx_rsi.ble_task == NULL)
     {
-        SILABS_LOG("%s: error: failed to create ble task.", __func__);
+        ChipLogError(DeviceLayer, "%s: error: failed to create ble task.", __func__);
     }
 
     // Initialize the CHIP BleLayer.
@@ -436,12 +426,11 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                                     PacketBufferHandle data)
 {
     int32_t status = 0;
-    SILABS_LOG("In send indication");
     status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()),
                                     data->Start());
     if (status != RSI_SUCCESS)
     {
-        SILABS_LOG("indication %d failed with error code %lx ", status);
+        ChipLogProgress(DeviceLayer, "indication %d failed with error code %lx ", status);
         return false;
     }
 
@@ -496,7 +485,6 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 
 void BLEManagerImpl::DriveBLEState(void)
 {
-    SILABS_LOG("%s starting", __func__);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized ( TODO )
@@ -510,7 +498,7 @@ void BLEManagerImpl::DriveBLEState(void)
         // to the advertising configuration.
         if (!mFlags.Has(Flags::kAdvertising) || mFlags.Has(Flags::kRestartAdvertising))
         {
-            SILABS_LOG("Start Advertising");
+            ChipLogProgress(DeviceLayer, "Start Advertising");
             err = StartAdvertising();
             SuccessOrExit(err);
         }
@@ -519,13 +507,12 @@ void BLEManagerImpl::DriveBLEState(void)
     // Otherwise, stop advertising if it is enabled.
     else if (mFlags.Has(Flags::kAdvertising))
     {
-        SILABS_LOG("Stop Advertising");
+        ChipLogProgress(DeviceLayer, "Stop Advertising");
         err = StopAdvertising();
         SuccessOrExit(err);
     }
 
 exit:
-    SILABS_LOG("%s End", __func__);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
@@ -711,14 +698,12 @@ void BLEManagerImpl::UpdateMtu(rsi_ble_event_mtu_t evt)
 
 void BLEManagerImpl::HandleBootEvent(void)
 {
-    ChipLogProgress(DeviceLayer, "HandleBootEvent started");
     mFlags.Set(Flags::kEFRBLEStackInitialized);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectEvent(void)
 {
-    ChipLogProgress(DeviceLayer, "Connect Event for handle : %d", event_msg.connectionHandle);
     AddConnection(event_msg.connectionHandle, event_msg.bondingHandle);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
@@ -727,8 +712,6 @@ void BLEManagerImpl::HandleConnectEvent(void)
 void BLEManagerImpl::HandleConnectionCloseEvent(uint16_t reason)
 {
     uint8_t connHandle = 1;
-
-    ChipLogProgress(DeviceLayer, "Disconnect Event for handle : %d", connHandle);
 
     if (RemoveConnection(connHandle))
     {
