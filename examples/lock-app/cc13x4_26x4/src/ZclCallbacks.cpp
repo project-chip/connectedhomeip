@@ -56,7 +56,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint) {}
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+                                            OperationErrorEnum & err)
 {
     ChipLogProgress(Zcl, "Door Lock App: Lock Command endpoint=%d", endpointId);
     bool status = LockMgr().Lock(endpointId, pinCode, err);

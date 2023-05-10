@@ -26,8 +26,6 @@
 #include <app/server/Server.h>
 
 #include "FreeRTOS.h"
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 #include <app/EventLogging.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>

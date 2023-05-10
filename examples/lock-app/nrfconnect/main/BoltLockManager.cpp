@@ -91,7 +91,8 @@ bool BoltLockManager::GetCredential(uint16_t credentialIndex, CredentialTypeEnum
 }
 
 bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
-                                    CredentialStructStatus credentialStatus, CredentialTypeEnum credentialType, const ByteSpan & secret)
+                                    CredentialStructStatus credentialStatus, CredentialTypeEnum credentialType,
+                                    const ByteSpan & secret)
 {
     VerifyOrReturnError(credentialIndex > 0 && credentialIndex <= CONFIG_LOCK_NUM_CREDENTIALS, false);
     VerifyOrReturnError(secret.size() <= kMaxCredentialLength, false);

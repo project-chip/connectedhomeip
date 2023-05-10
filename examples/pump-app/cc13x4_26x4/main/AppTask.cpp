@@ -230,7 +230,6 @@ int AppTask::Init()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
-
     ConfigurationMgr().LogDeviceConfig();
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)

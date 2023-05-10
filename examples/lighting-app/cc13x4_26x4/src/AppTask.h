@@ -28,7 +28,6 @@
 #include "AppEvent.h"
 #include "LightingManager.h"
 
-
 #include <ti/drivers/apps/Button.h>
 
 // Application-defined error codes in the CHIP_ERROR space.

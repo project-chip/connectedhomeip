@@ -155,7 +155,8 @@ public:
                        EmberAfPluginDoorLockCredentialInfo & credential);
 
     bool SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData);
+                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                       const chip::ByteSpan & credentialData);
 
     DlStatus GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
                                 EmberAfPluginDoorLockWeekDaySchedule & schedule);
@@ -180,7 +181,8 @@ public:
     bool IsValidYeardayScheduleIndex(uint8_t scheduleIndex);
     bool IsValidHolidayScheduleIndex(uint8_t scheduleIndex);
 
-    bool checkPin(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
+    bool checkPin(chip::EndpointId endpointId, DlLockState lockState, const Optional<chip::ByteSpan> & pin,
+                  OperationErrorEnum & err);
     const char * lockStateToString(DlLockState lockState) const;
 
     bool ReadConfigValues();
