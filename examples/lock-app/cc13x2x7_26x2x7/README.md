@@ -168,7 +168,7 @@ Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
 extension. For OTA enabled applications, the standalone image will instead end
 with the `*-bim.hex` file extension. This this is a combined image with
-application and and BIM included. The flag to enable or disable the OTA feature
+application and and `BIM` included. The flag to enable or disable the OTA feature
 is determined by "chip_enable_ota_requestor" in the application's args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
@@ -256,10 +256,10 @@ Commissioning complete, notify platform driver to persist network credentials.
 
 Send commands to the lock-app. Here are some example commands:
 
-Set a new user "TST" with user index of 1 with a default pin of 123456
+Set a new user "`TST`" with user index of 1 with a default pin of 123456
 
 ```
-./chip-tool doorlock set-user 0 1 TST 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000
+./chip-tool doorlock set-user 0 1 `TST` 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000
 ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 ```
 
