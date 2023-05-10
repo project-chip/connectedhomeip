@@ -78,7 +78,7 @@ limitations under the License.
       <arg name="NewMode" type="INT8U" optional="false"/>
     </command>
 
-    <command source="client" code="0x01" name="ChangeToModeWithStatus" optional="true">
+    <command source="client" code="0x01" name="ChangeToModeWithStatus" response="ChangeToModeResponse" optional="true">
       <description>
         This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
@@ -86,7 +86,7 @@ limitations under the License.
       <arg name="NewMode" type="INT8U" optional="false"/>
     </command>
 
-    <command source="server" code="0x02" name="ChangeToModeResponse" optional="true">
+    <command source="server" code="0x02" name="ChangeToModeResponse" disableDefaultResponse="true" optional="true">
       <description>
         This command is sent by the device on receipt of the ChangeToModeWithStatus command.
       </description>
