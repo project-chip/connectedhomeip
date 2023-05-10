@@ -407,8 +407,10 @@ def BuildTITargets():
         TargetPart('lighting', app=TIApp.LIGHTING),
         TargetPart('lock-ftd', app=TIApp.LOCK, openthread_ftd=True).OnlyIfRe("-(cc13x4_26x4)-"),
         TargetPart('lock-mtd', app=TIApp.LOCK, openthread_ftd=False),
-        TargetPart('pump', app=TIApp.PUMP),
-        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER)
+        TargetPart('pump-ftd', app=TIApp.PUMP, openthread_ftd=True).OnlyIfRe("-(cc13x4_26x4)-"),
+        TargetPart('pump-mtd', app=TIApp.PUMP, openthread_ftd=False),
+        TargetPart('pump-controller-ftd', app=TIApp.PUMP_CONTROLLER, openthread_ftd=True).OnlyIfRe("-(cc13x4_26x4)-"),
+        TargetPart('pump-controller-mtd', app=TIApp.PUMP_CONTROLLER, openthread_ftd=False),
     ])
 
     return target
