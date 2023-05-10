@@ -121,7 +121,9 @@ EventGroupHandle_t  sEventGroup;
 TimerHandle_t connectionTimeout;
 
 /* keep the device ID of the connected peer */
-uint8_t g_device_id;
+uint8_t gDeviceId;
+bool gDeviceSubscribed = false;
+bool gDeviceConnected  = false;
 
 const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xF6, 0xFF };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
@@ -213,16 +215,7 @@ exit:
 
 uint16_t BLEManagerCommon::_NumConnections(void)
 {
-    uint16_t numCons = 0;
-    for (uint16_t i = 0; i < kMaxConnections; i++)
-    {
-        if (mBleConnections[i].allocated)
-        {
-            numCons++;
-        }
-    }
-
-    return numCons;
+    return static_cast<uint16_t>(gDeviceConnected == true);
 }
 
 bool BLEManagerCommon::_IsAdvertisingEnabled(void)
@@ -233,65 +226,6 @@ bool BLEManagerCommon::_IsAdvertisingEnabled(void)
 bool BLEManagerCommon::_IsAdvertising(void)
 {
     return mFlags.Has(Flags::kAdvertising);
-}
-
-bool BLEManagerCommon::RemoveConnection(uint8_t connectionHandle)
-{
-    CHIPoBLEConState * bleConnState = GetConnectionState(connectionHandle, true);
-    bool status                     = false;
-
-    if (bleConnState != NULL)
-    {
-        memset(bleConnState, 0, sizeof(CHIPoBLEConState));
-        status = true;
-    }
-
-    return status;
-}
-
-void BLEManagerCommon::AddConnection(uint8_t connectionHandle)
-{
-    CHIPoBLEConState * bleConnState = GetConnectionState(connectionHandle, true);
-
-    if (bleConnState != NULL)
-    {
-        memset(bleConnState, 0, sizeof(CHIPoBLEConState));
-        bleConnState->allocated        = 1;
-        bleConnState->connectionHandle = connectionHandle;
-    }
-}
-
-BLEManagerCommon::CHIPoBLEConState * BLEManagerCommon::GetConnectionState(uint8_t connectionHandle, bool allocate)
-{
-    uint8_t freeIndex = kMaxConnections;
-
-    for (uint8_t i = 0; i < kMaxConnections; i++)
-    {
-        if (mBleConnections[i].allocated == 1)
-        {
-            if (mBleConnections[i].connectionHandle == connectionHandle)
-            {
-                return &mBleConnections[i];
-            }
-        }
-
-        else if (i < freeIndex)
-        {
-            freeIndex = i;
-        }
-    }
-
-    if (allocate)
-    {
-        if (freeIndex < kMaxConnections)
-        {
-            return &mBleConnections[freeIndex];
-        }
-
-        ChipLogError(DeviceLayer, "Failed to allocate CHIPoBLEConState");
-    }
-
-    return NULL;
 }
 
 CHIP_ERROR BLEManagerCommon::_SetAdvertisingEnabled(bool val)
@@ -318,8 +252,15 @@ CHIP_ERROR BLEManagerCommon::_SetAdvertisingMode(BLEAdvertisingMode mode)
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
         break;
     case BLEAdvertisingMode::kSlowAdvertising:
+    {
+        auto err = BLEMgrImpl().StopAdvertising();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(DeviceLayer, "Stop advertising failed.");
+        }
         mFlags.Set(Flags::kFastAdvertisingEnabled, false);
         break;
+    }
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -447,7 +388,6 @@ bool BLEManagerCommon::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_RE
 void BLEManagerCommon::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     BLEMgrImpl().blekw_stop_connection_internal(conId);
-    BLEMgrImpl().RemoveConnection(conId);
 }
 
 bool BLEManagerCommon::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
@@ -836,27 +776,19 @@ CHIP_ERROR BLEManagerCommon::StartAdvertising(void)
 
 CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
 {
-    ble_err_t err;
     CHIP_ERROR error = CHIP_NO_ERROR;
-    CHIPoBLEConState * bleConnState = GetConnectionState(g_device_id, false);
 
     if (mFlags.Has(Flags::kAdvertising))
     {
         mFlags.Clear(Flags::kAdvertising);
-        mFlags.Clear(Flags::kFastAdvertisingEnabled);
         mFlags.Clear(Flags::kRestartAdvertising);
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
-        /* there is no need to stop advertising if we have an active connection.
-         * that's because the controller already stopped the advertising during
-         * the connect event. Stopping advertising twice will lead to errors.
-         */
-        if (bleConnState && !bleConnState->allocated)
+        if(!gDeviceSubscribed)
         {
-            err = blekw_stop_advertising();
-            if (err != BLE_OK)
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
+            ble_err_t err = blekw_stop_advertising();
+            VerifyOrReturnError(err == BLE_OK, CHIP_ERROR_INCORRECT_STATE);
+            CancelBleAdvTimeoutTimer();
         }
 
 #if CONFIG_CHIP_NFC_COMMISSIONING
@@ -867,8 +799,6 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
         error                                      = PlatformMgr().PostEvent(&advChange);
 #endif
     }
-
-    CancelBleAdvTimeoutTimer();
 
     return error;
 }
@@ -934,10 +864,12 @@ void BLEManagerCommon::DoBleProcessing(void)
         }
         else if (msg->type == BLE_KW_MSG_CONNECTED)
         {
+            gDeviceConnected = true;
             sImplInstance->HandleConnectEvent(msg);
         }
         else if (msg->type == BLE_KW_MSG_DISCONNECTED)
         {
+            gDeviceConnected = false;
             sImplInstance->HandleConnectionCloseEvent(msg);
         }
         else if (msg->type == BLE_KW_MSG_MTU_CHANGED)
@@ -963,11 +895,10 @@ void BLEManagerCommon::DoBleProcessing(void)
             ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
 
             /* Set the advertising parameters */
-            if (Gap_Disconnect(g_device_id) != gBleSuccess_c)
+            if (Gap_Disconnect(gDeviceId) != gBleSuccess_c)
             {
                 ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
             }
-            sImplInstance->RemoveConnection(g_device_id);
         }
 
         /* Free the message from the queue */
@@ -978,8 +909,8 @@ void BLEManagerCommon::DoBleProcessing(void)
 
 void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 {
-    uint8_t device_id_loc = msg->data.u8;
-    ChipLogProgress(DeviceLayer, "BLE is connected with device: %d.\n", device_id_loc);
+    uint8_t deviceId = msg->data.u8;
+    ChipLogProgress(DeviceLayer, "BLE is connected with device: %d.\n", deviceId);
 
 #if gClkUseFro32K
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
@@ -987,16 +918,16 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 #endif
 #endif
 
-    g_device_id = device_id_loc;
+    gDeviceId = deviceId;
+
     blekw_start_connection_timeout();
-    sImplInstance->AddConnection(device_id_loc);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
 {
-    uint8_t device_id_loc = msg->data.u8;
-    ChipLogProgress(DeviceLayer, "BLE is disconnected with device: %d.\n", device_id_loc);
+    uint8_t deviceId = msg->data.u8;
+    ChipLogProgress(DeviceLayer, "BLE is disconnected with device: %d.\n", deviceId);
 
 #if gClkUseFro32K
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
@@ -1004,18 +935,15 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
 #endif
 #endif
 
-    if (sImplInstance->RemoveConnection(device_id_loc))
-    {
-        ChipDeviceEvent event;
-        event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
-        event.CHIPoBLEConnectionError.ConId  = device_id_loc;
-        event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
+    event.CHIPoBLEConnectionError.ConId  = deviceId;
+    event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
 
-        PlatformMgr().PostEventOrDie(&event);
-        mFlags.Set(Flags::kRestartAdvertising);
-        mFlags.Set(Flags::kFastAdvertisingEnabled);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-    }
+    PlatformMgr().PostEventOrDie(&event);
+    mFlags.Set(Flags::kRestartAdvertising);
+    mFlags.Set(Flags::kFastAdvertisingEnabled);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerCommon::HandleWriteEvent(blekw_msg_t * msg)
@@ -1053,43 +981,29 @@ void BLEManagerCommon::HandleWriteEvent(blekw_msg_t * msg)
 void BLEManagerCommon::HandleTXCharCCCDWrite(blekw_msg_t * msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CHIPoBLEConState * bleConnState;
-    bool indicationsEnabled;
-    ChipDeviceEvent event;
     blekw_att_written_data_t * att_wr_data = (blekw_att_written_data_t *) msg->data.data;
-    uint16_t writeLen                      = att_wr_data->length;
-    uint8_t * data                         = att_wr_data->data;
+    ChipDeviceEvent event;
 
-    VerifyOrExit(writeLen != 0, err = CHIP_ERROR_INCORRECT_STATE);
-    bleConnState = GetConnectionState(att_wr_data->device_id, false);
-    VerifyOrExit(bleConnState != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-    /* Determine if the client is enabling or disabling indications. */
-    indicationsEnabled = (*data);
+    VerifyOrExit(att_wr_data->length != 0, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(att_wr_data->data != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
 #if CHIP_DEVICE_CHIP0BLE_DEBUG
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", indicationsEnabled ? "subscribe" : "unsubscribe");
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", *att_wr_data->data ? "subscribe" : "unsubscribe");
 #endif
 
-    if (indicationsEnabled)
+    if (*att_wr_data->data)
     {
-        // If indications are not already enabled for the connection...
-        if (!bleConnState->subscribed)
+        if (!gDeviceSubscribed)
         {
-            bleConnState->subscribed = 1;
-            /* Post an event to the CHIP queue to process either a CHIPoBLE
-             * Subscribe or Unsubscribe based on whether the client
-             * is enabling or disabling indications. */
-            {
-                event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
-                event.CHIPoBLESubscribe.ConId = att_wr_data->device_id;
-                err                           = PlatformMgr().PostEvent(&event);
-            }
+            gDeviceSubscribed             = true;
+            event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
+            event.CHIPoBLESubscribe.ConId = att_wr_data->device_id;
+            err                           = PlatformMgr().PostEvent(&event);
         }
     }
     else
     {
-        bleConnState->subscribed      = 0;
+        gDeviceSubscribed             = false;
         event.Type                    = DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = att_wr_data->device_id;
         err                           = PlatformMgr().PostEvent(&event);
@@ -1107,15 +1021,13 @@ void BLEManagerCommon::HandleRXCharWrite(blekw_msg_t * msg)
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle buf;
     blekw_att_written_data_t * att_wr_data = (blekw_att_written_data_t *) msg->data.data;
-    uint16_t writeLen                      = att_wr_data->length;
-    uint8_t * data                         = att_wr_data->data;
+
+    VerifyOrExit(att_wr_data->length != 0, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(att_wr_data->data != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // Copy the data to a PacketBuffer.
-    buf = System::PacketBufferHandle::New(writeLen);
+    buf = System::PacketBufferHandle::NewWithData(att_wr_data->data, att_wr_data->length);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(buf->AvailableDataLength() >= writeLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(buf->Start(), data, writeLen);
-    buf->SetDataLength(writeLen);
 
 #if CHIP_DEVICE_CHIP0BLE_DEBUG
     ChipLogDetail(DeviceLayer,
@@ -1441,22 +1353,11 @@ exit:
 
 void BLEManagerCommon::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
-    // If stop advertising fails (timeout on event wait), then
-    // rearm the timer as fast as possible to retry.
-    // Once stop advertising is successful, slow advertising can start.
-    // However, this does not fix the root cause of the issue.
-    // Additional investigation is currently ongoing: https://jira.sw.nxp.com/browse/MATTER-768
-    auto err = sImplInstance->StopAdvertising();
-    if (err != CHIP_NO_ERROR)
+    if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        ChipLogDetail(DeviceLayer, "Stop advertising failed. Retrying...");
-        StartBleAdvTimeoutTimer(portTICK_PERIOD_MS);
-        return;
+        ChipLogDetail(DeviceLayer, "Start slow advertisement");
+        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     }
-
-    sImplInstance->mFlags.Clear(Flags::kFastAdvertisingEnabled);
-    ChipLogDetail(DeviceLayer, "Start slow advertisement");
-    sImplInstance->StartAdvertising();
 }
 
 void BLEManagerCommon::CancelBleAdvTimeoutTimer(void)

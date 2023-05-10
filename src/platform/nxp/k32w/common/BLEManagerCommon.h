@@ -108,7 +108,6 @@ protected:
 
     enum
     {
-        kMaxConnections      = BLE_LAYER_NUM_BLE_ENDPOINTS,
         kMaxDeviceNameLength = 16,
         kUnusedIndex         = 0xFF,
     };
@@ -172,18 +171,6 @@ protected:
         uint16_t handle;
     } blekw_att_read_data_t;
 
-    typedef struct CHIPoBLEConState_s
-    {
-        uint16_t mtu : 10;
-        uint16_t allocated : 1;
-        uint16_t subscribed : 1;
-        uint16_t unused : 4;
-        uint8_t connectionHandle;
-        uint8_t bondingHandle;
-    }CHIPoBLEConState;
-    
-    CHIPoBLEConState mBleConnections[kMaxConnections];
-
     CHIPoBLEServiceMode mServiceMode;
     uint16_t mNumGAPCons;
     uint8_t mAdvHandle;
@@ -218,9 +205,6 @@ protected:
     void HandleC3ReadRequest(blekw_msg_t * msg);
 #endif
     BLEManagerCommon::ble_err_t blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data, uint32_t len);
-    bool RemoveConnection(uint8_t connectionHandle);
-    void AddConnection(uint8_t connectionHandle);
-    BLEManagerCommon::CHIPoBLEConState * GetConnectionState(uint8_t connectionHandle, bool allocate);
 
     static void DriveBLEState(intptr_t arg);
     static void HandleWriteEvent(intptr_t arg);
