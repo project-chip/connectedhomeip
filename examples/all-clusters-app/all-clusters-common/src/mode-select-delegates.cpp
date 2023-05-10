@@ -42,7 +42,7 @@ void ModeSelectDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::C
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        response.status = int8_t(ChangeToModeResponseStatus::kGenericFailure);
+        response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kGenericFailure);
         response.statusText.SetValue(chip::CharSpan("Could not get the current mode", 30));
         return;
     }
@@ -51,7 +51,7 @@ void ModeSelectDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::C
     // response is sent.
     if (currentMode == ModeBlack && mode == ModeEspresso)
     {
-        response.status = int8_t(ChangeToModeResponseStatus::kGenericFailure);
+        response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kGenericFailure);
         response.statusText.SetValue(chip::CharSpan("Cannot change to Espresso from mode Black", 41));
         return;
     }
@@ -75,7 +75,7 @@ void RvcRunDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::Chang
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        response.status = int8_t(ChangeToModeResponseStatus::kGenericFailure);
+        response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kGenericFailure);
         response.statusText.SetValue(chip::CharSpan("Could not get the current mode", 30));
         return;
     }
@@ -83,11 +83,11 @@ void RvcRunDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::Chang
     // Our business logic states that we can only switch into the mapping state from the idle state.
     if (mode == RvcRun::ModeMapping && currentMode != RvcRun::ModeIdle)
     {
-        response.status = int8_t(ChangeToModeResponseStatus::kGenericFailure);
+        response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kGenericFailure);
         response.statusText.SetValue(chip::CharSpan("Change to the mapping state is only allowed from idle", 53));
     }
 
-    response.status = int8_t(ChangeToModeResponseStatus::kSuccess);
+    response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess);
 }
 
 //-- RVC Clean delegate functions
@@ -108,18 +108,18 @@ void RvcCleanDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::Cha
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        response.status = int8_t(ChangeToModeResponseStatus::kGenericFailure);
+        response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kGenericFailure);
         response.statusText.SetValue(chip::CharSpan("Could not get the current mode", 30));
         return;
     }
 
     if (rvcRunCurrentMode == RvcRun::ModeCleaning)
     {
-        response.status = int8_t(RvcClean::ChangeToModeResponseStatus::kCleaningInProgress);
+        response.status = static_cast<uint8_t>(RvcClean::ChangeToModeResponseStatus::kCleaningInProgress);
         response.statusText.SetValue(chip::CharSpan("Cannot change the cleaning mode during a clean", 60));
     }
 
-    response.status = int8_t(ChangeToModeResponseStatus::kSuccess);
+    response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess);
 }
 
 //-- Dishwasher Control delegate functions
@@ -135,7 +135,7 @@ Status DishwasherControlDelegate::HandleChangeToMode(uint8_t mode)
 
 void DishwasherControlDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::ChangeToModeResponse::Type &response)
 {
-    response.status = int8_t(ChangeToModeResponseStatus::kSuccess);
+    response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess);
 }
 
 //-- Laundry Washer delegate functions
@@ -151,7 +151,7 @@ Status LaundryWasherDelegate::HandleChangeToMode(uint8_t mode)
 
 void LaundryWasherDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::ChangeToModeResponse::Type &response)
 {
-    response.status = int8_t(ChangeToModeResponseStatus::kSuccess);
+    response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess);
 }
 
 //-- Refrigerator And Temperature Controlled Cabinet delegate functions
@@ -167,5 +167,5 @@ Status TccDelegate::HandleChangeToMode(uint8_t mode)
 
 void TccDelegate::HandleChangeToModeWitheStatus(uint8_t mode, Commands::ChangeToModeResponse::Type &response)
 {
-    response.status = int8_t(ChangeToModeResponseStatus::kSuccess);
+    response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess);
 }

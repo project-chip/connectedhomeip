@@ -349,14 +349,14 @@ void Instance::HandleChangeToModeWithStatus(HandlerContext & ctx,
     if (msDelegate->IsSupportedMode(newMode) != Status::Success)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
-        response.status = uint8_t(ModeSelect::ChangeToModeResponseStatus::kUnsupportedMode);
+        response.status = static_cast<uint8_t>(ModeSelect::ChangeToModeResponseStatus::kUnsupportedMode);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return;
     }
 
     msDelegate->HandleChangeToModeWitheStatus(newMode, response);
 
-    if (response.status == uint8_t(ChangeToModeResponseStatus::kSuccess))
+    if (response.status == static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess))
     {
         SetCurrentMode(newMode);
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: HandleChangeToModeWitheStatus changed to mode %u", newMode);

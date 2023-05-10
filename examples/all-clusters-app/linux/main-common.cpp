@@ -213,8 +213,8 @@ namespace {
     Clusters::ModeSelect::Instance modeSelectInstance(0x1, Clusters::ModeSelect::Id, &modeSelectDelegate);
 
     // RVC Run
-    constexpr SemanticTagStructType semanticTagsIdle[]     = { { .value = uint16_t(Clusters::RvcRun::SemanticTags::kIdle) } };
-    constexpr SemanticTagStructType semanticTagsCleaning[] = { { .value = uint16_t(Clusters::RvcRun::SemanticTags::kCleaning) } };
+    constexpr SemanticTagStructType semanticTagsIdle[]     = { { .value = static_cast<uint16_t>(Clusters::RvcRun::SemanticTags::kIdle) } };
+    constexpr SemanticTagStructType semanticTagsCleaning[] = { { .value = static_cast<uint16_t>(Clusters::RvcRun::SemanticTags::kCleaning) } };
 
     std::vector<ModeOptionStructType> rvcRunOptions = {
         chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Idle", Clusters::RvcRun::ModeIdle, List<const SemanticTagStructType>(semanticTagsIdle)),
@@ -225,10 +225,10 @@ namespace {
     Clusters::ModeSelect::Instance rvcRunInstance(0x1, Clusters::RvcRun::Id, &RvcRunDelegate);
 
     // RVC Clean
-    constexpr SemanticTagStructType semanticTagsVac[]     = { { .value = uint16_t(Clusters::RvcClean::SemanticTags::kVacuum) } };
-    constexpr SemanticTagStructType semanticTagsMop[] = { { .value = uint16_t(Clusters::RvcClean::SemanticTags::kMop) } };
-    constexpr SemanticTagStructType semanticTagsBoost[] = { { .value = uint16_t(Clusters::ModeSelect::SemanticTags::kMax) },
-                                                              { .value = uint16_t(Clusters::RvcClean::SemanticTags::kDeepClean) }};
+    constexpr SemanticTagStructType semanticTagsVac[]     = { { .value = static_cast<uint16_t>(Clusters::RvcClean::SemanticTags::kVacuum) } };
+    constexpr SemanticTagStructType semanticTagsMop[] = { { .value = static_cast<uint16_t>(Clusters::RvcClean::SemanticTags::kMop) } };
+    constexpr SemanticTagStructType semanticTagsBoost[] = { { .value = static_cast<uint16_t>(Clusters::ModeSelect::SemanticTags::kMax) },
+                                                              { .value = static_cast<uint16_t>(Clusters::RvcClean::SemanticTags::kDeepClean) }};
 
     std::vector<ModeOptionStructType> rvcCleanOptions = {
         chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Vacuum", Clusters::RvcClean::ModeVacuum, List<const SemanticTagStructType>(semanticTagsVac)),
@@ -239,12 +239,12 @@ namespace {
     Clusters::ModeSelect::Instance rvcCleanInstance(0x1, Clusters::RvcClean::Id, &RvcCleanDelegate);
 
     // Dishwasher Mode Select
-    constexpr SemanticTagStructType semanticTagsNormal[] = { { .value = uint16_t(Clusters::DishwasherModeSelect::SemanticTags::kNormal) } };
-    constexpr SemanticTagStructType semanticTagsHeavy[] = {{ .value = uint16_t(Clusters::ModeSelect::SemanticTags::kMax) },
-                                                             { .value = uint16_t(Clusters::DishwasherModeSelect::SemanticTags::kHeavy) }};
-    constexpr SemanticTagStructType semanticTagsLight[] = { { .value = uint16_t(Clusters::DishwasherModeSelect::SemanticTags::kLight) },
-                                                            { .value = uint16_t(Clusters::ModeSelect::SemanticTags::kNight) },
-                                                            { .value = uint16_t(Clusters::ModeSelect::SemanticTags::kQuiet) }};
+    constexpr SemanticTagStructType semanticTagsNormal[] = { { .value = static_cast<uint16_t>(Clusters::DishwasherModeSelect::SemanticTags::kNormal) } };
+    constexpr SemanticTagStructType semanticTagsHeavy[] = {{ .value = static_cast<uint16_t>(Clusters::ModeSelect::SemanticTags::kMax) },
+                                                             { .value = static_cast<uint16_t>(Clusters::DishwasherModeSelect::SemanticTags::kHeavy) }};
+    constexpr SemanticTagStructType semanticTagsLight[] = { { .value = static_cast<uint16_t>(Clusters::DishwasherModeSelect::SemanticTags::kLight) },
+                                                            { .value = static_cast<uint16_t>(Clusters::ModeSelect::SemanticTags::kNight) },
+                                                            { .value = static_cast<uint16_t>(Clusters::ModeSelect::SemanticTags::kQuiet) }};
 
     std::vector<ModeOptionStructType> dishwasherModeSelectOptions = {
         chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Normal", Clusters::DishwasherModeSelect::ModeNormal, List<const SemanticTagStructType>(semanticTagsNormal)),
@@ -255,13 +255,13 @@ namespace {
     Clusters::ModeSelect::Instance dishwasherModeSelectInstance(0x1, Clusters::DishwasherModeSelect::Id, &DishwasherModeSelectDelegate);
 
     // Laundry Washer
-    constexpr SemanticTagStructType semanticTagsLaundryNormal[] = { { .value = uint16_t(Clusters::LaundryWasher::SemanticTags::kNormal) } };
-    constexpr SemanticTagStructType semanticTagsLaundryDelicate[] = { { .value = uint16_t(Clusters::LaundryWasher::SemanticTags::kDelicate) },
-                                                             { .value = uint16_t(Clusters::ModeSelect::SemanticTags::kNight) },
-                                                             { .value = uint16_t(Clusters::ModeSelect::SemanticTags::kQuiet) }};
-    constexpr SemanticTagStructType semanticTagsLaundryHeavy[] = {{ .value = uint16_t(Clusters::ModeSelect::SemanticTags::kMax) },
-                                                             { .value = uint16_t(Clusters::LaundryWasher::SemanticTags::kHeavy) }};
-    constexpr SemanticTagStructType semanticTagsLaundryWhites[] = {{ .value = uint16_t(Clusters::LaundryWasher::SemanticTags::kWhites) }};
+    constexpr SemanticTagStructType semanticTagsLaundryNormal[] = { { .value = static_cast<uint16_t>(Clusters::LaundryWasher::SemanticTags::kNormal) } };
+    constexpr SemanticTagStructType semanticTagsLaundryDelicate[] = { { .value = static_cast<uint16_t>(Clusters::LaundryWasher::SemanticTags::kDelicate) },
+                                                             { .value = static_cast<uint16_t>(Clusters::ModeSelect::SemanticTags::kNight) },
+                                                             { .value = static_cast<uint16_t>(Clusters::ModeSelect::SemanticTags::kQuiet) }};
+    constexpr SemanticTagStructType semanticTagsLaundryHeavy[] = {{ .value = static_cast<uint16_t>(Clusters::ModeSelect::SemanticTags::kMax) },
+                                                             { .value = static_cast<uint16_t>(Clusters::LaundryWasher::SemanticTags::kHeavy) }};
+    constexpr SemanticTagStructType semanticTagsLaundryWhites[] = {{ .value = static_cast<uint16_t>(Clusters::LaundryWasher::SemanticTags::kWhites) }};
 
     std::vector<ModeOptionStructType> laundryWasherOptions = {
         chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Normal", Clusters::LaundryWasher::ModeNormal, List<const SemanticTagStructType>(semanticTagsLaundryNormal)),
@@ -273,9 +273,9 @@ namespace {
     Clusters::ModeSelect::Instance laundryWasherInstance(0x1, Clusters::LaundryWasher::Id, &LaundryWasherDelegate);
 
     // Refrigerator And Temperature Controlled Cabinet
-    constexpr SemanticTagStructType semanticTagsTccNormal[] = { { .value = uint16_t(Clusters::ModeSelect::SemanticTags::kAuto) } };
-    constexpr SemanticTagStructType semanticTagsTccRapidCool[] = { { .value = uint16_t(Clusters::RefrigeratorAndTemperatureControlledCabinet::SemanticTags::kRapidCool) }};
-    constexpr SemanticTagStructType semanticTagsTccRapidFreeze[] = { { .value = uint16_t(Clusters::RefrigeratorAndTemperatureControlledCabinet::SemanticTags::kRapidFreeze) }};
+    constexpr SemanticTagStructType semanticTagsTccNormal[] = { { .value = static_cast<uint16_t>(Clusters::ModeSelect::SemanticTags::kAuto) } };
+    constexpr SemanticTagStructType semanticTagsTccRapidCool[] = { { .value = static_cast<uint16_t>(Clusters::RefrigeratorAndTemperatureControlledCabinet::SemanticTags::kRapidCool) }};
+    constexpr SemanticTagStructType semanticTagsTccRapidFreeze[] = { { .value = static_cast<uint16_t>(Clusters::RefrigeratorAndTemperatureControlledCabinet::SemanticTags::kRapidFreeze) }};
 
     std::vector<ModeOptionStructType> tccOptions = {
         chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Normal", Clusters::RefrigeratorAndTemperatureControlledCabinet::ModeNormal, List<const SemanticTagStructType>(semanticTagsTccNormal)),
