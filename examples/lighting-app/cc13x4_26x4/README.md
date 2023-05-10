@@ -22,28 +22,28 @@ Instruments CC13XX_26XX family of Wireless MCUs.
 
 ## Introduction
 
-The CC13XX_26XX lighting example application provides a working demonstration of a
-connected light device. This uses the open-source Matter implementation and
+The CC13XX_26XX lighting example application provides a working demonstration of
+a connected light device. This uses the open-source Matter implementation and
 the Texas Instruments SimpleLink™ CC13XX and CC26XX software development kit.
 
 This example is enabled to build for CC1354P10 devices.
 
-The lighting example is intended to serve both as a means to explore the workings of
-Matter, as well as a template for creating real products based on the Texas
-Instruments devices.
+The lighting example is intended to serve both as a means to explore the
+workings of Matter, as well as a template for creating real products based on
+the Texas Instruments devices.
 
 ## Device UI
 
 | Action                                           | Functionality                          |
 | ------------------------------------------------ | -------------------------------------- |
-| Left Button (`BTN-1`) Press (less than 1000 ms)  | Light is turned on                     | 
-| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                          | 
-| Right Button (`BTN-2`) Press (less than 1000 ms) | Light is turned off                    | 
+| Left Button (`BTN-1`) Press (less than 1000 ms)  | Light is turned on                     |
+| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                          |
+| Right Button (`BTN-2`) Press (less than 1000 ms) | Light is turned off                    |
 | Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)     |
-| Red LED Solid On State                           | Light is turned on                     | 
-| Red LED Off State                                | Light is turned off                    | 
-| Green LED Blinking State                         | Identify Trigger Effect in progress    | 
-| Green LED Off State                              | No Identify Trigger Effect in progress | 
+| Red LED Solid On State                           | Light is turned on                     |
+| Red LED Off State                                | Light is turned off                    |
+| Green LED Blinking State                         | Identify Trigger Effect in progress    |
+| Green LED Off State                              | No Identify Trigger Effect in progress |
 
 ## Building
 
@@ -162,12 +162,10 @@ the session.
 
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
-extension.
-For OTA enabled applications, the standalone image will instead end with the
-`*-bim.hex` file extension. This this is a combined image with application and
-and BIM included.
-The flag to enable or disable the OTA feature is determined by
-"chip_enable_ota_requestor" in the application's args.gni file.
+extension. For OTA enabled applications, the standalone image will instead end
+with the `*-bim.hex` file extension. This this is a combined image with
+application and and BIM included. The flag to enable or disable the OTA feature
+is determined by "chip_enable_ota_requestor" in the application's args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -199,35 +197,35 @@ Router][ot_border_router_setup].
 For insight into what other components are needed to run this example, please
 refer to our [Matter Getting Started Guide][matter-e2e-faq].
 
-The steps below should be followed to commission the lighting device onto the 
-network and control it once it has been commissioned. 
+The steps below should be followed to commission the lighting device onto the
+network and control it once it has been commissioned.
 
-**Step 0** 
+**Step 0**
 
-Set up the CHIP tool by following the instructions outlined in our 
-[Matter Getting Started Guide][matter-e2e-faq].
+Set up the CHIP tool by following the instructions outlined in our [Matter
+Getting Started Guide][matter-e2e-faq].
 
 **Step 1**
 
-Commission the light device onto the Matter network. Run the following command 
-on the CHIP tool: 
+Commission the light device onto the Matter network. Run the following command
+on the CHIP tool:
 
 ```
 
-./chip-tool pairing ble-thread <nodeID - e.g. 1> hex:<complete dataset from starting the OTBR> 20202021 3840 
+./chip-tool pairing ble-thread <nodeID - e.g. 1> hex:<complete dataset from starting the OTBR> 20202021 3840
 
 ```
 
-Interacting with the application begins by enabling BLE advertisements and then 
-pairing the device into a Thread network. To provision this example onto a Matter 
-network, the device must be discoverable over Bluetooth LE. 
+Interacting with the application begins by enabling BLE advertisements and then
+pairing the device into a Thread network. To provision this example onto a
+Matter network, the device must be discoverable over Bluetooth LE.
 
-On the LaunchPad, press and hold the right button, labeled `BTN-2`, for more than 
-1 second. Upon release, the Bluetooth LE advertising will begin. Once the device is
-fully provisioned, BLE advertising will stop.
+On the LaunchPad, press and hold the right button, labeled `BTN-2`, for more
+than 1 second. Upon release, the Bluetooth LE advertising will begin. Once the
+device is fully provisioned, BLE advertising will stop.
 
-
-Once the device has been successfully commissioned, you will see the following message on the CHIP tool output: 
+Once the device has been successfully commissioned, you will see the following
+message on the CHIP tool output:
 
 ```
 
@@ -236,14 +234,13 @@ Once the device has been successfully commissioned, you will see the following m
 
 ```
 
-An accompanying message will be seen from the device: 
+An accompanying message will be seen from the device:
 
 ```
 
-Commissioning complete, notify platform driver to persist network credentials. 
+Commissioning complete, notify platform driver to persist network credentials.
 
 ```
-
 
 **Step 2**
 
@@ -289,7 +286,8 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
+[e2e]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [matter-e2e-faq]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG

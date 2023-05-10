@@ -4,6 +4,7 @@ A [chip-shell](../README.md) project on the Texas Instruments CC13XX_26XX family
 of Wireless MCUs.
 
 ## Building
+
 ### Preparation
 
 Some initial setup is necessary for preparing the build environment. This
@@ -57,8 +58,10 @@ Ninja to build the executable.
     $ ninja -C out/debug
 
     ```
+
     If you would like to define arguments on the command line you may add them
     to the GN call.
+
     ```
     gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
     ```
@@ -118,10 +121,9 @@ the session.
 
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
-extension.
-For OTA enabled applications, the standalone image will instead end with the
-`*-bim.hex` file extension. This this is a combined image with application and
-and BIM included.
+extension. For OTA enabled applications, the standalone image will instead end
+with the `*-bim.hex` file extension. This this is a combined image with
+application and and BIM included.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -171,7 +173,8 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
+[e2e]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [matter-e2e-faq]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG

@@ -37,14 +37,15 @@ workings of Matter, as well as a template for creating real products based on
 the Texas Instruments devices.
 
 ## Device UI
-| Action                                           | Functionality                              |
-| ------------------------------------------------ | --------------------------------------     |
-| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                              |
-| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)         |
-| Red LED Solid Blinking State                     | Identify Trigger Effect in progress (EP0/1)|
-| Red LED Off State                                | No Identify Trigger Effect in progress     |
-| Green LED Blinking State                         | Identify Trigger Effect in progress (EP 2) |
-| Green LED Off State                              | No Identify Trigger Effect in progress     |
+
+| Action                                           | Functionality                               |
+| ------------------------------------------------ | ------------------------------------------- |
+| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                               |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)          |
+| Red LED Solid Blinking State                     | Identify Trigger Effect in progress (EP0/1) |
+| Red LED Off State                                | No Identify Trigger Effect in progress      |
+| Green LED Blinking State                         | Identify Trigger Effect in progress (EP 2)  |
+| Green LED Off State                              | No Identify Trigger Effect in progress      |
 
 ## Building
 
@@ -101,8 +102,10 @@ Ninja to build the executable.
     $ ninja -C out/debug
 
     ```
+
     If you would like to define arguments on the command line you may add them
     to the GN call.
+
     ```
     gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
     ```
@@ -162,12 +165,10 @@ the session.
 
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
-extension.
-For OTA enabled applications, the standalone image will instead end with the
-`*-bim.hex` file extension. This this is a combined image with application and
-and BIM included.
-The flag to enable or disable the OTA feature is determined by
-"chip_enable_ota_requestor" in the application's args.gni file.
+extension. For OTA enabled applications, the standalone image will instead end
+with the `*-bim.hex` file extension. This this is a combined image with
+application and and BIM included. The flag to enable or disable the OTA feature
+is determined by "chip_enable_ota_requestor" in the application's args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -189,8 +190,6 @@ terminal emulator to that port to see the output with the following options:
 | Parity       | `None`   |
 | Flow control | `None`   |
 
-
-
 ## Running the Example
 
 Once a device has been flashed with this example, it can now join and operate in
@@ -201,18 +200,18 @@ Router][ot_border_router_setup].
 For insight into what other components are needed to run this example, please
 refer to our [Matter Getting Started Guide][matter-e2e-faq].
 
-The steps below should be followed to commission the device onto the
-network and control it once it has been commissioned.
+The steps below should be followed to commission the device onto the network and
+control it once it has been commissioned.
 
 **Step 0**
 
-Set up the CHIP tool by following the instructions outlined in our
-[Matter Getting Started Guide][matter-e2e-faq].
+Set up the CHIP tool by following the instructions outlined in our [Matter
+Getting Started Guide][matter-e2e-faq].
 
 **Step 1**
 
-Commission the device onto the Matter network. Run the following command
-on the CHIP tool:
+Commission the device onto the Matter network. Run the following command on the
+CHIP tool:
 
 ```
 
@@ -221,15 +220,15 @@ on the CHIP tool:
 ```
 
 Interacting with the application begins by enabling BLE advertisements and then
-pairing the device into a Thread network. To provision this example onto a Matter
-network, the device must be discoverable over Bluetooth LE.
+pairing the device into a Thread network. To provision this example onto a
+Matter network, the device must be discoverable over Bluetooth LE.
 
-On the LaunchPad, press and hold the right button, labeled `BTN-2`, for more than
-1 second. Upon release, the Bluetooth LE advertising will begin. Once the device is
-fully provisioned, BLE advertising will stop.
+On the LaunchPad, press and hold the right button, labeled `BTN-2`, for more
+than 1 second. Upon release, the Bluetooth LE advertising will begin. Once the
+device is fully provisioned, BLE advertising will stop.
 
-
-Once the device has been successfully commissioned, you will see the following message on the CHIP tool output:
+Once the device has been successfully commissioned, you will see the following
+message on the CHIP tool output:
 
 ```
 
@@ -246,17 +245,18 @@ Commissioning complete, notify platform driver to persist network credentials.
 
 ```
 
-
 **Step 2**
 
 Send commands to the all-cluster-app. Here are some example commands:
 
 Basic
+
 ```
 ./chip-tool basic read <attribute-id> <destination-id> <endpoint-id-ignored-for-group-commands> e.g.  ./chip-tool basic read product-id 1 0
 ```
 
 Identify
+
 ```
 ./chip-tool identify identify <IdentifyTime> <destination-id> <endpoint-id-ignored-for-group-commands>   e.g.  ./chip-tool identify identify 100 1 1
 ```
@@ -296,7 +296,8 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
+[e2e]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [matter-e2e-faq]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG

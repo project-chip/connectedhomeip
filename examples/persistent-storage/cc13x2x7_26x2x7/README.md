@@ -208,12 +208,10 @@ the session.
 
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
-extension.
-For OTA enabled applications, the standalone image will instead end with the
-`*-bim.hex` file extension. This this is a combined image with application and
-and BIM included.
-The flag to enable or disable the OTA feature is determined by
-"chip_enable_ota_requestor" in the application's args.gni file.
+extension. For OTA enabled applications, the standalone image will instead end
+with the `*-bim.hex` file extension. This this is a combined image with
+application and and BIM included. The flag to enable or disable the OTA feature
+is determined by "chip_enable_ota_requestor" in the application's args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -250,7 +248,8 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
+[e2e]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
     https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.10.0_2163-setup.run

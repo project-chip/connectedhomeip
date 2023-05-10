@@ -38,15 +38,15 @@ Instruments devices.
 
 ## Device UI
 
-| Action                                           | Functionality                           |
-| ------------------------------------------------ | --------------------------------------  |
-| Left Button (`BTN-1`) Press (less than 1000 ms)  | Change state to unlocked                |
-| Right Button (`BTN-2`) Press (less than 1000 ms) | Change state to locked                  |
-| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                           |
-| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)      |
-| Red & Green LED Blinking State                   | Lock state transition to locked/unlocked|
-| Red LED On State                                 | Lock state locked                       |
-| Red & Green LED Off State                        | Lock state unlocked                     |
+| Action                                           | Functionality                            |
+| ------------------------------------------------ | ---------------------------------------- |
+| Left Button (`BTN-1`) Press (less than 1000 ms)  | Change state to unlocked                 |
+| Right Button (`BTN-2`) Press (less than 1000 ms) | Change state to locked                   |
+| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                            |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)       |
+| Red & Green LED Blinking State                   | Lock state transition to locked/unlocked |
+| Red LED On State                                 | Lock state locked                        |
+| Red & Green LED Off State                        | Lock state unlocked                      |
 
 ## Building
 
@@ -167,12 +167,10 @@ the session.
 
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
-extension.
-For OTA enabled applications, the standalone image will instead end with the
-`*-bim.hex` file extension. This this is a combined image with application and
-and BIM included.
-The flag to enable or disable the OTA feature is determined by
-"chip_enable_ota_requestor" in the application's args.gni file.
+extension. For OTA enabled applications, the standalone image will instead end
+with the `*-bim.hex` file extension. This this is a combined image with
+application and and BIM included. The flag to enable or disable the OTA feature
+is determined by "chip_enable_ota_requestor" in the application's args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -204,18 +202,18 @@ Router][ot_border_router_setup].
 For insight into what other components are needed to run this example, please
 refer to our [Matter Getting Started Guide][matter-e2e-faq].
 
-The steps below should be followed to commission the device onto the
-network and control it once it has been commissioned.
+The steps below should be followed to commission the device onto the network and
+control it once it has been commissioned.
 
 **Step 0**
 
-Set up the CHIP tool by following the instructions outlined in our
-[Matter Getting Started Guide][matter-e2e-faq].
+Set up the CHIP tool by following the instructions outlined in our [Matter
+Getting Started Guide][matter-e2e-faq].
 
 **Step 1**
 
-Commission the device onto the Matter network. Run the following command
-on the CHIP tool:
+Commission the device onto the Matter network. Run the following command on the
+CHIP tool:
 
 ```
 
@@ -224,15 +222,15 @@ on the CHIP tool:
 ```
 
 Interacting with the application begins by enabling BLE advertisements and then
-pairing the device into a Thread network. To provision this example onto a Matter
-network, the device must be discoverable over Bluetooth LE.
+pairing the device into a Thread network. To provision this example onto a
+Matter network, the device must be discoverable over Bluetooth LE.
 
-On the LaunchPad, press and hold the right button, labeled `BTN-2`, for more than
-1 second. Upon release, the Bluetooth LE advertising will begin. Once the device is
-fully provisioned, BLE advertising will stop.
+On the LaunchPad, press and hold the right button, labeled `BTN-2`, for more
+than 1 second. Upon release, the Bluetooth LE advertising will begin. Once the
+device is fully provisioned, BLE advertising will stop.
 
-
-Once the device has been successfully commissioned, you will see the following message on the CHIP tool output:
+Once the device has been successfully commissioned, you will see the following
+message on the CHIP tool output:
 
 ```
 
@@ -249,9 +247,7 @@ Commissioning complete, notify platform driver to persist network credentials.
 
 ```
 
-
-**Step 2**
-The example Doorlock cluster operations have the following format:
+**Step 2** The example Doorlock cluster operations have the following format:
 
 ```
 ./chip-tool doorlock   <attribute-name> <attribute-values> <destination-id> <endpoint-id-ignored-for-group-commands>
@@ -267,17 +263,21 @@ Set a new user "TST" with user index of 1 with a default pin of 123456
 ./chip-tool doorlock set-user 0 1 TST 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 ```
+
 Require a pin mode for lock operations:
+
 ```
 ./chip-tool doorlock write require-pinfor-remote-operation 1 1 1
 ```
 
 Lock the Door
+
 ```
 ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
 ```
 
 Unlock the door
+
 ```
 ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
 ```
@@ -317,7 +317,8 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
+[e2e]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [matter-e2e-faq]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
