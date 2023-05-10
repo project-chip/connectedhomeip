@@ -37,14 +37,14 @@ the Texas Instruments devices.
 
 ## Device UI
 
-| Action                                           | Functionality                               |
-| ------------------------------------------------ | ------------------------------------------- |
-| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                               |
-| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)          |
-| Red LED Solid Blinking State                     | Identify Trigger Effect in progress (EP0/1) |
-| Red LED Off State                                | No Identify Trigger Effect in progress      |
-| Green LED Blinking State                         | Identify Trigger Effect in progress (EP2)   |
-| Green LED Off State                              | No Identify Trigger Effect in progress      |
+| Action                                           | Functionality                                 |
+| ------------------------------------------------ | --------------------------------------------- |
+| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                                 |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)            |
+| Red LED Solid Blinking State                     | Identify Trigger Effect in progress (`EP0/1`) |
+| Red LED Off State                                | No Identify Trigger Effect in progress        |
+| Green LED Blinking State                         | Identify Trigger Effect in progress (`EP2`)   |
+| Green LED Off State                              | No Identify Trigger Effect in progress        |
 
 ## Building
 
