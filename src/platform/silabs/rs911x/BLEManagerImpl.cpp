@@ -430,7 +430,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                                     data->Start());
     if (status != RSI_SUCCESS)
     {
-        ChipLogProgress(DeviceLayer, "indication %d failed with error code %lx ", status);
+        ChipLogProgress(DeviceLayer, "indication failed with error code %lx ", status);
         return false;
     }
 
