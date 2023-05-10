@@ -85,13 +85,13 @@ bool BoltLockManager::GetCredential(uint16_t credentialIndex, CredentialTypeEnum
     credential = mCredentials[credentialIndex - 1];
 
     ChipLogProgress(Zcl, "Getting lock credential %u: %s", static_cast<unsigned>(credentialIndex),
-                    credential.status == DlCredentialStatus::kAvailable ? "available" : "occupied");
+                    credential.status == CredentialStructStatus::kAvailable ? "available" : "occupied");
 
     return true;
 }
 
 bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
-                                    DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const ByteSpan & secret)
+                                    CredentialStructStatus credentialStatus, CredentialTypeEnum credentialType, const ByteSpan & secret)
 {
     VerifyOrReturnError(credentialIndex > 0 && credentialIndex <= CONFIG_LOCK_NUM_CREDENTIALS, false);
     VerifyOrReturnError(secret.size() <= kMaxCredentialLength, false);
@@ -113,7 +113,7 @@ bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creato
     credential.lastModifiedBy     = modifier;
 
     ChipLogProgress(Zcl, "Setting lock credential %u: %s", static_cast<unsigned>(credentialIndex),
-                    credential.status == DlCredentialStatus::kAvailable ? "available" : "occupied");
+                    credential.status == CredentialStructStatus::kAvailable ? "available" : "occupied");
 
     return true;
 }
@@ -129,7 +129,7 @@ bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, OperationE
     // Check the PIN code
     for (const auto & credential : mCredentials)
     {
-        if (credential.status == DlCredentialStatus::kAvailable || credential.credentialType != CredentialTypeEnum::kPin)
+        if (credential.status == CredentialStructStatus::kAvailable || credential.credentialType != CredentialTypeEnum::kPin)
         {
             continue;
         }

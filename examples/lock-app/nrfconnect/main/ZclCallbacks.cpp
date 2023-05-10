@@ -69,7 +69,7 @@ bool emberAfPluginDoorLockGetCredential(EndpointId endpointId, uint16_t credenti
 }
 
 bool emberAfPluginDoorLockSetCredential(EndpointId endpointId, uint16_t credentialIndex, FabricIndex creator, FabricIndex modifier,
-                                        DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                                        CredentialStructStatus credentialStatus, CredentialTypeEnum credentialType,
                                         const ByteSpan & secret)
 {
     return BoltLockMgr().SetCredential(credentialIndex, creator, modifier, credentialStatus, credentialType, secret);

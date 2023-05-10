@@ -15,8 +15,8 @@
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
-from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
+from builders.ti import TIApp, TIBoard, TIBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
@@ -392,22 +392,24 @@ def BuildK32WTarget():
 
     return target
 
+def BuildTITargets():
+    target = BuildTarget('ti', TIBuilder)
 
-def Buildcc13x2x7_26x2x7Target():
-    target = BuildTarget('cc13x2x7_26x2x7', cc13x2x7_26x2x7Builder)
-
-    # apps
+    # board
     target.AppendFixedTargets([
-        TargetPart('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL),
-        TargetPart('lock', app=cc13x2x7_26x2x7App.LOCK),
-        TargetPart('pump', app=cc13x2x7_26x2x7App.PUMP),
-        TargetPart('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER),
-        TargetPart('shell', app=cc13x2x7_26x2x7App.SHELL),
+        TargetPart('cc13x2x7_26x2x7', board=TIBoard.LP_CC2652R7),
+        TargetPart('cc13x4_26x4', board=TIBoard.LP_EM_CC1354P10_6)
     ])
 
-    target.AppendModifier(name="ftd", openthread_ftd=True).ExceptIfRe("-mtd")
-    target.AppendModifier(name="mtd", openthread_ftd=False).ExceptIfRe("-ftd")
+    target.AppendFixedTargets([
+        TargetPart('all-clusters', app=TIApp.ALL_CLUSTERS).OnlyIfRe("-(cc13x4_26x4)-"),
+        TargetPart('all-clusters-minimal', app=TIApp.ALL_CLUSTERS_MINIMAL).OnlyIfRe("-(cc13x4_26x4)-"),
+        TargetPart('lighting', app=TIApp.LIGHTING),
+        TargetPart('lock-ftd', app=TIApp.LOCK, openthread_ftd=True).OnlyIfRe("-(cc13x4_26x4)-"),
+        TargetPart('lock-mtd', app=TIApp.LOCK, openthread_ftd=False),
+        TargetPart('pump', app=TIApp.PUMP),
+        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER)
+    ])
 
     return target
 
@@ -450,7 +452,7 @@ def BuildQorvoTarget():
         TargetPart('qpg6105', board=QpgBoard.QPG6105),
     ])
 
-    # apps
+   # apps
     target.AppendFixedTargets([
         TargetPart('lock', app=QpgApp.LOCK),
         TargetPart('light', app=QpgApp.LIGHT),
@@ -583,8 +585,8 @@ BUILD_TARGETS = [
     BuildAmebaTarget(),
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
-    Buildcc13x2x7_26x2x7Target(),
     Buildcc32xxTarget(),
+    BuildTITargets(),
     BuildCyw30739Target(),
     BuildEfr32Target(),
     BuildEsp32Target(),
