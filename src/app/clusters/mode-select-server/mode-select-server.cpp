@@ -319,11 +319,10 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
 {
     uint8_t newMode = commandData.newMode;
 
-    Status checkSupportedModeStatus = msDelegate->IsSupportedMode(newMode);
-    if (Status::Success != checkSupportedModeStatus)
+    if (!msDelegate->IsSupportedMode(newMode))
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, checkSupportedModeStatus);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
         return;
     }
 
@@ -346,7 +345,7 @@ void Instance::HandleChangeToModeWithStatus(HandlerContext & ctx,
 
     ModeSelect::Commands::ChangeToModeResponse::Type response;
 
-    if (msDelegate->IsSupportedMode(newMode) != Status::Success)
+    if (!msDelegate->IsSupportedMode(newMode))
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
         response.status = static_cast<uint8_t>(ModeSelect::ChangeToModeResponseStatus::kUnsupportedMode);
@@ -458,7 +457,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
         uint8_t newMode;
         ReturnErrorOnFailure(aDecoder.Decode(newMode));
 
-        if (msDelegate->IsSupportedMode(newMode) != Status::Success)
+        if (!msDelegate->IsSupportedMode(newMode))
         {
             return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
         }

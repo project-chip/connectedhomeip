@@ -61,7 +61,7 @@ public:
 
     virtual CHIP_ERROR Init() = 0;
 
-    Status IsSupportedMode(uint8_t mode);
+    bool IsSupportedMode(uint8_t mode);
 
     Status GetMode(uint8_t mode, ModeOptionStructType & modeOption);
 

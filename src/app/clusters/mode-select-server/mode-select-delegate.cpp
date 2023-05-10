@@ -36,17 +36,17 @@ void Delegate::HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands:
     response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess);
 }
 
-Status Delegate::IsSupportedMode(uint8_t modeValue) 
+bool Delegate::IsSupportedMode(uint8_t modeValue)
 { 
     for (ModeOptionStructType modeStruct : modeOptions)
     {
         if (modeStruct.mode == modeValue)
         {
-            return Status::Success;
+            return true;
         }
     }
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", modeValue);
-    return Status::InvalidCommand;
+    return false;
 }
 
 Status Delegate::GetMode(uint8_t modeValue, ModeOptionStructType &modeOption)
