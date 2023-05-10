@@ -519,78 +519,78 @@ template("ti_simplelink_sdk") {
     if (ti_simplelink_device_family == "cc13x2_26x2" ||
         ti_simplelink_device_family == "cc13x4_26x4" ||
         ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-    defines = []
-    include_dirs = [
-      "${chip_root}/third_party/openthread/repo/include/",
-      "${chip_root}/src/",
-    ]
-    configs -=
-        [ "${build_root}/config/compiler:warnings_default" ]  # removed for
-                                                              # -Wshadow
+      defines = []
+      include_dirs = [
+        "${chip_root}/third_party/openthread/repo/include/",
+        "${chip_root}/src/",
+      ]
+      configs -=
+          [ "${build_root}/config/compiler:warnings_default" ]  # removed for
+                                                                # -Wshadow
 
-    cflags = [
-      "-Wno-sign-compare",
-      "-Wno-unused-variable",
-      "-Wno-implicit-function-declaration",  # asm not defined
-    ]
-
-    sources = [
-      "${chip_root}/src/platform/cc13xx_26xx/chipOBleProfile.c",
-      "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/TI_heap_wrapper.c",
-      "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/bget.c",
-      "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c",
-      "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/ble_remote_display/stack/osal_icall_ble.c",
-      "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/icall_FreeRTOS.c",
-      "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/util.c",
-      "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/thread/source/activity/dmm_thread_activity.c",
-      "${ti_simplelink_sdk_root}/source/ti/dmm/dmm_priority_ble_thread.c",
-    ]
-
-    if (ti_simplelink_device_family == "cc13x2_26x2" ||
-        ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-      sources += [
-        "${chip_root}/src/platform/cc13xx_26xx/cc13x2_26x2/ble_user_config.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack/host/gatt_uuid.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack/host/gattservapp_util.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/app/icall_api_lite.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/src/icall_cc2650.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/src/icall_user_config.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/stack/ble_user_config_stack.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack/profiles/dev_info/cc26xx/devinfoservice.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack/rom/agama_r1/rom_init.c",
+      cflags = [
+        "-Wno-sign-compare",
+        "-Wno-unused-variable",
+        "-Wno-implicit-function-declaration",  # asm not defined
       ]
 
-      include_dirs += [ "${chip_root}/src/platform/cc13xx_26xx/cc13x2_26x2/" ]
-    } else if (ti_simplelink_device_family == "cc13x4_26x4") {
-      sources += [
-        "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/ble_user_config.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/host/gatt_uuid.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/host/gattservapp_util.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/icall/app/icall_api_lite.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/icall/src/icall_cc2650.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/icall/src/icall_user_config.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/icall/stack/ble_user_config_stack.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/profiles/dev_info/cc26xx/devinfoservice.c",
-        "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/rom/agama_r1/rom_init.c",
+      sources = [
+        "${chip_root}/src/platform/cc13xx_26xx/chipOBleProfile.c",
+        "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/TI_heap_wrapper.c",
+        "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/bget.c",
+        "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c",
+        "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/ble_remote_display/stack/osal_icall_ble.c",
+        "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/icall_FreeRTOS.c",
+        "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/util.c",
+        "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/thread/source/activity/dmm_thread_activity.c",
+        "${ti_simplelink_sdk_root}/source/ti/dmm/dmm_priority_ble_thread.c",
       ]
 
-      include_dirs += [ "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/" ]
+      if (ti_simplelink_device_family == "cc13x2_26x2" ||
+          ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+        sources += [
+          "${chip_root}/src/platform/cc13xx_26xx/cc13x2_26x2/ble_user_config.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack/host/gatt_uuid.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack/host/gattservapp_util.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/app/icall_api_lite.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/src/icall_cc2650.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/src/icall_user_config.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/stack/ble_user_config_stack.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack/profiles/dev_info/cc26xx/devinfoservice.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack/rom/agama_r1/rom_init.c",
+        ]
+
+        include_dirs += [ "${chip_root}/src/platform/cc13xx_26xx/cc13x2_26x2/" ]
+      } else if (ti_simplelink_device_family == "cc13x4_26x4") {
+        sources += [
+          "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/ble_user_config.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/host/gatt_uuid.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/host/gattservapp_util.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/icall/app/icall_api_lite.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/icall/src/icall_cc2650.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/icall/src/icall_user_config.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/icall/stack/ble_user_config_stack.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/profiles/dev_info/cc26xx/devinfoservice.c",
+          "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/rom/agama_r1/rom_init.c",
+        ]
+
+        include_dirs += [ "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/" ]
+      }
+
+      configs -= [ "${build_root}/config/compiler:std_default" ]
+      configs += [ ":${sdk_target_name}_posix_config" ]
+
+      public_deps = [
+        "${chip_root}/third_party/ti_simplelink_sdk:freertos",
+        "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+      ]
+
+      public_configs = [
+        ":${sdk_target_name}_config",
+        ":${sdk_target_name}_dmm_config",
+      ]
     }
-
-    configs -= [ "${build_root}/config/compiler:std_default" ]
-    configs += [ ":${sdk_target_name}_posix_config" ]
-
-    public_deps = [
-      "${chip_root}/third_party/ti_simplelink_sdk:freertos",
-      "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
-    ]
-
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_dmm_config",
-    ]
   }
-}
 
   group(sdk_target_name) {
     public_deps = [
