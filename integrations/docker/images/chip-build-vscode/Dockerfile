@@ -47,7 +47,7 @@ COPY --from=k32w /opt/sdk /opt/k32w_sdk
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
-COPY --from=ti /opt/ti/sysconfig_1.13.0 /opt/ti/sysconfig_1.13.0
+COPY --from=ti /opt/ti/sysconfig_1.15.0 /opt/ti/sysconfig_1.15.0
 
 COPY --from=openiotsdk /opt/gcc-arm-none-eabi-10.3-2021.10/ /opt/gcc-arm-none-eabi-10.3-2021.10/
 COPY --from=openiotsdk /opt/FVP_Corstone_SSE-300/ /opt/FVP_Corstone_SSE-300/
@@ -105,7 +105,7 @@ ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.15.2
-ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.13.0
+ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.15.0
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 
