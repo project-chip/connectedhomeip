@@ -20,8 +20,8 @@ package chip.tlv
 
 /** Converts bytes in a Little Endian format into Long integer. */
 internal fun ByteArray.fromLittleEndianToLong(isSigned: Boolean = false): Long =
-  foldRightIndexed(0) { i, value, acc ->
-    (acc shl 8) or (if (i == lastIndex && isSigned) value.toLong() else (value.toLong() and 0xFF))
+  foldRightIndexed(0) { i, it, acc ->
+    (acc shl 8) or (if (i == lastIndex && isSigned) it.toLong() else (it.toLong() and 0xFF))
   }
 
 /** Converts Number into a byte array in a Little Endian format. */
@@ -62,15 +62,3 @@ internal fun unsignedIntSize(value: ULong): Short {
 }
 
 internal fun Byte.toBinary(): String = Integer.toBinaryString(toInt() and 0xFF)
-
-internal const val JSON_VALUE_TYPE_INT = "INT"
-internal const val JSON_VALUE_TYPE_UINT = "UINT"
-internal const val JSON_VALUE_TYPE_BOOL = "BOOL"
-internal const val JSON_VALUE_TYPE_FLOAT = "FLOAT"
-internal const val JSON_VALUE_TYPE_DOUBLE = "DOUBLE"
-internal const val JSON_VALUE_TYPE_BYTES = "BYTES"
-internal const val JSON_VALUE_TYPE_STRING = "STRING"
-internal const val JSON_VALUE_TYPE_NULL = "NULL"
-internal const val JSON_VALUE_TYPE_STRUCT = "STRUCT"
-internal const val JSON_VALUE_TYPE_ARRAY = "ARRAY"
-internal const val JSON_VALUE_TYPE_EMPTY = "?"
