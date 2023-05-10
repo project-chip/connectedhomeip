@@ -229,6 +229,7 @@ class TestRunTime(Enum):
     CHIP_TOOL_BUILTIN = auto()  # run via chip-tool built-in test commands
     CHIP_TOOL_PYTHON = auto()  # use the python yaml test parser with chip-tool
     CHIP_REPL_PYTHON = auto()       # use the python yaml test runner
+    DARWIN_FRAMEWORK_TOOL_BUILTIN = auto()  # run via darwin-framework-tool built-in test commands
 
 
 @dataclass
@@ -319,7 +320,7 @@ class TestDefinition:
                     ['--server_arguments', 'interactive server ' + ' '.join(tool_storage_args)]
                 pairing_cmd += server_args
                 test_cmd += server_args
-            else:
+            elif test_runtime == TestRunTime.CHIP_TOOL_BUILTIN:
                 pairing_cmd += tool_storage_args
                 test_cmd += tool_storage_args
 
