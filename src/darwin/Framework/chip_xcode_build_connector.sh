@@ -133,6 +133,12 @@ declare -a args=(
     )
 }
 
+[[ $CHIP_IS_UBSAN == YES ]] && {
+    args+=(
+        'is_ubsan=true'
+    )
+}
+
 [[ $CHIP_IS_CLANG == YES ]] && {
     args+=(
         'is_clang=true'

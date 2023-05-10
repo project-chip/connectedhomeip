@@ -38,8 +38,8 @@ MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID
 {{#zcl_attributes_server}}
 {{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#unless clusterRef}}
-{{#if (isSupported "" globalAttribute=(asUpperCamelCase label) isForIds=true)}}
-MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID {{availability "" globalAttribute=(asUpperCamelCase label) minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
+{{#if (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID {{availability "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
 {{/if}}
 {{/unless}}
 {{/zcl_attributes_server}}
@@ -86,7 +86,9 @@ MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
 // Cluster {{> cluster}} attributes
 {{/if}}
 {{/first}}
-{{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
+{{#if (and (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)
+           (or clusterRef
+               (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)))}}
 MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} =
 {{#if clusterRef}}
 {{asMEI manufacturerCode code}},
@@ -155,6 +157,15 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID {{availability cluster co
 {{/inline}}
 {{> commandIdDecl cluster=(asUpperCamelCase ../clusterName preserveAcronyms=true)
                   command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{! Anything which has an old name, and the new name was introduced in the "First after major API revamp" release or later
+    (or just after the "First major API revamp" release, but we don't have a good way to test for that),
+    we need to generate the new-form id for the old name too, as long as it was not removed. }}
+{{#if (and (hasOldName (asUpperCamelCase ../clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForIds=true)
+           (not (wasIntroducedBeforeRelease "First after major API revamp" (asUpperCamelCase ../clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForIds=true))
+           (isSupported (compatClusterNameRemapping ../clusterName) command=(compatCommandNameRemapping ../clusterName name) isForIds=true))}}
+{{> commandIdDecl cluster=(compatClusterNameRemapping ../clusterName)
+                  command=(compatCommandNameRemapping ../clusterName name)}}
+{{/if}}
 {{#last}}
 
 {{/last}}
