@@ -189,13 +189,13 @@ CHIP_ERROR Instance::Init()
     // Check that the cluster ID given is a valid mode select alias cluster ID.
     if (!std::any_of(AliasedClusters.begin(), AliasedClusters.end(), [this](ClusterId i){return i == clusterId;}))
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster with ID %lu is not a mode select alias.", long(clusterId));
+        ChipLogError(Zcl, "ModeSelect: The cluster with ID %lu is not a mode select alias.", long(clusterId));
         return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
     }
 
     // Check if the cluster has been selected in zap
     if (!emberAfContainsServer(endpointId, clusterId)) {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: The cluster with ID %lu was not enabled in zap.", long(clusterId));
+        ChipLogError(Zcl, "ModeSelect: The cluster with ID %lu was not enabled in zap.", long(clusterId));
         return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
     }
 
@@ -237,7 +237,7 @@ CHIP_ERROR Instance::Init()
                 {
                     if (onOffValueForStartUp && !onMode.IsNull())
                     {
-                        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: CurrentMode is overwritten by OnMode");
+                        ChipLogDetail(Zcl, "ModeSelect: CurrentMode is overwritten by OnMode");
                         // it is overwritten by the on/off cluster.
                         return CHIP_NO_ERROR;
                     }
@@ -274,16 +274,14 @@ CHIP_ERROR Instance::Init()
                 }
                 else
                 {
-                    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Successfully initialized CurrentMode to %u",
-                                   startUpMode.Value());
+                    ChipLogProgress(Zcl, "ModeSelect: Successfully initialized CurrentMode to %u", startUpMode.Value());
                 }
             }
         }
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "ModeSelect: Skipped initializing CurrentMode by StartUpMode because one of them is volatile");
+        ChipLogProgress(Zcl, "ModeSelect: Skipped initializing CurrentMode by StartUpMode because one of them is volatile");
     }
 
     return CHIP_NO_ERROR;
@@ -321,7 +319,7 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
 
     if (!msDelegate->IsSupportedMode(newMode))
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
+        ChipLogError(Zcl, "ModeSelect: Failed to find the option with mode %u", newMode);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
         return;
     }
@@ -335,7 +333,7 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
 
     SetCurrentMode(newMode);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: ChangeToMode changed to mode %u", newMode);
+    ChipLogProgress(Zcl, "ModeSelect: ChangeToMode changed to mode %u", newMode);
 }
 
 void Instance::HandleChangeToModeWithStatus(HandlerContext & ctx,
@@ -347,7 +345,7 @@ void Instance::HandleChangeToModeWithStatus(HandlerContext & ctx,
 
     if (!msDelegate->IsSupportedMode(newMode))
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
+        ChipLogError(Zcl, "ModeSelect: Failed to find the option with mode %u", newMode);
         response.status = static_cast<uint8_t>(ModeSelect::ChangeToModeResponseStatus::kUnsupportedMode);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return;
@@ -358,7 +356,7 @@ void Instance::HandleChangeToModeWithStatus(HandlerContext & ctx,
     if (response.status == static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess))
     {
         SetCurrentMode(newMode);
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: HandleChangeToModeWitheStatus changed to mode %u", newMode);
+        ChipLogProgress(Zcl, "ModeSelect: HandleChangeToModeWitheStatus changed to mode %u", newMode);
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -370,13 +368,13 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     switch (handlerContext.mRequestPath.mCommandId)
     {
     case ModeSelect::Commands::ChangeToMode::Id:
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Entering handling ChangeToMode");
+        ChipLogDetail(Zcl, "ModeSelect: Entering handling ChangeToMode");
 
         HandleCommand<Commands::ChangeToMode::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleChangeToMode(ctx, commandData); });
         break;
     case ModeSelect::Commands::ChangeToModeWithStatus::Id:
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Entering handling ChangeToModeWithStatus");
+        ChipLogDetail(Zcl, "ModeSelect: Entering handling ChangeToModeWithStatus");
 
         HandleCommand<Commands::ChangeToModeWithStatus::DecodableType>(
             handlerContext,

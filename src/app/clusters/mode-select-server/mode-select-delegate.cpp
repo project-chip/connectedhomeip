@@ -45,7 +45,7 @@ bool Delegate::IsSupportedMode(uint8_t modeValue)
             return true;
         }
     }
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", modeValue);
+    ChipLogDetail(Zcl, "Cannot find the mode %u", modeValue);
     return false;
 }
 
@@ -59,6 +59,6 @@ Status Delegate::GetMode(uint8_t modeValue, ModeOptionStructType &modeOption)
             return Status::Success;
         }
     }
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", modeValue);
+    ChipLogDetail(Zcl, "Cannot find the mode %u", modeValue);
     return Status::InvalidCommand;
 }
