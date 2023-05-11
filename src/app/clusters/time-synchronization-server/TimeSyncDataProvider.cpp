@@ -131,16 +131,20 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZone & timeZoneList, uint8_t &
         {
             if (timeZone.name.Value().size() <= tz[i].name.Value().size())
             {
-
+                ChipLogProgress(Zcl, "name len: %d", (int) tz[i].name.Value().size());
                 char * dest = const_cast<char *>(tz[i].name.Value().data());
                 size_t len  = timeZone.name.Value().size();
-                Platform::CopyString(dest, len, timeZone.name.Value().data());
+                memcpy(dest, timeZone.name.Value().data(), len);
                 tz[i].name.SetValue(chip::CharSpan(tz[i].name.Value().data(), len));
             }
             else
             {
                 err = CHIP_ERROR_BUFFER_TOO_SMALL;
             }
+        }
+        else
+        {
+            tz[i].name.ClearValue();
         }
         i++;
     }

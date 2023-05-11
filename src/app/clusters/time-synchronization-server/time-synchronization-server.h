@@ -86,6 +86,9 @@ public:
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 
 private:
+    void validateTimeZoneList(void);
+    void validateDSTOffsetList(void);
+
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
     DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList =
         DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type>(mTz);

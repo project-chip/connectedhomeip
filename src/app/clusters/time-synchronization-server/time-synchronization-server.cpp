@@ -28,6 +28,7 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SortUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -174,14 +175,35 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(DataModel::DecodableList<TimeS
 
     while (newTzL.Next() && i < CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE)
     {
+        // first element shall have validAt entry of 0
+        if (i == 0 && newTzL.GetValue().validAt != 0)
+        {
+            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+        }
+        // if second element, it shall have validAt entry of non-0
+        if (i == 1 && newTzL.GetValue().validAt == 0)
+        {
+            mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
+            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+        }
         tzL[i].offset  = newTzL.GetValue().offset;
         tzL[i].validAt = newTzL.GetValue().validAt;
         if (newTzL.GetValue().name.HasValue())
         {
+            if (newTzL.GetValue().name.Value().size() > sizeof(mNames[i].name))
+            {
+                mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
+                return CHIP_ERROR_BUFFER_TOO_SMALL;
+            }
             const char * buf = newTzL.GetValue().name.Value().data();
             size_t len       = newTzL.GetValue().name.Value().size();
             memset(mNames[i].name, 0, sizeof(mNames[i].name));
             memcpy(mNames[i].name, buf, len);
+            tzL[i].name.SetValue(chip::CharSpan(mNames[i].name, strnlen(mNames[i].name, sizeof(mNames[i].name))));
+        }
+        else
+        {
+            tzL[i].name.ClearValue();
         }
         i++;
     }
@@ -211,8 +233,45 @@ TimeSynchronizationServer::SetDSTOffset(DataModel::DecodableList<TimeSynchroniza
         dstL[i] = newDstL.GetValue();
         i++;
     }
-    ReturnErrorOnFailure(newDstL.GetStatus());
+
+    if (CHIP_NO_ERROR != newDstL.GetStatus())
+    {
+        mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetList, mDstOffsetListSize);
+        return newDstL.GetStatus();
+    }
+
     mDstOffsetListSize = i;
+
+    // sorted by ValidStarting time
+    Sorting::BubbleSort(TimeSynchronizationServer::Instance().GetDSTOffset().begin(), mDstOffsetListSize,
+                        [](TimeSynchronization::Structs::DSTOffsetStruct::Type a,
+                           TimeSynchronization::Structs::DSTOffsetStruct::Type b) { return a.validStarting < b.validStarting; });
+
+    // only 1 validuntil null value and shall be last in the list
+    uint64_t lastValidUntil = 0;
+    for (i = 0; i < mDstOffsetListSize; i++)
+    {
+        const auto & dstItem = TimeSynchronizationServer::Instance().GetDSTOffset()[i];
+        // validUntil shall be larger than validStarting
+        if (!dstItem.validUntil.IsNull() && dstItem.validStarting >= dstItem.validUntil.Value())
+        {
+            mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetList, mDstOffsetListSize);
+            return CHIP_ERROR_INVALID_TIME;
+        }
+        // validStarting shall not be smaller than validUntil of previous entry
+        if (dstItem.validStarting < lastValidUntil)
+        {
+            mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetList, mDstOffsetListSize);
+            return CHIP_ERROR_INVALID_TIME;
+        }
+        lastValidUntil = !dstItem.validUntil.IsNull() ? dstItem.validUntil.Value() : lastValidUntil;
+        // only 1 validuntil null value and shall be last in the list
+        if (dstItem.validUntil.IsNull() && (i != mDstOffsetListSize - 1))
+        {
+            mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetList, mDstOffsetListSize);
+            return CHIP_ERROR_INVALID_TIME;
+        }
+    }
 
     return mTimeSyncDataProvider.StoreDSTOffset(TimeSynchronizationServer::Instance().GetDSTOffset());
 }
@@ -220,8 +279,10 @@ TimeSynchronizationServer::SetDSTOffset(DataModel::DecodableList<TimeSynchroniza
 CHIP_ERROR TimeSynchronizationServer::ClearDSTOffset()
 {
     mDstOffsetListSize = 0;
-    memset((void *) mDst, 0, sizeof(mDst) * CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE);
-
+    for (uint8_t i = 0; i < CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE; i++)
+    {
+        mDst[i] = {};
+    }
     return mTimeSyncDataProvider.ClearDSTOffset();
 }
 
@@ -282,6 +343,10 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(chip::EndpointId ep, uint64_t
     localTime = (utcTime.count() + static_cast<uint64_t>(timeZoneOffset) + static_cast<uint64_t>(dstOffset));
     return CHIP_NO_ERROR;
 }
+
+void TimeSynchronizationServer::validateTimeZoneList() {}
+
+void TimeSynchronizationServer::validateDSTOffsetList() {}
 
 namespace {
 
@@ -419,7 +484,7 @@ CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath &
 }
 } // anonymous namespace
 
-static bool sendDSTTableEmpty(chip::EndpointId endpointId)
+static bool sendDSTTableEmptyEvent(chip::EndpointId endpointId)
 {
     Events::DSTTableEmpty::Type event;
     EventNumber eventNumber;
@@ -438,7 +503,7 @@ static bool sendDSTTableEmpty(chip::EndpointId endpointId)
     return true;
 }
 
-static bool sendDSTStatus(chip::EndpointId endpointId, bool dstOffsetActive)
+static bool sendDSTStatusEvent(chip::EndpointId endpointId, bool dstOffsetActive)
 {
     Events::DSTStatus::Type event;
     event.DSTOffsetActive = dstOffsetActive;
@@ -456,7 +521,7 @@ static bool sendDSTStatus(chip::EndpointId endpointId, bool dstOffsetActive)
     return true;
 }
 
-static bool sendTimeZoneStatus(chip::EndpointId endpointId, uint8_t listIndex)
+static bool sendTimeZoneStatusEvent(chip::EndpointId endpointId, uint8_t listIndex)
 {
     Events::TimeZoneStatus::Type event;
     auto tz      = TimeSynchronizationServer::Instance().GetTimeZone().begin();
@@ -479,7 +544,7 @@ static bool sendTimeZoneStatus(chip::EndpointId endpointId, uint8_t listIndex)
     return true;
 }
 
-static bool sendTimeFailure(chip::EndpointId endpointId)
+static bool sendTimeFailureEvent(chip::EndpointId endpointId)
 {
     Events::TimeFailure::Type event;
     EventNumber eventNumber;
@@ -497,7 +562,7 @@ static bool sendTimeFailure(chip::EndpointId endpointId)
     return true;
 }
 
-static bool sendMissingTrustedTimeSource(chip::EndpointId endpointId)
+static bool sendMissingTrustedTimeSourceEvent(chip::EndpointId endpointId)
 {
     Events::MissingTrustedTimeSource::Type event;
     EventNumber eventNumber;
@@ -557,7 +622,7 @@ bool emberAfTimeSynchronizationClusterSetTrustedTimeSourceCallback(
     else
     {
         tts.SetNull();
-        sendMissingTrustedTimeSource(commandPath.mEndpointId);
+        sendMissingTrustedTimeSourceEvent(commandPath.mEndpointId);
     }
 
     TimeSynchronizationServer::Instance().SetTrustedTimeSource(tts);
@@ -571,8 +636,6 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
 {
     const auto & timeZone = commandData.timeZone;
     uint64_t localTime;
-    // first element shall have validAt entry of 0
-    // if second element, it shall have validAt entry of non-0
 
     CHIP_ERROR err = TimeSynchronizationServer::Instance().SetTimeZone(timeZone);
     if (err != CHIP_NO_ERROR)
@@ -587,33 +650,38 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
         }
         return true;
     }
-    sendTimeZoneStatus(commandPath.mEndpointId, 0);
-    sendTimeFailure(commandPath.mEndpointId); // TODO remove
+    sendTimeZoneStatusEvent(commandPath.mEndpointId, 0);
+    sendTimeFailureEvent(commandPath.mEndpointId); // TODO remove
     GetDelegate()->HandleTimeZoneChanged(TimeSynchronizationServer::Instance().GetTimeZone());
     GetDelegate()->HandleDstoffsetlookup();
 
     TimeSynchronization::TimeZoneDatabaseEnum tzDb;
     TimeZoneDatabase::Get(commandPath.mEndpointId, &tzDb);
     Commands::SetTimeZoneResponse::Type response;
-    if (GetDelegate()->HasFeature(0, TimeSynchronization::TimeSynchronizationFeature::kTimeZone) &&
+    if (GetDelegate()->HasFeature(commandPath.mEndpointId, TimeSynchronization::TimeSynchronizationFeature::kTimeZone) &&
         tzDb != TimeSynchronization::TimeZoneDatabaseEnum::kNone)
     {
-        auto tz = TimeSynchronizationServer::Instance().GetTimeZone().begin();
-        if (tz->name.HasValue() && GetDelegate()->HandleDstoffsetavailable(tz->name.Value()) == true)
+        auto tzL = TimeSynchronizationServer::Instance().GetTimeZone();
+        auto tz  = tzL.begin();
+        if (tz != tzL.end() && tz->name.HasValue() && GetDelegate()->HandleDstoffsetavailable(tz->name.Value()))
         {
             GetDelegate()->HandleGetdstoffset();
             response.DSTOffsetRequired = false;
-            sendDSTStatus(commandPath.mEndpointId, true);
+            sendDSTStatusEvent(commandPath.mEndpointId, true);
         }
         else
         {
             TimeSynchronizationServer::Instance().ClearDSTOffset();
-            sendDSTTableEmpty(commandPath.mEndpointId);
-            sendDSTStatus(commandPath.mEndpointId, false);
+            sendDSTTableEmptyEvent(commandPath.mEndpointId);
+            sendDSTStatusEvent(commandPath.mEndpointId, false);
+            response.DSTOffsetRequired = true;
         }
     }
+    else
+    {
+        response.DSTOffsetRequired = true;
+    }
     TimeSynchronizationServer::Instance().GetLocalTime(commandPath.mEndpointId, localTime);
-    response.DSTOffsetRequired = true;
     commandObj->AddResponse(commandPath, response);
     return true;
 }
@@ -624,11 +692,6 @@ bool emberAfTimeSynchronizationClusterSetDSTOffsetCallback(
 {
     const auto & dstOffset = commandData.DSTOffset;
 
-    // sorted by ValidStarting time
-    // ValidStartingTime shall not be smaller than ValidUntil time of previous entry
-    // only 1 validuntil null value and shall be last in the list
-    // remove entries which are no longer active
-    // if offset == 0 && ValidUntil == null then no DST is used
     CHIP_ERROR err = TimeSynchronizationServer::Instance().SetDSTOffset(dstOffset);
     if (err != CHIP_NO_ERROR)
     {
@@ -643,9 +706,9 @@ bool emberAfTimeSynchronizationClusterSetDSTOffsetCallback(
         return true;
     }
     // if DST state changes, generate DSTStatus event
-    sendDSTStatus(commandPath.mEndpointId, true);
+    sendDSTStatusEvent(commandPath.mEndpointId, true);
     // if list is empty, generate DSTTableEmpty event
-    sendDSTTableEmpty(commandPath.mEndpointId);
+    sendDSTTableEmptyEvent(commandPath.mEndpointId);
 
     commandObj->AddStatus(commandPath, Status::Success);
     return true;

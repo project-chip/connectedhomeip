@@ -1438,7 +1438,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Defines the size of the DSTOffset list
  */
 #ifndef CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE
-#define CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE 1
+#define CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE 2
 #endif
 
 /**
