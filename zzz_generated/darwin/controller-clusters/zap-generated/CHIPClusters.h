@@ -366,6 +366,52 @@ public:
     ~ModeSelectCluster() {}
 };
 
+class DLL_EXPORT LaundryWasherCluster : public ClusterBase
+{
+public:
+    LaundryWasherCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~LaundryWasherCluster() {}
+};
+
+class DLL_EXPORT RefrigeratorAndTemperatureControlledCabinetCluster : public ClusterBase
+{
+public:
+    RefrigeratorAndTemperatureControlledCabinetCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                       EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~RefrigeratorAndTemperatureControlledCabinetCluster() {}
+};
+
+class DLL_EXPORT RvcRunCluster : public ClusterBase
+{
+public:
+    RvcRunCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~RvcRunCluster() {}
+};
+
+class DLL_EXPORT RvcCleanCluster : public ClusterBase
+{
+public:
+    RvcCleanCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~RvcCleanCluster() {}
+};
+
+class DLL_EXPORT DishwasherModeSelectCluster : public ClusterBase
+{
+public:
+    DishwasherModeSelectCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~DishwasherModeSelectCluster() {}
+};
+
 class DLL_EXPORT DoorLockCluster : public ClusterBase
 {
 public:

@@ -2669,6 +2669,11 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+- (void)changeToModeWithStatusWithParams:(MTRModeSelectClusterChangeToModeWithStatusParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                              completion:(void (^)(MTRModeSelectClusterChangeToModeResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
@@ -2716,6 +2721,304 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
+ * Cluster Laundry Washer
+ *    This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for laundry washer devices.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterLaundryWasher : MTRCluster
+
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+
+- (void)changeToModeWithParams:(MTRLaundryWasherClusterChangeToModeParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)changeToModeWithStatusWithParams:(MTRLaundryWasherClusterChangeToModeWithStatusParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                              completion:(void (^)(MTRLaundryWasherClusterChangeToModeResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                    params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                               params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
+ * Cluster Refrigerator And Temperature Controlled Cabinet
+ *    This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for refrigerator and temperature controlled cabinet devices.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterRefrigeratorAndTemperatureControlledCabinet : MTRCluster
+
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+
+- (void)changeToModeWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)
+    changeToModeWithStatusWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeWithStatusParams *)params
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                          completion:
+                              (void (^)(
+                                  MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                    params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                               params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
+ * Cluster RVC Run
+ *    This cluster is an alias of the Mode Select cluster which also defines a namespace for the running modes of the Robotic Vacuum
+ * Cleaner devices.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterRVCRun : MTRCluster
+
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+
+- (void)changeToModeWithParams:(MTRRVCRunClusterChangeToModeParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)changeToModeWithStatusWithParams:(MTRRVCRunClusterChangeToModeWithStatusParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                              completion:(void (^)(MTRRVCRunClusterChangeToModeResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                    params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                               params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
+ * Cluster RVC Clean
+ *    This cluster is an alias of the Mode Select cluster which also defines a namespace for the
+      cleaning type of the Robotic Vacuum Cleaner devices.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterRVCClean : MTRCluster
+
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+
+- (void)changeToModeWithParams:(MTRRVCCleanClusterChangeToModeParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)changeToModeWithStatusWithParams:(MTRRVCCleanClusterChangeToModeWithStatusParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                              completion:(void (^)(MTRRVCCleanClusterChangeToModeResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                    params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                               params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
+ * Cluster Dishwasher Mode Select
+ *    This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for dishwasher devices.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterDishwasherModeSelect : MTRCluster
+
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+
+- (void)changeToModeWithParams:(MTRDishwasherModeSelectClusterChangeToModeParams *)params
+                expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+         expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)changeToModeWithStatusWithParams:(MTRDishwasherModeSelectClusterChangeToModeWithStatusParams *)params
+                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                              completion:(void (^)(MTRDishwasherModeSelectClusterChangeToModeResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                    params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                               params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

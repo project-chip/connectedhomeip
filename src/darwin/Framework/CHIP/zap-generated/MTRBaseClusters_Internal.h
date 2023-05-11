@@ -202,6 +202,31 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
+@interface MTRBaseClusterLaundryWasher ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
+@interface MTRBaseClusterRefrigeratorAndTemperatureControlledCabinet ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
+@interface MTRBaseClusterRVCRun ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
+@interface MTRBaseClusterRVCClean ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
+@interface MTRBaseClusterDishwasherModeSelect ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
 @interface MTRBaseClusterDoorLock ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;

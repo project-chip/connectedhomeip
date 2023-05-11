@@ -415,6 +415,63 @@ typedef void (*ModeSelectEventListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*LaundryWasherSupportedModesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasher::Structs::ModeOptionStruct::DecodableType> & data);
+typedef void (*LaundryWasherGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*LaundryWasherAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*LaundryWasherEventListListAttributeCallback)(void * context,
+                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*LaundryWasherAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*RefrigeratorAndTemperatureControlledCabinetSupportedModesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::ModeOptionStruct::DecodableType> & data);
+typedef void (*RefrigeratorAndTemperatureControlledCabinetGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*RefrigeratorAndTemperatureControlledCabinetAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*RefrigeratorAndTemperatureControlledCabinetEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*RefrigeratorAndTemperatureControlledCabinetAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*RvcRunSupportedModesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::DecodableType> & data);
+typedef void (*RvcRunGeneratedCommandListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*RvcRunAcceptedCommandListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*RvcRunEventListListAttributeCallback)(void * context,
+                                                     const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*RvcRunAttributeListListAttributeCallback)(void * context,
+                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*RvcCleanSupportedModesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::DecodableType> & data);
+typedef void (*RvcCleanGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*RvcCleanAcceptedCommandListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*RvcCleanEventListListAttributeCallback)(void * context,
+                                                       const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*RvcCleanAttributeListListAttributeCallback)(void * context,
+                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*DishwasherModeSelectSupportedModesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::DecodableType> &
+        data);
+typedef void (*DishwasherModeSelectGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DishwasherModeSelectAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DishwasherModeSelectEventListListAttributeCallback)(void * context,
+                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*DishwasherModeSelectAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*DoorLockGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DoorLockAcceptedCommandListListAttributeCallback)(void * context,

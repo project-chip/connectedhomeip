@@ -59,7 +59,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 // This is an array of EmberAfCluster structures.
-#define GENERATED_CLUSTER_COUNT 65
+#define GENERATED_CLUSTER_COUNT 70
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
@@ -531,6 +531,71 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: Laundry Washer (client) */ \
+      .clusterId = 0x00000051, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Refrigerator And Temperature Controlled Cabinet (client) */ \
+      .clusterId = 0x00000052, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
+      /* Endpoint: 1, Cluster: RVC Run (client) */ \
+      .clusterId = 0x00000054, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
+      /* Endpoint: 1, Cluster: RVC Clean (client) */ \
+      .clusterId = 0x00000055, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
+      /* Endpoint: 1, Cluster: Dishwasher Mode Select (client) */ \
+      .clusterId = 0x00000059, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Door Lock (client) */ \
       .clusterId = 0x00000101, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -916,7 +981,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 65, 0 },                                                                                           \
+        { ZAP_CLUSTER_INDEX(0), 70, 0 },                                                                                           \
     }
 
 // Largest attribute size is needed for various buffers

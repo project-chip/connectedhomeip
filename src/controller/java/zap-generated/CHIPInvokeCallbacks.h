@@ -434,6 +434,96 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPModeSelectClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPModeSelectClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPModeSelectClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPModeSelectClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPLaundryWasherClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPLaundryWasherClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPLaundryWasherClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPLaundryWasherClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::LaundryWasher::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeResponse::DecodableType &
+            data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPRvcRunClusterChangeToModeResponseCallback : public Callback::Callback<CHIPRvcRunClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPRvcRunClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPRvcRunClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context, const chip::app::Clusters::RvcRun::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPRvcCleanClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPRvcCleanClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPRvcCleanClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPRvcCleanClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::RvcClean::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPDishwasherModeSelectClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPDishwasherModeSelectClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPDishwasherModeSelectClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPDishwasherModeSelectClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterGetWeekDayScheduleResponseCallback
     : public Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {
