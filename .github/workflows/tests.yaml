@@ -81,6 +81,7 @@ jobs:
                   mkdir objdir-clone || true
 
             - name: Bootstrap cache
+              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
@@ -337,6 +338,7 @@ jobs:
                   mkdir objdir-clone || true
 
             - name: Bootstrap cache
+              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
@@ -459,6 +461,7 @@ jobs:
                   mkdir objdir-clone || true
 
             - name: Bootstrap cache
+              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
@@ -546,6 +549,7 @@ jobs:
                   mkdir objdir-clone || true
 
             - name: Bootstrap cache
+              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
@@ -719,6 +723,7 @@ jobs:
                   mkdir objdir-clone || true
 
             - name: Bootstrap cache
+              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:

@@ -47,6 +47,7 @@ jobs:
               run: brew install python@3.9
 
             - name: Bootstrap cache
+              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
