@@ -101,7 +101,14 @@ CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint64_t & val)
 CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, buf, bufSize, &outLen);
+
+    auto err = PersistedStorage::KeyValueStoreMgr().Get(key.Name, buf, bufSize, &outLen);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    VerifyOrReturnError(outLen > 0, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    outLen--; // Account for null terminator
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
@@ -133,13 +140,20 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint64_t val)
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str)
 {
     VerifyOrReturnError(str != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return PersistedStorage::KeyValueStoreMgr().Put(key.Name, str, strlen(str));
+    return PersistedStorage::KeyValueStoreMgr().Put(key.Name, str, strlen(str) + 1);
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
     VerifyOrReturnError(str != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return PersistedStorage::KeyValueStoreMgr().Put(key.Name, str, strLen);
+
+    auto * strCopy = strndup(str, strLen);
+    VerifyOrReturnError(strCopy != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    auto err = PersistedStorage::KeyValueStoreMgr().Put(key.Name, strCopy, strLen + 1);
+
+    free(strCopy);
+    return err;
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
