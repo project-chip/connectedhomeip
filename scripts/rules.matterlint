@@ -19,6 +19,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/chip-ota.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chip-types.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/concentration-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml";
