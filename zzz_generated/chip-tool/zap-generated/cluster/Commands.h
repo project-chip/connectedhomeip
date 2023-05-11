@@ -6529,11 +6529,15 @@ class ColorControlStepColor : public ClusterCommand
 public:
     ColorControlStepColor(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("step-color", credsIssuerConfig)
     {
+<<<<<<< HEAD
         AddArgument("StepX", INT16_MIN, INT16_MAX, &mRequest.stepX);
         AddArgument("StepY", INT16_MIN, INT16_MAX, &mRequest.stepY);
         AddArgument("TransitionTime", 0, UINT16_MAX, &mRequest.transitionTime);
         AddArgument("OptionsMask", 0, UINT8_MAX, &mRequest.optionsMask);
         AddArgument("OptionsOverride", 0, UINT8_MAX, &mRequest.optionsOverride);
+=======
+        AddArgument("Count", INT16_MIN, INT16_MAX, &mRequest.count);
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
         ClusterCommand::AddArguments();
     }
 

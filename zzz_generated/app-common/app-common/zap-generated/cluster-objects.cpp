@@ -237,7 +237,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace Identify
 namespace Groups {
@@ -673,7 +674,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace Groups
 namespace Scenes {
@@ -1691,7 +1693,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace Scenes
 namespace OnOff {
@@ -1963,12 +1966,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace OnOff
 namespace OnOffSwitchConfiguration {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -2007,7 +2012,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace OnOffSwitchConfiguration
 namespace LevelControl {
@@ -2509,12 +2515,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace LevelControl
 namespace BinaryInputBasic {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -2574,12 +2582,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace BinaryInputBasic
 namespace PulseWidthModulation {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -2612,7 +2622,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace PulseWidthModulation
 namespace Descriptor {
@@ -2663,7 +2674,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace DeviceTypeStruct
 } // namespace Structs
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -2708,7 +2720,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace Descriptor
 namespace Binding {
@@ -2784,7 +2797,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TargetStruct
 } // namespace Structs
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -2820,7 +2834,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace Binding
 namespace AccessControl {
@@ -3018,7 +3033,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace AccessControlExtensionStruct
 } // namespace Structs
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -4604,7 +4620,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
@@ -4916,7 +4933,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace OtaSoftwareUpdateRequestor
 namespace LocalizationConfiguration {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -4955,12 +4973,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace LocalizationConfiguration
 namespace TimeFormatLocalization {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -5002,12 +5022,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace TimeFormatLocalization
 namespace UnitLocalization {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -5043,12 +5065,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace UnitLocalization
 namespace PowerSourceConfiguration {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -5084,7 +5108,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace PowerSourceConfiguration
 namespace PowerSource {
@@ -5223,7 +5248,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace WiredFaultChangeType
 } // namespace Structs
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -5817,7 +5843,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace GeneralCommissioning
 namespace NetworkCommissioning {
@@ -6447,7 +6474,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace NetworkCommissioning
 namespace DiagnosticLogs {
@@ -6580,7 +6608,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace DiagnosticLogs
 namespace GeneralDiagnostics {
@@ -8072,7 +8101,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace EthernetNetworkDiagnostics
 namespace TimeSynchronization {
@@ -8799,7 +8829,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace ProductAppearanceStruct
 } // namespace Structs
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -9026,7 +9057,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace BridgedDeviceBasicInformation
 namespace Switch {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -9509,7 +9541,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace AdministratorCommissioning
 namespace OperationalCredentials {
@@ -10193,7 +10226,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace OperationalCredentials
 namespace GroupKeyManagement {
@@ -10662,13 +10696,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace GroupKeyManagement
 namespace FixedLabel {
-namespace Structs {} // namespace Structs
+namespace Structs {
+} // namespace Structs
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10704,13 +10741,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace FixedLabel
 namespace UserLabel {
-namespace Structs {} // namespace Structs
+namespace Structs {
+} // namespace Structs
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10746,12 +10786,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace UserLabel
 namespace ProxyConfiguration {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10784,12 +10826,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace ProxyConfiguration
 namespace ProxyDiscovery {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10822,12 +10866,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace ProxyDiscovery
 namespace ProxyValid {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -10860,12 +10906,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace ProxyValid
 namespace BooleanState {
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 
 namespace Attributes {
 CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
@@ -11233,7 +11281,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace IcdManagement
 namespace ModeSelect {
@@ -14098,6 +14147,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14125,6 +14175,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         }
     }
+=======
+namespace Events {
+} // namespace Events
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
@@ -14341,8 +14395,33 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::NumberOfHolidaySchedulesSupported::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, numberOfHolidaySchedulesSupported));
         break;
+<<<<<<< HEAD
     case Attributes::MaxPINCodeLength::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, maxPINCodeLength));
+=======
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace BarrierControl
+namespace PumpConfigurationAndControl {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MaxPressure::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxPressure));
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
         break;
     case Attributes::MinPINCodeLength::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, minPINCodeLength));
@@ -15528,6 +15607,13 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -15548,6 +15634,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
     }
 
+<<<<<<< HEAD
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
@@ -15561,14 +15648,95 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
+=======
+namespace Commands {
+} // namespace Commands
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+<<<<<<< HEAD
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
     VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
+=======
+    switch (path.mAttributeId)
+    {
+    case Attributes::FanMode::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, fanMode));
+        break;
+    case Attributes::FanModeSequence::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, fanModeSequence));
+        break;
+    case Attributes::PercentSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, percentSetting));
+        break;
+    case Attributes::PercentCurrent::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, percentCurrent));
+        break;
+    case Attributes::SpeedMax::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, speedMax));
+        break;
+    case Attributes::SpeedSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, speedSetting));
+        break;
+    case Attributes::SpeedCurrent::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, speedCurrent));
+        break;
+    case Attributes::RockSupport::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, rockSupport));
+        break;
+    case Attributes::RockSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, rockSetting));
+        break;
+    case Attributes::WindSupport::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, windSupport));
+        break;
+    case Attributes::WindSetting::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, windSetting));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace FanControl
+namespace ThermostatUserInterfaceConfiguration {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
     {
         if (!TLV::IsContextTag(reader.GetTag()))
         {
@@ -15585,8 +15753,21 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
 } // namespace ElectronicTemperatureHigh.
 namespace PumpBlocked {
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace ThermostatUserInterfaceConfiguration
+namespace ColorControl {
+
+namespace Commands {
+namespace MoveToHue {
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -16691,6 +16872,13 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -16726,6 +16914,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
     }
 
+<<<<<<< HEAD
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
@@ -16744,6 +16933,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
+=======
+namespace Commands {
+} // namespace Commands
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -16797,6 +16990,19 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace BallastConfiguration
+namespace IlluminanceMeasurement {
+
+namespace Commands {
+} // namespace Commands
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -16849,6 +17055,19 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace IlluminanceMeasurement
+namespace TemperatureMeasurement {
+
+namespace Commands {
+} // namespace Commands
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -16885,9 +17104,25 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
 } // namespace MoveColor.
 namespace StepColor {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace TemperatureMeasurement
+namespace PressureMeasurement {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
@@ -16899,6 +17134,19 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace PressureMeasurement
+namespace FlowMeasurement {
+
+namespace Commands {
+} // namespace Commands
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -16951,6 +17199,19 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace FlowMeasurement
+namespace RelativeHumidityMeasurement {
+
+namespace Commands {
+} // namespace Commands
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -16987,8 +17248,139 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
 } // namespace MoveToColorTemperature.
 namespace EnhancedMoveToHue {
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace RelativeHumidityMeasurement
+namespace OccupancySensing {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::Occupancy::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupancy));
+        break;
+    case Attributes::OccupancySensorType::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupancySensorType));
+        break;
+    case Attributes::OccupancySensorTypeBitmap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, occupancySensorTypeBitmap));
+        break;
+    case Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PIROccupiedToUnoccupiedDelay));
+        break;
+    case Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PIRUnoccupiedToOccupiedDelay));
+        break;
+    case Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PIRUnoccupiedToOccupiedThreshold));
+        break;
+    case Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicOccupiedToUnoccupiedDelay));
+        break;
+    case Attributes::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedDelay));
+        break;
+    case Attributes::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedThreshold));
+        break;
+    case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactOccupiedToUnoccupiedDelay));
+        break;
+    case Attributes::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedDelay));
+        break;
+    case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedThreshold));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace OccupancySensing
+namespace WakeOnLan {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MACAddress::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, MACAddress));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace WakeOnLan
+namespace Channel {
+namespace Structs {
+namespace ChannelInfoStruct {
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -17256,8 +17648,61 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
 } // namespace ColorLoopSet.
 namespace StopMoveStep {
+=======
+} // namespace SkipChannel.
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::ChannelList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, channelList));
+        break;
+    case Attributes::Lineup::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, lineup));
+        break;
+    case Attributes::CurrentChannel::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, currentChannel));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace Channel
+namespace TargetNavigator {
+namespace Structs {
+namespace TargetInfoStruct {
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -17608,6 +18053,90 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     return CHIP_NO_ERROR;
 }
 } // namespace Attributes
+<<<<<<< HEAD
+=======
+
+namespace Events {
+} // namespace Events
+
+} // namespace TargetNavigator
+namespace MediaPlayback {
+namespace Structs {
+namespace PlaybackPositionStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kUpdatedAt), updatedAt));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kPosition), position));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kUpdatedAt):
+            ReturnErrorOnFailure(DataModel::Decode(reader, updatedAt));
+            break;
+        case to_underlying(Fields::kPosition):
+            ReturnErrorOnFailure(DataModel::Decode(reader, position));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace PlaybackPositionStruct
+} // namespace Structs
+
+namespace Commands {
+namespace Play {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        default:
+            break;
+        }
+    }
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 namespace Events {} // namespace Events
 
@@ -17857,7 +18386,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace PressureMeasurement
 namespace FlowMeasurement {
@@ -18386,7 +18916,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace Channel
 namespace TargetNavigator {
@@ -18433,6 +18964,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 } // namespace TargetInfoStruct
 } // namespace Structs
@@ -18559,7 +19097,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace TargetNavigator
 namespace MediaPlayback {
@@ -18911,8 +19450,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
+<<<<<<< HEAD
 } // namespace SkipForward.
 namespace SkipBackward {
+=======
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace ContentLauncher
+namespace AudioOutput {
+namespace Structs {
+namespace OutputInfoStruct {
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19081,7 +19632,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace MediaPlayback
 namespace MediaInput {
@@ -19324,8 +19876,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
+<<<<<<< HEAD
 } // namespace MediaInput
 namespace LowPower {
 
@@ -19363,6 +19917,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace Sleep.
+=======
+} // namespace ApplicationLauncher
+namespace ApplicationBasic {
+namespace Structs {
+} // namespace Structs
+
+namespace Commands {
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 } // namespace Commands
 
 namespace Attributes {
@@ -19396,7 +19958,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace LowPower
 namespace KeypadInput {
@@ -19618,6 +20181,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
+<<<<<<< HEAD
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19646,6 +20210,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         }
     }
+=======
+namespace Events {
+} // namespace Events
+>>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
@@ -20458,7 +21026,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace ApplicationBasic
 namespace AccountLogin {
@@ -21253,7 +21822,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace ElectricalMeasurement
 namespace UnitTesting {
@@ -23700,7 +24270,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 
 } // namespace FaultInjection
 
