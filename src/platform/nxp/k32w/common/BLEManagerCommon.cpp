@@ -840,9 +840,8 @@ void BLEManagerCommon::DriveBLEState(intptr_t arg)
 void BLEManagerCommon::DoBleProcessing(void)
 {
     blekw_msg_t * msg = NULL;
-    BaseType_t eventReceived = xQueueReceive(sBleEventQueue, &msg, 0);
 
-    while ((eventReceived == pdTRUE) && msg)
+    while ((xQueueReceive(sBleEventQueue, &msg, 0) == pdTRUE) && msg)
     {
         if (msg->type == BLE_KW_MSG_ERROR)
         {
