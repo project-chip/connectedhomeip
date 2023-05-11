@@ -17,20 +17,21 @@
 #pragma once
 
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/ICDManager.h>
 #include "lib/core/CHIPError.h"
+#include <platform/ICDManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {
 
 /**
  * @brief ICDEventManager class is responsible of processing Platform Events that affect an ICDs behaviour
- * The class registers an Event Handler with the Platform Manager and dispatchs the processing to the ICDManager class. 
+ * The class registers an Event Handler with the Platform Manager and dispatchs the processing to the ICDManager class.
  */
-class ICDEventManager {
+class ICDEventManager
+{
 
-public :
+public:
     static ICDEventManager & GetInstance();
     CHIP_ERROR Init();
 
@@ -39,7 +40,6 @@ private:
 
     ICDManager icdManager;
     static ICDEventManager instance;
-
 };
 
 } // namespace DeviceLayer

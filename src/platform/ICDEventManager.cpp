@@ -24,14 +24,13 @@ ICDEventManager ICDEventManager::instance;
 
 /**
  * @brief Returns Unique Instance for the ICDEventManager
- * 
- * @return ICDEventManager 
+ *
+ * @return ICDEventManager
  */
 ICDEventManager & ICDEventManager::GetInstance()
 {
     return instance;
 }
-
 
 CHIP_ERROR ICDEventManager::Init()
 {

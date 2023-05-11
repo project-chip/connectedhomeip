@@ -21,14 +21,14 @@ namespace DeviceLayer {
 
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
- * 
+ *
  */
-class ICDManager {
+class ICDManager
+{
 public:
     ICDManager();
 
 private:
-
 };
 
 } // namespace DeviceLayer

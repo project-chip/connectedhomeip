@@ -23,10 +23,7 @@ namespace DeviceLayer {
 /*
     Default constructor
 */
-ICDManager::ICDManager()
-{
-
-}
+ICDManager::ICDManager() {}
 
 } // namespace DeviceLayer
 } // namespace chip
