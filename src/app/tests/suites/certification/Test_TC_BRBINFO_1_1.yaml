@@ -186,52 +186,21 @@ tests:
               type: list
               contains: [18]
 
-    - label: "TH1 reads EventList from DUT"
-      PICS: " !BRBINFO.S.E00 && !BRBINFO.S.E01 && !BRBINFO.S.E02 &&
-          !BRBINFO.S.E03
-          "
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "TH1 reads optional event (StartUp) in EventList"
-      PICS: BRBINFO.S.E00
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [0]
-
-    - label: "TH1 reads optional event (ShutDown) in EventList"
-      PICS: BRBINFO.S.E01
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [1]
-
-    - label: "TH1 reads optional event (Leave) in EventList"
-      PICS: BRBINFO.S.E02
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [2]
-
-    - label: "TH1 reads optional event (ReachableChanged) in EventList"
-      PICS: BRBINFO.S.E03
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [3]
+    #Commenting out the step EventList attribute which is out of scope for matter V1.0
+    #- label:
+    #      "Read EventList attribute from the DUT and Verify that the DUT
+    #      response provides a list of supported events."
+    #  verification: |
+    #      Not implemented in chip-tool
+    #  cluster: "LogCommands"
+    #  command: "UserPrompt"
+    #  PICS: PICS_USER_PROMPT
+    #  arguments:
+    #      values:
+    #          - name: "message"
+    #            value: "Please enter 'y' for success"
+    #          - name: "expectedValue"
+    #            value: "y"
 
     - label: "TH1 reads AcceptedCommandList from DUT"
       command: "readAttribute"

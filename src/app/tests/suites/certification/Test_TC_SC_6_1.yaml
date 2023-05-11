@@ -146,7 +146,7 @@ tests:
       disabled: true
 
     - label:
-          "DUT binds GroupId with GroupKeySetID in the GroupKeyMap attribute
+          "DUT binds GroupID with GroupKeySetID in the GroupKeyMap attribute
           list on GroupKeyManagement cluster"
       PICS: GRPKEY.C.A0000
       verification: |
