@@ -172,7 +172,7 @@ client cluster Scenes = 5 {
   }
 
   response struct AddSceneResponse = 0 {
-    status status = 0;
+    ENUM8 status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -183,7 +183,7 @@ client cluster Scenes = 5 {
   }
 
   response struct ViewSceneResponse = 1 {
-    status status = 0;
+    ENUM8 status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
@@ -197,7 +197,7 @@ client cluster Scenes = 5 {
   }
 
   response struct RemoveSceneResponse = 2 {
-    status status = 0;
+    ENUM8 status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -207,7 +207,7 @@ client cluster Scenes = 5 {
   }
 
   response struct RemoveAllScenesResponse = 3 {
-    status status = 0;
+    ENUM8 status = 0;
     group_id groupID = 1;
   }
 
@@ -217,7 +217,7 @@ client cluster Scenes = 5 {
   }
 
   response struct StoreSceneResponse = 4 {
-    status status = 0;
+    ENUM8 status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -233,7 +233,7 @@ client cluster Scenes = 5 {
   }
 
   response struct GetSceneMembershipResponse = 6 {
-    status status = 0;
+    ENUM8 status = 0;
     nullable INT8U capacity = 1;
     group_id groupID = 2;
     optional INT8U sceneList[] = 3;
@@ -248,7 +248,7 @@ client cluster Scenes = 5 {
   }
 
   response struct EnhancedAddSceneResponse = 64 {
-    status status = 0;
+    ENUM8 status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
@@ -259,7 +259,7 @@ client cluster Scenes = 5 {
   }
 
   response struct EnhancedViewSceneResponse = 65 {
-    status status = 0;
+    ENUM8 status = 0;
     group_Id groupID = 1;
     INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
@@ -276,7 +276,7 @@ client cluster Scenes = 5 {
   }
 
   response struct CopySceneResponse = 66 {
-    status status = 0;
+    ENUM8 status = 0;
     group_Id groupIdentifierFrom = 1;
     INT8U sceneIdentifierFrom = 2;
   }
@@ -815,47 +815,9 @@ client cluster Actions = 37 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 client cluster BasicInformation = 40 {
-  enum ColorEnum : ENUM8 {
-    kBlack = 0;
-    kNavy = 1;
-    kGreen = 2;
-    kTeal = 3;
-    kMaroon = 4;
-    kPurple = 5;
-    kOlive = 6;
-    kGray = 7;
-    kBlue = 8;
-    kLime = 9;
-    kAqua = 10;
-    kRed = 11;
-    kFuchsia = 12;
-    kYellow = 13;
-    kWhite = 14;
-    kNickel = 15;
-    kChrome = 16;
-    kBrass = 17;
-    kCopper = 18;
-    kSilver = 19;
-    kGold = 20;
-  }
-
-  enum ProductFinishEnum : ENUM8 {
-    kOther = 0;
-    kMatte = 1;
-    kSatin = 2;
-    kPolished = 3;
-    kRugged = 4;
-    kFabric = 5;
-  }
-
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
-  }
-
-  struct ProductAppearanceStruct {
-    ProductFinishEnum finish = 0;
-    nullable ColorEnum primaryColor = 1;
   }
 
   critical event StartUp = 0 {
@@ -893,7 +855,6 @@ client cluster BasicInformation = 40 {
   readonly attribute optional boolean reachable = 17;
   readonly attribute optional char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
-  readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2072,49 +2033,157 @@ client cluster EthernetNetworkDiagnostics = 55 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+/** Accurate time is required for a number of reasons, including scheduling, display and validating security materials. */
+client cluster TimeSynchronization = 56 {
+  enum GranularityEnum : ENUM8 {
+    kNoTimeGranularity = 0;
+    kMinutesGranularity = 1;
+    kSecondsGranularity = 2;
+    kMillisecondsGranularity = 3;
+    kMicrosecondsGranularity = 4;
+  }
+
+  enum StatusCode : ENUM8 {
+    kTimeNotAccepted = 2;
+  }
+
+  enum TimeSourceEnum : ENUM8 {
+    kNone = 0;
+    kUnknown = 1;
+    kAdmin = 2;
+    kNodeTimeCluster = 3;
+    kNonMatterSNTP = 4;
+    kNonMatterNTP = 5;
+    kMatterSNTP = 6;
+    kMatterNTP = 7;
+    kMixedNTP = 8;
+    kNonMatterSNTPNTS = 9;
+    kNonMatterNTPNTS = 10;
+    kMatterSNTPNTS = 11;
+    kMatterNTPNTS = 12;
+    kMixedNTPNTS = 13;
+    kCloudSource = 14;
+    kPtp = 15;
+    kGnss = 16;
+  }
+
+  enum TimeZoneDatabaseEnum : ENUM8 {
+    kFull = 0;
+    kPartial = 1;
+    kNone = 2;
+  }
+
+  bitmap TimeSynchronizationFeature : BITMAP32 {
+    kTimeZone = 0x1;
+    kNTPClient = 0x2;
+    kNTPServer = 0x4;
+    kTimeSyncClient = 0x8;
+  }
+
+  struct DSTOffsetStruct {
+    int32s offset = 0;
+    epoch_us validStarting = 1;
+    nullable epoch_us validUntil = 2;
+  }
+
+  struct FabricScopedTrustedTimeSourceStruct {
+    node_id nodeID = 0;
+    endpoint_no endpoint = 1;
+  }
+
+  struct TimeZoneStruct {
+    int32s offset = 0;
+    epoch_us validAt = 1;
+    optional char_string<64> name = 2;
+  }
+
+  struct TrustedTimeSourceStruct {
+    fabric_idx fabricIndex = 0;
+    node_id nodeID = 1;
+    endpoint_no endpoint = 2;
+  }
+
+  info event DSTTableEmpty = 0 {
+  }
+
+  info event DSTStatus = 1 {
+    boolean DSTOffsetActive = 0;
+  }
+
+  info event TimeZoneStatus = 2 {
+    INT32S offset = 0;
+    optional CHAR_STRING name = 1;
+  }
+
+  info event TimeFailure = 3 {
+  }
+
+  info event MissingTrustedTimeSource = 4 {
+  }
+
+  readonly attribute nullable epoch_us UTCTime = 0;
+  readonly attribute GranularityEnum granularity = 1;
+  readonly attribute optional TimeSourceEnum timeSource = 2;
+  readonly attribute nullable TrustedTimeSourceStruct trustedTimeSource = 3;
+  readonly attribute optional nullable char_string<128> defaultNTP = 4;
+  readonly attribute optional TimeZoneStruct timeZone[] = 5;
+  readonly attribute optional DSTOffsetStruct DSTOffset[] = 6;
+  readonly attribute optional nullable epoch_us localTime = 7;
+  readonly attribute optional TimeZoneDatabaseEnum timeZoneDatabase = 8;
+  readonly attribute optional boolean NTPServerAvailable = 9;
+  readonly attribute optional int8u timeZoneListMaxSize = 10;
+  readonly attribute optional int8u DSTOffsetListMaxSize = 11;
+  readonly attribute optional boolean supportsDNSResolve = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetUtcTimeRequest {
+    epoch_us utcTime = 0;
+    GranularityEnum granularity = 1;
+    optional TimeSourceEnum timeSource = 2;
+  }
+
+  request struct SetTrustedTimeSourceRequest {
+    nullable FabricScopedTrustedTimeSourceStruct trustedTimeSource = 0;
+  }
+
+  request struct SetTimeZoneRequest {
+    TimeZoneStruct timeZone[] = 0;
+  }
+
+  response struct SetTimeZoneResponse = 3 {
+    boolean DSTOffsetRequired = 0;
+  }
+
+  request struct SetDSTOffsetRequest {
+    DSTOffsetStruct DSTOffset[] = 0;
+  }
+
+  request struct SetDefaultNTPRequest {
+    nullable CHAR_STRING<128> defaultNTP = 0;
+  }
+
+  /** This command MAY be issued by Administrator to set the time. */
+  command access(invoke: administer) SetUtcTime(SetUtcTimeRequest): DefaultSuccess = 0;
+  /** This command SHALL set TrustedTimeSource. */
+  fabric command access(invoke: administer) SetTrustedTimeSource(SetTrustedTimeSourceRequest): DefaultSuccess = 1;
+  /** This command SHALL set TimeZone. */
+  command access(invoke: manage) SetTimeZone(SetTimeZoneRequest): SetTimeZoneResponse = 2;
+  /** This command SHALL set DSTOffset. */
+  command access(invoke: manage) SetDSTOffset(SetDSTOffsetRequest): DefaultSuccess = 4;
+  /** This command is used to set DefaultNTP. */
+  command access(invoke: administer) SetDefaultNTP(SetDefaultNTPRequest): DefaultSuccess = 5;
+}
+
 /** This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
           the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name. */
 client cluster BridgedDeviceBasicInformation = 57 {
-  enum ColorEnum : ENUM8 {
-    kBlack = 0;
-    kNavy = 1;
-    kGreen = 2;
-    kTeal = 3;
-    kMaroon = 4;
-    kPurple = 5;
-    kOlive = 6;
-    kGray = 7;
-    kBlue = 8;
-    kLime = 9;
-    kAqua = 10;
-    kRed = 11;
-    kFuchsia = 12;
-    kYellow = 13;
-    kWhite = 14;
-    kNickel = 15;
-    kChrome = 16;
-    kBrass = 17;
-    kCopper = 18;
-    kSilver = 19;
-    kGold = 20;
-  }
-
-  enum ProductFinishEnum : ENUM8 {
-    kOther = 0;
-    kMatte = 1;
-    kSatin = 2;
-    kPolished = 3;
-    kRugged = 4;
-    kFabric = 5;
-  }
-
-  struct ProductAppearanceStruct {
-    ProductFinishEnum finish = 0;
-    nullable ColorEnum primaryColor = 1;
-  }
-
   critical event StartUp = 0 {
     INT32U softwareVersion = 0;
   }
@@ -2144,7 +2213,6 @@ client cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute optional char_string<32> serialNumber = 15;
   readonly attribute boolean reachable = 17;
   readonly attribute optional char_string<32> uniqueID = 18;
-  readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4970,6 +5038,43 @@ client cluster ElectricalMeasurement = 2820 {
   command GetMeasurementProfileCommand(GetMeasurementProfileCommandRequest): DefaultSuccess = 1;
 }
 
+/** Client Monitoring allows for ensuring that listed clients meet the required monitoring conditions on the server. */
+client cluster ClientMonitoring = 4166 {
+  fabric_scoped struct MonitoringRegistration {
+    node_id clientNodeId = 1;
+    int64u ICid = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute int32u idleModeInterval = 0;
+  readonly attribute int32u activeModeInterval = 1;
+  readonly attribute int16u activeModeThreshold = 2;
+  readonly attribute MonitoringRegistration expectedClients[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RegisterClientMonitoringRequest {
+    node_id clientNodeId = 0;
+    INT64U ICid = 1;
+  }
+
+  request struct UnregisterClientMonitoringRequest {
+    node_id clientNodeId = 0;
+    INT64U ICid = 1;
+  }
+
+  /** Register a client to the end device */
+  command access(invoke: manage) RegisterClientMonitoring(RegisterClientMonitoringRequest): DefaultSuccess = 0;
+  /** Unregister a client from an end device */
+  command access(invoke: manage) UnregisterClientMonitoring(UnregisterClientMonitoringRequest): DefaultSuccess = 1;
+  /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
+  command access(invoke: manage) StayAwakeRequest(): DefaultSuccess = 2;
+}
+
 /** The Test Cluster is meant to validate the generated code */
 client cluster UnitTesting = 4294048773 {
   enum SimpleEnum : ENUM8 {
@@ -5445,6 +5550,7 @@ endpoint 1 {
   binding cluster ThreadNetworkDiagnostics;
   binding cluster WiFiNetworkDiagnostics;
   binding cluster EthernetNetworkDiagnostics;
+  binding cluster TimeSynchronization;
   binding cluster BridgedDeviceBasicInformation;
   binding cluster Switch;
   binding cluster AdministratorCommissioning;
@@ -5482,6 +5588,7 @@ endpoint 1 {
   binding cluster ApplicationBasic;
   binding cluster AccountLogin;
   binding cluster ElectricalMeasurement;
+  binding cluster ClientMonitoring;
   binding cluster UnitTesting;
 }
 
