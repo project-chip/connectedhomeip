@@ -878,6 +878,23 @@ static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEn
     return kEmberInvalidEndpointIndex;
 }
 
+uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster)
+{
+    uint16_t epIndex = findIndexFromEndpoint(endpoint, true /*ignoreDisabledEndpoints*/);
+
+    // Endpoint must be configured and enabled
+    if (epIndex != kEmberInvalidEndpointIndex)
+    {
+        if (emberAfFindClusterInType(emAfEndpoints[epIndex].endpointType, cluster, CLUSTER_MASK_SERVER) == nullptr)
+        {
+            // The provided endpoint do not contain the given cluster server.
+            return kEmberInvalidEndpointIndex;
+        }
+    }
+
+    return epIndex;
+}
+
 bool emberAfEndpointIsEnabled(EndpointId endpoint)
 {
     uint16_t index = findIndexFromEndpoint(endpoint,

@@ -654,7 +654,7 @@ bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint
  */
 EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, OnOff::Id);
+    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, OnOff::Id);
     if (index >= ArraySize(gEventControls))
     {
         return nullptr;
