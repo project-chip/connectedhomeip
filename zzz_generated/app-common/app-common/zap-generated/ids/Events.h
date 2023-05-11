@@ -267,6 +267,58 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace BooleanState
 
+namespace RefrigeratorAlarm {
+namespace Events {
+
+namespace Notify {
+static constexpr EventId Id = 0x00000000;
+} // namespace Notify
+
+} // namespace Events
+} // namespace RefrigeratorAlarm
+
+namespace DishwasherOperationalState {
+namespace Events {
+
+namespace OperationalError {
+static constexpr EventId Id = 0x00000000;
+} // namespace OperationalError
+
+namespace OperationCompletion {
+static constexpr EventId Id = 0x00000001;
+} // namespace OperationCompletion
+
+} // namespace Events
+} // namespace DishwasherOperationalState
+
+namespace OperationalState {
+namespace Events {
+
+namespace OperationalError {
+static constexpr EventId Id = 0x00000000;
+} // namespace OperationalError
+
+namespace OperationCompletion {
+static constexpr EventId Id = 0x00000001;
+} // namespace OperationCompletion
+
+} // namespace Events
+} // namespace OperationalState
+
+namespace RoboticVacuumOperationalState {
+namespace Events {
+
+namespace OperationalError {
+static constexpr EventId Id = 0x00000000;
+} // namespace OperationalError
+
+namespace OperationCompletion {
+static constexpr EventId Id = 0x00000001;
+} // namespace OperationCompletion
+
+} // namespace Events
+} // namespace RoboticVacuumOperationalState
+
 namespace DoorLock {
 namespace Events {
 

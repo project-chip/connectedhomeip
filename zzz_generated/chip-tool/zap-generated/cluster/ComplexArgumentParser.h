@@ -226,6 +226,46 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Str
 
 static void Finalize(chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DishwasherOperationalState::Structs::ErrorStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DishwasherOperationalState::Structs::ErrorStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::RoboticVacuumOperationalState::Structs::ErrorStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::RoboticVacuumOperationalState::Structs::ErrorStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);
 

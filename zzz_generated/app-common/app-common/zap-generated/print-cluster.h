@@ -286,6 +286,38 @@
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_TEMPERATURE_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_TEMPERATURE_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER { chip::app::Clusters::TemperatureControl::Id, "Temperature Control" },
+#else
+#define CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER
+#endif
+
+#if defined(ZCL_USING_REFRIGERATOR_ALARM_CLUSTER_SERVER) || defined(ZCL_USING_REFRIGERATOR_ALARM_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM_CLUSTER { chip::app::Clusters::RefrigeratorAlarm::Id, "Refrigerator Alarm" },
+#else
+#define CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM_CLUSTER
+#endif
+
+#if defined(ZCL_USING_OPERATIONAL_STATE_DISHWASHER_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_DISHWASHER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_DISHWASHER_CLUSTER                                                                     \
+    { chip::app::Clusters::DishwasherOperationalState::Id, "Dishwasher Operational State" },
+#else
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_DISHWASHER_CLUSTER
+#endif
+
+#if defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER { chip::app::Clusters::OperationalState::Id, "Operational State" },
+#else
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_OPERATIONAL_STATE_RVC_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_RVC_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                            \
+    { chip::app::Clusters::RoboticVacuumOperationalState::Id, "Robotic Vacuum Operational State" },
+#else
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER
+#endif
+
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER { chip::app::Clusters::DoorLock::Id, "Door Lock" },
 #else
@@ -523,6 +555,11 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM_CLUSTER                                                                                   \
+    CHIP_PRINTCLUSTER_OPERATIONAL_STATE_DISHWASHER_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \

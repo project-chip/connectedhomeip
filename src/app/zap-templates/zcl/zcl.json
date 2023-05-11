@@ -270,10 +270,19 @@
             "CurrentMaxRate",
             "OverrunCount"
         ],
-        "Channel": ["Lineup", "CurrentChannel"],
-        "Media Playback": ["SampledPosition"],
-        "Application Launcher": ["CurrentApp"],
-        "Application Basic": ["Application"],
+        "Channel": [
+            "Lineup",
+            "CurrentChannel"
+        ],
+        "Media Playback": [
+            "SampledPosition"
+        ],
+        "Application Launcher": [
+            "CurrentApp"
+        ],
+        "Application Basic": [
+            "Application"
+        ],
         "Time Synchronization": [
             "TrustedTimeSource",
             "DefaultNTP",
