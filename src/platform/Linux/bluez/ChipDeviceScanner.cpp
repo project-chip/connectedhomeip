@@ -128,6 +128,7 @@ std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(BluezAdapter1 * ada
 
 CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 {
+    assertChipStackLockedByCurrentThread();
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     mIsScanning = true; // optimistic, to allow all callbacks to check this
