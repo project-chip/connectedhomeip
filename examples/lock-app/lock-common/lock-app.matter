@@ -80,6 +80,7 @@ server cluster OnOff = 6 {
 
   bitmap OnOffFeature : BITMAP32 {
     kLighting = 0x1;
+    kDeadFront = 0x2;
   }
 
   readonly attribute boolean onOff = 0;
@@ -2533,7 +2534,7 @@ endpoint 1 {
     ram      attribute offWaitTime default = 0;
     ram      attribute startUpOnOff;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
   }
 
   server cluster Descriptor {

@@ -180,7 +180,8 @@ enum class OnOffControl : uint8_t
 // Bitmap for OnOffFeature
 enum class OnOffFeature : uint32_t
 {
-    kLighting = 0x1,
+    kLighting  = 0x1,
+    kDeadFront = 0x2,
 };
 } // namespace OnOff
 

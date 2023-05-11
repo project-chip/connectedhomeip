@@ -1308,6 +1308,7 @@ class OnOff(Cluster):
 
         class OnOffFeature(IntFlag):
             kLighting = 0x1
+            kDeadFront = 0x2
 
     class Commands:
         @dataclass
