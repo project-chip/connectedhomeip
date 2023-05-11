@@ -89,7 +89,6 @@ ASAN
 asdk
 AssertionError
 ASR
-asr
 AST
 ASYNC
 atomics

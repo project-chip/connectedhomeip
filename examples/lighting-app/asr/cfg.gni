@@ -13,7 +13,7 @@
 # limitations under the License.
 
 declare_args() {
-  chip_use_factory = false
+  chip_enable_factory_data = false
 
   chip_lwip_ip6_hook = false
 

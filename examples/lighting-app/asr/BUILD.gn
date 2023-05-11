@@ -46,7 +46,7 @@ asr_sdk_sources("lighting_app_sdk_sources") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
   ]
 
-  if (chip_use_factory) {
+  if (chip_enable_factory_data) {
     defines += [
       "CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER=1",
       "CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER=1",
