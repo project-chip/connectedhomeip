@@ -26,6 +26,8 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
+    # XXX: Workaround for https://github.com/actions/cache/issues/1141
+    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
 
 jobs:
     build_linux_gcc_debug:
@@ -68,7 +70,6 @@ jobs:
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
 
             - name: Bootstrap cache
-              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
@@ -186,7 +187,6 @@ jobs:
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
 
             - name: Bootstrap cache
-              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
@@ -349,7 +349,6 @@ jobs:
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 
             - name: Bootstrap cache
-              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
@@ -409,7 +408,6 @@ jobs:
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
 
             - name: Bootstrap cache
-              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
@@ -510,7 +508,6 @@ jobs:
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 
             - name: Bootstrap cache
-              if: false # XXX: Disabled until cache is fixed: https://github.com/actions/cache/issues/1141
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
