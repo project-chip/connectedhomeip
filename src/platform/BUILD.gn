@@ -21,6 +21,7 @@ import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 
 import("device.gni")
+import("icd.gni")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
@@ -424,6 +425,17 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
     ]
+
+    if (chip_enable_icd) {
+      sources += [
+        "../include/platform/ICDEventManager.h",
+        "../include/platform/ICDManager.h",
+        "ICDEventManager.cpp",
+        "ICDManager.cpp",
+      ]
+
+      defines = [ "CHIP_DEVICE_CONFIG_ICD_ENABLE" ]
+    }
 
     if (chip_device_platform == "cc13x2_26x2") {
       _platform_target = "cc13xx_26xx/cc13x2_26x2"
