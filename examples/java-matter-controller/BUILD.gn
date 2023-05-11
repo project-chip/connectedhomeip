@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ kotlin_binary("java-matter-controller") {
   output_name = "java-matter-controller"
   deps = [
     ":java",
-    "${chip_root}/src/controller/java:json_to_tlv_to_json_test",
     "${chip_root}/src/controller/java:tlv_read_write_test",
     "${chip_root}/src/controller/java:tlv_reader_test",
     "${chip_root}/src/controller/java:tlv_writer_test",
