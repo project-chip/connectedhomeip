@@ -19,6 +19,7 @@ name:
 
 PICS:
     - MCORE.ROLE.COMMISSIONER
+    - GRPKEY.C
 
 config:
     nodeId: 0x12344321
@@ -92,7 +93,7 @@ tests:
 
     - label:
           "DUT sends KeySetWrite command to GroupKeyManagement cluster to TH on
-          PIXIT.G.ENDPOINT"
+          EP0"
       PICS: GRPKEY.C.C00.Tx
       verification: |
           Verify TH recieves KeySetWrite command on TH(Reference app)log:
@@ -203,7 +204,7 @@ tests:
           [1659350562.022661][5824:5824] CHIP:DMG: AccessControl: allowed
       disabled: true
 
-    - label: "DUT sends AddGroup Command to TH on PIXIT.G.ENDPOINT"
+    - label: "DUT sends AddGroup Command to TH on EP0"
       PICS: G.C.C00.Tx
       verification: |
           ./chip-tool groups add-group 0x0001 grp1 1 0
@@ -245,7 +246,7 @@ tests:
 
     - label:
           "DUT sends ViewGroup command with the GroupID and GroupName to the
-          Group cluster on the TH on PIXIT.G.ENDPOINT"
+          Group cluster on the TH on EP0"
       PICS: G.C.C01.Tx
       verification: |
           ./chip-tool groups view-group 0x0001 1 0

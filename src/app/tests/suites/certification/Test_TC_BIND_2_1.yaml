@@ -116,7 +116,7 @@ tests:
           [1652330385.328298][3240:3245] CHIP:DMG:                        },
 
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 2, "deviceType": null}]}]" 3 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 2, "deviceType": null}]}]' 3 0
 
           on TH1(Chip-tool), Verify the on command receives success response
 

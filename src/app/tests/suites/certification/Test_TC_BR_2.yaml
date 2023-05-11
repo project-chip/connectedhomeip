@@ -959,7 +959,7 @@ tests:
           [1659351487.005831][12201:12207] CHIP:TOO:   MeasuredValue: 100
           [1659351487.005924][12201:12207] CHIP:EM: Sending Standalone Ack for MessageCounter:236763897 on exchange 8128i
 
-          3) Press a key 'tbd' on bridge-app to change the simulated temperature
+          3) Press a key 't' on bridge-app to change the simulated temperature
 
           Verify on bridge-app
 

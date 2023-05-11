@@ -40,7 +40,7 @@ tests:
 
     - label: "The FeatureMap attribute value is 1"
       verification: |
-          "./chip-tool networkcommissioning read feature-map 1 0
+          ./chip-tool networkcommissioning read feature-map 1 0
 
           Verify the "feature-map" on the TH(Chip-tool) Log:
 

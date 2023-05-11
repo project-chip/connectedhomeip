@@ -284,8 +284,7 @@
         "Test_TC_DGTHREAD_3_1",
         "Test_TC_DGTHREAD_3_2",
         "Test_TC_DGTHREAD_3_3",
-        "Test_TC_DGTHREAD_3_4",
-        "Test_TC_DGTHREAD_3_5"
+        "Test_TC_DGTHREAD_3_4"
     ],
     "Actions": [
         "Test_TC_ACT_2_1",
