@@ -1551,6 +1551,18 @@ static id _Nullable DecodeEventPayloadForModeSelectCluster(EventId aEventId, TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForAirQualityCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::AirQuality;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForDoorLockCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DoorLock;
@@ -2577,14 +2589,7 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
         return DecodeEventPayloadForModeSelectCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::AirQuality::Id: {
-        using namespace Clusters::AirQuality;
-        switch (aPath.mEventId) {
-
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
+        return DecodeEventPayloadForAirQualityCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);
