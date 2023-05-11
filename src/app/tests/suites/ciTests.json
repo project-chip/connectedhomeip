@@ -14,7 +14,10 @@
     "AccessControlEnforcement": ["Test_TC_ACE_1_1", "Test_TC_ACE_1_5"],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
-    "BridgedDeviceBasicInformation": [],
+    "BridgedDeviceBasicInformation": [
+        "Test_TC_BRBINFO_1_1",
+        "Test_TC_BRBINFO_2_1"
+    ],
     "Actions": ["Test_TC_ACT_1_1"],
     "ColorControl": [
         "Test_TC_CC_1_1",
@@ -127,7 +130,9 @@
         "Test_TC_AUDIOOUTPUT_7_2",
         "Test_TC_TGTNAV_8_1",
         "Test_TC_APBSC_9_1",
-        "Test_TC_CONTENTLAUNCHER_10_1"
+        "Test_TC_CONTENTLAUNCHER_10_1",
+        "Test_TC_WAKEONLAN_4_1",
+        "Test_TC_ALOGIN_12_1"
     ],
     "ModeSelect": ["Test_TC_MOD_1_1"],
     "MultipleFabrics": [],
