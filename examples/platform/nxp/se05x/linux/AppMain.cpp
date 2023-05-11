@@ -299,7 +299,7 @@ struct CommonCaseDeviceServerInitParams_Se05x : public CommonCaseDeviceServerIni
         static chip::PersistentStorageOperationalKeystoreHSM sPersistentStorageOperationalKeystore;
         static chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
-        static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
+        static Credentials::IgnoreCertificateValidityPeriodPolicy sDefaultCertValidityPolicy;
         static chip::Crypto::DefaultSessionKeystore sSessionKeystore;
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
