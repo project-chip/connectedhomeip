@@ -2554,8 +2554,8 @@ client cluster HepaFilterMonitoring = 113 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2587,8 +2587,8 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2653,8 +2653,8 @@ client cluster ElectrostaticFilterMonitoring = 116 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2686,8 +2686,8 @@ client cluster UvFilterMonitoring = 117 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2719,8 +2719,8 @@ client cluster IonizingFilterMonitoring = 118 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2752,8 +2752,8 @@ client cluster ZeoliteFilterMonitoring = 119 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2785,8 +2785,8 @@ client cluster OzoneFilterMonitoring = 120 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2818,8 +2818,8 @@ client cluster WaterTankMonitoring = 121 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2851,8 +2851,8 @@ client cluster FuelTankMonitoring = 122 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2884,8 +2884,8 @@ client cluster InkCartridgeMonitoring = 123 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2917,8 +2917,8 @@ client cluster TonerCartridgeMonitoring = 124 {
     kWarning = 0x2;
   }
 
-  readonly attribute percent condition = 0;
-  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
   readonly attribute optional boolean inPlaceIndicator = 3;
   readonly attribute command_id generatedCommandList[] = 65528;

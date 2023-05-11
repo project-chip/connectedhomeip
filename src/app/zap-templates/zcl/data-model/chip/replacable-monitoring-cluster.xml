@@ -26,10 +26,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="HEPA_FILTER_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="HEPA_FILTER_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="HEPA_FILTER_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="HEPA_FILTER_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -47,10 +47,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="ACTIVATED_CARBON_FILTER_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="ACTIVATED_CARBON_FILTER_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="ACTIVATED_CARBON_FILTER_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="ACTIVATED_CARBON_FILTER_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -89,10 +89,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="ELECTROSTATIC_FILTER_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="ELECTROSTATIC_FILTER_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="ELECTROSTATIC_FILTER_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="ELECTROSTATIC_FILTER_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -110,10 +110,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="UV_FILTER_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="UV_FILTER_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="UV_FILTER_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="UV_FILTER_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -131,10 +131,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="IONIZING_FILTER_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="IONIZING_FILTER_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="IONIZING_FILTER_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="IONIZING_FILTER_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -152,10 +152,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="ZEOLITE_FILTER_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="ZEOLITE_FILTER_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="ZEOLITE_FILTER_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="ZEOLITE_FILTER_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -173,10 +173,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="OZONE_FILTER_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="OZONE_FILTER_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="OZONE_FILTER_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="OZONE_FILTER_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -194,10 +194,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="WATER_TANK_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="WATER_TANK_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="WATER_TANK_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="WATER_TANK_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -215,10 +215,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="FUEL_TANK_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="FUEL_TANK_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="FUEL_TANK_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="FUEL_TANK_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -236,10 +236,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="INK_CARTRIDGE_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="INK_CARTRIDGE_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="INK_CARTRIDGE_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="INK_CARTRIDGE_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -257,10 +257,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="TONER_CARTRIDGE_MONITORING" type="percent" min="0" max="100" writable="false" isNullable="false">Condition</attribute>
-    <attribute side="server" code="0x0001" define="TONER_CARTRIDGE_MONITORING" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false">DegradationDirection</attribute>
-    <attribute side="server" code="0x0002" define="TONER_CARTRIDGE_MONITORING" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
-    <attribute side="server" code="0x0003" define="TONER_CARTRIDGE_MONITORING" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">

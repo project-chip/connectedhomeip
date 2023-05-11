@@ -14788,8 +14788,8 @@ class HepaFilterMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=HepaFilterMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[HepaFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=HepaFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -14800,8 +14800,8 @@ class HepaFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'HepaFilterMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[HepaFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'HepaFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -14863,9 +14863,9 @@ class HepaFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -14879,9 +14879,9 @@ class HepaFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=HepaFilterMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[HepaFilterMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'HepaFilterMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[HepaFilterMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
@@ -15020,8 +15020,8 @@ class ActivatedCarbonFilterMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=ActivatedCarbonFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -15032,8 +15032,8 @@ class ActivatedCarbonFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'ActivatedCarbonFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -15095,9 +15095,9 @@ class ActivatedCarbonFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -15111,9 +15111,9 @@ class ActivatedCarbonFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[ActivatedCarbonFilterMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
@@ -15484,8 +15484,8 @@ class ElectrostaticFilterMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=ElectrostaticFilterMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[ElectrostaticFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=ElectrostaticFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -15496,8 +15496,8 @@ class ElectrostaticFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'ElectrostaticFilterMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[ElectrostaticFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'ElectrostaticFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -15559,9 +15559,9 @@ class ElectrostaticFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -15575,9 +15575,9 @@ class ElectrostaticFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ElectrostaticFilterMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[ElectrostaticFilterMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'ElectrostaticFilterMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[ElectrostaticFilterMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
@@ -15716,8 +15716,8 @@ class UvFilterMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=UvFilterMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[UvFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=UvFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -15728,8 +15728,8 @@ class UvFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'UvFilterMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[UvFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'UvFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -15791,9 +15791,9 @@ class UvFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -15807,9 +15807,9 @@ class UvFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=UvFilterMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[UvFilterMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'UvFilterMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[UvFilterMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
@@ -15948,8 +15948,8 @@ class IonizingFilterMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=IonizingFilterMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[IonizingFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=IonizingFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -15960,8 +15960,8 @@ class IonizingFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'IonizingFilterMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[IonizingFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'IonizingFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -16023,9 +16023,9 @@ class IonizingFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -16039,9 +16039,9 @@ class IonizingFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=IonizingFilterMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[IonizingFilterMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'IonizingFilterMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[IonizingFilterMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
@@ -16180,8 +16180,8 @@ class ZeoliteFilterMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=ZeoliteFilterMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[ZeoliteFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=ZeoliteFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -16192,8 +16192,8 @@ class ZeoliteFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'ZeoliteFilterMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[ZeoliteFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'ZeoliteFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -16255,9 +16255,9 @@ class ZeoliteFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -16271,9 +16271,9 @@ class ZeoliteFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ZeoliteFilterMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[ZeoliteFilterMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'ZeoliteFilterMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[ZeoliteFilterMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
@@ -16412,8 +16412,8 @@ class OzoneFilterMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=OzoneFilterMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[OzoneFilterMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=OzoneFilterMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -16424,8 +16424,8 @@ class OzoneFilterMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'OzoneFilterMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[OzoneFilterMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'OzoneFilterMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -16487,9 +16487,9 @@ class OzoneFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -16503,9 +16503,9 @@ class OzoneFilterMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=OzoneFilterMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[OzoneFilterMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'OzoneFilterMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[OzoneFilterMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
@@ -16644,8 +16644,8 @@ class WaterTankMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=WaterTankMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[WaterTankMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=WaterTankMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -16656,8 +16656,8 @@ class WaterTankMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'WaterTankMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[WaterTankMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'WaterTankMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -16719,9 +16719,9 @@ class WaterTankMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -16735,9 +16735,9 @@ class WaterTankMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=WaterTankMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[WaterTankMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'WaterTankMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[WaterTankMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
@@ -16876,8 +16876,8 @@ class FuelTankMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=FuelTankMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[FuelTankMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=FuelTankMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -16888,8 +16888,8 @@ class FuelTankMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'FuelTankMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[FuelTankMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'FuelTankMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -16951,9 +16951,9 @@ class FuelTankMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -16967,9 +16967,9 @@ class FuelTankMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=FuelTankMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[FuelTankMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'FuelTankMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[FuelTankMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
@@ -17108,8 +17108,8 @@ class InkCartridgeMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=InkCartridgeMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[InkCartridgeMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=InkCartridgeMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -17120,8 +17120,8 @@ class InkCartridgeMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'InkCartridgeMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[InkCartridgeMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'InkCartridgeMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -17183,9 +17183,9 @@ class InkCartridgeMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -17199,9 +17199,9 @@ class InkCartridgeMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=InkCartridgeMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[InkCartridgeMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'InkCartridgeMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[InkCartridgeMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
@@ -17340,8 +17340,8 @@ class TonerCartridgeMonitoring(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=TonerCartridgeMonitoring.Enums.DegradationDirectionEnum),
+                ClusterObjectFieldDescriptor(Label="condition", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="degradationDirection", Tag=0x00000001, Type=typing.Optional[TonerCartridgeMonitoring.Enums.DegradationDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="changeIndication", Tag=0x00000002, Type=TonerCartridgeMonitoring.Enums.ChangeIndicationEnum),
                 ClusterObjectFieldDescriptor(Label="inPlaceIndicator", Tag=0x00000003, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -17352,8 +17352,8 @@ class TonerCartridgeMonitoring(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    condition: 'uint' = None
-    degradationDirection: 'TonerCartridgeMonitoring.Enums.DegradationDirectionEnum' = None
+    condition: 'typing.Optional[uint]' = None
+    degradationDirection: 'typing.Optional[TonerCartridgeMonitoring.Enums.DegradationDirectionEnum]' = None
     changeIndication: 'TonerCartridgeMonitoring.Enums.ChangeIndicationEnum' = None
     inPlaceIndicator: 'typing.Optional[bool]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -17415,9 +17415,9 @@ class TonerCartridgeMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DegradationDirection(ClusterAttributeDescriptor):
@@ -17431,9 +17431,9 @@ class TonerCartridgeMonitoring(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=TonerCartridgeMonitoring.Enums.DegradationDirectionEnum)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[TonerCartridgeMonitoring.Enums.DegradationDirectionEnum])
 
-            value: 'TonerCartridgeMonitoring.Enums.DegradationDirectionEnum' = 0
+            value: 'typing.Optional[TonerCartridgeMonitoring.Enums.DegradationDirectionEnum]' = None
 
         @dataclass
         class ChangeIndication(ClusterAttributeDescriptor):
