@@ -23,6 +23,7 @@
         "DESCRIPTOR_CLUSTER": [],
         "DEVICE_TEMP_CLUSTER": [],
         "DIAGNOSTIC_LOGS_CLUSTER": [],
+        "DISHWASHER_MODE_SELECT_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [],
@@ -38,6 +39,7 @@
         "IDENTIFY_CLUSTER": [],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": [],
+        "LAUNDRY_WASHER_CLUSTER": [],
         "LEVEL_CONTROL_CLUSTER": [],
         "LOCALIZATION_CONFIGURATION_CLUSTER": [],
         "LOW_POWER_CLUSTER": [],
@@ -65,7 +67,10 @@
             "pump-configuration-and-control-client"
         ],
         "PWM_CLUSTER": [],
+        "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER": [],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
+        "RVC_CLEAN_CLUSTER": [],
+        "RVC_RUN_CLUSTER": [],
         "SCENES_CLUSTER": [],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": [],
         "SWITCH_CLUSTER": [],
@@ -114,6 +119,7 @@
         "DESCRIPTOR_CLUSTER": ["descriptor"],
         "DEVICE_TEMP_CLUSTER": [],
         "DIAGNOSTIC_LOGS_CLUSTER": ["diagnostic-logs-server"],
+        "DISHWASHER_MODE_SELECT_CLUSTER": ["mode-select-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [
@@ -131,6 +137,7 @@
         "IDENTIFY_CLUSTER": ["identify-server"],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": ["keypad-input-server"],
+        "LAUNDRY_WASHER_CLUSTER": ["mode-select-server"],
         "LEVEL_CONTROL_CLUSTER": ["level-control"],
         "LOCALIZATION_CONFIGURATION_CLUSTER": [
             "localization-configuration-server"
@@ -162,7 +169,10 @@
             "pump-configuration-and-control-server"
         ],
         "PWM_CLUSTER": [],
+        "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER": ["mode-select-server"],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
+        "RVC_CLEAN_CLUSTER": ["mode-select-server"],
+        "RVC_RUN_CLUSTER": ["mode-select-server"],
         "SCENES_CLUSTER": ["scenes"],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
         "SWITCH_CLUSTER": ["switch-server"],

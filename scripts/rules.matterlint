@@ -22,6 +22,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-select-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/fan-control-cluster.xml";
@@ -35,6 +36,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/laundry-washer-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/level-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/localization-configuration-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml";
@@ -54,7 +56,10 @@ load "../src/app/zap-templates/zcl/data-model/chip/proxy-discovery-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/proxy-valid-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/pump-configuration-and-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/pwm-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/refrigerator-and-temperature-controlled-cabinet-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/rvc-clean-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/rvc-run-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/scene.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml";
@@ -75,6 +80,7 @@ load "../src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml"
 load "../src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml";
 load "../src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml";
+
 
 all endpoints {
     // These attributes follow a different code path and do not have to be
