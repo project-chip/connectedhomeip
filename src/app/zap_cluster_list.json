@@ -169,7 +169,9 @@
             "pump-configuration-and-control-server"
         ],
         "PWM_CLUSTER": [],
-        "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER": ["mode-select-server"],
+        "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER": [
+            "mode-select-server"
+        ],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
         "RVC_CLEAN_CLUSTER": ["mode-select-server"],
         "RVC_RUN_CLUSTER": ["mode-select-server"],
