@@ -10000,7 +10000,7 @@
           "name": "HEPA Filter Monitoring",
           "code": 113,
           "mfgCode": null,
-          "define": "HEPA_FILTER_MONITORING",
+          "define": "HEPA_FILTER_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -10042,7 +10042,7 @@
           "name": "HEPA Filter Monitoring",
           "code": 113,
           "mfgCode": null,
-          "define": "HEPA_FILTER_MONITORING",
+          "define": "HEPA_FILTER_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -10212,7 +10212,7 @@
           "name": "Activated Carbon Filter Monitoring",
           "code": 114,
           "mfgCode": null,
-          "define": "ACTIVATED_CARBON_FILTER_MONITORING",
+          "define": "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -10254,7 +10254,7 @@
           "name": "Activated Carbon Filter Monitoring",
           "code": 114,
           "mfgCode": null,
-          "define": "ACTIVATED_CARBON_FILTER_MONITORING",
+          "define": "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -10424,7 +10424,7 @@
           "name": "Ceramic Filter Monitoring",
           "code": 115,
           "mfgCode": null,
-          "define": "CERAMIC_FILTER_MONITORING",
+          "define": "CERAMIC_FILTER_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -10466,7 +10466,7 @@
           "name": "Ceramic Filter Monitoring",
           "code": 115,
           "mfgCode": null,
-          "define": "CERAMIC_FILTER_MONITORING",
+          "define": "CERAMIC_FILTER_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -10636,7 +10636,7 @@
           "name": "Electrostatic Filter Monitoring",
           "code": 116,
           "mfgCode": null,
-          "define": "ELECTROSTATIC_FILTER_MONITORING",
+          "define": "ELECTROSTATIC_FILTER_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -10678,7 +10678,7 @@
           "name": "Electrostatic Filter Monitoring",
           "code": 116,
           "mfgCode": null,
-          "define": "ELECTROSTATIC_FILTER_MONITORING",
+          "define": "ELECTROSTATIC_FILTER_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -10848,7 +10848,7 @@
           "name": "UV Filter Monitoring",
           "code": 117,
           "mfgCode": null,
-          "define": "UV_FILTER_MONITORING",
+          "define": "UV_FILTER_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -10890,7 +10890,7 @@
           "name": "UV Filter Monitoring",
           "code": 117,
           "mfgCode": null,
-          "define": "UV_FILTER_MONITORING",
+          "define": "UV_FILTER_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -11060,7 +11060,7 @@
           "name": "Ionizing Filter Monitoring",
           "code": 118,
           "mfgCode": null,
-          "define": "IONIZING_FILTER_MONITORING",
+          "define": "IONIZING_FILTER_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -11102,7 +11102,7 @@
           "name": "Ionizing Filter Monitoring",
           "code": 118,
           "mfgCode": null,
-          "define": "IONIZING_FILTER_MONITORING",
+          "define": "IONIZING_FILTER_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -11272,7 +11272,7 @@
           "name": "Zeolite Filter Monitoring",
           "code": 119,
           "mfgCode": null,
-          "define": "ZEOLITE_FILTER_MONITORING",
+          "define": "ZEOLITE_FILTER_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -11314,7 +11314,7 @@
           "name": "Zeolite Filter Monitoring",
           "code": 119,
           "mfgCode": null,
-          "define": "ZEOLITE_FILTER_MONITORING",
+          "define": "ZEOLITE_FILTER_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -11484,7 +11484,7 @@
           "name": "Ozone Filter Monitoring",
           "code": 120,
           "mfgCode": null,
-          "define": "OZONE_FILTER_MONITORING",
+          "define": "OZONE_FILTER_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -11526,7 +11526,7 @@
           "name": "Ozone Filter Monitoring",
           "code": 120,
           "mfgCode": null,
-          "define": "OZONE_FILTER_MONITORING",
+          "define": "OZONE_FILTER_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -11696,7 +11696,7 @@
           "name": "Water Tank Monitoring",
           "code": 121,
           "mfgCode": null,
-          "define": "WATER_TANK_MONITORING",
+          "define": "WATER_TANK_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -11738,7 +11738,7 @@
           "name": "Water Tank Monitoring",
           "code": 121,
           "mfgCode": null,
-          "define": "WATER_TANK_MONITORING",
+          "define": "WATER_TANK_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -11908,7 +11908,7 @@
           "name": "Fuel Tank Monitoring",
           "code": 122,
           "mfgCode": null,
-          "define": "FUEL_TANK_MONITORING",
+          "define": "FUEL_TANK_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -11950,7 +11950,7 @@
           "name": "Fuel Tank Monitoring",
           "code": 122,
           "mfgCode": null,
-          "define": "FUEL_TANK_MONITORING",
+          "define": "FUEL_TANK_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -12120,7 +12120,7 @@
           "name": "Ink Cartridge Monitoring",
           "code": 123,
           "mfgCode": null,
-          "define": "INK_CARTRIDGE_MONITORING",
+          "define": "INK_CARTRIDGE_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -12162,7 +12162,7 @@
           "name": "Ink Cartridge Monitoring",
           "code": 123,
           "mfgCode": null,
-          "define": "INK_CARTRIDGE_MONITORING",
+          "define": "INK_CARTRIDGE_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -12332,7 +12332,7 @@
           "name": "Toner Cartridge Monitoring",
           "code": 124,
           "mfgCode": null,
-          "define": "TONER_CARTRIDGE_MONITORING",
+          "define": "TONER_CARTRIDGE_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -12374,7 +12374,7 @@
           "name": "Toner Cartridge Monitoring",
           "code": 124,
           "mfgCode": null,
-          "define": "TONER_CARTRIDGE_MONITORING",
+          "define": "TONER_CARTRIDGE_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
