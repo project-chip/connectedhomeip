@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright 2021, Cypress Semiconductor Corporation (an Infineon company)
+ *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,17 +21,12 @@
  */
 
 #include "AppConfig.h"
-#include "Globals.h"
-#include <lib/support/logging/CHIPLogging.h>
-
-#include "ClusterManager.h"
+#include "LightingManager.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/CommandHandler.h>
-#include <app/util/af-types.h>
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
@@ -40,35 +34,26 @@ using namespace ::chip::app::Clusters;
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    EndpointId endpoint     = attributePath.mEndpointId;
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
-    PLAT_LOG("MatterPostAttributeChangeCallback - Cluster ID: " ChipLogFormatMEI
-             ", EndPoint ID: '0x%02x', Attribute ID: " ChipLogFormatMEI,
-             ChipLogValueMEI(clusterId), endpoint, ChipLogValueMEI(attributeId));
+    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    switch (clusterId)
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
-    case OnOff::Id:
-        ClusterMgr().OnOnOffPostAttributeChangeCallback(endpoint, attributeId, value);
-        break;
-
-    case Identify::Id:
-        ClusterMgr().OnIdentifyPostAttributeChangeCallback(endpoint, attributeId, size, value);
-        break;
-
-    case LevelControl::Id:
-        ClusterMgr().OnLevelControlAttributeChangeCallback(endpoint, attributeId, value);
-        break;
-
-    case ColorControl::Id:
-        ClusterMgr().OnColorControlAttributeChangeCallback(endpoint, attributeId, value);
-        break;
-    default:
-        PLAT_LOG("Unhandled cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-        break;
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+    }
+    else if (clusterId == Identify::Id)
+    {
+        ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributeId), type, *value, size);
+    }
+    else if (clusterId == Groups::Id)
+    {
+        ChipLogProgress(Zcl, "Groups attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributeId), type, *value, size);
     }
 }
+
 /** @brief OnOff Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
@@ -76,6 +61,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  * It is called exactly once for each endpoint where cluster is present.
  *
  * @param endpoint   Ver.: always
+ *
+ * TODO Issue #3841
+ * emberAfOnOffClusterInitCallback happens before the stack initialize the cluster
+ * attributes to the default value.
+ * The logic here expects something similar to the deprecated Plugins callback
+ * emberAfPluginOnOffClusterServerPostInitCallback.
+ *
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {

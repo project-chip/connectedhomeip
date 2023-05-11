@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,21 @@
  *    limitations under the License.
  */
 
-#include "Globals.h"
+#ifndef APP_CONFIG_H
+#define APP_CONFIG_H
 
-LED_Handle sAppRedHandle;
-LED_Handle sAppGreenHandle;
+// Logging
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int cc13xx_26xxLogInit(void);
+void cc13xx_26xxLog(const char * aFormat, ...);
+#define PLAT_LOG(...) cc13xx_26xxLog(__VA_ARGS__);
+
+#define ACTUATOR_MOVEMENT_PERIOD_MS 1000
+
+#ifdef __cplusplus
+}
+#endif
+#endif // APP_CONFIG_H

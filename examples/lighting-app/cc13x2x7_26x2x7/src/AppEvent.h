@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2018 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #ifndef APP_EVENT_H
 #define APP_EVENT_H
 
@@ -30,6 +29,10 @@ struct AppEvent
         kEventType_ButtonLeft,
         kEventType_ButtonRight,
         kEventType_AppEvent,
+        kEventType_IdentifyStart,
+        kEventType_IdentifyStop,
+        kEventType_Light,
+        kEventType_Timer,
     };
 
     enum AppEventButtonType
@@ -37,6 +40,15 @@ struct AppEvent
         kAppEventButtonType_None = 0,
         kAppEventButtonType_Clicked,
         kAppEventButtonType_LongClicked,
+    };
+
+    enum AppEventIdentifyType
+    {
+        kAppEventIdentifyType_Blink = 0,
+        kAppEventIdentifyType_Breathe,
+        kAppEventIdentifyType_Okay,
+        kAppEventIdentifyType_Finish,
+        kAppEventIdentifyType_Stop,
     };
 
     enum AppEventType Type;
@@ -51,7 +63,19 @@ struct AppEvent
         struct
         {
             void * Context;
-        } BoltLockEvent;
+        } TimerEvent;
+
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+            void * Context;
+        } LightEvent;
+
+        struct
+        {
+            enum AppEventIdentifyType Type;
+        } IdentifyEvent;
     };
 
     EventHandler Handler;

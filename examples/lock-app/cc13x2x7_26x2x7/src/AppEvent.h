@@ -39,7 +39,6 @@ struct AppEvent
         kAppEventButtonType_None = 0,
         kAppEventButtonType_Clicked,
         kAppEventButtonType_LongClicked,
-        kAppEventButtonType_LongPressed,
     };
 
     enum AppEventType Type;
@@ -54,7 +53,13 @@ struct AppEvent
         struct
         {
             void * Context;
-        } PumpStateEvent;
+        } BoltLockEvent;
+
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } LockEvent;
     };
 
     EventHandler Handler;

@@ -55,7 +55,9 @@
  * physical device, a change to its packaging, and/or a change to its marketing presentation.
  * This value is generally *not* incremented for device software versions.
  */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
+#endif
 
 /**
  * Values set by args.gni:
@@ -79,7 +81,7 @@
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
-#define MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED 1
+#define MATTER_CC13XX_26XX_PLATFORM_LOG_ENABLED 1
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -108,13 +110,13 @@
  *
  * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
  */
-#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 1
+#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 2
 
 /**
  * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
  *
  * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
  */
-#define CHIP_IM_MAX_NUM_WRITE_HANDLER 1
+#define CHIP_IM_MAX_NUM_WRITE_HANDLER 2
 
 #endif // CHIP_PROJECT_CONFIG_H

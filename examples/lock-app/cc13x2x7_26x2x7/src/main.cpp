@@ -21,8 +21,8 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <AppConfig.h>
-#include <AppTask.h>
+#include "AppConfig.h"
+#include "AppTask.h"
 
 #include <FreeRTOS.h>
 
@@ -37,7 +37,7 @@
 #include <ti/drivers/SHA2.h>
 
 #include <bget.h>
-#define TOTAL_ICALL_HEAP_SIZE (0xC700)
+#define TOTAL_ICALL_HEAP_SIZE (0xc600)
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -51,7 +51,7 @@ uint32_t heapSize = TOTAL_ICALL_HEAP_SIZE;
 // ================================================================================
 extern "C" void vApplicationStackOverflowHook(void)
 {
-    while (true)
+    while (1)
     {
         ;
     }
@@ -93,13 +93,13 @@ int main(void)
     {
         // can't log until the kernel is started
         // PLAT_LOG("GetAppTask().StartAppTask() failed");
-        while (true)
+        while (1)
             ;
     }
 
     vTaskStartScheduler();
 
     // Should never get here.
-    while (true)
+    while (1)
         ;
 }
