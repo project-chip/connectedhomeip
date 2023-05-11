@@ -82,7 +82,7 @@ limitations under the License.
   </cluster>
 
   <bitmap name="ModeSelectFeature" type="BITMAP32">
-    <cluster code="0x0050"/>
+    <cluster code="0x0052"/>
     <field name="On/Off" mask="0x1"/>
     <field name="Extended Status" mask="0x2"/>
   </bitmap>
