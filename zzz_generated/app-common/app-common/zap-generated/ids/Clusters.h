@@ -193,6 +193,114 @@ static constexpr ClusterId Id = 0x00000405;
 namespace OccupancySensing {
 static constexpr ClusterId Id = 0x00000406;
 } // namespace OccupancySensing
+namespace CarbonMonoxideMeasurement {
+static constexpr ClusterId Id = 0x0000040C;
+} // namespace CarbonMonoxideMeasurement
+namespace CarbonDioxideMeasurement {
+static constexpr ClusterId Id = 0x0000040D;
+} // namespace CarbonDioxideMeasurement
+namespace EthyleneMeasurement {
+static constexpr ClusterId Id = 0x0000040E;
+} // namespace EthyleneMeasurement
+namespace EthyleneOxideMeasurement {
+static constexpr ClusterId Id = 0x0000040F;
+} // namespace EthyleneOxideMeasurement
+namespace HydrogenMeasurement {
+static constexpr ClusterId Id = 0x00000410;
+} // namespace HydrogenMeasurement
+namespace HydrogenSulfideMeasurement {
+static constexpr ClusterId Id = 0x00000411;
+} // namespace HydrogenSulfideMeasurement
+namespace NitricOxideMeasurement {
+static constexpr ClusterId Id = 0x00000412;
+} // namespace NitricOxideMeasurement
+namespace NitrogenDioxideMeasurement {
+static constexpr ClusterId Id = 0x00000413;
+} // namespace NitrogenDioxideMeasurement
+namespace OxygenMeasurement {
+static constexpr ClusterId Id = 0x00000414;
+} // namespace OxygenMeasurement
+namespace OzoneMeasurement {
+static constexpr ClusterId Id = 0x00000415;
+} // namespace OzoneMeasurement
+namespace SulfurDioxideMeasurement {
+static constexpr ClusterId Id = 0x00000416;
+} // namespace SulfurDioxideMeasurement
+namespace DissolvedOxygenMeasurement {
+static constexpr ClusterId Id = 0x00000417;
+} // namespace DissolvedOxygenMeasurement
+namespace BromateMeasurement {
+static constexpr ClusterId Id = 0x00000418;
+} // namespace BromateMeasurement
+namespace ChloraminesMeasurement {
+static constexpr ClusterId Id = 0x00000419;
+} // namespace ChloraminesMeasurement
+namespace ChlorineMeasurement {
+static constexpr ClusterId Id = 0x0000041A;
+} // namespace ChlorineMeasurement
+namespace FecalColiformEColiMeasurement {
+static constexpr ClusterId Id = 0x0000041B;
+} // namespace FecalColiformEColiMeasurement
+namespace FluorideMeasurement {
+static constexpr ClusterId Id = 0x0000041C;
+} // namespace FluorideMeasurement
+namespace HaloaceticAcidsMeasurement {
+static constexpr ClusterId Id = 0x0000041D;
+} // namespace HaloaceticAcidsMeasurement
+namespace TotalTrihalomethanesMeasurement {
+static constexpr ClusterId Id = 0x0000041E;
+} // namespace TotalTrihalomethanesMeasurement
+namespace TotalColiformBacteriaMeasurement {
+static constexpr ClusterId Id = 0x0000041F;
+} // namespace TotalColiformBacteriaMeasurement
+namespace TurbidityMeasurement {
+static constexpr ClusterId Id = 0x00000420;
+} // namespace TurbidityMeasurement
+namespace CopperMeasurement {
+static constexpr ClusterId Id = 0x00000421;
+} // namespace CopperMeasurement
+namespace LeadMeasurement {
+static constexpr ClusterId Id = 0x00000422;
+} // namespace LeadMeasurement
+namespace ManganeseMeasurement {
+static constexpr ClusterId Id = 0x00000423;
+} // namespace ManganeseMeasurement
+namespace SulfateMeasurement {
+static constexpr ClusterId Id = 0x00000424;
+} // namespace SulfateMeasurement
+namespace BromodichloromethaneMeasurement {
+static constexpr ClusterId Id = 0x00000425;
+} // namespace BromodichloromethaneMeasurement
+namespace BromoformMeasurement {
+static constexpr ClusterId Id = 0x00000426;
+} // namespace BromoformMeasurement
+namespace ChlorodibromomethaneMeasurement {
+static constexpr ClusterId Id = 0x00000427;
+} // namespace ChlorodibromomethaneMeasurement
+namespace ChloroformMeasurement {
+static constexpr ClusterId Id = 0x00000428;
+} // namespace ChloroformMeasurement
+namespace SodiumMeasurement {
+static constexpr ClusterId Id = 0x00000429;
+} // namespace SodiumMeasurement
+namespace Pm25Measurement {
+static constexpr ClusterId Id = 0x0000042A;
+} // namespace Pm25Measurement
+namespace FormaldehydeMeasurement {
+static constexpr ClusterId Id = 0x0000042B;
+} // namespace FormaldehydeMeasurement
+namespace Pm1Measurement {
+static constexpr ClusterId Id = 0x0000042C;
+} // namespace Pm1Measurement
+namespace Pm10Measurement {
+static constexpr ClusterId Id = 0x0000042D;
+} // namespace Pm10Measurement
+namespace TotalVolatileOrganicCompoundsMeasurement {
+static constexpr ClusterId Id = 0x0000042E;
+} // namespace TotalVolatileOrganicCompoundsMeasurement
+namespace RadonMeasurement {
+static constexpr ClusterId Id = 0x0000042F;
+} // namespace RadonMeasurement
 namespace WakeOnLan {
 static constexpr ClusterId Id = 0x00000503;
 } // namespace WakeOnLan

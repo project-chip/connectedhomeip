@@ -72,6 +72,42 @@
 #define EMBER_AF_FLOW_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_OCCUPANCY_SENSING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_CARBON_MONOXIDE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_CARBON_DIOXIDE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_ETHYLENE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_ETHYLENE_OXIDE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_HYDROGEN_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_NITRIC_OXIDE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_OXYGEN_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_OZONE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_SULFUR_DIOXIDE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_BROMATE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_CHLORAMINES_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_CHLORINE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_FECAL_COLIFORM_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_FLUORIDE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_HALOACETIC_ACIDS_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_TURBIDITY_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_COPPER_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_LEAD_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_MANGANESE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_SULFATE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_BROMOFORM_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_CHLOROFORM_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_SODIUM_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_PM2_5_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_FORMALDEHYDE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_PM1_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_PM10_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_VOC_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_RADON_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WAKE_ON_LAN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_CHANNEL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TARGET_NAVIGATOR_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -292,6 +328,150 @@
 // Use this macro to check if the client side of the Occupancy Sensing cluster is included
 #define ZCL_USING_OCCUPANCY_SENSING_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_OCCUPANCY_SENSING_CLIENT
+
+// Use this macro to check if the client side of the Carbon Monoxide Measurement cluster is included
+#define ZCL_USING_CARBON_MONOXIDE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_CARBON_MONOXIDE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Carbon Dioxide Measurement cluster is included
+#define ZCL_USING_CARBON_DIOXIDE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_CARBON_DIOXIDE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Ethylene Measurement cluster is included
+#define ZCL_USING_ETHYLENE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_ETHYLENE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Ethylene Oxide Measurement cluster is included
+#define ZCL_USING_ETHYLENE_OXIDE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_ETHYLENE_OXIDE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Hydrogen Measurement cluster is included
+#define ZCL_USING_HYDROGEN_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_HYDROGEN_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Hydrogen Sulfide Measurement cluster is included
+#define ZCL_USING_HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_HYDROGEN_SULFIDE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Nitric Oxide Measurement cluster is included
+#define ZCL_USING_NITRIC_OXIDE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_NITRIC_OXIDE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Nitrogen Dioxide Measurement cluster is included
+#define ZCL_USING_NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Oxygen Measurement cluster is included
+#define ZCL_USING_OXYGEN_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_OXYGEN_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Ozone Measurement cluster is included
+#define ZCL_USING_OZONE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_OZONE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Sulfur Dioxide Measurement cluster is included
+#define ZCL_USING_SULFUR_DIOXIDE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_SULFUR_DIOXIDE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Dissolved Oxygen Measurement cluster is included
+#define ZCL_USING_DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_DISSOLVED_OXYGEN_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Bromate Measurement cluster is included
+#define ZCL_USING_BROMATE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_BROMATE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Chloramines Measurement cluster is included
+#define ZCL_USING_CHLORAMINES_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_CHLORAMINES_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Chlorine Measurement cluster is included
+#define ZCL_USING_CHLORINE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_CHLORINE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Fecal coliform & E. Coli Measurement cluster is included
+#define ZCL_USING_FECAL_COLIFORM_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_FECAL_COLIFORM_E_COLI_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Fluoride Measurement cluster is included
+#define ZCL_USING_FLUORIDE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_FLUORIDE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Haloacetic Acids Measurement cluster is included
+#define ZCL_USING_HALOACETIC_ACIDS_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_HALOACETIC_ACIDS_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Total Trihalomethanes Measurement cluster is included
+#define ZCL_USING_TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TOTAL_TRIHALOMETHANES_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Total Coliform Bacteria Measurement cluster is included
+#define ZCL_USING_TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Turbidity Measurement cluster is included
+#define ZCL_USING_TURBIDITY_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TURBIDITY_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Copper Measurement cluster is included
+#define ZCL_USING_COPPER_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_COPPER_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Lead Measurement cluster is included
+#define ZCL_USING_LEAD_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_LEAD_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Manganese Measurement cluster is included
+#define ZCL_USING_MANGANESE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_MANGANESE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Sulfate Measurement cluster is included
+#define ZCL_USING_SULFATE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_SULFATE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Bromodichloromethane Measurement cluster is included
+#define ZCL_USING_BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_BROMODICHLOROMETHANE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Bromoform Measurement cluster is included
+#define ZCL_USING_BROMOFORM_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_BROMOFORM_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Chlorodibromomethane Measurement cluster is included
+#define ZCL_USING_CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_CHLORODIBROMOMETHANE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Chloroform Measurement cluster is included
+#define ZCL_USING_CHLOROFORM_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_CHLOROFORM_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Sodium Measurement cluster is included
+#define ZCL_USING_SODIUM_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_SODIUM_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the PM2.5 Measurement cluster is included
+#define ZCL_USING_PM2_5_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_PM2__5_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Formaldehyde Measurement cluster is included
+#define ZCL_USING_FORMALDEHYDE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_FORMALDEHYDE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the PM1 Measurement cluster is included
+#define ZCL_USING_PM1_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_PM1_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the PM10 Measurement cluster is included
+#define ZCL_USING_PM10_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_PM10_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Total Volatile Organic Compounds Measurement cluster is included
+#define ZCL_USING_VOC_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Radon Measurement cluster is included
+#define ZCL_USING_RADON_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_RADON_MEASUREMENT_CLIENT
 
 // Use this macro to check if the client side of the Wake on LAN cluster is included
 #define ZCL_USING_WAKE_ON_LAN_CLUSTER_CLIENT

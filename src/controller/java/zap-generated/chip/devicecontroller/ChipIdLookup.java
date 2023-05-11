@@ -178,6 +178,114 @@ public final class ChipIdLookup {
     if (clusterId == 1030L) {
       return "OccupancySensing";
     }
+    if (clusterId == 1036L) {
+      return "CarbonMonoxideMeasurement";
+    }
+    if (clusterId == 1037L) {
+      return "CarbonDioxideMeasurement";
+    }
+    if (clusterId == 1038L) {
+      return "EthyleneMeasurement";
+    }
+    if (clusterId == 1039L) {
+      return "EthyleneOxideMeasurement";
+    }
+    if (clusterId == 1040L) {
+      return "HydrogenMeasurement";
+    }
+    if (clusterId == 1041L) {
+      return "HydrogenSulfideMeasurement";
+    }
+    if (clusterId == 1042L) {
+      return "NitricOxideMeasurement";
+    }
+    if (clusterId == 1043L) {
+      return "NitrogenDioxideMeasurement";
+    }
+    if (clusterId == 1044L) {
+      return "OxygenMeasurement";
+    }
+    if (clusterId == 1045L) {
+      return "OzoneMeasurement";
+    }
+    if (clusterId == 1046L) {
+      return "SulfurDioxideMeasurement";
+    }
+    if (clusterId == 1047L) {
+      return "DissolvedOxygenMeasurement";
+    }
+    if (clusterId == 1048L) {
+      return "BromateMeasurement";
+    }
+    if (clusterId == 1049L) {
+      return "ChloraminesMeasurement";
+    }
+    if (clusterId == 1050L) {
+      return "ChlorineMeasurement";
+    }
+    if (clusterId == 1051L) {
+      return "FecalColiformEColiMeasurement";
+    }
+    if (clusterId == 1052L) {
+      return "FluorideMeasurement";
+    }
+    if (clusterId == 1053L) {
+      return "HaloaceticAcidsMeasurement";
+    }
+    if (clusterId == 1054L) {
+      return "TotalTrihalomethanesMeasurement";
+    }
+    if (clusterId == 1055L) {
+      return "TotalColiformBacteriaMeasurement";
+    }
+    if (clusterId == 1056L) {
+      return "TurbidityMeasurement";
+    }
+    if (clusterId == 1057L) {
+      return "CopperMeasurement";
+    }
+    if (clusterId == 1058L) {
+      return "LeadMeasurement";
+    }
+    if (clusterId == 1059L) {
+      return "ManganeseMeasurement";
+    }
+    if (clusterId == 1060L) {
+      return "SulfateMeasurement";
+    }
+    if (clusterId == 1061L) {
+      return "BromodichloromethaneMeasurement";
+    }
+    if (clusterId == 1062L) {
+      return "BromoformMeasurement";
+    }
+    if (clusterId == 1063L) {
+      return "ChlorodibromomethaneMeasurement";
+    }
+    if (clusterId == 1064L) {
+      return "ChloroformMeasurement";
+    }
+    if (clusterId == 1065L) {
+      return "SodiumMeasurement";
+    }
+    if (clusterId == 1066L) {
+      return "Pm25Measurement";
+    }
+    if (clusterId == 1067L) {
+      return "FormaldehydeMeasurement";
+    }
+    if (clusterId == 1068L) {
+      return "Pm1Measurement";
+    }
+    if (clusterId == 1069L) {
+      return "Pm10Measurement";
+    }
+    if (clusterId == 1070L) {
+      return "TotalVolatileOrganicCompoundsMeasurement";
+    }
+    if (clusterId == 1071L) {
+      return "RadonMeasurement";
+    }
     if (clusterId == 1283L) {
       return "WakeOnLan";
     }
@@ -2874,6 +2982,1950 @@ public final class ChipIdLookup {
       }
       return "";
     }
+    if (clusterId == 1036L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1037L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1038L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1039L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1040L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1041L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1042L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1043L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1044L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1045L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1046L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1047L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1048L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1049L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1050L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1051L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1052L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1053L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1054L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1055L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1056L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1057L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1058L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1059L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1060L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1061L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1062L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1063L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1064L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1065L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1066L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1067L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1068L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1069L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1070L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 1071L) {
+      if (attributeId == 0L) {
+        return "MeasuredValue";
+      }
+      if (attributeId == 1L) {
+        return "MinMeasuredValue";
+      }
+      if (attributeId == 2L) {
+        return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "PeakMeasuredValue";
+      }
+      if (attributeId == 4L) {
+        return "PeakMeasuredValueWindow";
+      }
+      if (attributeId == 5L) {
+        return "AverageMeasuredValue";
+      }
+      if (attributeId == 6L) {
+        return "AverageMeasuredValueWindow";
+      }
+      if (attributeId == 7L) {
+        return "Uncertainty";
+      }
+      if (attributeId == 8L) {
+        return "MeasurementUnit";
+      }
+      if (attributeId == 9L) {
+        return "MeasurementMedium";
+      }
+      if (attributeId == 10L) {
+        return "LevelValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
     if (clusterId == 1283L) {
       if (attributeId == 0L) {
         return "MACAddress";
@@ -4218,6 +6270,114 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 1030L) {
+      return "";
+    }
+    if (clusterId == 1036L) {
+      return "";
+    }
+    if (clusterId == 1037L) {
+      return "";
+    }
+    if (clusterId == 1038L) {
+      return "";
+    }
+    if (clusterId == 1039L) {
+      return "";
+    }
+    if (clusterId == 1040L) {
+      return "";
+    }
+    if (clusterId == 1041L) {
+      return "";
+    }
+    if (clusterId == 1042L) {
+      return "";
+    }
+    if (clusterId == 1043L) {
+      return "";
+    }
+    if (clusterId == 1044L) {
+      return "";
+    }
+    if (clusterId == 1045L) {
+      return "";
+    }
+    if (clusterId == 1046L) {
+      return "";
+    }
+    if (clusterId == 1047L) {
+      return "";
+    }
+    if (clusterId == 1048L) {
+      return "";
+    }
+    if (clusterId == 1049L) {
+      return "";
+    }
+    if (clusterId == 1050L) {
+      return "";
+    }
+    if (clusterId == 1051L) {
+      return "";
+    }
+    if (clusterId == 1052L) {
+      return "";
+    }
+    if (clusterId == 1053L) {
+      return "";
+    }
+    if (clusterId == 1054L) {
+      return "";
+    }
+    if (clusterId == 1055L) {
+      return "";
+    }
+    if (clusterId == 1056L) {
+      return "";
+    }
+    if (clusterId == 1057L) {
+      return "";
+    }
+    if (clusterId == 1058L) {
+      return "";
+    }
+    if (clusterId == 1059L) {
+      return "";
+    }
+    if (clusterId == 1060L) {
+      return "";
+    }
+    if (clusterId == 1061L) {
+      return "";
+    }
+    if (clusterId == 1062L) {
+      return "";
+    }
+    if (clusterId == 1063L) {
+      return "";
+    }
+    if (clusterId == 1064L) {
+      return "";
+    }
+    if (clusterId == 1065L) {
+      return "";
+    }
+    if (clusterId == 1066L) {
+      return "";
+    }
+    if (clusterId == 1067L) {
+      return "";
+    }
+    if (clusterId == 1068L) {
+      return "";
+    }
+    if (clusterId == 1069L) {
+      return "";
+    }
+    if (clusterId == 1070L) {
+      return "";
+    }
+    if (clusterId == 1071L) {
       return "";
     }
     if (clusterId == 1283L) {

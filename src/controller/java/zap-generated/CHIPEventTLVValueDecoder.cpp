@@ -3306,6 +3306,366 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::CarbonMonoxideMeasurement::Id: {
+        using namespace app::Clusters::CarbonMonoxideMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::CarbonDioxideMeasurement::Id: {
+        using namespace app::Clusters::CarbonDioxideMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::EthyleneMeasurement::Id: {
+        using namespace app::Clusters::EthyleneMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::EthyleneOxideMeasurement::Id: {
+        using namespace app::Clusters::EthyleneOxideMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::HydrogenMeasurement::Id: {
+        using namespace app::Clusters::HydrogenMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::HydrogenSulfideMeasurement::Id: {
+        using namespace app::Clusters::HydrogenSulfideMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::NitricOxideMeasurement::Id: {
+        using namespace app::Clusters::NitricOxideMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::NitrogenDioxideMeasurement::Id: {
+        using namespace app::Clusters::NitrogenDioxideMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::OxygenMeasurement::Id: {
+        using namespace app::Clusters::OxygenMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::OzoneMeasurement::Id: {
+        using namespace app::Clusters::OzoneMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::SulfurDioxideMeasurement::Id: {
+        using namespace app::Clusters::SulfurDioxideMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::DissolvedOxygenMeasurement::Id: {
+        using namespace app::Clusters::DissolvedOxygenMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::BromateMeasurement::Id: {
+        using namespace app::Clusters::BromateMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ChloraminesMeasurement::Id: {
+        using namespace app::Clusters::ChloraminesMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ChlorineMeasurement::Id: {
+        using namespace app::Clusters::ChlorineMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::FecalColiformEColiMeasurement::Id: {
+        using namespace app::Clusters::FecalColiformEColiMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::FluorideMeasurement::Id: {
+        using namespace app::Clusters::FluorideMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::HaloaceticAcidsMeasurement::Id: {
+        using namespace app::Clusters::HaloaceticAcidsMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::TotalTrihalomethanesMeasurement::Id: {
+        using namespace app::Clusters::TotalTrihalomethanesMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::TotalColiformBacteriaMeasurement::Id: {
+        using namespace app::Clusters::TotalColiformBacteriaMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::TurbidityMeasurement::Id: {
+        using namespace app::Clusters::TurbidityMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::CopperMeasurement::Id: {
+        using namespace app::Clusters::CopperMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::LeadMeasurement::Id: {
+        using namespace app::Clusters::LeadMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ManganeseMeasurement::Id: {
+        using namespace app::Clusters::ManganeseMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::SulfateMeasurement::Id: {
+        using namespace app::Clusters::SulfateMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::BromodichloromethaneMeasurement::Id: {
+        using namespace app::Clusters::BromodichloromethaneMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::BromoformMeasurement::Id: {
+        using namespace app::Clusters::BromoformMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ChlorodibromomethaneMeasurement::Id: {
+        using namespace app::Clusters::ChlorodibromomethaneMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ChloroformMeasurement::Id: {
+        using namespace app::Clusters::ChloroformMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::SodiumMeasurement::Id: {
+        using namespace app::Clusters::SodiumMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::Pm25Measurement::Id: {
+        using namespace app::Clusters::Pm25Measurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::FormaldehydeMeasurement::Id: {
+        using namespace app::Clusters::FormaldehydeMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::Pm1Measurement::Id: {
+        using namespace app::Clusters::Pm1Measurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::Pm10Measurement::Id: {
+        using namespace app::Clusters::Pm10Measurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::TotalVolatileOrganicCompoundsMeasurement::Id: {
+        using namespace app::Clusters::TotalVolatileOrganicCompoundsMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::RadonMeasurement::Id: {
+        using namespace app::Clusters::RadonMeasurement;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::WakeOnLan::Id: {
         using namespace app::Clusters::WakeOnLan;
         switch (aPath.mEventId)

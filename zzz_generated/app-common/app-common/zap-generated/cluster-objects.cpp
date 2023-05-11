@@ -16038,6 +16038,2562 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace OccupancySensing
+namespace CarbonMonoxideMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace CarbonMonoxideMeasurement
+namespace CarbonDioxideMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace CarbonDioxideMeasurement
+namespace EthyleneMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace EthyleneMeasurement
+namespace EthyleneOxideMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace EthyleneOxideMeasurement
+namespace HydrogenMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace HydrogenMeasurement
+namespace HydrogenSulfideMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace HydrogenSulfideMeasurement
+namespace NitricOxideMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace NitricOxideMeasurement
+namespace NitrogenDioxideMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace NitrogenDioxideMeasurement
+namespace OxygenMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace OxygenMeasurement
+namespace OzoneMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace OzoneMeasurement
+namespace SulfurDioxideMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace SulfurDioxideMeasurement
+namespace DissolvedOxygenMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace DissolvedOxygenMeasurement
+namespace BromateMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace BromateMeasurement
+namespace ChloraminesMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace ChloraminesMeasurement
+namespace ChlorineMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace ChlorineMeasurement
+namespace FecalColiformEColiMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace FecalColiformEColiMeasurement
+namespace FluorideMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace FluorideMeasurement
+namespace HaloaceticAcidsMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace HaloaceticAcidsMeasurement
+namespace TotalTrihalomethanesMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace TotalTrihalomethanesMeasurement
+namespace TotalColiformBacteriaMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace TotalColiformBacteriaMeasurement
+namespace TurbidityMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace TurbidityMeasurement
+namespace CopperMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace CopperMeasurement
+namespace LeadMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace LeadMeasurement
+namespace ManganeseMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace ManganeseMeasurement
+namespace SulfateMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace SulfateMeasurement
+namespace BromodichloromethaneMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace BromodichloromethaneMeasurement
+namespace BromoformMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace BromoformMeasurement
+namespace ChlorodibromomethaneMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace ChlorodibromomethaneMeasurement
+namespace ChloroformMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace ChloroformMeasurement
+namespace SodiumMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace SodiumMeasurement
+namespace Pm25Measurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace Pm25Measurement
+namespace FormaldehydeMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace FormaldehydeMeasurement
+namespace Pm1Measurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace Pm1Measurement
+namespace Pm10Measurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace Pm10Measurement
+namespace TotalVolatileOrganicCompoundsMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace TotalVolatileOrganicCompoundsMeasurement
+namespace RadonMeasurement {
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measuredValue));
+        break;
+    case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, minMeasuredValue));
+        break;
+    case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValue));
+        break;
+    case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, peakMeasuredValueWindow));
+        break;
+    case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValue));
+        break;
+    case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, averageMeasuredValueWindow));
+        break;
+    case Attributes::Uncertainty::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, uncertainty));
+        break;
+    case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementUnit));
+        break;
+    case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, measurementMedium));
+        break;
+    case Attributes::LevelValue::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, levelValue));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace RadonMeasurement
 namespace WakeOnLan {
 
 namespace Commands {} // namespace Commands

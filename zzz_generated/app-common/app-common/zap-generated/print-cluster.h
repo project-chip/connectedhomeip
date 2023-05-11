@@ -384,6 +384,244 @@
 #define CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER
 #endif
 
+#if defined(ZCL_USING_CARBON_MONOXIDE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_CARBON_MONOXIDE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CARBON_MONOXIDE_MEASUREMENT_CLUSTER                                                                      \
+    { chip::app::Clusters::CarbonMonoxideMeasurement::Id, "Carbon Monoxide Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_CARBON_MONOXIDE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CARBON_DIOXIDE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_CARBON_DIOXIDE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CARBON_DIOXIDE_MEASUREMENT_CLUSTER                                                                       \
+    { chip::app::Clusters::CarbonDioxideMeasurement::Id, "Carbon Dioxide Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_CARBON_DIOXIDE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ETHYLENE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_ETHYLENE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ETHYLENE_MEASUREMENT_CLUSTER { chip::app::Clusters::EthyleneMeasurement::Id, "Ethylene Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_ETHYLENE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ETHYLENE_OXIDE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_ETHYLENE_OXIDE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ETHYLENE_OXIDE_MEASUREMENT_CLUSTER                                                                       \
+    { chip::app::Clusters::EthyleneOxideMeasurement::Id, "Ethylene Oxide Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_ETHYLENE_OXIDE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_HYDROGEN_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_HYDROGEN_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_HYDROGEN_MEASUREMENT_CLUSTER { chip::app::Clusters::HydrogenMeasurement::Id, "Hydrogen Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_HYDROGEN_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER                                                                     \
+    { chip::app::Clusters::HydrogenSulfideMeasurement::Id, "Hydrogen Sulfide Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_NITRIC_OXIDE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_NITRIC_OXIDE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_NITRIC_OXIDE_MEASUREMENT_CLUSTER                                                                         \
+    { chip::app::Clusters::NitricOxideMeasurement::Id, "Nitric Oxide Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_NITRIC_OXIDE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER                                                                     \
+    { chip::app::Clusters::NitrogenDioxideMeasurement::Id, "Nitrogen Dioxide Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_OXYGEN_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_OXYGEN_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OXYGEN_MEASUREMENT_CLUSTER { chip::app::Clusters::OxygenMeasurement::Id, "Oxygen Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_OXYGEN_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_OZONE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_OZONE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OZONE_MEASUREMENT_CLUSTER { chip::app::Clusters::OzoneMeasurement::Id, "Ozone Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_OZONE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_SULFUR_DIOXIDE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_SULFUR_DIOXIDE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_SULFUR_DIOXIDE_MEASUREMENT_CLUSTER                                                                       \
+    { chip::app::Clusters::SulfurDioxideMeasurement::Id, "Sulfur Dioxide Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_SULFUR_DIOXIDE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER                                                                     \
+    { chip::app::Clusters::DissolvedOxygenMeasurement::Id, "Dissolved Oxygen Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_BROMATE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_BROMATE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BROMATE_MEASUREMENT_CLUSTER { chip::app::Clusters::BromateMeasurement::Id, "Bromate Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_BROMATE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CHLORAMINES_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_CHLORAMINES_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CHLORAMINES_MEASUREMENT_CLUSTER                                                                          \
+    { chip::app::Clusters::ChloraminesMeasurement::Id, "Chloramines Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_CHLORAMINES_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CHLORINE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_CHLORINE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CHLORINE_MEASUREMENT_CLUSTER { chip::app::Clusters::ChlorineMeasurement::Id, "Chlorine Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_CHLORINE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_FECAL_COLIFORM_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_FECAL_COLIFORM_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_FECAL_COLIFORM_MEASUREMENT_CLUSTER                                                                       \
+    { chip::app::Clusters::FecalColiformEColiMeasurement::Id, "Fecal coliform & E. Coli Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_FECAL_COLIFORM_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_FLUORIDE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_FLUORIDE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_FLUORIDE_MEASUREMENT_CLUSTER { chip::app::Clusters::FluorideMeasurement::Id, "Fluoride Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_FLUORIDE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_HALOACETIC_ACIDS_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_HALOACETIC_ACIDS_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_HALOACETIC_ACIDS_MEASUREMENT_CLUSTER                                                                     \
+    { chip::app::Clusters::HaloaceticAcidsMeasurement::Id, "Haloacetic Acids Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_HALOACETIC_ACIDS_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER_SERVER) ||                                                         \
+    defined(ZCL_USING_TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER                                                                \
+    { chip::app::Clusters::TotalTrihalomethanesMeasurement::Id, "Total Trihalomethanes Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER_SERVER) ||                                                       \
+    defined(ZCL_USING_TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER                                                              \
+    { chip::app::Clusters::TotalColiformBacteriaMeasurement::Id, "Total Coliform Bacteria Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_TURBIDITY_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_TURBIDITY_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TURBIDITY_MEASUREMENT_CLUSTER { chip::app::Clusters::TurbidityMeasurement::Id, "Turbidity Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_TURBIDITY_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_COPPER_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_COPPER_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_COPPER_MEASUREMENT_CLUSTER { chip::app::Clusters::CopperMeasurement::Id, "Copper Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_COPPER_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_LEAD_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_LEAD_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_LEAD_MEASUREMENT_CLUSTER { chip::app::Clusters::LeadMeasurement::Id, "Lead Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_LEAD_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_MANGANESE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_MANGANESE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_MANGANESE_MEASUREMENT_CLUSTER { chip::app::Clusters::ManganeseMeasurement::Id, "Manganese Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_MANGANESE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_SULFATE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_SULFATE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_SULFATE_MEASUREMENT_CLUSTER { chip::app::Clusters::SulfateMeasurement::Id, "Sulfate Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_SULFATE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER_SERVER) ||                                                          \
+    defined(ZCL_USING_BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER                                                                 \
+    { chip::app::Clusters::BromodichloromethaneMeasurement::Id, "Bromodichloromethane Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_BROMOFORM_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_BROMOFORM_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BROMOFORM_MEASUREMENT_CLUSTER { chip::app::Clusters::BromoformMeasurement::Id, "Bromoform Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_BROMOFORM_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER_SERVER) ||                                                          \
+    defined(ZCL_USING_CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER                                                                 \
+    { chip::app::Clusters::ChlorodibromomethaneMeasurement::Id, "Chlorodibromomethane Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CHLOROFORM_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_CHLOROFORM_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CHLOROFORM_MEASUREMENT_CLUSTER                                                                           \
+    { chip::app::Clusters::ChloroformMeasurement::Id, "Chloroform Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_CHLOROFORM_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_SODIUM_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_SODIUM_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_SODIUM_MEASUREMENT_CLUSTER { chip::app::Clusters::SodiumMeasurement::Id, "Sodium Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_SODIUM_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_PM2_5_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_PM2_5_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_PM2_5_MEASUREMENT_CLUSTER { chip::app::Clusters::Pm25Measurement::Id, "PM2.5 Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_PM2_5_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_FORMALDEHYDE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_FORMALDEHYDE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_FORMALDEHYDE_MEASUREMENT_CLUSTER                                                                         \
+    { chip::app::Clusters::FormaldehydeMeasurement::Id, "Formaldehyde Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_FORMALDEHYDE_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_PM1_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_PM1_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_PM1_MEASUREMENT_CLUSTER { chip::app::Clusters::Pm1Measurement::Id, "PM1 Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_PM1_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_PM10_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_PM10_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_PM10_MEASUREMENT_CLUSTER { chip::app::Clusters::Pm10Measurement::Id, "PM10 Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_PM10_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_VOC_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_VOC_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_VOC_MEASUREMENT_CLUSTER                                                                                  \
+    { chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::Id, "Total Volatile Organic Compounds Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_VOC_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_RADON_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_RADON_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_RADON_MEASUREMENT_CLUSTER { chip::app::Clusters::RadonMeasurement::Id, "Radon Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_RADON_MEASUREMENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_WAKE_ON_LAN_CLUSTER_SERVER) || defined(ZCL_USING_WAKE_ON_LAN_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER { chip::app::Clusters::WakeOnLan::Id, "Wake on LAN" },
 #else
@@ -538,6 +776,42 @@
     CHIP_PRINTCLUSTER_FLOW_MEASUREMENT_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_CARBON_MONOXIDE_MEASUREMENT_CLUSTER                                                                          \
+    CHIP_PRINTCLUSTER_CARBON_DIOXIDE_MEASUREMENT_CLUSTER                                                                           \
+    CHIP_PRINTCLUSTER_ETHYLENE_MEASUREMENT_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_ETHYLENE_OXIDE_MEASUREMENT_CLUSTER                                                                           \
+    CHIP_PRINTCLUSTER_HYDROGEN_MEASUREMENT_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_NITRIC_OXIDE_MEASUREMENT_CLUSTER                                                                             \
+    CHIP_PRINTCLUSTER_NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_OXYGEN_MEASUREMENT_CLUSTER                                                                                   \
+    CHIP_PRINTCLUSTER_OZONE_MEASUREMENT_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_SULFUR_DIOXIDE_MEASUREMENT_CLUSTER                                                                           \
+    CHIP_PRINTCLUSTER_DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_BROMATE_MEASUREMENT_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_CHLORAMINES_MEASUREMENT_CLUSTER                                                                              \
+    CHIP_PRINTCLUSTER_CHLORINE_MEASUREMENT_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_FECAL_COLIFORM_MEASUREMENT_CLUSTER                                                                           \
+    CHIP_PRINTCLUSTER_FLUORIDE_MEASUREMENT_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_HALOACETIC_ACIDS_MEASUREMENT_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER                                                                    \
+    CHIP_PRINTCLUSTER_TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER                                                                  \
+    CHIP_PRINTCLUSTER_TURBIDITY_MEASUREMENT_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_COPPER_MEASUREMENT_CLUSTER                                                                                   \
+    CHIP_PRINTCLUSTER_LEAD_MEASUREMENT_CLUSTER                                                                                     \
+    CHIP_PRINTCLUSTER_MANGANESE_MEASUREMENT_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_SULFATE_MEASUREMENT_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER                                                                     \
+    CHIP_PRINTCLUSTER_BROMOFORM_MEASUREMENT_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER                                                                     \
+    CHIP_PRINTCLUSTER_CHLOROFORM_MEASUREMENT_CLUSTER                                                                               \
+    CHIP_PRINTCLUSTER_SODIUM_MEASUREMENT_CLUSTER                                                                                   \
+    CHIP_PRINTCLUSTER_PM2_5_MEASUREMENT_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_FORMALDEHYDE_MEASUREMENT_CLUSTER                                                                             \
+    CHIP_PRINTCLUSTER_PM1_MEASUREMENT_CLUSTER                                                                                      \
+    CHIP_PRINTCLUSTER_PM10_MEASUREMENT_CLUSTER                                                                                     \
+    CHIP_PRINTCLUSTER_VOC_MEASUREMENT_CLUSTER                                                                                      \
+    CHIP_PRINTCLUSTER_RADON_MEASUREMENT_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_CHANNEL_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_TARGET_NAVIGATOR_CLUSTER                                                                                     \
@@ -555,4 +829,4 @@
     CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER
 
-#define MAX_CLUSTER_NAME_LENGTH 39
+#define MAX_CLUSTER_NAME_LENGTH 44

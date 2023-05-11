@@ -508,6 +508,436 @@ typedef void (*OccupancySensingClusterOccupancySensorTypeEnumAttributeCallback)(
     void *, chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum);
 typedef void (*NullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum> &);
+typedef void (*CarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType);
+typedef void (*NullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType> &);
+typedef void (*CarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType);
+typedef void (*NullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType> &);
+typedef void (*CarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType);
+typedef void (*NullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType> &);
+typedef void (*CarbonDioxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType);
+typedef void (*NullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType> &);
+typedef void (*CarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType);
+typedef void (*NullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType> &);
+typedef void (*CarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType);
+typedef void (*NullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType> &);
+typedef void (*EthyleneMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                          chip::app::Clusters::EthyleneMeasurement::LevelValueType);
+typedef void (*NullableEthyleneMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::LevelValueType> &);
+typedef void (*EthyleneMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType);
+typedef void (*NullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType> &);
+typedef void (*EthyleneMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType);
+typedef void (*NullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType> &);
+typedef void (*EthyleneOxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType);
+typedef void (*NullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType> &);
+typedef void (*EthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType);
+typedef void (*NullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType> &);
+typedef void (*EthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType);
+typedef void (*NullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType> &);
+typedef void (*HydrogenMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                          chip::app::Clusters::HydrogenMeasurement::LevelValueType);
+typedef void (*NullableHydrogenMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::LevelValueType> &);
+typedef void (*HydrogenMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType);
+typedef void (*NullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType> &);
+typedef void (*HydrogenMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType);
+typedef void (*NullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType> &);
+typedef void (*HydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType);
+typedef void (*NullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType> &);
+typedef void (*HydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType);
+typedef void (*NullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType> &);
+typedef void (*HydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType);
+typedef void (*NullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType> &);
+typedef void (*NitricOxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::NitricOxideMeasurement::LevelValueType);
+typedef void (*NullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::LevelValueType> &);
+typedef void (*NitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType);
+typedef void (*NullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType> &);
+typedef void (*NitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType);
+typedef void (*NullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType> &);
+typedef void (*NitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType);
+typedef void (*NullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType> &);
+typedef void (*NitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType);
+typedef void (*NullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType> &);
+typedef void (*NitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType);
+typedef void (*NullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType> &);
+typedef void (*OxygenMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                        chip::app::Clusters::OxygenMeasurement::LevelValueType);
+typedef void (*NullableOxygenMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::LevelValueType> &);
+typedef void (*OxygenMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::OxygenMeasurement::MeasurementMediumType);
+typedef void (*NullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::MeasurementMediumType> &);
+typedef void (*OxygenMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::OxygenMeasurement::MeasurementUnitType);
+typedef void (*NullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::MeasurementUnitType> &);
+typedef void (*OzoneMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                       chip::app::Clusters::OzoneMeasurement::LevelValueType);
+typedef void (*NullableOzoneMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::LevelValueType> &);
+typedef void (*OzoneMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::OzoneMeasurement::MeasurementMediumType);
+typedef void (*NullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::MeasurementMediumType> &);
+typedef void (*OzoneMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::OzoneMeasurement::MeasurementUnitType);
+typedef void (*NullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::MeasurementUnitType> &);
+typedef void (*SulfurDioxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType);
+typedef void (*NullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType> &);
+typedef void (*SulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType);
+typedef void (*NullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType> &);
+typedef void (*SulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType);
+typedef void (*NullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType> &);
+typedef void (*DissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType);
+typedef void (*NullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType> &);
+typedef void (*DissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType);
+typedef void (*NullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType> &);
+typedef void (*DissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType);
+typedef void (*NullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType> &);
+typedef void (*BromateMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                         chip::app::Clusters::BromateMeasurement::LevelValueType);
+typedef void (*NullableBromateMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::LevelValueType> &);
+typedef void (*BromateMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::BromateMeasurement::MeasurementMediumType);
+typedef void (*NullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::MeasurementMediumType> &);
+typedef void (*BromateMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::BromateMeasurement::MeasurementUnitType);
+typedef void (*NullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::MeasurementUnitType> &);
+typedef void (*ChloraminesMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChloraminesMeasurement::LevelValueType);
+typedef void (*NullableChloraminesMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::LevelValueType> &);
+typedef void (*ChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType);
+typedef void (*NullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType> &);
+typedef void (*ChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType);
+typedef void (*NullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType> &);
+typedef void (*ChlorineMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                          chip::app::Clusters::ChlorineMeasurement::LevelValueType);
+typedef void (*NullableChlorineMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::LevelValueType> &);
+typedef void (*ChlorineMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType);
+typedef void (*NullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType> &);
+typedef void (*ChlorineMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType);
+typedef void (*NullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType> &);
+typedef void (*FecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType);
+typedef void (*NullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType> &);
+typedef void (*FecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType);
+typedef void (*NullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType> &);
+typedef void (*FecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType);
+typedef void (*NullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType> &);
+typedef void (*FluorideMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                          chip::app::Clusters::FluorideMeasurement::LevelValueType);
+typedef void (*NullableFluorideMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::LevelValueType> &);
+typedef void (*FluorideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::FluorideMeasurement::MeasurementMediumType);
+typedef void (*NullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::MeasurementMediumType> &);
+typedef void (*FluorideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::FluorideMeasurement::MeasurementUnitType);
+typedef void (*NullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::MeasurementUnitType> &);
+typedef void (*HaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType);
+typedef void (*NullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType> &);
+typedef void (*HaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType);
+typedef void (*NullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType> &);
+typedef void (*HaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType);
+typedef void (*NullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType> &);
+typedef void (*TotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType);
+typedef void (*NullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType> &);
+typedef void (*TotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType);
+typedef void (*NullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType> &);
+typedef void (*TotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType);
+typedef void (*NullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType> &);
+typedef void (*TotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType);
+typedef void (*NullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType> &);
+typedef void (*TotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType);
+typedef void (*NullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType> &);
+typedef void (*TotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType);
+typedef void (*NullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType> &);
+typedef void (*TurbidityMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::TurbidityMeasurement::LevelValueType);
+typedef void (*NullableTurbidityMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::LevelValueType> &);
+typedef void (*TurbidityMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType);
+typedef void (*NullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType> &);
+typedef void (*TurbidityMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType);
+typedef void (*NullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType> &);
+typedef void (*CopperMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                        chip::app::Clusters::CopperMeasurement::LevelValueType);
+typedef void (*NullableCopperMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::LevelValueType> &);
+typedef void (*CopperMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::CopperMeasurement::MeasurementMediumType);
+typedef void (*NullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::MeasurementMediumType> &);
+typedef void (*CopperMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::CopperMeasurement::MeasurementUnitType);
+typedef void (*NullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::MeasurementUnitType> &);
+typedef void (*LeadMeasurementClusterLevelValueTypeAttributeCallback)(void *, chip::app::Clusters::LeadMeasurement::LevelValueType);
+typedef void (*NullableLeadMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::LevelValueType> &);
+typedef void (*LeadMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::LeadMeasurement::MeasurementMediumType);
+typedef void (*NullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::MeasurementMediumType> &);
+typedef void (*LeadMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::LeadMeasurement::MeasurementUnitType);
+typedef void (*NullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::MeasurementUnitType> &);
+typedef void (*ManganeseMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::ManganeseMeasurement::LevelValueType);
+typedef void (*NullableManganeseMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::LevelValueType> &);
+typedef void (*ManganeseMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType);
+typedef void (*NullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType> &);
+typedef void (*ManganeseMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType);
+typedef void (*NullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType> &);
+typedef void (*SulfateMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                         chip::app::Clusters::SulfateMeasurement::LevelValueType);
+typedef void (*NullableSulfateMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::LevelValueType> &);
+typedef void (*SulfateMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::SulfateMeasurement::MeasurementMediumType);
+typedef void (*NullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::MeasurementMediumType> &);
+typedef void (*SulfateMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::SulfateMeasurement::MeasurementUnitType);
+typedef void (*NullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::MeasurementUnitType> &);
+typedef void (*BromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType);
+typedef void (*NullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType> &);
+typedef void (*BromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType);
+typedef void (*NullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType> &);
+typedef void (*BromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType);
+typedef void (*NullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType> &);
+typedef void (*BromoformMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::BromoformMeasurement::LevelValueType);
+typedef void (*NullableBromoformMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::LevelValueType> &);
+typedef void (*BromoformMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::BromoformMeasurement::MeasurementMediumType);
+typedef void (*NullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::MeasurementMediumType> &);
+typedef void (*BromoformMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::BromoformMeasurement::MeasurementUnitType);
+typedef void (*NullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::MeasurementUnitType> &);
+typedef void (*ChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType);
+typedef void (*NullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType> &);
+typedef void (*ChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType);
+typedef void (*NullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType> &);
+typedef void (*ChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType);
+typedef void (*NullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType> &);
+typedef void (*ChloroformMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChloroformMeasurement::LevelValueType);
+typedef void (*NullableChloroformMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::LevelValueType> &);
+typedef void (*ChloroformMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType);
+typedef void (*NullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType> &);
+typedef void (*ChloroformMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType);
+typedef void (*NullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType> &);
+typedef void (*SodiumMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                        chip::app::Clusters::SodiumMeasurement::LevelValueType);
+typedef void (*NullableSodiumMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::LevelValueType> &);
+typedef void (*SodiumMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::SodiumMeasurement::MeasurementMediumType);
+typedef void (*NullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::MeasurementMediumType> &);
+typedef void (*SodiumMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::SodiumMeasurement::MeasurementUnitType);
+typedef void (*NullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::MeasurementUnitType> &);
+typedef void (*PM25MeasurementClusterLevelValueTypeAttributeCallback)(void *, chip::app::Clusters::Pm25Measurement::LevelValueType);
+typedef void (*NullablePM25MeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::LevelValueType> &);
+typedef void (*PM25MeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::Pm25Measurement::MeasurementMediumType);
+typedef void (*NullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::MeasurementMediumType> &);
+typedef void (*PM25MeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::Pm25Measurement::MeasurementUnitType);
+typedef void (*NullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::MeasurementUnitType> &);
+typedef void (*FormaldehydeMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::FormaldehydeMeasurement::LevelValueType);
+typedef void (*NullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::LevelValueType> &);
+typedef void (*FormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType);
+typedef void (*NullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType> &);
+typedef void (*FormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType);
+typedef void (*NullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType> &);
+typedef void (*PM1MeasurementClusterLevelValueTypeAttributeCallback)(void *, chip::app::Clusters::Pm1Measurement::LevelValueType);
+typedef void (*NullablePM1MeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::LevelValueType> &);
+typedef void (*PM1MeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::Pm1Measurement::MeasurementMediumType);
+typedef void (*NullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::MeasurementMediumType> &);
+typedef void (*PM1MeasurementClusterMeasurementUnitTypeAttributeCallback)(void *,
+                                                                          chip::app::Clusters::Pm1Measurement::MeasurementUnitType);
+typedef void (*NullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::MeasurementUnitType> &);
+typedef void (*PM10MeasurementClusterLevelValueTypeAttributeCallback)(void *, chip::app::Clusters::Pm10Measurement::LevelValueType);
+typedef void (*NullablePM10MeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::LevelValueType> &);
+typedef void (*PM10MeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::Pm10Measurement::MeasurementMediumType);
+typedef void (*NullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::MeasurementMediumType> &);
+typedef void (*PM10MeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::Pm10Measurement::MeasurementUnitType);
+typedef void (*NullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::MeasurementUnitType> &);
+typedef void (*TotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType);
+typedef void (*NullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType> &);
+typedef void (*TotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType);
+typedef void (*NullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType> &);
+typedef void (*TotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType);
+typedef void (*NullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType> &);
+typedef void (*RadonMeasurementClusterLevelValueTypeAttributeCallback)(void *,
+                                                                       chip::app::Clusters::RadonMeasurement::LevelValueType);
+typedef void (*NullableRadonMeasurementClusterLevelValueTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::LevelValueType> &);
+typedef void (*RadonMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, chip::app::Clusters::RadonMeasurement::MeasurementMediumType);
+typedef void (*NullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::MeasurementMediumType> &);
+typedef void (*RadonMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, chip::app::Clusters::RadonMeasurement::MeasurementUnitType);
+typedef void (*NullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::MeasurementUnitType> &);
 typedef void (*ChannelClusterChannelStatusEnumAttributeCallback)(void *, chip::app::Clusters::Channel::ChannelStatusEnum);
 typedef void (*NullableChannelClusterChannelStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelStatusEnum> &);
@@ -1004,6 +1434,294 @@ typedef void (*OccupancySensingGeneratedCommandListListAttributeCallback)(
 typedef void (*OccupancySensingAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OccupancySensingAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*CarbonMonoxideMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*CarbonMonoxideMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*CarbonMonoxideMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*CarbonMonoxideMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*CarbonDioxideMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*CarbonDioxideMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*CarbonDioxideMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*CarbonDioxideMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*EthyleneMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*EthyleneMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*EthyleneMeasurementEventListListAttributeCallback)(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*EthyleneMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*EthyleneOxideMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*EthyleneOxideMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*EthyleneOxideMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*EthyleneOxideMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*HydrogenMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*HydrogenMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*HydrogenMeasurementEventListListAttributeCallback)(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*HydrogenMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*HydrogenSulfideMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*HydrogenSulfideMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*HydrogenSulfideMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*HydrogenSulfideMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*NitricOxideMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*NitricOxideMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*NitricOxideMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*NitricOxideMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*NitrogenDioxideMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*NitrogenDioxideMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*NitrogenDioxideMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*NitrogenDioxideMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*OxygenMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OxygenMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OxygenMeasurementEventListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*OxygenMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*OzoneMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OzoneMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*OzoneMeasurementEventListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*OzoneMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*SulfurDioxideMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*SulfurDioxideMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*SulfurDioxideMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*SulfurDioxideMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*DissolvedOxygenMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DissolvedOxygenMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DissolvedOxygenMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*DissolvedOxygenMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BromateMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BromateMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BromateMeasurementEventListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*BromateMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ChloraminesMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ChloraminesMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ChloraminesMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ChloraminesMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ChlorineMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ChlorineMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ChlorineMeasurementEventListListAttributeCallback)(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ChlorineMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*FecalColiformEColiMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FecalColiformEColiMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FecalColiformEColiMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*FecalColiformEColiMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*FluorideMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FluorideMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FluorideMeasurementEventListListAttributeCallback)(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*FluorideMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*HaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*HaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*HaloaceticAcidsMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*HaloaceticAcidsMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TotalTrihalomethanesMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*TotalTrihalomethanesMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TotalColiformBacteriaMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*TotalColiformBacteriaMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TurbidityMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TurbidityMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TurbidityMeasurementEventListListAttributeCallback)(void * context,
+                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*TurbidityMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*CopperMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*CopperMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*CopperMeasurementEventListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*CopperMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*LeadMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*LeadMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*LeadMeasurementEventListListAttributeCallback)(void * context,
+                                                              const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*LeadMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ManganeseMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ManganeseMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ManganeseMeasurementEventListListAttributeCallback)(void * context,
+                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ManganeseMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*SulfateMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*SulfateMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*SulfateMeasurementEventListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*SulfateMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BromodichloromethaneMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BromodichloromethaneMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BromodichloromethaneMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*BromodichloromethaneMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BromoformMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BromoformMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BromoformMeasurementEventListListAttributeCallback)(void * context,
+                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*BromoformMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ChlorodibromomethaneMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ChlorodibromomethaneMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ChloroformMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ChloroformMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ChloroformMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ChloroformMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*SodiumMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*SodiumMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*SodiumMeasurementEventListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*SodiumMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*PM25MeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PM25MeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PM25MeasurementEventListListAttributeCallback)(void * context,
+                                                              const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*PM25MeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*FormaldehydeMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FormaldehydeMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*FormaldehydeMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*FormaldehydeMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*PM1MeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PM1MeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PM1MeasurementEventListListAttributeCallback)(void * context,
+                                                             const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*PM1MeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*PM10MeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PM10MeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*PM10MeasurementEventListListAttributeCallback)(void * context,
+                                                              const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*PM10MeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*TotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*RadonMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*RadonMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*RadonMeasurementEventListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*RadonMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*WakeOnLANGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -8735,6 +9453,4805 @@ public:
     void OnSubscriptionEstablished();
     using MTROccupancySensingAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROccupancySensingAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonMonoxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonMonoxideMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRCarbonMonoxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonMonoxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRCarbonMonoxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRCarbonMonoxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRCarbonMonoxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonMonoxideMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonMonoxideMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonMonoxideMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonMonoxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonMonoxideMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRCarbonMonoxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonMonoxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRCarbonMonoxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRCarbonMonoxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRCarbonMonoxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonMonoxideMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonMonoxideMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonMonoxideMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonMonoxideMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonMonoxideMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRCarbonMonoxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonMonoxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRCarbonMonoxideMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRCarbonMonoxideMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRCarbonMonoxideMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonMonoxideMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonMonoxideMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonMonoxideMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonMonoxideMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonMonoxideMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRCarbonMonoxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonMonoxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRCarbonMonoxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRCarbonMonoxideMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRCarbonMonoxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonMonoxideMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonMonoxideMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonMonoxideMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonDioxideMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRCarbonDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonDioxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<CarbonDioxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRCarbonDioxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRCarbonDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRCarbonDioxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonDioxideMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRCarbonDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonDioxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<CarbonDioxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRCarbonDioxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRCarbonDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRCarbonDioxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonDioxideMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonDioxideMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRCarbonDioxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonDioxideMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonDioxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<CarbonDioxideMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRCarbonDioxideMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRCarbonDioxideMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRCarbonDioxideMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonDioxideMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonDioxideMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonDioxideMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonDioxideMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonDioxideMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRCarbonDioxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonDioxideMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonDioxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<CarbonDioxideMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRCarbonDioxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRCarbonDioxideMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRCarbonDioxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonDioxideMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonDioxideMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonDioxideMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTREthyleneMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTREthyleneMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTREthyleneMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTREthyleneMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTREthyleneMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTREthyleneMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTREthyleneMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTREthyleneMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneMeasurementEventListListAttributeCallback>
+{
+public:
+    MTREthyleneMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTREthyleneMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTREthyleneMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTREthyleneMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action,
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTREthyleneMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTREthyleneMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTREthyleneMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTREthyleneMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneOxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneOxideMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTREthyleneOxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneOxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneOxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneOxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTREthyleneOxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTREthyleneOxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTREthyleneOxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneOxideMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneOxideMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneOxideMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneOxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneOxideMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTREthyleneOxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneOxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneOxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneOxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTREthyleneOxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTREthyleneOxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTREthyleneOxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneOxideMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneOxideMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneOxideMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneOxideMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneOxideMeasurementEventListListAttributeCallback>
+{
+public:
+    MTREthyleneOxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneOxideMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneOxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneOxideMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTREthyleneOxideMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTREthyleneOxideMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTREthyleneOxideMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneOxideMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneOxideMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneOxideMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneOxideMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneOxideMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTREthyleneOxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneOxideMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneOxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneOxideMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTREthyleneOxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTREthyleneOxideMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTREthyleneOxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneOxideMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneOxideMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneOxideMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRHydrogenMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRHydrogenMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRHydrogenMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRHydrogenMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRHydrogenMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRHydrogenMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRHydrogenMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRHydrogenMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRHydrogenMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action,
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRHydrogenMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRHydrogenMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRHydrogenMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenSulfideMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenSulfideMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRHydrogenSulfideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenSulfideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRHydrogenSulfideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenSulfideMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRHydrogenSulfideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenSulfideMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenSulfideMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenSulfideMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenSulfideMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenSulfideMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRHydrogenSulfideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenSulfideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRHydrogenSulfideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenSulfideMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRHydrogenSulfideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenSulfideMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenSulfideMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenSulfideMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenSulfideMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenSulfideMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRHydrogenSulfideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenSulfideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRHydrogenSulfideMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenSulfideMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRHydrogenSulfideMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenSulfideMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenSulfideMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenSulfideMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenSulfideMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenSulfideMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRHydrogenSulfideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenSulfideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRHydrogenSulfideMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenSulfideMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRHydrogenSulfideMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenSulfideMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenSulfideMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenSulfideMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitricOxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<NitricOxideMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRNitricOxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitricOxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitricOxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<NitricOxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRNitricOxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRNitricOxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRNitricOxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitricOxideMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitricOxideMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitricOxideMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitricOxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<NitricOxideMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRNitricOxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitricOxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitricOxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NitricOxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRNitricOxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRNitricOxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRNitricOxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitricOxideMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitricOxideMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitricOxideMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitricOxideMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<NitricOxideMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRNitricOxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitricOxideMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitricOxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NitricOxideMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRNitricOxideMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRNitricOxideMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRNitricOxideMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitricOxideMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitricOxideMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitricOxideMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitricOxideMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<NitricOxideMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRNitricOxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitricOxideMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitricOxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NitricOxideMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRNitricOxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRNitricOxideMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRNitricOxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitricOxideMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitricOxideMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitricOxideMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitrogenDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<NitrogenDioxideMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRNitrogenDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitrogenDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRNitrogenDioxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRNitrogenDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRNitrogenDioxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitrogenDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitrogenDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitrogenDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitrogenDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<NitrogenDioxideMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRNitrogenDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitrogenDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRNitrogenDioxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRNitrogenDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRNitrogenDioxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitrogenDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitrogenDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitrogenDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitrogenDioxideMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<NitrogenDioxideMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRNitrogenDioxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitrogenDioxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRNitrogenDioxideMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRNitrogenDioxideMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRNitrogenDioxideMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitrogenDioxideMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitrogenDioxideMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitrogenDioxideMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitrogenDioxideMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<NitrogenDioxideMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRNitrogenDioxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitrogenDioxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRNitrogenDioxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRNitrogenDioxideMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRNitrogenDioxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitrogenDioxideMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitrogenDioxideMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitrogenDioxideMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROxygenMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<OxygenMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTROxygenMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OxygenMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROxygenMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<OxygenMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTROxygenMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTROxygenMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTROxygenMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROxygenMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROxygenMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROxygenMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROxygenMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<OxygenMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTROxygenMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OxygenMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROxygenMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<OxygenMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTROxygenMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTROxygenMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTROxygenMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROxygenMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROxygenMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROxygenMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROxygenMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<OxygenMeasurementEventListListAttributeCallback>
+{
+public:
+    MTROxygenMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OxygenMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROxygenMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRActionBlock action) :
+        MTRCallbackBridge<OxygenMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTROxygenMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTROxygenMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTROxygenMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action,
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROxygenMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROxygenMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROxygenMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROxygenMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<OxygenMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTROxygenMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OxygenMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROxygenMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<OxygenMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTROxygenMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTROxygenMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTROxygenMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROxygenMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROxygenMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROxygenMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROzoneMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<OzoneMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTROzoneMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OzoneMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROzoneMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<OzoneMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTROzoneMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTROzoneMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTROzoneMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROzoneMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROzoneMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROzoneMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROzoneMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<OzoneMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTROzoneMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OzoneMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROzoneMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<OzoneMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTROzoneMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTROzoneMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTROzoneMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROzoneMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROzoneMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROzoneMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROzoneMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<OzoneMeasurementEventListListAttributeCallback>
+{
+public:
+    MTROzoneMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OzoneMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROzoneMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                            MTRActionBlock action) :
+        MTRCallbackBridge<OzoneMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTROzoneMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTROzoneMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTROzoneMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action,
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROzoneMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROzoneMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROzoneMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROzoneMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<OzoneMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTROzoneMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OzoneMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROzoneMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<OzoneMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTROzoneMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTROzoneMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTROzoneMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROzoneMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROzoneMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROzoneMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfurDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfurDioxideMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRSulfurDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfurDioxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfurDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<SulfurDioxideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRSulfurDioxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRSulfurDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRSulfurDioxideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfurDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfurDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfurDioxideMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfurDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfurDioxideMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRSulfurDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfurDioxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfurDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<SulfurDioxideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRSulfurDioxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRSulfurDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRSulfurDioxideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfurDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfurDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfurDioxideMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfurDioxideMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfurDioxideMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRSulfurDioxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfurDioxideMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfurDioxideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<SulfurDioxideMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRSulfurDioxideMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRSulfurDioxideMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRSulfurDioxideMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfurDioxideMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfurDioxideMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfurDioxideMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfurDioxideMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfurDioxideMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRSulfurDioxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfurDioxideMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfurDioxideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<SulfurDioxideMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRSulfurDioxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRSulfurDioxideMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRSulfurDioxideMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfurDioxideMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfurDioxideMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfurDioxideMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDissolvedOxygenMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DissolvedOxygenMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRDissolvedOxygenMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDissolvedOxygenMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRDissolvedOxygenMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRDissolvedOxygenMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRDissolvedOxygenMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDissolvedOxygenMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDissolvedOxygenMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDissolvedOxygenMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDissolvedOxygenMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DissolvedOxygenMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRDissolvedOxygenMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDissolvedOxygenMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRDissolvedOxygenMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRDissolvedOxygenMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRDissolvedOxygenMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDissolvedOxygenMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDissolvedOxygenMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDissolvedOxygenMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDissolvedOxygenMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DissolvedOxygenMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRDissolvedOxygenMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDissolvedOxygenMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRDissolvedOxygenMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRDissolvedOxygenMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRDissolvedOxygenMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDissolvedOxygenMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDissolvedOxygenMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDissolvedOxygenMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDissolvedOxygenMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DissolvedOxygenMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRDissolvedOxygenMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDissolvedOxygenMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRDissolvedOxygenMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRDissolvedOxygenMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRDissolvedOxygenMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDissolvedOxygenMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDissolvedOxygenMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDissolvedOxygenMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromateMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromateMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRBromateMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromateMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromateMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<BromateMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRBromateMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBromateMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRBromateMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromateMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromateMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromateMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromateMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromateMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRBromateMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromateMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromateMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<BromateMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRBromateMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBromateMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRBromateMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromateMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromateMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromateMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromateMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromateMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRBromateMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromateMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromateMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRActionBlock action) :
+        MTRCallbackBridge<BromateMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRBromateMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRBromateMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRBromateMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromateMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromateMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromateMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromateMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromateMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRBromateMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromateMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromateMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<BromateMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRBromateMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRBromateMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRBromateMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromateMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromateMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromateMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloraminesMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloraminesMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRChloraminesMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloraminesMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloraminesMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<ChloraminesMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRChloraminesMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRChloraminesMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRChloraminesMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloraminesMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloraminesMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloraminesMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloraminesMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloraminesMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRChloraminesMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloraminesMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloraminesMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<ChloraminesMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRChloraminesMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRChloraminesMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRChloraminesMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloraminesMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloraminesMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloraminesMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloraminesMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloraminesMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRChloraminesMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloraminesMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloraminesMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<ChloraminesMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRChloraminesMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRChloraminesMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRChloraminesMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloraminesMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloraminesMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloraminesMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloraminesMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloraminesMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRChloraminesMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloraminesMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloraminesMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<ChloraminesMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRChloraminesMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRChloraminesMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRChloraminesMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloraminesMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloraminesMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloraminesMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorineMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorineMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRChlorineMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChlorineMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorineMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<ChlorineMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRChlorineMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRChlorineMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRChlorineMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorineMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorineMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorineMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorineMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorineMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRChlorineMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChlorineMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorineMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<ChlorineMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRChlorineMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRChlorineMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRChlorineMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorineMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorineMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorineMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorineMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorineMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRChlorineMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChlorineMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorineMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action) :
+        MTRCallbackBridge<ChlorineMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRChlorineMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRChlorineMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRChlorineMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action,
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorineMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorineMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorineMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorineMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorineMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRChlorineMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChlorineMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorineMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<ChlorineMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRChlorineMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRChlorineMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRChlorineMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorineMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorineMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorineMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFecalColiformEColiMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FecalColiformEColiMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRFecalColiformEColiMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFecalColiformEColiMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRFecalColiformEColiMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRFecalColiformEColiMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRFecalColiformEColiMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFecalColiformEColiMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFecalColiformEColiMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFecalColiformEColiMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFecalColiformEColiMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FecalColiformEColiMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRFecalColiformEColiMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFecalColiformEColiMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRFecalColiformEColiMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRFecalColiformEColiMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRFecalColiformEColiMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFecalColiformEColiMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFecalColiformEColiMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFecalColiformEColiMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFecalColiformEColiMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FecalColiformEColiMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRFecalColiformEColiMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFecalColiformEColiMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRFecalColiformEColiMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRFecalColiformEColiMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRFecalColiformEColiMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFecalColiformEColiMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFecalColiformEColiMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFecalColiformEColiMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFecalColiformEColiMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FecalColiformEColiMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRFecalColiformEColiMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFecalColiformEColiMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRFecalColiformEColiMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRFecalColiformEColiMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRFecalColiformEColiMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFecalColiformEColiMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFecalColiformEColiMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFecalColiformEColiMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFluorideMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FluorideMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRFluorideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FluorideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFluorideMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<FluorideMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRFluorideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRFluorideMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRFluorideMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFluorideMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFluorideMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFluorideMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFluorideMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FluorideMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRFluorideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FluorideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFluorideMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<FluorideMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRFluorideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRFluorideMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRFluorideMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFluorideMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFluorideMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFluorideMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFluorideMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FluorideMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRFluorideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FluorideMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFluorideMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action) :
+        MTRCallbackBridge<FluorideMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRFluorideMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRFluorideMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRFluorideMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action,
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFluorideMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFluorideMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFluorideMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFluorideMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FluorideMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRFluorideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FluorideMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFluorideMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<FluorideMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRFluorideMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRFluorideMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRFluorideMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFluorideMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFluorideMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFluorideMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRHaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRHaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRHaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRHaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHaloaceticAcidsMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRHaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRHaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRHaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRHaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHaloaceticAcidsMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHaloaceticAcidsMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HaloaceticAcidsMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRHaloaceticAcidsMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHaloaceticAcidsMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRHaloaceticAcidsMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRHaloaceticAcidsMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRHaloaceticAcidsMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHaloaceticAcidsMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHaloaceticAcidsMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHaloaceticAcidsMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHaloaceticAcidsMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HaloaceticAcidsMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRHaloaceticAcidsMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHaloaceticAcidsMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRHaloaceticAcidsMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRHaloaceticAcidsMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRHaloaceticAcidsMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHaloaceticAcidsMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHaloaceticAcidsMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHaloaceticAcidsMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRTotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalTrihalomethanesMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRTotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalTrihalomethanesMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalTrihalomethanesMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalTrihalomethanesMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRTotalTrihalomethanesMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalTrihalomethanesMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRTotalTrihalomethanesMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalTrihalomethanesMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRTotalTrihalomethanesMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalTrihalomethanesMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalTrihalomethanesMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalTrihalomethanesMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalTrihalomethanesMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalTrihalomethanesMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRTotalTrihalomethanesMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalTrihalomethanesMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRTotalTrihalomethanesMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalTrihalomethanesMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRTotalTrihalomethanesMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalTrihalomethanesMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalTrihalomethanesMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalTrihalomethanesMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRTotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler,
+                                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                     OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalColiformBacteriaMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRTotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalColiformBacteriaMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalColiformBacteriaMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalColiformBacteriaMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRTotalColiformBacteriaMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalColiformBacteriaMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRTotalColiformBacteriaMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalColiformBacteriaMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRTotalColiformBacteriaMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalColiformBacteriaMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalColiformBacteriaMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalColiformBacteriaMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalColiformBacteriaMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalColiformBacteriaMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRTotalColiformBacteriaMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalColiformBacteriaMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementAttributeListListAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRTotalColiformBacteriaMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalColiformBacteriaMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRTotalColiformBacteriaMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalColiformBacteriaMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalColiformBacteriaMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalColiformBacteriaMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTurbidityMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TurbidityMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRTurbidityMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TurbidityMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTurbidityMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<TurbidityMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTurbidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTurbidityMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTurbidityMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTurbidityMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTurbidityMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTurbidityMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTurbidityMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TurbidityMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRTurbidityMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TurbidityMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTurbidityMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<TurbidityMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTurbidityMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTurbidityMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTurbidityMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTurbidityMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTurbidityMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTurbidityMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTurbidityMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TurbidityMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRTurbidityMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TurbidityMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTurbidityMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<TurbidityMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRTurbidityMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRTurbidityMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRTurbidityMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTurbidityMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTurbidityMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTurbidityMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTurbidityMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TurbidityMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRTurbidityMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TurbidityMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTurbidityMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<TurbidityMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRTurbidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRTurbidityMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRTurbidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTurbidityMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTurbidityMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTurbidityMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCopperMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CopperMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRCopperMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CopperMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCopperMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<CopperMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRCopperMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRCopperMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRCopperMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCopperMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCopperMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCopperMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCopperMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CopperMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRCopperMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CopperMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCopperMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<CopperMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRCopperMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRCopperMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRCopperMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCopperMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCopperMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCopperMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCopperMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CopperMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRCopperMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CopperMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCopperMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRActionBlock action) :
+        MTRCallbackBridge<CopperMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRCopperMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRCopperMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRCopperMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action,
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCopperMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCopperMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCopperMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCopperMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<CopperMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRCopperMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CopperMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCopperMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<CopperMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRCopperMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRCopperMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRCopperMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCopperMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCopperMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCopperMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRLeadMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<LeadMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRLeadMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LeadMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRLeadMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<LeadMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRLeadMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRLeadMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRLeadMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLeadMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRLeadMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLeadMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRLeadMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<LeadMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRLeadMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LeadMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRLeadMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<LeadMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRLeadMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRLeadMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRLeadMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLeadMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRLeadMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLeadMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRLeadMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<LeadMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRLeadMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LeadMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRLeadMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<LeadMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRLeadMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRLeadMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRLeadMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action,
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLeadMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRLeadMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLeadMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRLeadMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<LeadMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRLeadMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LeadMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRLeadMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action) :
+        MTRCallbackBridge<LeadMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRLeadMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRLeadMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRLeadMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action,
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLeadMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRLeadMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLeadMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRManganeseMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ManganeseMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRManganeseMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ManganeseMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRManganeseMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<ManganeseMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRManganeseMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRManganeseMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRManganeseMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRManganeseMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRManganeseMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRManganeseMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRManganeseMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ManganeseMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRManganeseMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ManganeseMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRManganeseMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<ManganeseMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRManganeseMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRManganeseMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRManganeseMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRManganeseMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRManganeseMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRManganeseMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRManganeseMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ManganeseMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRManganeseMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ManganeseMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRManganeseMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<ManganeseMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRManganeseMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRManganeseMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRManganeseMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRManganeseMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRManganeseMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRManganeseMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRManganeseMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ManganeseMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRManganeseMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ManganeseMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRManganeseMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<ManganeseMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRManganeseMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRManganeseMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRManganeseMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRManganeseMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRManganeseMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRManganeseMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfateMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfateMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRSulfateMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfateMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfateMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<SulfateMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRSulfateMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRSulfateMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRSulfateMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfateMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfateMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfateMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfateMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfateMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRSulfateMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfateMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfateMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<SulfateMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRSulfateMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRSulfateMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRSulfateMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfateMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfateMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfateMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfateMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfateMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRSulfateMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfateMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfateMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRActionBlock action) :
+        MTRCallbackBridge<SulfateMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRSulfateMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRSulfateMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRSulfateMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfateMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfateMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfateMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfateMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfateMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRSulfateMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfateMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfateMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<SulfateMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRSulfateMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRSulfateMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRSulfateMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfateMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfateMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfateMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromodichloromethaneMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromodichloromethaneMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRBromodichloromethaneMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromodichloromethaneMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRBromodichloromethaneMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBromodichloromethaneMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRBromodichloromethaneMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromodichloromethaneMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromodichloromethaneMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromodichloromethaneMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromodichloromethaneMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromodichloromethaneMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRBromodichloromethaneMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromodichloromethaneMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRBromodichloromethaneMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBromodichloromethaneMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRBromodichloromethaneMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromodichloromethaneMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromodichloromethaneMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromodichloromethaneMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromodichloromethaneMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromodichloromethaneMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRBromodichloromethaneMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromodichloromethaneMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRBromodichloromethaneMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRBromodichloromethaneMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRBromodichloromethaneMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromodichloromethaneMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromodichloromethaneMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromodichloromethaneMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromodichloromethaneMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromodichloromethaneMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRBromodichloromethaneMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromodichloromethaneMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRBromodichloromethaneMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRBromodichloromethaneMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRBromodichloromethaneMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromodichloromethaneMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromodichloromethaneMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromodichloromethaneMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromoformMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromoformMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRBromoformMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromoformMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromoformMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<BromoformMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRBromoformMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBromoformMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRBromoformMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromoformMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromoformMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromoformMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromoformMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromoformMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRBromoformMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromoformMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromoformMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<BromoformMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRBromoformMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBromoformMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRBromoformMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromoformMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromoformMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromoformMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromoformMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromoformMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRBromoformMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromoformMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromoformMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<BromoformMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRBromoformMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRBromoformMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRBromoformMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromoformMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromoformMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromoformMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromoformMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BromoformMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRBromoformMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromoformMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromoformMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<BromoformMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRBromoformMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRBromoformMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRBromoformMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromoformMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromoformMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromoformMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorodibromomethaneMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorodibromomethaneMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorodibromomethaneMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorodibromomethaneMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRChlorodibromomethaneMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorodibromomethaneMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRChlorodibromomethaneMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRChlorodibromomethaneMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRChlorodibromomethaneMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorodibromomethaneMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorodibromomethaneMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorodibromomethaneMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorodibromomethaneMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorodibromomethaneMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRChlorodibromomethaneMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorodibromomethaneMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRChlorodibromomethaneMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRChlorodibromomethaneMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRChlorodibromomethaneMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorodibromomethaneMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorodibromomethaneMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorodibromomethaneMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloroformMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloroformMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRChloroformMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloroformMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloroformMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<ChloroformMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRChloroformMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRChloroformMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRChloroformMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloroformMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloroformMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloroformMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloroformMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloroformMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRChloroformMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloroformMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloroformMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<ChloroformMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRChloroformMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRChloroformMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRChloroformMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloroformMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloroformMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloroformMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloroformMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloroformMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRChloroformMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloroformMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloroformMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<ChloroformMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRChloroformMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRChloroformMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRChloroformMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloroformMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloroformMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloroformMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloroformMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloroformMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRChloroformMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloroformMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloroformMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<ChloroformMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRChloroformMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRChloroformMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRChloroformMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloroformMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloroformMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloroformMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSodiumMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SodiumMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRSodiumMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SodiumMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSodiumMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<SodiumMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRSodiumMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRSodiumMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRSodiumMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSodiumMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSodiumMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSodiumMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSodiumMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SodiumMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRSodiumMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SodiumMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSodiumMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<SodiumMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRSodiumMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRSodiumMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRSodiumMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSodiumMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSodiumMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSodiumMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSodiumMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SodiumMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRSodiumMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SodiumMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSodiumMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRActionBlock action) :
+        MTRCallbackBridge<SodiumMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRSodiumMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRSodiumMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRSodiumMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action,
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSodiumMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSodiumMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSodiumMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSodiumMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SodiumMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRSodiumMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SodiumMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSodiumMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<SodiumMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRSodiumMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRSodiumMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRSodiumMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSodiumMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSodiumMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSodiumMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM25MeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM25MeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRPM25MeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM25MeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM25MeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<PM25MeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRPM25MeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRPM25MeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRPM25MeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM25MeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM25MeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM25MeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM25MeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM25MeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRPM25MeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM25MeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM25MeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<PM25MeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRPM25MeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRPM25MeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRPM25MeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM25MeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM25MeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM25MeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM25MeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM25MeasurementEventListListAttributeCallback>
+{
+public:
+    MTRPM25MeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM25MeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM25MeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<PM25MeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRPM25MeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRPM25MeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRPM25MeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action,
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM25MeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM25MeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM25MeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM25MeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM25MeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRPM25MeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM25MeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM25MeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action) :
+        MTRCallbackBridge<PM25MeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRPM25MeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRPM25MeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRPM25MeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action,
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM25MeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM25MeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM25MeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFormaldehydeMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FormaldehydeMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRFormaldehydeMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FormaldehydeMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFormaldehydeMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<FormaldehydeMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRFormaldehydeMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRFormaldehydeMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRFormaldehydeMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFormaldehydeMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFormaldehydeMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFormaldehydeMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFormaldehydeMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FormaldehydeMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRFormaldehydeMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FormaldehydeMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFormaldehydeMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<FormaldehydeMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRFormaldehydeMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRFormaldehydeMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRFormaldehydeMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFormaldehydeMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFormaldehydeMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFormaldehydeMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFormaldehydeMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FormaldehydeMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRFormaldehydeMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FormaldehydeMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFormaldehydeMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<FormaldehydeMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRFormaldehydeMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRFormaldehydeMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRFormaldehydeMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFormaldehydeMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFormaldehydeMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFormaldehydeMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFormaldehydeMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<FormaldehydeMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRFormaldehydeMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FormaldehydeMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFormaldehydeMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<FormaldehydeMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRFormaldehydeMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRFormaldehydeMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRFormaldehydeMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFormaldehydeMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFormaldehydeMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFormaldehydeMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM1MeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM1MeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRPM1MeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM1MeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM1MeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<PM1MeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRPM1MeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRPM1MeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRPM1MeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM1MeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM1MeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM1MeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM1MeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM1MeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRPM1MeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM1MeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM1MeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<PM1MeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRPM1MeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRPM1MeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRPM1MeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM1MeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM1MeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM1MeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM1MeasurementEventListListAttributeCallbackBridge : public MTRCallbackBridge<PM1MeasurementEventListListAttributeCallback>
+{
+public:
+    MTRPM1MeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM1MeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM1MeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<PM1MeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRPM1MeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRPM1MeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRPM1MeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action,
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM1MeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM1MeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM1MeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM1MeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM1MeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRPM1MeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM1MeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM1MeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRActionBlock action) :
+        MTRCallbackBridge<PM1MeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRPM1MeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRPM1MeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRPM1MeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM1MeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM1MeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM1MeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM10MeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM10MeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRPM10MeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM10MeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM10MeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<PM10MeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRPM10MeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRPM10MeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRPM10MeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM10MeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM10MeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM10MeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM10MeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM10MeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRPM10MeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM10MeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM10MeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<PM10MeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRPM10MeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRPM10MeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRPM10MeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM10MeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM10MeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM10MeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM10MeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM10MeasurementEventListListAttributeCallback>
+{
+public:
+    MTRPM10MeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM10MeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM10MeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<PM10MeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRPM10MeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRPM10MeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRPM10MeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action,
+                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM10MeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM10MeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM10MeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM10MeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<PM10MeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRPM10MeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM10MeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM10MeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action) :
+        MTRCallbackBridge<PM10MeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRPM10MeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRPM10MeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRPM10MeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action,
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM10MeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM10MeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM10MeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                               ResponseHandler handler) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallback>(queue, handler,
+                                                                                                             OnSuccessFn){};
+
+    MTRTotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                               ResponseHandler handler,
+                                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                             OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalVolatileOrganicCompoundsMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                              ResponseHandler handler) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallback>(queue, handler,
+                                                                                                            OnSuccessFn){};
+
+    MTRTotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                              ResponseHandler handler,
+                                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                                            OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalVolatileOrganicCompoundsMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalVolatileOrganicCompoundsMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
+
+    MTRTotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRTotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalVolatileOrganicCompoundsMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRadonMeasurementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RadonMeasurementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRRadonMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RadonMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRadonMeasurementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<RadonMeasurementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRRadonMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRRadonMeasurementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRRadonMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRadonMeasurementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRadonMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRadonMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRadonMeasurementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RadonMeasurementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRRadonMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RadonMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRadonMeasurementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<RadonMeasurementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRRadonMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRRadonMeasurementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRRadonMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRadonMeasurementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRadonMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRadonMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRadonMeasurementEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RadonMeasurementEventListListAttributeCallback>
+{
+public:
+    MTRRadonMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RadonMeasurementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRadonMeasurementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                            MTRActionBlock action) :
+        MTRCallbackBridge<RadonMeasurementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRRadonMeasurementEventListListAttributeCallbackSubscriptionBridge
+    : public MTRRadonMeasurementEventListListAttributeCallbackBridge
+{
+public:
+    MTRRadonMeasurementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action,
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRadonMeasurementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRadonMeasurementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRadonMeasurementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRadonMeasurementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RadonMeasurementAttributeListListAttributeCallback>
+{
+public:
+    MTRRadonMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RadonMeasurementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRadonMeasurementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<RadonMeasurementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRRadonMeasurementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRRadonMeasurementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRRadonMeasurementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRadonMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRadonMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRadonMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18948,6 +24465,7703 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType value);
+};
+
+class MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<NullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<NullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType value);
+};
+
+class MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler) :
+        MTRCallbackBridge<NullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                          OnSuccessFn){};
+
+    MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler,
+                                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<CarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType value);
+};
+
+class MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler) :
+        MTRCallbackBridge<NullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                        OnSuccessFn){};
+
+    MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler,
+                                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<NullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                        OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonDioxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<CarbonDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType value);
+};
+
+class MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<CarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<CarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType value);
+};
+
+class MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<CarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<CarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType value);
+};
+
+class MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<NullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                       OnSuccessFn){};
+
+    MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler,
+                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<NullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                       OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::EthyleneMeasurement::LevelValueType value);
+};
+
+class MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableEthyleneMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableEthyleneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<NullableEthyleneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType value);
+};
+
+class MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType value);
+};
+
+class MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneOxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneOxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneOxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType value);
+};
+
+class MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType value);
+};
+
+class MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<EthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<EthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<EthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType value);
+};
+
+class MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<NullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                       OnSuccessFn){};
+
+    MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler,
+                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<NullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                       OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::HydrogenMeasurement::LevelValueType value);
+};
+
+class MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableHydrogenMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableHydrogenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<NullableHydrogenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType value);
+};
+
+class MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType value);
+};
+
+class MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType value);
+};
+
+class MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType value);
+};
+
+class MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler) :
+        MTRCallbackBridge<NullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                           OnSuccessFn){};
+
+    MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler,
+                                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<NullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                           OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<HydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<HydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType value);
+};
+
+class MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NitricOxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitricOxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<NitricOxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::NitricOxideMeasurement::LevelValueType value);
+};
+
+class MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType value);
+};
+
+class MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<NullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                       OnSuccessFn){};
+
+    MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler,
+                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<NullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                       OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<NitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType value);
+};
+
+class MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler) :
+        MTRCallbackBridge<NullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler,
+                                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                     OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType value);
+};
+
+class MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType value);
+};
+
+class MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler) :
+        MTRCallbackBridge<NullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                           OnSuccessFn){};
+
+    MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler,
+                                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<NullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                           OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<NitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType value);
+};
+
+class MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<OxygenMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OxygenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<OxygenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OxygenMeasurement::LevelValueType value);
+};
+
+class MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOxygenMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableOxygenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<NullableOxygenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<OxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<OxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OxygenMeasurement::MeasurementMediumType value);
+};
+
+class MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<OxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<OxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OxygenMeasurement::MeasurementUnitType value);
+};
+
+class MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<OzoneMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OzoneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<OzoneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OzoneMeasurement::LevelValueType value);
+};
+
+class MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOzoneMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableOzoneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableOzoneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<OzoneMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OzoneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<OzoneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OzoneMeasurement::MeasurementMediumType value);
+};
+
+class MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<NullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<NullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<OzoneMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OzoneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<OzoneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OzoneMeasurement::MeasurementUnitType value);
+};
+
+class MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfurDioxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfurDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<SulfurDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType value);
+};
+
+class MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<SulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<SulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType value);
+};
+
+class MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<SulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType value);
+};
+
+class MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<NullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                       OnSuccessFn){};
+
+    MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler,
+                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<NullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                       OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<DissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType value);
+};
+
+class MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<DissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType value);
+};
+
+class MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler) :
+        MTRCallbackBridge<NullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                           OnSuccessFn){};
+
+    MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler,
+                                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<NullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                           OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<DissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<DissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType value);
+};
+
+class MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<BromateMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromateMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<BromateMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::BromateMeasurement::LevelValueType value);
+};
+
+class MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableBromateMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableBromateMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<NullableBromateMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<BromateMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromateMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<BromateMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::BromateMeasurement::MeasurementMediumType value);
+};
+
+class MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<NullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<NullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<BromateMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromateMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<BromateMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::BromateMeasurement::MeasurementUnitType value);
+};
+
+class MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<NullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<NullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloraminesMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloraminesMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<ChloraminesMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChloraminesMeasurement::LevelValueType value);
+};
+
+class MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChloraminesMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableChloraminesMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableChloraminesMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<ChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType value);
+};
+
+class MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<NullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                       OnSuccessFn){};
+
+    MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler,
+                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<NullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                       OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<ChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType value);
+};
+
+class MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler) :
+        MTRCallbackBridge<NullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler,
+                                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                     OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorineMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChlorineMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<ChlorineMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChlorineMeasurement::LevelValueType value);
+};
+
+class MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChlorineMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableChlorineMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<NullableChlorineMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorineMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChlorineMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<ChlorineMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType value);
+};
+
+class MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorineMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChlorineMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<ChlorineMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType value);
+};
+
+class MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<FecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType value);
+};
+
+class MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<NullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler,
+                                                                                                       OnSuccessFn){};
+
+    MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler,
+                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<NullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                       OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<FecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
+
+    MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType value);
+};
+
+class MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                ResponseHandler handler) :
+        MTRCallbackBridge<NullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                              OnSuccessFn){};
+
+    MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                ResponseHandler handler,
+                                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<FecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<FecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType value);
+};
+
+class MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                              ResponseHandler handler) :
+        MTRCallbackBridge<NullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                            OnSuccessFn){};
+
+    MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                              ResponseHandler handler,
+                                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<NullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                            OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<FluorideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FluorideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<FluorideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FluorideMeasurement::LevelValueType value);
+};
+
+class MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFluorideMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableFluorideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<NullableFluorideMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<FluorideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FluorideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<FluorideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FluorideMeasurement::MeasurementMediumType value);
+};
+
+class MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<FluorideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FluorideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<FluorideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FluorideMeasurement::MeasurementUnitType value);
+};
+
+class MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<HaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType value);
+};
+
+class MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<HaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType value);
+};
+
+class MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler) :
+        MTRCallbackBridge<NullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                           OnSuccessFn){};
+
+    MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler,
+                                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<NullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                           OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<HaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<HaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType value);
+};
+
+class MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType value);
+};
+
+class MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                        OnSuccessFn){};
+
+    MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler,
+                                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                        OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType value);
+};
+
+class MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                  ResponseHandler handler) :
+        MTRCallbackBridge<NullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                                OnSuccessFn){};
+
+    MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                  ResponseHandler handler,
+                                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
+
+    MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<TotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType value);
+};
+
+class MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                ResponseHandler handler) :
+        MTRCallbackBridge<NullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                              OnSuccessFn){};
+
+    MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                ResponseHandler handler,
+                                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType value);
+};
+
+class MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler) :
+        MTRCallbackBridge<NullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler,
+                                                                                                          OnSuccessFn){};
+
+    MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler,
+                                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType value);
+};
+
+class MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<NullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                                 OnSuccessFn){};
+
+    MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                   ResponseHandler handler,
+                                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<NullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                       OnSuccessFn){};
+
+    MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler,
+                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<TotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                       OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType value);
+};
+
+class MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                 ResponseHandler handler) :
+        MTRCallbackBridge<NullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                               OnSuccessFn){};
+
+    MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                 ResponseHandler handler,
+                                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TurbidityMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TurbidityMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<TurbidityMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TurbidityMeasurement::LevelValueType value);
+};
+
+class MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTurbidityMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableTurbidityMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableTurbidityMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TurbidityMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TurbidityMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<TurbidityMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType value);
+};
+
+class MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler) :
+        MTRCallbackBridge<NullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler,
+                                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                     OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TurbidityMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TurbidityMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<TurbidityMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType value);
+};
+
+class MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<NullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<NullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<CopperMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CopperMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<CopperMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::CopperMeasurement::LevelValueType value);
+};
+
+class MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableCopperMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableCopperMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<NullableCopperMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<CopperMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CopperMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<CopperMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::CopperMeasurement::MeasurementMediumType value);
+};
+
+class MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<CopperMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<CopperMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<CopperMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::CopperMeasurement::MeasurementUnitType value);
+};
+
+class MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<LeadMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LeadMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<LeadMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::LeadMeasurement::LevelValueType value);
+};
+
+class MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableLeadMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableLeadMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableLeadMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<LeadMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LeadMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<LeadMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::LeadMeasurement::MeasurementMediumType value);
+};
+
+class MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<LeadMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LeadMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<LeadMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::LeadMeasurement::MeasurementUnitType value);
+};
+
+class MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ManganeseMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ManganeseMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<ManganeseMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ManganeseMeasurement::LevelValueType value);
+};
+
+class MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableManganeseMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableManganeseMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableManganeseMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ManganeseMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ManganeseMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<ManganeseMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType value);
+};
+
+class MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler) :
+        MTRCallbackBridge<NullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler,
+                                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                     OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ManganeseMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ManganeseMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<ManganeseMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType value);
+};
+
+class MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<NullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<NullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfateMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfateMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<SulfateMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SulfateMeasurement::LevelValueType value);
+};
+
+class MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSulfateMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableSulfateMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<NullableSulfateMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfateMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfateMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<SulfateMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SulfateMeasurement::MeasurementMediumType value);
+};
+
+class MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<NullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<NullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<SulfateMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SulfateMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<SulfateMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SulfateMeasurement::MeasurementUnitType value);
+};
+
+class MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<NullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<NullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<BromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType value);
+};
+
+class MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<BromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                        OnSuccessFn){};
+
+    MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler,
+                                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                        OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType value);
+};
+
+class MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                  ResponseHandler handler) :
+        MTRCallbackBridge<NullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                                OnSuccessFn){};
+
+    MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                  ResponseHandler handler,
+                                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<BromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
+
+    MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<BromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType value);
+};
+
+class MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                ResponseHandler handler) :
+        MTRCallbackBridge<NullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                              OnSuccessFn){};
+
+    MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                ResponseHandler handler,
+                                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<BromoformMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromoformMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<BromoformMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::BromoformMeasurement::LevelValueType value);
+};
+
+class MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableBromoformMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableBromoformMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableBromoformMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<BromoformMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromoformMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<BromoformMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::BromoformMeasurement::MeasurementMediumType value);
+};
+
+class MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler) :
+        MTRCallbackBridge<NullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler,
+                                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                     OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<BromoformMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BromoformMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<BromoformMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::BromoformMeasurement::MeasurementUnitType value);
+};
+
+class MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler) :
+        MTRCallbackBridge<NullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<NullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType value);
+};
+
+class MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                        OnSuccessFn){};
+
+    MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler,
+                                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                        OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType value);
+};
+
+class MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                  ResponseHandler handler) :
+        MTRCallbackBridge<NullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                                OnSuccessFn){};
+
+    MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                  ResponseHandler handler,
+                                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
+
+    MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<ChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType value);
+};
+
+class MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                ResponseHandler handler) :
+        MTRCallbackBridge<NullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                              OnSuccessFn){};
+
+    MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                ResponseHandler handler,
+                                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloroformMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloroformMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<ChloroformMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChloroformMeasurement::LevelValueType value);
+};
+
+class MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChloroformMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableChloroformMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableChloroformMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloroformMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloroformMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<ChloroformMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType value);
+};
+
+class MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<NullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
+
+    MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<NullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<ChloroformMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ChloroformMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<ChloroformMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType value);
+};
+
+class MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<SodiumMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SodiumMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<SodiumMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SodiumMeasurement::LevelValueType value);
+};
+
+class MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSodiumMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableSodiumMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<NullableSodiumMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<SodiumMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SodiumMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<SodiumMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SodiumMeasurement::MeasurementMediumType value);
+};
+
+class MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<SodiumMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SodiumMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<SodiumMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SodiumMeasurement::MeasurementUnitType value);
+};
+
+class MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<PM25MeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM25MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<PM25MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Pm25Measurement::LevelValueType value);
+};
+
+class MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePM25MeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullablePM25MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullablePM25MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::LevelValueType> & value);
+};
+
+class MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<PM25MeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM25MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<PM25MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Pm25Measurement::MeasurementMediumType value);
+};
+
+class MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::MeasurementMediumType> & value);
+};
+
+class MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<PM25MeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM25MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<PM25MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Pm25Measurement::MeasurementUnitType value);
+};
+
+class MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::MeasurementUnitType> & value);
+};
+
+class MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<FormaldehydeMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FormaldehydeMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<FormaldehydeMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FormaldehydeMeasurement::LevelValueType value);
+};
+
+class MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<NullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<NullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<FormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<FormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType value);
+};
+
+class MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler) :
+        MTRCallbackBridge<NullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                        OnSuccessFn){};
+
+    MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler,
+                                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<NullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                        OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<FormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<FormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType value);
+};
+
+class MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<NullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
+
+    MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<NullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<PM1MeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM1MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<PM1MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Pm1Measurement::LevelValueType value);
+};
+
+class MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePM1MeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullablePM1MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<NullablePM1MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::LevelValueType> & value);
+};
+
+class MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<PM1MeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM1MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<PM1MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Pm1Measurement::MeasurementMediumType value);
+};
+
+class MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::MeasurementMediumType> & value);
+};
+
+class MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<PM1MeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM1MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<PM1MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Pm1Measurement::MeasurementUnitType value);
+};
+
+class MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<NullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::MeasurementUnitType> & value);
+};
+
+class MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<PM10MeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM10MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<PM10MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Pm10Measurement::LevelValueType value);
+};
+
+class MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePM10MeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullablePM10MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullablePM10MeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::LevelValueType> & value);
+};
+
+class MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<PM10MeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM10MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<PM10MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Pm10Measurement::MeasurementMediumType value);
+};
+
+class MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::MeasurementMediumType> & value);
+};
+
+class MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<PM10MeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PM10MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<PM10MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Pm10Measurement::MeasurementUnitType value);
+};
+
+class MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::MeasurementUnitType> & value);
+};
+
+class MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler,
+                                                                                                          OnSuccessFn){};
+
+    MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler,
+                                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType value);
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<NullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler,
+                                                                                                                  OnSuccessFn){};
+
+    MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                    ResponseHandler handler,
+                                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<NullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType> &
+            value);
+};
+
+class MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler,
+                                                                                                                 OnSuccessFn){};
+
+    MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                   ResponseHandler handler,
+                                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType value);
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(
+        dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallback>(
+            queue, handler, OnSuccessFn){};
+
+    MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                           ResponseHandler handler,
+                                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType> &
+            value);
+};
+
+class MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler,
+                                                                                                               action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::
+        KeepAliveOnCallback;
+    using MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                 ResponseHandler handler) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler,
+                                                                                                               OnSuccessFn){};
+
+    MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                 ResponseHandler handler,
+                                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<TotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType value);
+};
+
+class MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<NullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallback>(
+            queue, handler, OnSuccessFn){};
+
+    MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                         ResponseHandler handler,
+                                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<NullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType> &
+            value);
+};
+
+class MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler,
+                                                                                                             action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<RadonMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RadonMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<RadonMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::RadonMeasurement::LevelValueType value);
+};
+
+class MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableRadonMeasurementClusterLevelValueTypeAttributeCallback>
+{
+public:
+    MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableRadonMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableRadonMeasurementClusterLevelValueTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::LevelValueType> & value);
+};
+
+class MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<RadonMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RadonMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<RadonMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::RadonMeasurement::MeasurementMediumType value);
+};
+
+class MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallback>
+{
+public:
+    MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<NullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<NullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::MeasurementMediumType> & value);
+};
+
+class MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<RadonMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RadonMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<RadonMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::RadonMeasurement::MeasurementUnitType value);
+};
+
+class MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallback>
+{
+public:
+    MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::MeasurementUnitType> & value);
+};
+
+class MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge
+    : public MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
+{
+public:
+    MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

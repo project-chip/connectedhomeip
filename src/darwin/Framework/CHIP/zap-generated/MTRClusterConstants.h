@@ -292,6 +292,42 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeFlowMeasurementID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000404,
     MTRClusterIDTypeRelativeHumidityMeasurementID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000405,
     MTRClusterIDTypeOccupancySensingID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000406,
+    MTRClusterIDTypeCarbonMonoxideMeasurementID MTR_NEWLY_AVAILABLE = 0x0000040C,
+    MTRClusterIDTypeCarbonDioxideMeasurementID MTR_NEWLY_AVAILABLE = 0x0000040D,
+    MTRClusterIDTypeEthyleneMeasurementID MTR_NEWLY_AVAILABLE = 0x0000040E,
+    MTRClusterIDTypeEthyleneOxideMeasurementID MTR_NEWLY_AVAILABLE = 0x0000040F,
+    MTRClusterIDTypeHydrogenMeasurementID MTR_NEWLY_AVAILABLE = 0x00000410,
+    MTRClusterIDTypeHydrogenSulfideMeasurementID MTR_NEWLY_AVAILABLE = 0x00000411,
+    MTRClusterIDTypeNitricOxideMeasurementID MTR_NEWLY_AVAILABLE = 0x00000412,
+    MTRClusterIDTypeNitrogenDioxideMeasurementID MTR_NEWLY_AVAILABLE = 0x00000413,
+    MTRClusterIDTypeOxygenMeasurementID MTR_NEWLY_AVAILABLE = 0x00000414,
+    MTRClusterIDTypeOzoneMeasurementID MTR_NEWLY_AVAILABLE = 0x00000415,
+    MTRClusterIDTypeSulfurDioxideMeasurementID MTR_NEWLY_AVAILABLE = 0x00000416,
+    MTRClusterIDTypeDissolvedOxygenMeasurementID MTR_NEWLY_AVAILABLE = 0x00000417,
+    MTRClusterIDTypeBromateMeasurementID MTR_NEWLY_AVAILABLE = 0x00000418,
+    MTRClusterIDTypeChloraminesMeasurementID MTR_NEWLY_AVAILABLE = 0x00000419,
+    MTRClusterIDTypeChlorineMeasurementID MTR_NEWLY_AVAILABLE = 0x0000041A,
+    MTRClusterIDTypeFecalColiformEColiMeasurementID MTR_NEWLY_AVAILABLE = 0x0000041B,
+    MTRClusterIDTypeFluorideMeasurementID MTR_NEWLY_AVAILABLE = 0x0000041C,
+    MTRClusterIDTypeHaloaceticAcidsMeasurementID MTR_NEWLY_AVAILABLE = 0x0000041D,
+    MTRClusterIDTypeTotalTrihalomethanesMeasurementID MTR_NEWLY_AVAILABLE = 0x0000041E,
+    MTRClusterIDTypeTotalColiformBacteriaMeasurementID MTR_NEWLY_AVAILABLE = 0x0000041F,
+    MTRClusterIDTypeTurbidityMeasurementID MTR_NEWLY_AVAILABLE = 0x00000420,
+    MTRClusterIDTypeCopperMeasurementID MTR_NEWLY_AVAILABLE = 0x00000421,
+    MTRClusterIDTypeLeadMeasurementID MTR_NEWLY_AVAILABLE = 0x00000422,
+    MTRClusterIDTypeManganeseMeasurementID MTR_NEWLY_AVAILABLE = 0x00000423,
+    MTRClusterIDTypeSulfateMeasurementID MTR_NEWLY_AVAILABLE = 0x00000424,
+    MTRClusterIDTypeBromodichloromethaneMeasurementID MTR_NEWLY_AVAILABLE = 0x00000425,
+    MTRClusterIDTypeBromoformMeasurementID MTR_NEWLY_AVAILABLE = 0x00000426,
+    MTRClusterIDTypeChlorodibromomethaneMeasurementID MTR_NEWLY_AVAILABLE = 0x00000427,
+    MTRClusterIDTypeChloroformMeasurementID MTR_NEWLY_AVAILABLE = 0x00000428,
+    MTRClusterIDTypeSodiumMeasurementID MTR_NEWLY_AVAILABLE = 0x00000429,
+    MTRClusterIDTypePM25MeasurementID MTR_NEWLY_AVAILABLE = 0x0000042A,
+    MTRClusterIDTypeFormaldehydeMeasurementID MTR_NEWLY_AVAILABLE = 0x0000042B,
+    MTRClusterIDTypePM1MeasurementID MTR_NEWLY_AVAILABLE = 0x0000042C,
+    MTRClusterIDTypePM10MeasurementID MTR_NEWLY_AVAILABLE = 0x0000042D,
+    MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID MTR_NEWLY_AVAILABLE = 0x0000042E,
+    MTRClusterIDTypeRadonMeasurementID MTR_NEWLY_AVAILABLE = 0x0000042F,
     MTRClusterIDTypeWakeOnLANID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000503,
     MTRClusterIDTypeChannelID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000504,
     MTRClusterIDTypeTargetNavigatorID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000505,
@@ -5902,6 +5938,837 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterOccupancySensingAttributeClusterRevisionID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster CarbonMonoxideMeasurement attributes
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster CarbonDioxideMeasurement attributes
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster EthyleneMeasurement attributes
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterEthyleneMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster EthyleneOxideMeasurement attributes
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster HydrogenMeasurement attributes
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterHydrogenMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster HydrogenSulfideMeasurement attributes
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster NitricOxideMeasurement attributes
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster NitrogenDioxideMeasurement attributes
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster OxygenMeasurement attributes
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterOxygenMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster OzoneMeasurement attributes
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterOzoneMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster SulfurDioxideMeasurement attributes
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster DissolvedOxygenMeasurement attributes
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster BromateMeasurement attributes
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterBromateMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ChloraminesMeasurement attributes
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterChloraminesMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ChlorineMeasurement attributes
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterChlorineMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster FecalColiformEColiMeasurement attributes
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster FluorideMeasurement attributes
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterFluorideMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster HaloaceticAcidsMeasurement attributes
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster TotalTrihalomethanesMeasurement attributes
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster TotalColiformBacteriaMeasurement attributes
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster TurbidityMeasurement attributes
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterTurbidityMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster CopperMeasurement attributes
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterCopperMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster LeadMeasurement attributes
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterLeadMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ManganeseMeasurement attributes
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterManganeseMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster SulfateMeasurement attributes
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterSulfateMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster BromodichloromethaneMeasurement attributes
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster BromoformMeasurement attributes
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterBromoformMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ChlorodibromomethaneMeasurement attributes
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ChloroformMeasurement attributes
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterChloroformMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster SodiumMeasurement attributes
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterSodiumMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster PM25Measurement attributes
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterPM25MeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster FormaldehydeMeasurement attributes
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster PM1Measurement attributes
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterPM1MeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster PM10Measurement attributes
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterPM10MeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster TotalVolatileOrganicCompoundsMeasurement attributes
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE
+    = 0x00000004,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE
+    = 0x00000005,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE
+    = 0x00000006,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster RadonMeasurement attributes
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeMinMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributePeakMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributePeakMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeAverageMeasuredValueID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeAverageMeasuredValueWindowID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeUncertaintyID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeMeasurementUnitID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeMeasurementMediumID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeLevelValueID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterRadonMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster WakeOnLan deprecated attribute names

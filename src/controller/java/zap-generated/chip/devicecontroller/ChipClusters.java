@@ -22579,6 +22579,13074 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
+  public static class CarbonMonoxideMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1036L;
+
+    public CarbonMonoxideMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class CarbonDioxideMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1037L;
+
+    public CarbonDioxideMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class EthyleneMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1038L;
+
+    public EthyleneMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class EthyleneOxideMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1039L;
+
+    public EthyleneOxideMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class HydrogenMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1040L;
+
+    public HydrogenMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class HydrogenSulfideMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1041L;
+
+    public HydrogenSulfideMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class NitricOxideMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1042L;
+
+    public NitricOxideMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class NitrogenDioxideMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1043L;
+
+    public NitrogenDioxideMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class OxygenMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1044L;
+
+    public OxygenMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class OzoneMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1045L;
+
+    public OzoneMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class SulfurDioxideMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1046L;
+
+    public SulfurDioxideMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class DissolvedOxygenMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1047L;
+
+    public DissolvedOxygenMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class BromateMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1048L;
+
+    public BromateMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class ChloraminesMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1049L;
+
+    public ChloraminesMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class ChlorineMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1050L;
+
+    public ChlorineMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class FecalColiformEColiMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1051L;
+
+    public FecalColiformEColiMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class FluorideMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1052L;
+
+    public FluorideMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class HaloaceticAcidsMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1053L;
+
+    public HaloaceticAcidsMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class TotalTrihalomethanesMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1054L;
+
+    public TotalTrihalomethanesMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class TotalColiformBacteriaMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1055L;
+
+    public TotalColiformBacteriaMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class TurbidityMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1056L;
+
+    public TurbidityMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class CopperMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1057L;
+
+    public CopperMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class LeadMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1058L;
+
+    public LeadMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class ManganeseMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1059L;
+
+    public ManganeseMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class SulfateMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1060L;
+
+    public SulfateMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class BromodichloromethaneMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1061L;
+
+    public BromodichloromethaneMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class BromoformMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1062L;
+
+    public BromoformMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class ChlorodibromomethaneMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1063L;
+
+    public ChlorodibromomethaneMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class ChloroformMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1064L;
+
+    public ChloroformMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class SodiumMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1065L;
+
+    public SodiumMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class Pm25MeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1066L;
+
+    public Pm25MeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class FormaldehydeMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1067L;
+
+    public FormaldehydeMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class Pm1MeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1068L;
+
+    public Pm1MeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class Pm10MeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1069L;
+
+    public Pm10MeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class TotalVolatileOrganicCompoundsMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1070L;
+
+    public TotalVolatileOrganicCompoundsMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
+  public static class RadonMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1071L;
+
+    public RadonMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface MeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MinMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface MaxMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PeakMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AverageMeasuredValueAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
+      readMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasuredValueAttribute(
+        MeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinMeasuredValueAttribute(MinMeasuredValueAttributeCallback callback) {
+      readMinMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinMeasuredValueAttribute(
+        MinMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxMeasuredValueAttribute(MaxMeasuredValueAttributeCallback callback) {
+      readMaxMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxMeasuredValueAttribute(
+        MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueAttribute(PeakMeasuredValueAttributeCallback callback) {
+      readPeakMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueAttribute(
+        PeakMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readPeakMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readPeakMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribePeakMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribePeakMeasuredValueWindowAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueAttribute(AverageMeasuredValueAttributeCallback callback) {
+      readAverageMeasuredValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueAttribute(
+        AverageMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAverageMeasuredValueWindowAttribute(LongAttributeCallback callback) {
+      readAverageMeasuredValueWindowAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAverageMeasuredValueWindowAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAverageMeasuredValueWindowAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUncertaintyAttribute(FloatAttributeCallback callback) {
+      readUncertaintyAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUncertaintyAttribute(
+        FloatAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUncertaintyAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementUnitAttribute(IntegerAttributeCallback callback) {
+      readMeasurementUnitAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementUnitAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMeasurementMediumAttribute(IntegerAttributeCallback callback) {
+      readMeasurementMediumAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMeasurementMediumAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMeasurementMediumAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLevelValueAttribute(IntegerAttributeCallback callback) {
+      readLevelValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLevelValueAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLevelValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readMeasuredValueAttribute(
+        long chipClusterPtr, MeasuredValueAttributeCallback callback);
+
+    private native void subscribeMeasuredValueAttribute(
+        long chipClusterPtr,
+        MeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinMeasuredValueAttribute(
+        long chipClusterPtr, MinMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMinMeasuredValueAttribute(
+        long chipClusterPtr,
+        MinMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxMeasuredValueAttribute(
+        long chipClusterPtr, MaxMeasuredValueAttributeCallback callback);
+
+    private native void subscribeMaxMeasuredValueAttribute(
+        long chipClusterPtr,
+        MaxMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueAttribute(
+        long chipClusterPtr, PeakMeasuredValueAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueAttribute(
+        long chipClusterPtr,
+        PeakMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readPeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribePeakMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAverageMeasuredValueAttribute(
+        long chipClusterPtr, AverageMeasuredValueAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueAttribute(
+        long chipClusterPtr,
+        AverageMeasuredValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeAverageMeasuredValueWindowAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void subscribeUncertaintyAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementUnitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMeasurementMediumAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLevelValueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
   public static class WakeOnLanCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1283L;
 

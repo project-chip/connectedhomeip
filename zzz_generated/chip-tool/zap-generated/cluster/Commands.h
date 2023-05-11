@@ -88,6 +88,42 @@
 | FlowMeasurement                                                     | 0x0404 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
 | OccupancySensing                                                    | 0x0406 |
+| CarbonMonoxideMeasurement                                           | 0x040C |
+| CarbonDioxideMeasurement                                            | 0x040D |
+| EthyleneMeasurement                                                 | 0x040E |
+| EthyleneOxideMeasurement                                            | 0x040F |
+| HydrogenMeasurement                                                 | 0x0410 |
+| HydrogenSulfideMeasurement                                          | 0x0411 |
+| NitricOxideMeasurement                                              | 0x0412 |
+| NitrogenDioxideMeasurement                                          | 0x0413 |
+| OxygenMeasurement                                                   | 0x0414 |
+| OzoneMeasurement                                                    | 0x0415 |
+| SulfurDioxideMeasurement                                            | 0x0416 |
+| DissolvedOxygenMeasurement                                          | 0x0417 |
+| BromateMeasurement                                                  | 0x0418 |
+| ChloraminesMeasurement                                              | 0x0419 |
+| ChlorineMeasurement                                                 | 0x041A |
+| FecalColiformEColiMeasurement                                       | 0x041B |
+| FluorideMeasurement                                                 | 0x041C |
+| HaloaceticAcidsMeasurement                                          | 0x041D |
+| TotalTrihalomethanesMeasurement                                     | 0x041E |
+| TotalColiformBacteriaMeasurement                                    | 0x041F |
+| TurbidityMeasurement                                                | 0x0420 |
+| CopperMeasurement                                                   | 0x0421 |
+| LeadMeasurement                                                     | 0x0422 |
+| ManganeseMeasurement                                                | 0x0423 |
+| SulfateMeasurement                                                  | 0x0424 |
+| BromodichloromethaneMeasurement                                     | 0x0425 |
+| BromoformMeasurement                                                | 0x0426 |
+| ChlorodibromomethaneMeasurement                                     | 0x0427 |
+| ChloroformMeasurement                                               | 0x0428 |
+| SodiumMeasurement                                                   | 0x0429 |
+| Pm25Measurement                                                     | 0x042A |
+| FormaldehydeMeasurement                                             | 0x042B |
+| Pm1Measurement                                                      | 0x042C |
+| Pm10Measurement                                                     | 0x042D |
+| TotalVolatileOrganicCompoundsMeasurement                            | 0x042E |
+| RadonMeasurement                                                    | 0x042F |
 | WakeOnLan                                                           | 0x0503 |
 | Channel                                                             | 0x0504 |
 | TargetNavigator                                                     | 0x0505 |
@@ -6102,6 +6138,978 @@ private:
 | * PhysicalContactOccupiedToUnoccupiedDelay                          | 0x0030 |
 | * PhysicalContactUnoccupiedToOccupiedDelay                          | 0x0031 |
 | * PhysicalContactUnoccupiedToOccupiedThreshold                      | 0x0032 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster CarbonMonoxideMeasurement                                   | 0x040C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster CarbonDioxideMeasurement                                    | 0x040D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster EthyleneMeasurement                                         | 0x040E |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster EthyleneOxideMeasurement                                    | 0x040F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster HydrogenMeasurement                                         | 0x0410 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster HydrogenSulfideMeasurement                                  | 0x0411 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster NitricOxideMeasurement                                      | 0x0412 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster NitrogenDioxideMeasurement                                  | 0x0413 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster OxygenMeasurement                                           | 0x0414 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster OzoneMeasurement                                            | 0x0415 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster SulfurDioxideMeasurement                                    | 0x0416 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster DissolvedOxygenMeasurement                                  | 0x0417 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster BromateMeasurement                                          | 0x0418 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ChloraminesMeasurement                                      | 0x0419 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ChlorineMeasurement                                         | 0x041A |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster FecalColiformEColiMeasurement                               | 0x041B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster FluorideMeasurement                                         | 0x041C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster HaloaceticAcidsMeasurement                                  | 0x041D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster TotalTrihalomethanesMeasurement                             | 0x041E |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster TotalColiformBacteriaMeasurement                            | 0x041F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster TurbidityMeasurement                                        | 0x0420 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster CopperMeasurement                                           | 0x0421 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster LeadMeasurement                                             | 0x0422 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ManganeseMeasurement                                        | 0x0423 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster SulfateMeasurement                                          | 0x0424 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster BromodichloromethaneMeasurement                             | 0x0425 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster BromoformMeasurement                                        | 0x0426 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ChlorodibromomethaneMeasurement                             | 0x0427 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster ChloroformMeasurement                                       | 0x0428 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster SodiumMeasurement                                           | 0x0429 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster Pm25Measurement                                             | 0x042A |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster FormaldehydeMeasurement                                     | 0x042B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster Pm1Measurement                                              | 0x042C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster Pm10Measurement                                             | 0x042D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster TotalVolatileOrganicCompoundsMeasurement                    | 0x042E |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster RadonMeasurement                                            | 0x042F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasuredValue                                                     | 0x0000 |
+| * MinMeasuredValue                                                  | 0x0001 |
+| * MaxMeasuredValue                                                  | 0x0002 |
+| * PeakMeasuredValue                                                 | 0x0003 |
+| * PeakMeasuredValueWindow                                           | 0x0004 |
+| * AverageMeasuredValue                                              | 0x0005 |
+| * AverageMeasuredValueWindow                                        | 0x0006 |
+| * Uncertainty                                                       | 0x0007 |
+| * MeasurementUnit                                                   | 0x0008 |
+| * MeasurementMedium                                                 | 0x0009 |
+| * LevelValue                                                        | 0x000A |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -14232,6 +15240,3894 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterCarbonMonoxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::CarbonMonoxideMeasurement;
+
+    const char * clusterName = "CarbonMonoxideMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterCarbonDioxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::CarbonDioxideMeasurement;
+
+    const char * clusterName = "CarbonDioxideMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterEthyleneMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::EthyleneMeasurement;
+
+    const char * clusterName = "EthyleneMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterEthyleneOxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::EthyleneOxideMeasurement;
+
+    const char * clusterName = "EthyleneOxideMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterHydrogenMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::HydrogenMeasurement;
+
+    const char * clusterName = "HydrogenMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterHydrogenSulfideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::HydrogenSulfideMeasurement;
+
+    const char * clusterName = "HydrogenSulfideMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterNitricOxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::NitricOxideMeasurement;
+
+    const char * clusterName = "NitricOxideMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterNitrogenDioxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::NitrogenDioxideMeasurement;
+
+    const char * clusterName = "NitrogenDioxideMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterOxygenMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::OxygenMeasurement;
+
+    const char * clusterName = "OxygenMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterOzoneMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::OzoneMeasurement;
+
+    const char * clusterName = "OzoneMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterSulfurDioxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::SulfurDioxideMeasurement;
+
+    const char * clusterName = "SulfurDioxideMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterDissolvedOxygenMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::DissolvedOxygenMeasurement;
+
+    const char * clusterName = "DissolvedOxygenMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterBromateMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::BromateMeasurement;
+
+    const char * clusterName = "BromateMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterChloraminesMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ChloraminesMeasurement;
+
+    const char * clusterName = "ChloraminesMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterChlorineMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ChlorineMeasurement;
+
+    const char * clusterName = "ChlorineMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterFecalColiformEColiMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::FecalColiformEColiMeasurement;
+
+    const char * clusterName = "FecalColiformEColiMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterFluorideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::FluorideMeasurement;
+
+    const char * clusterName = "FluorideMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterHaloaceticAcidsMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::HaloaceticAcidsMeasurement;
+
+    const char * clusterName = "HaloaceticAcidsMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterTotalTrihalomethanesMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::TotalTrihalomethanesMeasurement;
+
+    const char * clusterName = "TotalTrihalomethanesMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterTotalColiformBacteriaMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::TotalColiformBacteriaMeasurement;
+
+    const char * clusterName = "TotalColiformBacteriaMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterTurbidityMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::TurbidityMeasurement;
+
+    const char * clusterName = "TurbidityMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterCopperMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::CopperMeasurement;
+
+    const char * clusterName = "CopperMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterLeadMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::LeadMeasurement;
+
+    const char * clusterName = "LeadMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterManganeseMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ManganeseMeasurement;
+
+    const char * clusterName = "ManganeseMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterSulfateMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::SulfateMeasurement;
+
+    const char * clusterName = "SulfateMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterBromodichloromethaneMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::BromodichloromethaneMeasurement;
+
+    const char * clusterName = "BromodichloromethaneMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterBromoformMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::BromoformMeasurement;
+
+    const char * clusterName = "BromoformMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterChlorodibromomethaneMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ChlorodibromomethaneMeasurement;
+
+    const char * clusterName = "ChlorodibromomethaneMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterChloroformMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ChloroformMeasurement;
+
+    const char * clusterName = "ChloroformMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterSodiumMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::SodiumMeasurement;
+
+    const char * clusterName = "SodiumMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterPm25Measurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::Pm25Measurement;
+
+    const char * clusterName = "Pm25Measurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterFormaldehydeMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::FormaldehydeMeasurement;
+
+    const char * clusterName = "FormaldehydeMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterPm1Measurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::Pm1Measurement;
+
+    const char * clusterName = "Pm1Measurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterPm10Measurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::Pm10Measurement;
+
+    const char * clusterName = "Pm10Measurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterTotalVolatileOrganicCompoundsMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement;
+
+    const char * clusterName = "TotalVolatileOrganicCompoundsMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterRadonMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::RadonMeasurement;
+
+    const char * clusterName = "RadonMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "min-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MinMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "max-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::MaxMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "peak-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::PeakMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "peak-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::PeakMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<float>>>(
+            Id, "average-measured-value", -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(),
+            Attributes::AverageMeasuredValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "average-measured-value-window", 0, UINT32_MAX,
+                                              Attributes::AverageMeasuredValueWindow::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
+                                           std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
+                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::MeasurementUnitType>>(
+            Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::MeasurementMediumType>>(
+            Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::LevelValueType>>(
+            Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                           //
+        make_unique<SubscribeAttribute>(Id, "measured-value", Attributes::MeasuredValue::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "min-measured-value", Attributes::MinMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "max-measured-value", Attributes::MaxMeasuredValue::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value", Attributes::PeakMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "peak-measured-value-window", Attributes::PeakMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value", Attributes::AverageMeasuredValue::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "average-measured-value-window", Attributes::AverageMeasuredValueWindow::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "uncertainty", Attributes::Uncertainty::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "measurement-unit", Attributes::MeasurementUnit::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "measurement-medium", Attributes::MeasurementMedium::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "level-value", Attributes::LevelValue::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterWakeOnLan(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::WakeOnLan;
@@ -16351,6 +21247,42 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterFlowMeasurement(commands, credsIssuerConfig);
     registerClusterRelativeHumidityMeasurement(commands, credsIssuerConfig);
     registerClusterOccupancySensing(commands, credsIssuerConfig);
+    registerClusterCarbonMonoxideMeasurement(commands, credsIssuerConfig);
+    registerClusterCarbonDioxideMeasurement(commands, credsIssuerConfig);
+    registerClusterEthyleneMeasurement(commands, credsIssuerConfig);
+    registerClusterEthyleneOxideMeasurement(commands, credsIssuerConfig);
+    registerClusterHydrogenMeasurement(commands, credsIssuerConfig);
+    registerClusterHydrogenSulfideMeasurement(commands, credsIssuerConfig);
+    registerClusterNitricOxideMeasurement(commands, credsIssuerConfig);
+    registerClusterNitrogenDioxideMeasurement(commands, credsIssuerConfig);
+    registerClusterOxygenMeasurement(commands, credsIssuerConfig);
+    registerClusterOzoneMeasurement(commands, credsIssuerConfig);
+    registerClusterSulfurDioxideMeasurement(commands, credsIssuerConfig);
+    registerClusterDissolvedOxygenMeasurement(commands, credsIssuerConfig);
+    registerClusterBromateMeasurement(commands, credsIssuerConfig);
+    registerClusterChloraminesMeasurement(commands, credsIssuerConfig);
+    registerClusterChlorineMeasurement(commands, credsIssuerConfig);
+    registerClusterFecalColiformEColiMeasurement(commands, credsIssuerConfig);
+    registerClusterFluorideMeasurement(commands, credsIssuerConfig);
+    registerClusterHaloaceticAcidsMeasurement(commands, credsIssuerConfig);
+    registerClusterTotalTrihalomethanesMeasurement(commands, credsIssuerConfig);
+    registerClusterTotalColiformBacteriaMeasurement(commands, credsIssuerConfig);
+    registerClusterTurbidityMeasurement(commands, credsIssuerConfig);
+    registerClusterCopperMeasurement(commands, credsIssuerConfig);
+    registerClusterLeadMeasurement(commands, credsIssuerConfig);
+    registerClusterManganeseMeasurement(commands, credsIssuerConfig);
+    registerClusterSulfateMeasurement(commands, credsIssuerConfig);
+    registerClusterBromodichloromethaneMeasurement(commands, credsIssuerConfig);
+    registerClusterBromoformMeasurement(commands, credsIssuerConfig);
+    registerClusterChlorodibromomethaneMeasurement(commands, credsIssuerConfig);
+    registerClusterChloroformMeasurement(commands, credsIssuerConfig);
+    registerClusterSodiumMeasurement(commands, credsIssuerConfig);
+    registerClusterPm25Measurement(commands, credsIssuerConfig);
+    registerClusterFormaldehydeMeasurement(commands, credsIssuerConfig);
+    registerClusterPm1Measurement(commands, credsIssuerConfig);
+    registerClusterPm10Measurement(commands, credsIssuerConfig);
+    registerClusterTotalVolatileOrganicCompoundsMeasurement(commands, credsIssuerConfig);
+    registerClusterRadonMeasurement(commands, credsIssuerConfig);
     registerClusterWakeOnLan(commands, credsIssuerConfig);
     registerClusterChannel(commands, credsIssuerConfig);
     registerClusterTargetNavigator(commands, credsIssuerConfig);
