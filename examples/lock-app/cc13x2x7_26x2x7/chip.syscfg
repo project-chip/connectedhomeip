@@ -133,8 +133,8 @@ UART1.$name         = "CONFIG_UART_DEBUG";
 
 /* TRNG */
 TRNG1.$name     = "CONFIG_TRNG_0";
-TRNG2.$name     = "CONFIG_TRNG_1";
-TRNG3.$name     = "CONFIG_TRNG_APP";
+TRNG2.$name     = "CONFIG_TRNG_APP";
+TRNG3.$name     = "CONFIG_TRNG_THREAD";
 
 RTOS.name = "FreeRTOS";
 
