@@ -135,7 +135,8 @@ def _GetInDevelopmentTests() -> Set[str]:
     """
     return {
         "Test_AddNewFabricFromExistingFabric.yaml",     # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
-        "TestClientMonitoringCluster.yaml"  # Client Monitoring Tests need a rework after the XML update
+        "TestClientMonitoringCluster.yaml",  # Client Monitoring Tests need a rework after the XML update
+        "Test_TC_TIMESYNC_1_1.yaml"  # Time sync SDK is not yet ready
     }
 
 
