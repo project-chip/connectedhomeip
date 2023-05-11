@@ -21,7 +21,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring HEPA filters in a device</description>
     <code>0x0071</code>
-    <define>HEPA_FILTER_MONITORING</define>
+    <define>HEPA_FILTER_MONITORING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
@@ -42,7 +42,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring activated carbon filters in a device</description>
     <code>0x0072</code>
-    <define>ACTIVATED_CARBON_FILTER_MONITORING</define>
+    <define>ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
@@ -63,7 +63,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring ceramic filters in a device</description>
     <code>0x0073</code>
-    <define>CERAMIC_FILTER_MONITORING</define>
+    <define>CERAMIC_FILTER_MONITORING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
@@ -105,7 +105,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring UV filters in a device</description>
     <code>0x0075</code>
-    <define>UV_FILTER_MONITORING</define>
+    <define>UV_FILTER_MONITORING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
@@ -126,7 +126,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring ionizing filters in a device</description>
     <code>0x0076</code>
-    <define>IONIZING_FILTER_MONITORING</define>
+    <define>IONIZING_FILTER_MONITORING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
@@ -168,7 +168,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring ozone filters in a device</description>
     <code>0x0078</code>
-    <define>OZONE_FILTER_MONITORING</define>
+    <define>OZONE_FILTER_MONITORING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
@@ -189,7 +189,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring water tanks in a device</description>
     <code>0x0079</code>
-    <define>WATER_TANK_MONITORING</define>
+    <define>WATER_TANK_MONITORING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
@@ -210,7 +210,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring fuel tanks in a device</description>
     <code>0x007A</code>
-    <define>FUEL_TANK_MONITORING</define>
+    <define>FUEL_TANK_MONITORING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
@@ -231,7 +231,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring ink cartridges in a device</description>
     <code>0x007B</code>
-    <define>INK_CARTRIDGE_MONITORING</define>
+    <define>INK_CARTRIDGE_MONITORING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
@@ -252,7 +252,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for monitoring toner cartridges in a device</description>
     <code>0x007C</code>
-    <define>TONER_CARTRIDGE_MONITORING</define>
+    <define>TONER_CARTRIDGE_MONITORING_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
