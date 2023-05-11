@@ -120,11 +120,6 @@ EventGroupHandle_t  sEventGroup;
 
 TimerHandle_t connectionTimeout;
 
-/* keep the device ID of the connected peer */
-uint8_t gDeviceId;
-bool gDeviceSubscribed = false;
-bool gDeviceConnected  = false;
-
 const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xF6, 0xFF };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -215,7 +210,7 @@ exit:
 
 uint16_t BLEManagerCommon::_NumConnections(void)
 {
-    return static_cast<uint16_t>(gDeviceConnected == true);
+    return static_cast<uint16_t>(mDeviceConnected == true);
 }
 
 bool BLEManagerCommon::_IsAdvertisingEnabled(void)
@@ -784,7 +779,7 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
         mFlags.Clear(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
-        if(!gDeviceSubscribed)
+        if(!mDeviceConnected)
         {
             ble_err_t err = blekw_stop_advertising();
             VerifyOrReturnError(err == BLE_OK, CHIP_ERROR_INCORRECT_STATE);
@@ -864,12 +859,10 @@ void BLEManagerCommon::DoBleProcessing(void)
         }
         else if (msg->type == BLE_KW_MSG_CONNECTED)
         {
-            gDeviceConnected = true;
             sImplInstance->HandleConnectEvent(msg);
         }
         else if (msg->type == BLE_KW_MSG_DISCONNECTED)
         {
-            gDeviceConnected = false;
             sImplInstance->HandleConnectionCloseEvent(msg);
         }
         else if (msg->type == BLE_KW_MSG_MTU_CHANGED)
@@ -892,13 +885,7 @@ void BLEManagerCommon::DoBleProcessing(void)
         }
         else if (msg->type == BLE_KW_MSG_FORCE_DISCONNECT)
         {
-            ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
-
-            /* Set the advertising parameters */
-            if (Gap_Disconnect(gDeviceId) != gBleSuccess_c)
-            {
-                ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
-            }
+            sImplInstance->HandleForceDisconnect();
         }
 
         /* Free the message from the queue */
@@ -918,7 +905,8 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 #endif
 #endif
 
-    gDeviceId = deviceId;
+    mDeviceId = deviceId;
+    mDeviceConnected = true;
 
     blekw_start_connection_timeout();
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -934,6 +922,8 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
     PWR_AllowDeviceToSleep();
 #endif
 #endif
+
+    mDeviceConnected = false;
 
     ChipDeviceEvent event;
     event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
@@ -993,9 +983,9 @@ void BLEManagerCommon::HandleTXCharCCCDWrite(blekw_msg_t * msg)
 
     if (*att_wr_data->data)
     {
-        if (!gDeviceSubscribed)
+        if (!mDeviceSubscribed)
         {
-            gDeviceSubscribed             = true;
+            mDeviceSubscribed             = true;
             event.Type                    = DeviceEventType::kCHIPoBLESubscribe;
             event.CHIPoBLESubscribe.ConId = att_wr_data->device_id;
             err                           = PlatformMgr().PostEvent(&event);
@@ -1003,7 +993,7 @@ void BLEManagerCommon::HandleTXCharCCCDWrite(blekw_msg_t * msg)
     }
     else
     {
-        gDeviceSubscribed             = false;
+        mDeviceSubscribed             = false;
         event.Type                    = DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = att_wr_data->device_id;
         err                           = PlatformMgr().PostEvent(&event);
@@ -1050,6 +1040,18 @@ exit:
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
     }
 }
+
+void BLEManagerCommon::HandleForceDisconnect()
+{
+    ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
+
+    /* Set the advertising parameters */
+    if (Gap_Disconnect(mDeviceId) != gBleSuccess_c)
+    {
+        ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
+    }
+}
+
 /*******************************************************************************
  * BLE stack callbacks
  *******************************************************************************/

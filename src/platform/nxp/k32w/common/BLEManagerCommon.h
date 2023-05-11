@@ -174,6 +174,9 @@ protected:
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     chip::System::PacketBufferHandle c3AdditionalDataBufferHandle;
 #endif
+    uint8_t mDeviceId;
+    bool mDeviceSubscribed = false;
+    bool mDeviceConnected  = false;
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertising(void);
@@ -186,6 +189,7 @@ protected:
     void HandleWriteEvent(blekw_msg_t * msg);
     void HandleRXCharWrite(blekw_msg_t * msg);
     void HandleTXCharCCCDWrite(blekw_msg_t * msg);
+    void HandleForceDisconnect();
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     CHIP_ERROR EncodeAdditionalDataTlv();
