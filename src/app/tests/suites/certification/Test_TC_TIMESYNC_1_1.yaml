@@ -44,7 +44,9 @@ tests:
     # TS 3: Feature map
     ##########################
     # TZ
-    - label: "TS3: Given TIMESYNC.S.F00(TZ) ensure featuremap has the correct bit set"
+    - label:
+          "TS3: Given TIMESYNC.S.F00(TZ) ensure featuremap has the correct bit
+          set"
       PICS: TIMESYNC.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -53,7 +55,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "TS3: Given !TIMESYNC.S.F00(TZ) ensure featuremap has the correct bit clear"
+    - label:
+          "TS3: Given !TIMESYNC.S.F00(TZ) ensure featuremap has the correct bit
+          clear"
       PICS: "!TIMESYNC.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -62,7 +66,9 @@ tests:
               type: bitmap32
               hasMasksClear: [0x1]
     # NTPC
-    - label: "TS3: Given TIMESYNC.S.F01(NTPC) ensure featuremap has the correct bit set"
+    - label:
+          "TS3: Given TIMESYNC.S.F01(NTPC) ensure featuremap has the correct bit
+          set"
       PICS: TIMESYNC.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -71,7 +77,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "TS3: Given !TIMESYNC.S.F01(NTPC) ensure featuremap has the correct bit clear"
+    - label:
+          "TS3: Given !TIMESYNC.S.F01(NTPC) ensure featuremap has the correct
+          bit clear"
       PICS: "!TIMESYNC.S.F01"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -81,7 +89,9 @@ tests:
               hasMasksClear: [0x2]
 
     # NTPS
-    - label: "TS3: Given TIMESYNC.S.F02(NTPS) ensure featuremap has the correct bit set"
+    - label:
+          "TS3: Given TIMESYNC.S.F02(NTPS) ensure featuremap has the correct bit
+          set"
       PICS: TIMESYNC.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -90,7 +100,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x4]
 
-    - label: "TS3: Given !TIMESYNC.S.F02(NTPS) ensure featuremap has the correct bit clear"
+    - label:
+          "TS3: Given !TIMESYNC.S.F02(NTPS) ensure featuremap has the correct
+          bit clear"
       PICS: "!TIMESYNC.S.F02"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -100,7 +112,9 @@ tests:
               hasMasksClear: [0x4]
 
     # TSC
-    - label: "TS3: Given TIMESYNC.S.F03(TSC) ensure featuremap has the correct bit set"
+    - label:
+          "TS3: Given TIMESYNC.S.F03(TSC) ensure featuremap has the correct bit
+          set"
       PICS: TIMESYNC.S.F03
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -109,7 +123,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x8]
 
-    - label: "TS3: Given !TIMESYNC.S.F03(TSC) ensure featuremap has the correct bit clear"
+    - label:
+          "TS3: Given !TIMESYNC.S.F03(TSC) ensure featuremap has the correct bit
+          clear"
       PICS: "!TIMESYNC.S.F03"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -288,7 +304,8 @@ tests:
           constraints:
               contains: [0x02, 0x04]
 
-    - label: "TS6: Check for TZ feature-based commands in not AcceptedCommandList"
+    - label:
+          "TS6: Check for TZ feature-based commands in not AcceptedCommandList"
       PICS: "!TIMESYNC.S.F00"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -305,7 +322,8 @@ tests:
           constraints:
               contains: [0x05]
 
-    - label: "TS6: Check for NTPC feature-based commands in not AcceptedCommandList"
+    - label:
+          "TS6: Check for NTPC feature-based commands in not AcceptedCommandList"
       PICS: "!TIMESYNC.S.F01"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -322,7 +340,8 @@ tests:
           constraints:
               contains: [0x01]
 
-    - label: "TS6: Check for TSC feature-based commands in not AcceptedCommandList"
+    - label:
+          "TS6: Check for TSC feature-based commands in not AcceptedCommandList"
       PICS: "!TIMESYNC.S.F03"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -344,7 +363,8 @@ tests:
           constraints:
               contains: [0x03]
 
-    - label: "TS6: Check for TZ feature-based commands in not AcceptedCommandList"
+    - label:
+          "TS6: Check for TZ feature-based commands in not AcceptedCommandList"
       PICS: "!TIMESYNC.S.F00"
       command: "readAttribute"
       attribute: "GeneratedCommandList"

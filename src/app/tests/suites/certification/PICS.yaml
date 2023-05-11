@@ -7290,11 +7290,13 @@ PICS:
 
     # Time Synchronization Cluster Test Plan
     - label:
-          "Does the device implement the Time Synchronization cluster as a server?"
+          "Does the device implement the Time Synchronization cluster as a
+          server?"
       id: TIMESYNC.S
 
     - label:
-          "Does the device implement the Time Synchronization cluster as a client?"
+          "Does the device implement the Time Synchronization cluster as a
+          client?"
       id: TIMESYNC.C
 
     #
@@ -7360,7 +7362,8 @@ PICS:
     - label: "Does the device implement receiving the SetUTCTime command?"
       id: TIMESYNC.S.C00.Rsp
 
-    - label: "Does the device implement receiving the SetTrustedTimeSource command?"
+    - label:
+          "Does the device implement receiving the SetTrustedTimeSource command?"
       id: TIMESYNC.S.C01.Rsp
 
     - label: "Does the device implement receiving the SetTimeZone command?"
