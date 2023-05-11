@@ -2396,6 +2396,105 @@ public class ClusterWriteMapping {
         "writePhysicalContactUnoccupiedToOccupiedThresholdAttribute",
         writeOccupancySensingPhysicalContactUnoccupiedToOccupiedThresholdAttributeInteractionInfo);
     writeAttributeMap.put("occupancySensing", writeOccupancySensingInteractionInfo);
+    Map<String, InteractionInfo> writeCarbonMonoxideMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "carbonMonoxideMeasurement", writeCarbonMonoxideMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeCarbonDioxideMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("carbonDioxideMeasurement", writeCarbonDioxideMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeEthyleneMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("ethyleneMeasurement", writeEthyleneMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeEthyleneOxideMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("ethyleneOxideMeasurement", writeEthyleneOxideMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeHydrogenMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("hydrogenMeasurement", writeHydrogenMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeHydrogenSulfideMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "hydrogenSulfideMeasurement", writeHydrogenSulfideMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeNitricOxideMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("nitricOxideMeasurement", writeNitricOxideMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeNitrogenDioxideMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "nitrogenDioxideMeasurement", writeNitrogenDioxideMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeOxygenMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("oxygenMeasurement", writeOxygenMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeOzoneMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("ozoneMeasurement", writeOzoneMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeSulfurDioxideMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("sulfurDioxideMeasurement", writeSulfurDioxideMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeDissolvedOxygenMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "dissolvedOxygenMeasurement", writeDissolvedOxygenMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeBromateMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("bromateMeasurement", writeBromateMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeChloraminesMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("chloraminesMeasurement", writeChloraminesMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeChlorineMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("chlorineMeasurement", writeChlorineMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeFecalColiformEColiMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "fecalColiformEColiMeasurement", writeFecalColiformEColiMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeFluorideMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("fluorideMeasurement", writeFluorideMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeHaloaceticAcidsMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "haloaceticAcidsMeasurement", writeHaloaceticAcidsMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeTotalTrihalomethanesMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "totalTrihalomethanesMeasurement", writeTotalTrihalomethanesMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeTotalColiformBacteriaMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "totalColiformBacteriaMeasurement", writeTotalColiformBacteriaMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeTurbidityMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("turbidityMeasurement", writeTurbidityMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeCopperMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("copperMeasurement", writeCopperMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeLeadMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("leadMeasurement", writeLeadMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeManganeseMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("manganeseMeasurement", writeManganeseMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeSulfateMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("sulfateMeasurement", writeSulfateMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeBromodichloromethaneMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "bromodichloromethaneMeasurement", writeBromodichloromethaneMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeBromoformMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("bromoformMeasurement", writeBromoformMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeChlorodibromomethaneMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "chlorodibromomethaneMeasurement", writeChlorodibromomethaneMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeChloroformMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("chloroformMeasurement", writeChloroformMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeSodiumMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("sodiumMeasurement", writeSodiumMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writePm25MeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("pm25Measurement", writePm25MeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeFormaldehydeMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("formaldehydeMeasurement", writeFormaldehydeMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writePm1MeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("pm1Measurement", writePm1MeasurementInteractionInfo);
+    Map<String, InteractionInfo> writePm10MeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("pm10Measurement", writePm10MeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeTotalVolatileOrganicCompoundsMeasurementInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "totalVolatileOrganicCompoundsMeasurement",
+        writeTotalVolatileOrganicCompoundsMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeRadonMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("radonMeasurement", writeRadonMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeWakeOnLanInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wakeOnLan", writeWakeOnLanInteractionInfo);
     Map<String, InteractionInfo> writeChannelInteractionInfo = new LinkedHashMap<>();
