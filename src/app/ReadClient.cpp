@@ -248,7 +248,6 @@ CHIP_ERROR ReadClient::SendRequest(ReadPrepareParams & aReadPrepareParams)
 
 CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 {
-    // TODO: SendRequest parameter is too long, need to have the structure to represent it
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogDetail(DataManagement, "%s ReadClient[%p]: Sending Read Request", __func__, this);
