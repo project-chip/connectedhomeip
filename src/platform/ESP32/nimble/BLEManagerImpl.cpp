@@ -1653,6 +1653,7 @@ void BLEManagerImpl::OnDeviceScanned(const struct ble_hs_adv_fields & fields, co
     {
         if (!mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator()))
         {
+            printf("Discriminator didi not match \n");
             return;
         }
         ChipLogProgress(Ble, "Device Discriminator match. Attempting to connect");
@@ -1667,7 +1668,10 @@ void BLEManagerImpl::OnDeviceScanned(const struct ble_hs_adv_fields & fields, co
     }
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kConnectTimeout), HandleConnectTimeout, nullptr);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
     mDeviceScanner.StopScan();
 
     ConnectDevice(addr, kConnectTimeout);
