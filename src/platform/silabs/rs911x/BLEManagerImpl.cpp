@@ -31,7 +31,7 @@
 #ifndef SIWX_917
 #include "rail.h"
 #endif
-
+#include <crypto/RandUtils.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,6 +60,8 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
+#define RSI_BLE_ADDR_MAX_LENGTH 6
+
 extern uint16_t rsi_ble_measurement_hndl;
 extern rsi_ble_event_conn_status_t conn_event_to_app;
 extern sl_wfx_msg_t event_msg;
@@ -75,22 +77,21 @@ using namespace ::chip;
 using namespace ::chip::Ble;
 using namespace ::chip::DeviceLayer::Internal;
 
-void sl_get_bluethooth_addr(uint8_t *addr)
+void sl_get_bluethooth_addr(uint8_t *addr, uint8_t length)
 {
-	uint8_t length = 6;
-		SILABS_LOG("Address:: ");
+	uint16_t randNumber = chip::Crypto::GetRandU16();
+	srand(randNumber);
 	while( length > 0) {
-		*(addr+length) = std::rand() % 255;
-		SILABS_LOG("%d ", *(addr+length));
+		int value = std::rand();
+		*(addr+length) = value % 255;
 		length--;
 	}
-	SILABS_LOG("END:: ");
 }
 
 void sl_ble_init()
 {
 
-    uint8_t addr[8] = { 0 };
+    uint8_t addr[RSI_BLE_ADDR_MAX_LENGTH] = { 0 };
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
@@ -106,7 +107,7 @@ void sl_ble_init()
 
     //  initializing the application events map
     rsi_ble_app_init_events();
-    sl_get_bluethooth_addr(addr);
+    sl_get_bluethooth_addr(addr, RSI_BLE_ADDR_MAX_LENGTH);
     rsi_ble_set_random_address_with_value(addr);
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
