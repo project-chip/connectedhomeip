@@ -2548,7 +2548,7 @@ client cluster AirQuality = 91 {
     kExtremelyPoor = 6;
   }
 
-  bitmap AirQualityFeature : BITMAP32 {
+  bitmap Features : BITMAP32 {
     kFair = 0x1;
     kModerate = 0x2;
     kVeryPoor = 0x4;

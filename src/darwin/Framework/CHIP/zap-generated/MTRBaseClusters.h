@@ -20247,11 +20247,11 @@ typedef NS_ENUM(uint8_t, MTRAirQuality) {
     MTRAirQualityExtremelyPoor MTR_NEWLY_AVAILABLE = 0x06,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRAirQualityFeature) {
-    MTRAirQualityFeatureFair MTR_NEWLY_AVAILABLE = 0x1,
-    MTRAirQualityFeatureModerate MTR_NEWLY_AVAILABLE = 0x2,
-    MTRAirQualityFeatureVeryPoor MTR_NEWLY_AVAILABLE = 0x4,
-    MTRAirQualityFeatureExtremelyPoor MTR_NEWLY_AVAILABLE = 0x8,
+typedef NS_OPTIONS(uint32_t, MTRAirQualityFeatures) {
+    MTRAirQualityFeaturesFair MTR_NEWLY_AVAILABLE = 0x1,
+    MTRAirQualityFeaturesModerate MTR_NEWLY_AVAILABLE = 0x2,
+    MTRAirQualityFeaturesVeryPoor MTR_NEWLY_AVAILABLE = 0x4,
+    MTRAirQualityFeaturesExtremelyPoor MTR_NEWLY_AVAILABLE = 0x8,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockAlarmCode) {
