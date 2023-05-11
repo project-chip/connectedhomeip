@@ -202,6 +202,31 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
+@interface MTRBaseClusterTemperatureControl ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
+@interface MTRBaseClusterRefrigeratorAlarm ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
+@interface MTRBaseClusterDishwasherOperationalState ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
+@interface MTRBaseClusterOperationalState ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
+@interface MTRBaseClusterRoboticVacuumOperationalState ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
 @interface MTRBaseClusterDoorLock ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;

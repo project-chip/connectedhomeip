@@ -361,6 +361,46 @@ void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Temperature Control Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTemperatureControlClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Refrigerator Alarm Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfRefrigeratorAlarmClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Operational State Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Operational State Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Robotic Vacuum Operational State Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfRoboticVacuumOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Door Lock Cluster Init
  *
  * Cluster Init
@@ -3771,6 +3811,391 @@ void emberAfModeSelectClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+// Temperature Control Cluster
+//
+
+/** @brief Temperature Control Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTemperatureControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Temperature Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTemperatureControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Temperature Control Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTemperatureControlClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Temperature Control Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTemperatureControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Temperature Control Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTemperatureControlClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Temperature Control Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTemperatureControlClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Temperature Control Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTemperatureControlClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Temperature Control Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTemperatureControlClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Refrigerator Alarm Cluster
+//
+
+/** @brief Refrigerator Alarm Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfRefrigeratorAlarmClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Refrigerator Alarm Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterRefrigeratorAlarmClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Refrigerator Alarm Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfRefrigeratorAlarmClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Refrigerator Alarm Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterRefrigeratorAlarmClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Refrigerator Alarm Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterRefrigeratorAlarmClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Refrigerator Alarm Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterRefrigeratorAlarmClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Refrigerator Alarm Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfRefrigeratorAlarmClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Refrigerator Alarm Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfRefrigeratorAlarmClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Dishwasher Operational State Cluster
+//
+
+/** @brief Dishwasher Operational State Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherOperationalStateClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Operational State Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDishwasherOperationalStateClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Operational State Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherOperationalStateClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Operational State Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterDishwasherOperationalStateClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Dishwasher Operational State Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterDishwasherOperationalStateClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Dishwasher Operational State Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterDishwasherOperationalStateClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Dishwasher Operational State Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDishwasherOperationalStateClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Operational State Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDishwasherOperationalStateClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Operational State Cluster
+//
+
+/** @brief Operational State Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOperationalStateClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Operational State Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOperationalStateClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Operational State Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOperationalStateClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Operational State Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterOperationalStateClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Operational State Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterOperationalStateClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Operational State Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterOperationalStateClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Operational State Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOperationalStateClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Operational State Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOperationalStateClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Robotic Vacuum Operational State Cluster
+//
+
+/** @brief Robotic Vacuum Operational State Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfRoboticVacuumOperationalStateClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Robotic Vacuum Operational State Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterRoboticVacuumOperationalStateClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Robotic Vacuum Operational State Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfRoboticVacuumOperationalStateClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Robotic Vacuum Operational State Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterRoboticVacuumOperationalStateClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Robotic Vacuum Operational State Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterRoboticVacuumOperationalStateClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Robotic Vacuum Operational State Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterRoboticVacuumOperationalStateClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Robotic Vacuum Operational State Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfRoboticVacuumOperationalStateClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Robotic Vacuum Operational State Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfRoboticVacuumOperationalStateClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
 // Door Lock Cluster
 //
 
@@ -6650,6 +7075,90 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
 bool emberAfModeSelectClusterChangeToModeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::DecodableType & commandData);
+/**
+ * @brief Temperature Control Cluster SetTemperature Command callback (from client)
+ */
+bool emberAfTemperatureControlClusterSetTemperatureCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TemperatureControl::Commands::SetTemperature::DecodableType & commandData);
+/**
+ * @brief Refrigerator Alarm Cluster Reset Command callback (from client)
+ */
+bool emberAfRefrigeratorAlarmClusterResetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::DecodableType & commandData);
+/**
+ * @brief Dishwasher Operational State Cluster Pause Command callback (from client)
+ */
+bool emberAfDishwasherOperationalStateClusterPauseCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherOperationalState::Commands::Pause::DecodableType & commandData);
+/**
+ * @brief Dishwasher Operational State Cluster Stop Command callback (from client)
+ */
+bool emberAfDishwasherOperationalStateClusterStopCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherOperationalState::Commands::Stop::DecodableType & commandData);
+/**
+ * @brief Dishwasher Operational State Cluster Start Command callback (from client)
+ */
+bool emberAfDishwasherOperationalStateClusterStartCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherOperationalState::Commands::Start::DecodableType & commandData);
+/**
+ * @brief Dishwasher Operational State Cluster Resume Command callback (from client)
+ */
+bool emberAfDishwasherOperationalStateClusterResumeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherOperationalState::Commands::Resume::DecodableType & commandData);
+/**
+ * @brief Operational State Cluster Pause Command callback (from client)
+ */
+bool emberAfOperationalStateClusterPauseCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalState::Commands::Pause::DecodableType & commandData);
+/**
+ * @brief Operational State Cluster Stop Command callback (from client)
+ */
+bool emberAfOperationalStateClusterStopCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalState::Commands::Stop::DecodableType & commandData);
+/**
+ * @brief Operational State Cluster Start Command callback (from client)
+ */
+bool emberAfOperationalStateClusterStartCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalState::Commands::Start::DecodableType & commandData);
+/**
+ * @brief Operational State Cluster Resume Command callback (from client)
+ */
+bool emberAfOperationalStateClusterResumeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalState::Commands::Resume::DecodableType & commandData);
+/**
+ * @brief Robotic Vacuum Operational State Cluster Pause Command callback (from client)
+ */
+bool emberAfRoboticVacuumOperationalStateClusterPauseCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RoboticVacuumOperationalState::Commands::Pause::DecodableType & commandData);
+/**
+ * @brief Robotic Vacuum Operational State Cluster Stop Command callback (from client)
+ */
+bool emberAfRoboticVacuumOperationalStateClusterStopCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RoboticVacuumOperationalState::Commands::Stop::DecodableType & commandData);
+/**
+ * @brief Robotic Vacuum Operational State Cluster Start Command callback (from client)
+ */
+bool emberAfRoboticVacuumOperationalStateClusterStartCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RoboticVacuumOperationalState::Commands::Start::DecodableType & commandData);
+/**
+ * @brief Robotic Vacuum Operational State Cluster Resume Command callback (from client)
+ */
+bool emberAfRoboticVacuumOperationalStateClusterResumeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RoboticVacuumOperationalState::Commands::Resume::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */

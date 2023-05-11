@@ -619,6 +619,104 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace ModeSelect
 
+namespace TemperatureControl {
+namespace Commands {
+
+namespace SetTemperature {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetTemperature
+
+} // namespace Commands
+} // namespace TemperatureControl
+
+namespace RefrigeratorAlarm {
+namespace Commands {
+
+namespace Reset {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Reset
+
+} // namespace Commands
+} // namespace RefrigeratorAlarm
+
+namespace DishwasherOperationalState {
+namespace Commands {
+
+namespace Pause {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Pause
+
+namespace Stop {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Stop
+
+namespace Start {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Start
+
+namespace Resume {
+static constexpr CommandId Id = 0x00000003;
+} // namespace Resume
+
+namespace OperationalCommandResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace OperationalCommandResponse
+
+} // namespace Commands
+} // namespace DishwasherOperationalState
+
+namespace OperationalState {
+namespace Commands {
+
+namespace Pause {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Pause
+
+namespace Stop {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Stop
+
+namespace Start {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Start
+
+namespace Resume {
+static constexpr CommandId Id = 0x00000003;
+} // namespace Resume
+
+namespace OperationalCommandResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace OperationalCommandResponse
+
+} // namespace Commands
+} // namespace OperationalState
+
+namespace RoboticVacuumOperationalState {
+namespace Commands {
+
+namespace Pause {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Pause
+
+namespace Stop {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Stop
+
+namespace Start {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Start
+
+namespace Resume {
+static constexpr CommandId Id = 0x00000003;
+} // namespace Resume
+
+namespace OperationalCommandResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace OperationalCommandResponse
+
+} // namespace Commands
+} // namespace RoboticVacuumOperationalState
+
 namespace DoorLock {
 namespace Commands {
 

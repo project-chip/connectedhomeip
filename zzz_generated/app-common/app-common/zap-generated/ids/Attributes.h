@@ -2405,6 +2405,264 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ModeSelect
 
+namespace TemperatureControl {
+namespace Attributes {
+
+namespace TemperatureSetpoint {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureSetpoint
+
+namespace MinTemperature {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MinTemperature
+
+namespace MaxTemperature {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxTemperature
+
+namespace Step {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Step
+
+namespace CurrentTemperatureLevelIndex {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace CurrentTemperatureLevelIndex
+
+namespace SupportedTemperatureLevels {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace SupportedTemperatureLevels
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TemperatureControl
+
+namespace RefrigeratorAlarm {
+namespace Attributes {
+
+namespace Mask {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Mask
+
+namespace Latch {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Latch
+
+namespace State {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace State
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace RefrigeratorAlarm
+
+namespace DishwasherOperationalState {
+namespace Attributes {
+
+namespace PhaseList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace PhaseList
+
+namespace CurrentPhase {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentPhase
+
+namespace CountdownTime {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CountdownTime
+
+namespace OperationalStateList {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OperationalStateList
+
+namespace OperationalState {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace OperationalState
+
+namespace OperationalError {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace OperationalError
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace DishwasherOperationalState
+
+namespace OperationalState {
+namespace Attributes {
+
+namespace PhaseList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace PhaseList
+
+namespace CurrentPhase {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentPhase
+
+namespace CountdownTime {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CountdownTime
+
+namespace OperationalStateList {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OperationalStateList
+
+namespace OperationalState {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace OperationalState
+
+namespace OperationalError {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace OperationalError
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace OperationalState
+
+namespace RoboticVacuumOperationalState {
+namespace Attributes {
+
+namespace PhaseList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace PhaseList
+
+namespace CurrentPhase {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentPhase
+
+namespace CountdownTime {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CountdownTime
+
+namespace OperationalStateList {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OperationalStateList
+
+namespace OperationalState {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace OperationalState
+
+namespace OperationalError {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace OperationalError
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace RoboticVacuumOperationalState
+
 namespace DoorLock {
 namespace Attributes {
 

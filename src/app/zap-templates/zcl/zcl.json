@@ -151,14 +151,12 @@
             "CapabilityMinima",
             "ProductAppearance"
         ],
-<<<<<<< HEAD
-        "Bridged Device Basic Information": ["ProductAppearance"],
-        "Descriptor": ["ClusterRevision"],
-=======
+        "Bridged Device Basic Information": [
+            "ProductAppearance"
+        ],
         "Descriptor": [
             "ClusterRevision"
         ],
->>>>>>> 808ef74ffd6a11aae5538299d734169d0ff79e8e
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -287,10 +285,19 @@
             "CurrentMaxRate",
             "OverrunCount"
         ],
-        "Channel": ["Lineup", "CurrentChannel"],
-        "Media Playback": ["SampledPosition"],
-        "Application Launcher": ["CurrentApp"],
-        "Application Basic": ["Application"],
+        "Channel": [
+            "Lineup",
+            "CurrentChannel"
+        ],
+        "Media Playback": [
+            "SampledPosition"
+        ],
+        "Application Launcher": [
+            "CurrentApp"
+        ],
+        "Application Basic": [
+            "Application"
+        ],
         "Time Synchronization": [
             "TrustedTimeSource",
             "DefaultNTP",
