@@ -16,7 +16,7 @@
 import asyncio
 import time
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .adapter import TestAdapter
 from .hooks import TestRunnerHooks
@@ -72,7 +72,7 @@ class TestRunnerConfig:
     """
     adapter: TestAdapter = None
     pseudo_clusters: PseudoClusters = PseudoClusters([])
-    options: TestRunnerOptions = TestRunnerOptions()
+    options: TestRunnerOptions = field(default_factory=TestRunnerOptions)
     hooks: TestRunnerHooks = TestRunnerHooks()
 
 

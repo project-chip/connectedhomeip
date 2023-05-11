@@ -115,5 +115,4 @@ ENV TIZEN_SDK_TOOLCHAIN $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
 ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core
 
 ENV FVP_CORSTONE_300_PATH=/opt/FVP_Corstone_SSE-300
-ENV ARM_GCC_TOOLCHAIN_PATH=/opt/gcc-arm-none-eabi-10.3-2021.10
 ENV BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk

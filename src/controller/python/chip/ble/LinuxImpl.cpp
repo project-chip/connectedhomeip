@@ -130,7 +130,11 @@ extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, 
         return nullptr;
     }
 
-    if (scanner->StartScan(chip::System::Clock::Milliseconds32(timeoutMs)) != CHIP_NO_ERROR)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    err = scanner->StartScan(chip::System::Clock::Milliseconds32(timeoutMs));
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    if (err != CHIP_NO_ERROR)
     {
         return nullptr;
     }
