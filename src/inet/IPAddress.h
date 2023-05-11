@@ -124,7 +124,7 @@ union SockAddr
 };
 
 /**
- * SockAddrWithoutStorage cane be used any time we want to do the sockaddr
+ * SockAddrWithoutStorage can be used any time we want to do the sockaddr
  * type-punning but will not store the data ourselves (e.g. we're working with
  * an existing sockaddr pointer, and reintepret it as a
  * pointer-to-SockAddrWithoutStorage).
