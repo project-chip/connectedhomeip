@@ -27,14 +27,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -51,14 +51,14 @@ limitations under the License.
     <server tick="false" init="false">true</server>
 
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -74,14 +74,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -97,14 +97,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -120,14 +120,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -143,14 +143,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -166,14 +166,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -189,14 +189,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -212,14 +212,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -235,14 +235,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -258,14 +258,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -281,14 +281,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -304,14 +304,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -327,14 +327,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -350,14 +350,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -373,14 +373,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -396,14 +396,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -419,14 +419,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -442,14 +442,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -465,14 +465,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -488,14 +488,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -511,14 +511,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -534,14 +534,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -557,14 +557,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -580,14 +580,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -603,14 +603,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -626,14 +626,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -649,14 +649,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -672,14 +672,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -695,14 +695,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -718,14 +718,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -741,14 +741,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -764,14 +764,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -787,14 +787,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -810,14 +810,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
@@ -833,14 +833,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
+    <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
+    <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0003" define="PEAK_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">PeakMeasuredValue</attribute>
     <attribute side="server" code="0x0004" define="PEAK_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">PeakMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" min="0" max="0xFFFFFFFF" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
+    <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
-    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" min="0" max="0xFFFFFFFF" writable="false" default="0" optional="true">Uncertainty</attribute>
+    <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
     <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
     <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
     <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
