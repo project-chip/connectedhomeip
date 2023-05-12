@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2008,2020 Silicon Labs.
+Copyright (c) 2021 Project CHIP Authors
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,8 +18,8 @@ limitations under the License.
   <domain name="CHIP" />
 
   <cluster>
-    <name>Smoke CO Alarm</name>
     <domain>Closures</domain>
+    <name>Smoke CO Alarm</name>
     <code>0x005C</code>
     <define>SMOKE_CO_ALARM_CLUSTER</define>
     <description>This cluster provides an interface for observing and managing the state of smoke and CO alarms.</description>
@@ -30,6 +33,11 @@ limitations under the License.
 
     <!-- Current cluster version -->
     <globalAttribute side="either" code="0xFFFD" value="1" />
+    <!-- Cluster feature map -->
+    <globalAttribute side="server" code="0xFFFC" value="1">
+      <featureBit tag="SMOKE" bit="0">true</featureBit>
+      <featureBit tag="CO" bit="1">true</featureBit>
+    </globalAttribute>
 
     <!-- Attributes -->
     <attribute side="server" code="0x0000" define="EXPRESSED_STATE" type="ExpressedStateEnum" writable="false" optional="false">ExpressedState</attribute>
@@ -43,7 +51,7 @@ limitations under the License.
     <attribute side="server" code="0x0008" define="INTERCONNECT_SMOKE_ALARM" type="AlarmStateEnum" writable="false" optional="true">InterconnectSmokeAlarm</attribute>
     <attribute side="server" code="0x0009" define="INTERCONNECT_CO_ALARM" type="AlarmStateEnum" writable="false" optional="true">InterconnectCOAlarm</attribute>
     <attribute side="server" code="0x000A" define="CONTAMINATION_STATE" type="ContaminationStateEnum" writable="false" optional="true">ContaminationState</attribute>
-    <attribute side="server" code="0x000B" define="SENSITIVITY_LEVEL" type="SensitivityEnum" writable="true" optional="true">SensitivityLevel</attribute>
+    <attribute side="server" code="0x000B" define="SENSITIVITY_LEVEL" type="SensitivityEnum" min="0" max="2" writable="true" optional="true">SensitivityLevel</attribute>
     <attribute side="server" code="0x000C" define="EXPIRY_DATE" type="Date" writable="false" optional="true">ExpiryDate</attribute>
 
     <!-- Commands -->
