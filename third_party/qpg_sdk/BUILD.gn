@@ -90,8 +90,6 @@ qpg_make_build("qpg_mbedtls_alt") {
     "-f",
     rebase_path(qpg_sdk_root, root_build_dir) +
         "/Libraries/Qorvo/mbedtls_alt/Makefile.mbedtls_alt_${qpg_target_ic}",
-    "MBEDTLS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
-        "/third_party/mbedtls/repo",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
         "/${qpg_sdk_lib_dir}/mbedtls_alt_${qpg_target_ic}",
   ]
@@ -129,8 +127,6 @@ qpg_make_build("qpg_glue") {
     rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/MatterQorvoGlue/Makefile.MatterQorvoGlue_${qpg_target_ic}_libbuild",
     "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
         "/third_party/freertos/repo",
-    "MBEDTLS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
-        "/third_party/mbedtls/repo",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
         "/${qpg_sdk_lib_dir}/MatterQorvoGlue",
   ]
@@ -151,8 +147,6 @@ qpg_make_build("qpg_bootloader") {
     rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/Bootloader/Makefile.Bootloader_${qpg_target_ic}_compr_secure",
     "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
         "/third_party/freertos/repo",
-    "MBEDTLS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
-        "/third_party/mbedtls/repo",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
         "/${qpg_sdk_lib_dir}/Bootloader_${qpg_target_ic}_compr_secure",
     "UMB_WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
@@ -181,8 +175,6 @@ qpg_make_build("qpg_openthread_glue") {
     rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/OpenThreadQorvoGlue/Makefile.OpenThreadQorvoGlue_${qpg_target_ic}_ftd",
     "FREERTOS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
         "/third_party/freertos/repo",
-    "MBEDTLS_REPO_DIR=" + rebase_path(chip_root, root_build_dir) +
-        "/third_party/mbedtls/repo",
     "OPENTHREAD_REPO_DIR =" + rebase_path(chip_root, root_build_dir) +
         "/third_party/openthread/repo",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
