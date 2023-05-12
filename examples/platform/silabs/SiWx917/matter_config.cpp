@@ -56,6 +56,10 @@ using namespace ::chip::DeviceLayer;
 
 #include "SilabsDeviceDataProvider.h"
 
+#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+ICDManager SilabsMatterConfig::mICDManager;
+#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+
 #if SILABS_OTA_ENABLED
 void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
@@ -134,8 +138,12 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
+#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+    initParams.icdManager = &mICDManager;
+#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     ReturnErrorOnFailure(err);
