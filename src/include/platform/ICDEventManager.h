@@ -16,10 +16,9 @@
  */
 #pragma once
 
-/* this file behaves like a config.h, comes first */
-#include "lib/core/CHIPError.h"
-#include <platform/ICDManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <lib/core/CHIPError.h>
+#include <platform/ICDManager.h>
 
 namespace chip {
 namespace DeviceLayer {

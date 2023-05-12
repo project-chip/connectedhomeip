@@ -32,7 +32,6 @@ CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
     VerifyOrReturnError(icdManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mICDManager = icdManager;
 
-    // OTA Requestor initialization will be triggered by the connectivity events
     PlatformMgr().AddEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(nullptr));
 
     return CHIP_NO_ERROR;

@@ -22,8 +22,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 
-// TODO define
+#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
 #include <platform/ICDManager.h>
+#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 #include "ICDSubscriptionCallback.h"
