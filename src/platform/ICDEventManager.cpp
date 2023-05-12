@@ -24,7 +24,7 @@ CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
 {
     VerifyOrReturnError(icdManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mICDManager = icdManager;
-    
+
     return CHIP_NO_ERROR;
 }
 
