@@ -20,10 +20,20 @@
 namespace chip {
 namespace DeviceLayer {
 
+/**
+ * @brief Initialisation function of the ICDEventManager.
+ *        Init function MUST be called before using the object
+ * 
+ * @param icdManager pointer to the ICDManager object
+ * @return CHIP_ERROR 
+ */
 CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
 {
     VerifyOrReturnError(icdManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mICDManager = icdManager;
+
+    // OTA Requestor initialization will be triggered by the connectivity events
+    PlatformMgr().AddEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(nullptr));
 
     return CHIP_NO_ERROR;
 }
@@ -33,5 +43,17 @@ CHIP_ERROR ICDEventManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-} // namespace DeviceLayer
+/**
+ * @brief Event Handler callback given to the PlatformManager
+ *        Function dispatchs the event to the ICDManager member
+ * 
+ * @param event 
+ * @param arg 
+ */
+void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg)
+{
+    // TODO
+}
+
+} // namespace DeviceLaye
 } // namespace chip

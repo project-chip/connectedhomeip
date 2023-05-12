@@ -35,6 +35,7 @@ public:
     ICDEventManager() = default;
     CHIP_ERROR Init(ICDManager * icdManager);
     CHIP_ERROR Shutdown();
+    static void ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg);
 
 private:
     ICDManager * mICDManager;
