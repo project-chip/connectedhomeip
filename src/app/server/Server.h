@@ -604,8 +604,9 @@ private:
     Inet::InterfaceId mInterfaceId;
 
     System::Clock::Microseconds64 mInitTimestamp;
-
+#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
     DeviceLayer::ICDEventManager mICDEventManager;
+#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
 };
 
 } // namespace chip
