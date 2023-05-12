@@ -107,7 +107,7 @@ CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 
     // We are storing string values in the config store without
     // the null terminator, so we need to add it here.
-    VerifyOrReturnError(bufSize >= outLen + 1, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(bufSize >= outLen + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
     buf[outLen] = '\0';
 
     return CHIP_NO_ERROR;
