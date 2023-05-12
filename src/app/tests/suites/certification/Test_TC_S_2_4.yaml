@@ -75,7 +75,7 @@ tests:
           "TH sends a AddScene command to DUT with the GroupID field set to
           0x0001, the SceneID field set to 0x01, the TransitionTime field set to
           0x0001 and a set of extension fields appropriate to AC1."
-      PICS: S.S.C00.Rsp
+      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
           values:
@@ -125,8 +125,68 @@ tests:
                 value: 0x01
 
     - label:
+          "TH sends a AddScene command to DUT with the GroupID field set to
+          0x0001, the SceneID field set to 0x01, the TransitionTime field set to
+          0x0001 and a set of extension fields appropriate to AC1."
+      verification: |
+          Execute the following command in TH to generate the pre-condition to execute this test case:
+          
+          ./chip-tool scenes add-scene 0x0001 1 1 "Test Name" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": [value]}]}' nodeId endpointId
+          
+          Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
+
+          Verify the "status is success" on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
+          [1670970505.887060][5742:5744] CHIP:DMG: InvokeResponseMessage =
+          [1670970505.887118][5742:5744] CHIP:DMG: {
+          [1670970505.887172][5742:5744] CHIP:DMG: 	suppressResponse = false,
+          [1670970505.887231][5742:5744] CHIP:DMG: 	InvokeResponseIBs =
+          [1670970505.887307][5742:5744] CHIP:DMG: 	[
+          [1670970505.887366][5742:5744] CHIP:DMG: 		InvokeResponseIB =
+          [1670970505.887444][5742:5744] CHIP:DMG: 		{
+          [1670970505.887507][5742:5744] CHIP:DMG: 			CommandDataIB =
+          [1670970505.887576][5742:5744] CHIP:DMG: 			{
+          [1670970505.887713][5742:5744] CHIP:DMG: 				CommandPathIB =
+          [1670970505.887804][5742:5744] CHIP:DMG: 				{
+          [1670970505.887940][5742:5744] CHIP:DMG: 					EndpointId = 0x1,
+          [1670970505.888093][5742:5744] CHIP:DMG: 					ClusterId = 0x5,
+          [1670970505.888242][5742:5744] CHIP:DMG: 					CommandId = 0x0,
+          [1670970505.888385][5742:5744] CHIP:DMG: 				},
+          [1670970505.888692][5742:5744] CHIP:DMG:
+          [1670970505.888769][5742:5744] CHIP:DMG: 				CommandFields =
+          [1670970505.888852][5742:5744] CHIP:DMG: 				{
+          [1670970505.889030][5742:5744] CHIP:DMG: 					0x0 = 0,
+          [1670970505.889183][5742:5744] CHIP:DMG: 					0x1 = 1,
+          [1670970505.889406][5742:5744] CHIP:DMG: 					0x2 = 1,
+          [1670970505.889515][5742:5744] CHIP:DMG: 				},
+          [1670970505.889603][5742:5744] CHIP:DMG: 			},
+          [1670970505.889684][5742:5744] CHIP:DMG:
+          [1670970505.889745][5742:5744] CHIP:DMG: 		},
+          [1670970505.889821][5742:5744] CHIP:DMG:
+          [1670970505.889878][5742:5744] CHIP:DMG: 	],
+          [1670970505.889953][5742:5744] CHIP:DMG:
+          [1670970505.890009][5742:5744] CHIP:DMG: 	InteractionModelRevision = 1
+          [1670970505.890066][5742:5744] CHIP:DMG: },
+          [1670970505.890212][5742:5744] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0005 Command=0x0000_0000
+          [1670970505.890328][5742:5744] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
+          [1670970505.890458][5742:5744] CHIP:TOO:   AddSceneResponse: {
+          [1670970505.890551][5742:5744] CHIP:TOO:     status: 0
+          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 1
+          [1670970505.890717][5742:5744] CHIP:TOO:     sceneId: 1
+          [1670970505.890774][5742:5744] CHIP:TOO:    }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: S.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please execute the add scene command with extensionfieldsets in accordance with AC1 on DUT and enter 'y' if the command is successful"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
           "TH configures AC1 on DUT for all implemented application clusters
           supporting scenes."
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "MoveToLevelWithOnOff"
       arguments:
@@ -139,6 +199,20 @@ tests:
                 value: 0
               - name: "OptionsOverride"
                 value: 0
+
+    - label: "TH configures AC1 on DUT for all implemented application clusters
+          supporting scenes."
+      verification: |
+          Is DUT configured with AC1?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please configure AC1 on DUT and enter 'y' after the configuration is complete"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH sends a StoreScene command to DUT with the GroupID field set to
@@ -163,6 +237,7 @@ tests:
     - label:
           "TH configures AC2 on DUT for all implemented application clusters
           supporting scenes."
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "MoveToLevelWithOnOff"
       arguments:
@@ -175,6 +250,20 @@ tests:
                 value: 0
               - name: "OptionsOverride"
                 value: 0
+
+    - label: "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      verification: |
+          Is DUT configured with AC2?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please configure AC2 on DUT and enter 'y' after the configuration is complete"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH sends a RecallScene command to DUT with the GroupID field set to
@@ -188,10 +277,13 @@ tests:
                 value: 0x0001
               - name: "SceneID"
                 value: 0x01
+      response:
+          error: 0x00
 
     - label:
           "TH configures AC2 on DUT for all implemented application clusters
           supporting scenes."
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "MoveToLevelWithOnOff"
       arguments:
@@ -204,6 +296,20 @@ tests:
                 value: 0
               - name: "OptionsOverride"
                 value: 0
+
+    - label: "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      verification: |
+          Is DUT configured with AC2?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please configure AC2 on DUT and enter 'y' after the configuration is complete"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH sends a RecallScene command to DUT with the GroupID field set to
@@ -219,10 +325,13 @@ tests:
                 value: 0x01
               - name: "TransitionTime"
                 value: null
+      response:
+          error: 0x00
 
     - label:
           "TH configures AC2 on DUT for all implemented application clusters
           supporting scenes."
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "MoveToLevelWithOnOff"
       arguments:
@@ -235,6 +344,20 @@ tests:
                 value: 0
               - name: "OptionsOverride"
                 value: 0
+
+    - label: "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      verification: |
+          Is DUT configured with AC2?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please configure AC2 on DUT and enter 'y' after the configuration is complete"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH sends a RecallScene command to DUT with the GroupID field set to
@@ -250,3 +373,5 @@ tests:
                 value: 0x01
               - name: "TransitionTime"
                 value: null
+      response:
+          error: 0x00

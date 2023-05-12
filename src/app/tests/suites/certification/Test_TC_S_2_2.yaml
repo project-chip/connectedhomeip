@@ -229,6 +229,8 @@ tests:
                 value: 0x0001
               - name: "SceneID"
                 value: 0x01
+      response:
+          error: 0x00
 
     - label: "TH reads the SceneCount attribute from DUT."
       PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003
@@ -327,6 +329,8 @@ tests:
                 value: 0x0001
               - name: "SceneID"
                 value: 0x01
+      response:
+          error: 0x00
 
     - label:
           "TH sends a ViewScene command to DUT with the GroupID field set to
@@ -538,7 +542,7 @@ tests:
           [1670970505.888769][5742:5744] CHIP:DMG: 				CommandFields =
           [1670970505.888852][5742:5744] CHIP:DMG: 				{
           [1670970505.889030][5742:5744] CHIP:DMG: 					0x0 = 0,
-          [1670970505.889183][5742:5744] CHIP:DMG: 					0x1 = 0,
+          [1670970505.889183][5742:5744] CHIP:DMG: 					0x1 = 1,
           [1670970505.889406][5742:5744] CHIP:DMG: 					0x2 = 1,
           [1670970505.889515][5742:5744] CHIP:DMG: 				},
           [1670970505.889603][5742:5744] CHIP:DMG: 			},
@@ -551,7 +555,7 @@ tests:
           [1670970505.890066][5742:5744] CHIP:DMG: },
           [1670970505.890212][5742:5744] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0005 Command=0x0000_0000
           [1670970505.890328][5742:5744] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
-          [1670970505.890458][5742:5744] CHIP:TOO:   EnhancedAddSceneResponse: {
+          [1670970505.890458][5742:5744] CHIP:TOO:   AddSceneResponse: {
           [1670970505.890551][5742:5744] CHIP:TOO:     status: 0
           [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 1
           [1670970505.890717][5742:5744] CHIP:TOO:     sceneId: 1
@@ -666,6 +670,8 @@ tests:
                 value: 0x0001
               - name: "SceneID"
                 value: 0x01
+      response:
+          error: 0x8b
 
     - label:
           "TH configures AC1 on DUT for all implemented application clusters
@@ -887,7 +893,7 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 0x00 || 0x89
+                value: 0x00
               - name: "GroupID"
                 value: 0x0002
               - name: "SceneID"
