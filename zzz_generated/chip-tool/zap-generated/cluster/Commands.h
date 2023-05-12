@@ -2942,19 +2942,26 @@ private:
 | Cluster TimeSynchronization                                         | 0x0038 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * SetUtcTime                                                        |   0x00 |
+| * SetUTCTime                                                        |   0x00 |
+| * SetTrustedTimeSource                                              |   0x01 |
+| * SetTimeZone                                                       |   0x02 |
+| * SetDSTOffset                                                      |   0x04 |
+| * SetDefaultNTP                                                     |   0x05 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * UTCTime                                                           | 0x0000 |
 | * Granularity                                                       | 0x0001 |
 | * TimeSource                                                        | 0x0002 |
-| * TrustedTimeNodeId                                                 | 0x0003 |
-| * DefaultNtp                                                        | 0x0004 |
+| * TrustedTimeSource                                                 | 0x0003 |
+| * DefaultNTP                                                        | 0x0004 |
 | * TimeZone                                                          | 0x0005 |
 | * DSTOffset                                                         | 0x0006 |
 | * LocalTime                                                         | 0x0007 |
 | * TimeZoneDatabase                                                  | 0x0008 |
-| * NtpServerPort                                                     | 0x0009 |
+| * NTPServerAvailable                                                | 0x0009 |
+| * TimeZoneListMaxSize                                               | 0x000A |
+| * DSTOffsetListMaxSize                                              | 0x000B |
+| * SupportsDNSResolve                                                | 0x000C |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -2963,17 +2970,22 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * DSTTableEmpty                                                     | 0x0000 |
+| * DSTStatus                                                         | 0x0001 |
+| * TimeZoneStatus                                                    | 0x0002 |
+| * TimeFailure                                                       | 0x0003 |
+| * MissingTrustedTimeSource                                          | 0x0004 |
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command SetUtcTime
+ * Command SetUTCTime
  */
-class TimeSynchronizationSetUtcTime : public ClusterCommand
+class TimeSynchronizationSetUTCTime : public ClusterCommand
 {
 public:
-    TimeSynchronizationSetUtcTime(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-utc-time", credsIssuerConfig)
+    TimeSynchronizationSetUTCTime(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-utctime", credsIssuerConfig)
     {
-        AddArgument("UtcTime", 0, UINT64_MAX, &mRequest.utcTime);
+        AddArgument("UTCTime", 0, UINT64_MAX, &mRequest.UTCTime);
         AddArgument("Granularity", 0, UINT8_MAX, &mRequest.granularity);
         AddArgument("TimeSource", 0, UINT8_MAX, &mRequest.timeSource);
         ClusterCommand::AddArguments();
@@ -2994,7 +3006,138 @@ public:
     }
 
 private:
-    chip::app::Clusters::TimeSynchronization::Commands::SetUtcTime::Type mRequest;
+    chip::app::Clusters::TimeSynchronization::Commands::SetUTCTime::Type mRequest;
+};
+
+/*
+ * Command SetTrustedTimeSource
+ */
+class TimeSynchronizationSetTrustedTimeSource : public ClusterCommand
+{
+public:
+    TimeSynchronizationSetTrustedTimeSource(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-trusted-time-source", credsIssuerConfig), mComplex_TrustedTimeSource(&mRequest.trustedTimeSource)
+    {
+        AddArgument("TrustedTimeSource", &mComplex_TrustedTimeSource);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000001) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000038, 0x00000001, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000001) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000038, 0x00000001, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TimeSynchronization::Commands::SetTrustedTimeSource::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::Nullable<
+        chip::app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type>>
+        mComplex_TrustedTimeSource;
+};
+
+/*
+ * Command SetTimeZone
+ */
+class TimeSynchronizationSetTimeZone : public ClusterCommand
+{
+public:
+    TimeSynchronizationSetTimeZone(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-time-zone", credsIssuerConfig), mComplex_TimeZone(&mRequest.timeZone)
+    {
+        AddArgument("TimeZone", &mComplex_TimeZone);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000002) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000038, 0x00000002, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000002) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000038, 0x00000002, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TimeSynchronization::Commands::SetTimeZone::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
+        mComplex_TimeZone;
+};
+
+/*
+ * Command SetDSTOffset
+ */
+class TimeSynchronizationSetDSTOffset : public ClusterCommand
+{
+public:
+    TimeSynchronizationSetDSTOffset(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-dstoffset", credsIssuerConfig), mComplex_DSTOffset(&mRequest.DSTOffset)
+    {
+        AddArgument("DSTOffset", &mComplex_DSTOffset);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000004) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000038, 0x00000004, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000004) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000038, 0x00000004, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TimeSynchronization::Commands::SetDSTOffset::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>
+        mComplex_DSTOffset;
+};
+
+/*
+ * Command SetDefaultNTP
+ */
+class TimeSynchronizationSetDefaultNTP : public ClusterCommand
+{
+public:
+    TimeSynchronizationSetDefaultNTP(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-default-ntp", credsIssuerConfig)
+    {
+        AddArgument("DefaultNTP", &mRequest.defaultNTP);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000005) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000038, 0x00000005, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000038) command (0x00000005) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000038, 0x00000005, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -11008,53 +11151,66 @@ void registerClusterTimeSynchronization(Commands & commands, CredentialIssuerCom
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),            //
-        make_unique<TimeSynchronizationSetUtcTime>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                      //
+        make_unique<TimeSynchronizationSetUTCTime>(credsIssuerConfig),           //
+        make_unique<TimeSynchronizationSetTrustedTimeSource>(credsIssuerConfig), //
+        make_unique<TimeSynchronizationSetTimeZone>(credsIssuerConfig),          //
+        make_unique<TimeSynchronizationSetDSTOffset>(credsIssuerConfig),         //
+        make_unique<TimeSynchronizationSetDefaultNTP>(credsIssuerConfig),        //
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "utctime", Attributes::UTCTime::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "granularity", Attributes::Granularity::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "time-source", Attributes::TimeSource::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "trusted-time-node-id", Attributes::TrustedTimeNodeId::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "default-ntp", Attributes::DefaultNtp::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "time-zone", Attributes::TimeZone::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "dstoffset", Attributes::DSTOffset::Id, credsIssuerConfig),                         //
-        make_unique<ReadAttribute>(Id, "local-time", Attributes::LocalTime::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "time-zone-database", Attributes::TimeZoneDatabase::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "ntp-server-port", Attributes::NtpServerPort::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                  //
+        make_unique<ReadAttribute>(Id, "utctime", Attributes::UTCTime::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "granularity", Attributes::Granularity::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "time-source", Attributes::TimeSource::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "trusted-time-source", Attributes::TrustedTimeSource::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "default-ntp", Attributes::DefaultNTP::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "time-zone", Attributes::TimeZone::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "dstoffset", Attributes::DSTOffset::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "local-time", Attributes::LocalTime::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "time-zone-database", Attributes::TimeZoneDatabase::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "ntpserver-available", Attributes::NTPServerAvailable::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "time-zone-list-max-size", Attributes::TimeZoneListMaxSize::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "dstoffset-list-max-size", Attributes::DSTOffsetListMaxSize::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "supports-dnsresolve", Attributes::SupportsDNSResolve::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),             //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                               //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(Id, "utctime", 0, UINT64_MAX, Attributes::UTCTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::TimeSynchronization::GranularityEnum>>(
             Id, "granularity", 0, UINT8_MAX, Attributes::Granularity::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::TimeSynchronization::TimeSourceEnum>>(
             Id, "time-source", 0, UINT8_MAX, Attributes::TimeSource::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::NodeId>>>(Id, "trusted-time-node-id", 0, UINT64_MAX,
-                                                                                  Attributes::TrustedTimeNodeId::Id,
-                                                                                  WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(Id, "default-ntp", Attributes::DefaultNtp::Id,
-                                                                                    WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type>>>(
+            Id, "trusted-time-source", Attributes::TrustedTimeSource::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(
+            Id, "default-ntp", Attributes::DefaultNTP::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>>(
-            Id, "time-zone", Attributes::TimeZone::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "time-zone", Attributes::TimeZone::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>>>(
-            Id, "dstoffset", Attributes::DSTOffset::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "dstoffset", Attributes::DSTOffset::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(
             Id, "local-time", 0, UINT64_MAX, Attributes::LocalTime::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<bool>>(Id, "time-zone-database", 0, 1, Attributes::TimeZoneDatabase::Id,
+        make_unique<WriteAttribute<chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum>>(
+            Id, "time-zone-database", 0, UINT8_MAX, Attributes::TimeZoneDatabase::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "ntpserver-available", 0, 1, Attributes::NTPServerAvailable::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "ntp-server-port", 0, UINT16_MAX,
-                                                                              Attributes::NtpServerPort::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "time-zone-list-max-size", 0, UINT8_MAX, Attributes::TimeZoneListMaxSize::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "dstoffset-list-max-size", 0, UINT8_MAX, Attributes::DSTOffsetListMaxSize::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "supports-dnsresolve", 0, 1, Attributes::SupportsDNSResolve::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -11067,29 +11223,42 @@ void registerClusterTimeSynchronization(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "utctime", Attributes::UTCTime::Id, credsIssuerConfig),                             //
-        make_unique<SubscribeAttribute>(Id, "granularity", Attributes::Granularity::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "time-source", Attributes::TimeSource::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "trusted-time-node-id", Attributes::TrustedTimeNodeId::Id, credsIssuerConfig),      //
-        make_unique<SubscribeAttribute>(Id, "default-ntp", Attributes::DefaultNtp::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "time-zone", Attributes::TimeZone::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "dstoffset", Attributes::DSTOffset::Id, credsIssuerConfig),                         //
-        make_unique<SubscribeAttribute>(Id, "local-time", Attributes::LocalTime::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "time-zone-database", Attributes::TimeZoneDatabase::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "ntp-server-port", Attributes::NtpServerPort::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                 //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                  //
+        make_unique<SubscribeAttribute>(Id, "utctime", Attributes::UTCTime::Id, credsIssuerConfig),                              //
+        make_unique<SubscribeAttribute>(Id, "granularity", Attributes::Granularity::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "time-source", Attributes::TimeSource::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "trusted-time-source", Attributes::TrustedTimeSource::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "default-ntp", Attributes::DefaultNTP::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "time-zone", Attributes::TimeZone::Id, credsIssuerConfig),                           //
+        make_unique<SubscribeAttribute>(Id, "dstoffset", Attributes::DSTOffset::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "local-time", Attributes::LocalTime::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "time-zone-database", Attributes::TimeZoneDatabase::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "ntpserver-available", Attributes::NTPServerAvailable::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "time-zone-list-max-size", Attributes::TimeZoneListMaxSize::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "dstoffset-list-max-size", Attributes::DSTOffsetListMaxSize::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "supports-dnsresolve", Attributes::SupportsDNSResolve::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                 //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),             //
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                           //
+        make_unique<ReadEvent>(Id, "dsttable-empty", Events::DSTTableEmpty::Id, credsIssuerConfig),                              //
+        make_unique<ReadEvent>(Id, "dststatus", Events::DSTStatus::Id, credsIssuerConfig),                                       //
+        make_unique<ReadEvent>(Id, "time-zone-status", Events::TimeZoneStatus::Id, credsIssuerConfig),                           //
+        make_unique<ReadEvent>(Id, "time-failure", Events::TimeFailure::Id, credsIssuerConfig),                                  //
+        make_unique<ReadEvent>(Id, "missing-trusted-time-source", Events::MissingTrustedTimeSource::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                      //
+        make_unique<SubscribeEvent>(Id, "dsttable-empty", Events::DSTTableEmpty::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeEvent>(Id, "dststatus", Events::DSTStatus::Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeEvent>(Id, "time-zone-status", Events::TimeZoneStatus::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeEvent>(Id, "time-failure", Events::TimeFailure::Id, credsIssuerConfig),                             //
+        make_unique<SubscribeEvent>(Id, "missing-trusted-time-source", Events::MissingTrustedTimeSource::Id, credsIssuerConfig), //
     };
 
     commands.Register(clusterName, clusterCommands);

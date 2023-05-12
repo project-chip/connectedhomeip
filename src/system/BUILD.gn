@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 
+import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -32,6 +33,12 @@ declare_args() {
 
   # Extra include dirs for project configs.
   chip_project_config_include_dirs = []
+
+  # enable clang thread safety analysis in SystemMutex.h,
+  # specifically attributes such as capability, guarded_by, acquire, ...
+  #
+  # see https://clang.llvm.org/docs/ThreadSafetyAnalysis.html
+  chip_enable_thread_safety_checks = is_clang
 }
 
 if (chip_project_config_include_dirs == [] &&
@@ -116,6 +123,9 @@ buildconfig_header("system_buildconfig") {
     defines += [
       "SYSTEM_PLATFORM_CONFIG_INCLUDE=${chip_system_platform_config_include}",
     ]
+  }
+  if (chip_enable_thread_safety_checks) {
+    defines += [ "SYSTEM_ENABLE_CLANG_THREAD_SAFETY_ANALYSIS=1" ]
   }
 
   if (chip_system_layer_impl_config_file != "") {

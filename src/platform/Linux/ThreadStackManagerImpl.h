@@ -147,9 +147,12 @@ private:
 
     std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
 
+    static CHIP_ERROR GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self);
+    static CHIP_ERROR GLibMatterContextCallAttach(ThreadStackManagerImpl * self);
+    static CHIP_ERROR GLibMatterContextCallScan(ThreadStackManagerImpl * self);
     static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
                                         const gchar * const * invalidated_properties, gpointer user_data);
-    void ThreadDevcieRoleChangedHandler(const gchar * role);
+    void ThreadDeviceRoleChangedHandler(const gchar * role);
 
     Thread::OperationalDataset mDataset = {};
 

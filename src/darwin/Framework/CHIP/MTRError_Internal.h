@@ -16,6 +16,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRError.h>
 
 #include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPError.h>

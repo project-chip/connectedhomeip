@@ -319,7 +319,7 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 
     ClearLine();
 
-    *status = mHandler->RunInteractive(command);
+    *status = mHandler->RunInteractive(command, GetStorageDirectory());
 
     return true;
 }

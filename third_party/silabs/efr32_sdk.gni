@@ -193,6 +193,7 @@ template("efr32_sdk") {
 
     if (chip_enable_ble_rs911x) {
       _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
+      _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
 
     # Note that we're setting the mbedTLS and PSA configuration files through a

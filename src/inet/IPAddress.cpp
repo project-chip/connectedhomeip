@@ -237,7 +237,7 @@ struct in6_addr IPAddress::ToIPv6() const
     return ipAddr;
 }
 
-CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddress & outIPAddress)
+CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddrWithoutStorage & sockaddr, IPAddress & outIPAddress)
 {
 #if INET_CONFIG_ENABLE_IPV4
     if (sockaddr.any.sa_family == AF_INET)

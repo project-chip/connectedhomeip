@@ -125,7 +125,7 @@ struct BluezAddress
 struct IOChannel
 {
     GIOChannel * mpChannel;
-    guint mWatch;
+    GSource * mWatchSource;
 };
 
 struct BluezEndpoint
