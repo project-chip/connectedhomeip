@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include "blecent.h"
 #include "host/ble_hs.h"
 #include "host/ble_uuid.h"
@@ -216,4 +215,3 @@ void print_adv_fields(const struct ble_hs_adv_fields * fields)
         MODLOG_DFLT(DEBUG, "\n");
     }
 }
-#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
