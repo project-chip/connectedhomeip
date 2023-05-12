@@ -290,6 +290,18 @@
             "DSTOffset",
             "UTCTime",
             "LocalTime"
+        ],
+        "Operational State": [
+            "OperationalState",
+            "OperationalError"
+        ],
+        "Dishwasher Operational State": [
+            "OperationalState",
+            "OperationalError"
+        ],
+        "Robotic Vacuum Operational State": [
+            "OperationalState",
+            "OperationalError"
         ]
     },
     "defaultReportingPolicy": "mandatory",
