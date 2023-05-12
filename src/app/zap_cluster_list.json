@@ -49,6 +49,7 @@
         "ON_OFF_CLUSTER": [],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": [],
+        "OPERATIONAL_STATE_CLUSTER": [],
         "OTA_BOOTLOAD_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER": [],
@@ -82,6 +83,7 @@
         "UNIT_TESTING_CLUSTER": [],
         "USER_LABEL_CLUSTER": [],
         "WAKE_ON_LAN_CLUSTER": [],
+        "WASHER_CONTROLS_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": [],
         "ZLL_COMMISSIONING_CLUSTER": []
@@ -144,6 +146,7 @@
         "ON_OFF_CLUSTER": ["on-off-server"],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": ["operational-credentials-server"],
+        "OPERATIONAL_STATE_CLUSTER": ["operational-state-server"],
         "OTA_BOOTLOAD_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": ["ota-provider"],
         "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER": ["ota-requestor"],
@@ -182,6 +185,7 @@
         "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
         "USER_LABEL_CLUSTER": ["user-label-server"],
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
+        "WASHER_CONTROLS_CLUSTER": ["washer-controls-server"],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
         "ZLL_COMMISSIONING_CLUSTER": []

@@ -62,6 +62,7 @@
         "onoff-cluster.xml",
         "onoff-switch-configuration-cluster.xml",
         "operational-credentials-cluster.xml",
+        "operationstate.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",
@@ -85,6 +86,7 @@
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
         "wake-on-lan-cluster.xml",
+        "washer-controls-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
         "matter-devices.xml",
@@ -182,6 +184,7 @@
             "CommissionedFabrics",
             "CurrentFabricIndex"
         ],
+        "Operational State": ["OperationalState", "OperationalError"],
         "Software Diagnostics": [
             "CurrentHeapFree",
             "CurrentHeapHighWatermark",
