@@ -119,6 +119,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/access-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/account-login-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/administrator-commissioning-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/air-quality-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/application-basic-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/application-launcher-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/audio-output-cluster.xml \
@@ -190,7 +191,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml \
                       src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/draft/air-quality-cluster.xml \
                     "
             - name: Build Apps
               timeout-minutes: 60
