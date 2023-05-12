@@ -103,9 +103,7 @@
             "account-login-server"
         ],
         "ACTIONS_CLUSTER": [],
-        "ADMINISTRATOR_COMMISSIONING_CLUSTER": [
-            "administrator-commissioning-server"
-        ],
+        "ADMINISTRATOR_COMMISSIONING_CLUSTER": ["administrator-commissioning-server"],
         "ALARM_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": [
             "application-basic-server"
