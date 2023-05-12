@@ -18,7 +18,7 @@
 #include <openthread/platform/memory.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/nxp/k32w/common/RamStorage.h>
+#include <platform/nxp/k32w/k32w0/RamStorage.h>
 
 #include "pdm_ram_storage_glue.h"
 
@@ -39,7 +39,34 @@
 #define ot_free(...)
 #endif
 
+#if PDM_SAVE_IDLE
+// Segment data size is: D_SEGMENT_MEMORY_SIZE (4096) - D_PDM_NVM_SEGMENT_HEADER_SIZE (size of internal header).
+// Subtract 64 to have more margin.
+#define PDM_SEGMENT_SIZE (4096 - 64)
+#endif
+
 namespace chip::DeviceLayer::Internal {
+
+RamStorageKey::RamStorageKey(RamStorage * storage, uint8_t keyId, uint8_t internalId)
+{
+    mStorage = storage;
+    mId      = GetInternalId(keyId, internalId);
+}
+
+CHIP_ERROR RamStorageKey::Read(uint8_t * buf, uint16_t & sizeToRead) const
+{
+    return mStorage->Read(mId, 0, buf, &sizeToRead);
+}
+
+CHIP_ERROR RamStorageKey::Write(const uint8_t * buf, uint16_t length)
+{
+    return mStorage->Write(mId, buf, length);
+}
+
+CHIP_ERROR RamStorageKey::Delete()
+{
+    return mStorage->Delete(mId, -1);
+}
 
 CHIP_ERROR RamStorage::Init(uint16_t aInitialSize)
 {
