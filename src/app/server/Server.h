@@ -137,42 +137,6 @@ struct ServerInitParams
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
 };
 
-class IgnoreCertificateValidityPolicy : public Credentials::CertificateValidityPolicy
-{
-public:
-    IgnoreCertificateValidityPolicy() {}
-
-    /**
-     * @brief
-     *
-     * This certificate validity policy does not validate NotBefore or
-     * NotAfter to accommodate platforms that may have wall clock time, but
-     * where it is unreliable.
-     *
-     * Last Known Good Time is also not considered in this policy.
-     *
-     * @param cert CHIP Certificate for which we are evaluating validity
-     * @param depth the depth of the certificate in the chain, where the leaf is at depth 0
-     * @return CHIP_NO_ERROR if CHIPCert should accept the certificate; an appropriate CHIP_ERROR if it should be rejected
-     */
-    CHIP_ERROR ApplyCertificateValidityPolicy(const Credentials::ChipCertificateData * cert, uint8_t depth,
-                                              Credentials::CertificateValidityResult result) override
-    {
-        switch (result)
-        {
-        case Credentials::CertificateValidityResult::kValid:
-        case Credentials::CertificateValidityResult::kNotYetValid:
-        case Credentials::CertificateValidityResult::kExpired:
-        case Credentials::CertificateValidityResult::kNotExpiredAtLastKnownGoodTime:
-        case Credentials::CertificateValidityResult::kExpiredAtLastKnownGoodTime:
-        case Credentials::CertificateValidityResult::kTimeUnknown:
-            return CHIP_NO_ERROR;
-        default:
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-    }
-};
-
 /**
  * Transitional version of ServerInitParams to assist SDK integrators in
  * transitioning to injecting product/platform-owned resources. This version
@@ -289,7 +253,7 @@ private:
     static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
     static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
     static Credentials::GroupDataProviderImpl sGroupDataProvider;
-    static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
+    static Credentials::IgnoreCertificateValidityPeriodPolicy sDefaultCertValidityPolicy;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
     static SimpleSessionResumptionStorage sSessionResumptionStorage;
 #endif

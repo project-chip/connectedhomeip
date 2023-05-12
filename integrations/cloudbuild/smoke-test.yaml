@@ -29,6 +29,7 @@ steps:
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle --target
+              esp32-devkitc-light-rpc --target
               esp32-m5stack-all-clusters-ipv6only --target
               esp32-m5stack-all-clusters-rpc --target
               esp32-m5stack-light --target
