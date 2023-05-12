@@ -584,12 +584,57 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 @interface MTRAttributeReport : NSObject
 @property (nonatomic, readonly, copy) MTRAttributePath * path;
-// value is nullable because nullable attributes can have nil as value.
+
+/**
+ * value will be nil in the following cases:
+ *
+ * * There was an error.  In this case, "error" will not be nil.
+ * * The attribute is nullable and the value of the attribute is null.
+ *
+ * If value is not nil, the actual type of value will depend on the
+ * schema-defined (typically defiend in the Matter specification) type of the
+ * attribute as follows:
+ *
+ * * list: NSArray of whatever type the list entries are.
+ * * struct: The corresponding structure interface defined by Matter.framework
+ * * octet string: NSData
+ * * string: NSString
+ * * discrete/analog types: NSNumber
+ *
+ * Derived types (in the Matter specification sense) are represented the same as
+ * the base type, except for "string" (which is a derived type of "octet string"
+ * in the specification).
+ */
 @property (nonatomic, readonly, copy, nullable) id value;
-// If this specific path resulted in an error, the error (in the
-// MTRInteractionErrorDomain or MTRErrorDomain) that corresponds to this
-// path.
+
+/**
+ * If this specific path resulted in an error, the error (in the
+ * MTRInteractionErrorDomain or MTRErrorDomain) that corresponds to this
+ * path.
+ */
 @property (nonatomic, readonly, copy, nullable) NSError * error;
+
+/**
+ * Initialize an MTRAttributeReport with a response-value dictionary of the sort
+ * that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * an attribute response.
+ *
+ * Will set the value property to nil and the error property to non-nil, even if
+ * the schema for the value is not known, if the response-value is an error, not
+ * data.
+ *
+ * Will return nil and hand out an error if the response-value is data in the
+ * following cases:
+ *
+ * * The response is for a cluster/attribute combination for which the schema is
+ *   unknown and hence the type of the data is not known.
+ * * The data does not match the known schema.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 @end
 
 typedef NS_ENUM(NSUInteger, MTREventTimeType) {
@@ -605,22 +650,62 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
 
 @interface MTREventReport : NSObject
 @property (nonatomic, readonly, copy) MTREventPath * path;
+
+/**
+ * eventNumber will only have a useful value if "error" is nil.
+ */
 @property (nonatomic, readonly, copy) NSNumber * eventNumber; // EventNumber type (uint64_t)
+
+/**
+ * priority will only have a useful value if "error" is nil.
+ */
 @property (nonatomic, readonly, copy) NSNumber * priority; // PriorityLevel type (MTREventPriority)
 
-// Either systemUpTime or timestampDate will be valid depending on eventTimeType
+/**
+ * Either systemUpTime or timestampDate will be valid depending on
+ * eventTimeType, if "error" is nil.  If "error" is not nil, none of
+ * eventTimeType, systemUpTime, timestampDate should be expected to have useful
+ * values.
+ */
 @property (nonatomic, readonly) MTREventTimeType eventTimeType API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 @property (nonatomic, readonly) NSTimeInterval systemUpTime API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 @property (nonatomic, readonly, copy, nullable)
     NSDate * timestampDate API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
-// An instance of one of the event payload interfaces.
-@property (nonatomic, readonly, copy) id value;
+/**
+ * An instance of one of the event payload interfaces, or nil if error is not
+ * nil (in which case there is no payload available).
+ */
+@property (nonatomic, readonly, copy, nullable) id value;
 
-// If this specific path resulted in an error, the error (in the
-// MTRInteractionErrorDomain or MTRErrorDomain) that corresponds to this
-// path.
+/**
+ * If this specific path resulted in an error, the error (in the
+ * MTRInteractionErrorDomain or MTRErrorDomain) that corresponds to this
+ * path.
+ */
 @property (nonatomic, readonly, copy, nullable) NSError * error;
+
+/**
+ * Initialize an MTREventReport with a response-value dictionary of the sort
+ * that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * an event response.
+ *
+ * Will set the value property to nil and the error property to non-nil, even if
+ * the schema for the value is not known, if the response-value is an error, not
+ * data.
+ *
+ * Will return nil and hand out an error if the response-value is data in the
+ * following cases:
+ *
+ * * The response is for a cluster/event combination for which the schema is
+ *   unknown and hence the type of the data is not known.
+ * * The data does not match the known schema.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 @end
 
 @interface MTRBaseDevice (Deprecated)

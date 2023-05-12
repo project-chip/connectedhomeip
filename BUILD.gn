@@ -677,10 +677,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (enable_tizen_builds) {
     group("check:tizen") {
       testonly = true
-      deps = [ "${chip_root}/src/test_driver/tizen/integration-tests:check" ]
+      deps = [ "${chip_root}/src/test_driver/tizen:check(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
     }
 
-    extra_check_deps += [ ":check:tizen" ]
+    # Include Tizen check target only if BLE is not enabled, since
+    # currently, QEMU-based Tizen does not support Bluetooth.
+    if (!chip_config_network_layer_ble) {
+      extra_check_deps += [ ":check:tizen" ]
+    }
   }
 
   if (enable_mw320_shell_build) {

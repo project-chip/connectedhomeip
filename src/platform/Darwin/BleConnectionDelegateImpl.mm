@@ -698,7 +698,7 @@ namespace DeviceLayer {
 
 - (void)removePeripheralsFromCache
 {
-    for (CBPeripheral * peripheral in _cachedPeripherals) {
+    for (CBPeripheral * peripheral in [_cachedPeripherals allValues]) {
         [self removePeripheralFromCache:peripheral];
     }
 }

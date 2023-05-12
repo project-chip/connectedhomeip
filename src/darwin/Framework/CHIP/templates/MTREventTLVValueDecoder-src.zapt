@@ -17,19 +17,14 @@
 using namespace chip;
 using namespace chip::app;
 
-id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{{#zcl_clusters}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+static id _Nullable DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    switch (aPath.mClusterId)
-    {
-    {{#zcl_clusters}}
-    {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
-    case Clusters::{{asUpperCamelCase name}}::Id: {
-        using namespace Clusters::{{asUpperCamelCase name}};
-        switch (aPath.mEventId)
-        {
+    using namespace Clusters::{{asUpperCamelCase name}};
+    switch (aEventId) {
         {{#zcl_events}}
         {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
-
         case Events::{{asUpperCamelCase name}}::Id: {
             Events::{{asUpperCamelCase name}}::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
@@ -52,22 +47,33 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
 
             return value;
         }
-
         {{/if}}
         {{/zcl_events}}
-
-        default:
-          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-          break;
+        default: {
+            break;
         }
-        break;
     }
-    {{/if}}
-    {{/zcl_clusters}}
-    default: {
-      *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-      break;
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+{{/if}}
+{{/zcl_clusters}}
+
+id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    switch (aPath.mClusterId) {
+        {{#zcl_clusters}}
+        {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+        case Clusters::{{asUpperCamelCase name}}::Id: {
+            return DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aPath.mEventId, aReader, aError);
+        }
+        {{/if}}
+        {{/zcl_clusters}}
+        default: {
+            break;
+        }
     }
-    }
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }

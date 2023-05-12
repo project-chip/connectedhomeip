@@ -432,7 +432,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:openiotsdkApp}/openiotsdk",
             "executable": "./build/chip-openiotsdk-${input:openiotsdkApp}-example.elf",
-            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
             "servertype": "external",
             "gdbTarget": "${input:openiotsdkRemoteHost}:31627", //GDBserver port on FVP
             "overrideLaunchCommands": [
@@ -452,7 +452,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}/src/test_driver/openiotsdk/unit-tests",
             "executable": "./build/${input:openiotsdkUnittest}.elf",
-            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
             "servertype": "external",
             "gdbTarget": ":31627", //GDBserver port on FVP
             "overrideLaunchCommands": ["-enable-pretty-printing"],

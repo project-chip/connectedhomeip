@@ -25,12 +25,14 @@
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
+#import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
 #import "MTRSetupPayload_Internal.h"
 
 #include "app/ConcreteAttributePath.h"
 #include "app/ConcreteCommandPath.h"
 #include "app/ConcreteEventPath.h"
+#include "app/StatusResponse.h"
 #include "lib/core/CHIPError.h"
 #include "lib/core/DataModelTypes.h"
 
@@ -2161,6 +2163,12 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 {
     return [MTRAttributePath attributePathWithEndpointID:self.endpoint clusterID:self.cluster attributeID:_attribute];
 }
+
+- (ConcreteAttributePath)_asConcretePath
+{
+    return ConcreteAttributePath([self.endpoint unsignedShortValue], static_cast<ClusterId>([self.cluster unsignedLongValue]),
+        static_cast<AttributeId>([self.attribute unsignedLongValue]));
+}
 @end
 
 @implementation MTRAttributePath (Deprecated)
@@ -2199,6 +2207,12 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 - (id)copyWithZone:(NSZone *)zone
 {
     return [MTREventPath eventPathWithEndpointID:self.endpoint clusterID:self.cluster eventID:_event];
+}
+
+- (ConcreteEventPath)_asConcretePath
+{
+    return ConcreteEventPath([self.endpoint unsignedShortValue], static_cast<ClusterId>([self.cluster unsignedLongValue]),
+        static_cast<EventId>([self.event unsignedLongValue]));
 }
 @end
 
@@ -2239,7 +2253,124 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 }
 @end
 
+static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode, NSError * __autoreleasing * error)
+{
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (!error) {
+        return;
+    }
+
+    NSDictionary * userInfo = @ { NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+    *error = [NSError errorWithDomain:MTRErrorDomain code:errorCode userInfo:userInfo];
+}
+
+static void LogStringAndReturnError(NSString * errorStr, CHIP_ERROR errorCode, NSError * __autoreleasing * error)
+{
+    MTR_LOG_ERROR("%s: %s", errorStr.UTF8String, errorCode.AsString());
+    if (!error) {
+        return;
+    }
+
+    *error = [MTRError errorForCHIPErrorCode:errorCode];
+}
+
+static bool CheckMemberOfType(NSDictionary<NSString *, id> * responseValue, NSString * memberName, Class expectedClass,
+    NSString * errorMessage, NSError * __autoreleasing * error)
+{
+    id _Nullable value = responseValue[memberName];
+    if (value == nil) {
+        LogStringAndReturnError([NSString stringWithFormat:@"%s is null when not expected to be", memberName.UTF8String],
+            MTRErrorCodeInvalidArgument, error);
+        return false;
+    }
+
+    if (![value isKindOfClass:expectedClass]) {
+        LogStringAndReturnError(errorMessage, MTRErrorCodeInvalidArgument, error);
+        return false;
+    }
+
+    return true;
+}
+
+// Allocates a buffer, encodes the data-value as TLV, and points the TLV::Reader
+// to the data.  Returns false if any of that fails, in which case error gets
+// set.
+//
+// Data model decoding requires a contiguous buffer (because lists walk all the
+// data multiple times and TLVPacketBufferBackingStore doesn't have a way to
+// checkpoint and restore its state), but we can encode into chained packet
+// buffers and then decide whether we need a contiguous realloc.
+static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::ScopedMemoryBuffer<uint8_t> & flatBuffer,
+    NSDictionary * data, TLV::TLVReader & reader, NSError * __autoreleasing * error)
+{
+    buffer = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        LogStringAndReturnError(@"Unable to allocate encoding buffer", CHIP_ERROR_NO_MEMORY, error);
+        return false;
+    }
+
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ true);
+
+    CHIP_ERROR errorCode = MTREncodeTLVFromDataValueDictionary(data, writer, TLV::AnonymousTag());
+    if (errorCode != CHIP_NO_ERROR) {
+        LogStringAndReturnError(@"Unable to encode data-value to TLV", errorCode, error);
+        return false;
+    }
+
+    errorCode = writer.Finalize(&buffer);
+    if (errorCode != CHIP_NO_ERROR) {
+        LogStringAndReturnError(@"Unable to encode data-value to TLV", errorCode, error);
+        return false;
+    }
+
+    if (buffer->HasChainedBuffer()) {
+        // We need to reallocate into a single contiguous buffer.
+        size_t remainingData = buffer->TotalLength();
+        if (!flatBuffer.Calloc(remainingData)) {
+            LogStringAndReturnError(@"Unable to allocate decoding buffer", CHIP_ERROR_NO_MEMORY, error);
+            return false;
+        }
+        size_t copiedData = 0;
+        while (!buffer.IsNull()) {
+            if (buffer->DataLength() > remainingData) {
+                // Should never happen, but let's be extra careful about buffer
+                // overruns.
+                LogStringAndReturnError(@"Encoding buffer size is bigger than it claimed", CHIP_ERROR_INCORRECT_STATE, error);
+                return false;
+            }
+
+            memcpy(flatBuffer.Get() + copiedData, buffer->Start(), buffer->DataLength());
+            copiedData += buffer->DataLength();
+            remainingData -= buffer->DataLength();
+            buffer.Advance();
+        }
+        if (remainingData != 0) {
+            LogStringAndReturnError(
+                @"Did not copy all data from Encoding buffer for some reason", CHIP_ERROR_INCORRECT_STATE, error);
+            return false;
+        }
+        reader.Init(flatBuffer.Get(), copiedData);
+    } else {
+        reader.Init(buffer->Start(), buffer->DataLength());
+    }
+
+    errorCode = reader.Next(TLV::AnonymousTag());
+    if (errorCode != CHIP_NO_ERROR) {
+        LogStringAndReturnError(@"data-value TLV encoding did not create a TLV element", errorCode, error);
+        return false;
+    }
+
+    return true;
+}
+
 @implementation MTRAttributeReport
++ (void)initialize
+{
+    // One of our init methods ends up doing Platform::MemoryAlloc.
+    MTRFrameworkInit();
+}
+
 - (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(id _Nullable)value error:(NSError * _Nullable)error
 {
     if (self = [super init]) {
@@ -2249,6 +2380,75 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     }
     return self;
 }
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    // In theory, the types of all the things in the dictionary will be correct
+    // if our consumer passes in an actual response-value dictionary, but
+    // double-check just to be sure
+    if (!CheckMemberOfType(responseValue, MTRAttributePathKey, [MTRAttributePath class],
+            @"response-value attribute path is not an MTRAttributePath.", error)) {
+        return nil;
+    }
+    MTRAttributePath * path = responseValue[MTRAttributePathKey];
+
+    id _Nullable value = responseValue[MTRErrorKey];
+    if (value != nil) {
+        if (!CheckMemberOfType(responseValue, MTRErrorKey, [NSError class], @"response-value error is not an NSError.", error)) {
+            return nil;
+        }
+
+        _path = path;
+        _value = nil;
+        _error = value;
+        return self;
+    }
+
+    if (!CheckMemberOfType(
+            responseValue, MTRDataKey, [NSDictionary class], @"response-value data is not a data-value dictionary.", error)) {
+        return nil;
+    }
+    NSDictionary * data = responseValue[MTRDataKey];
+
+    // Encode the data to TLV and then decode from that, to reuse existing code.
+    System::PacketBufferHandle buffer;
+    Platform::ScopedMemoryBuffer<uint8_t> flatBuffer;
+    TLV::TLVReader reader;
+    if (!EncodeDataValueToTLV(buffer, flatBuffer, data, reader, error)) {
+        return nil;
+    }
+
+    auto attributePath = [path _asConcretePath];
+
+    CHIP_ERROR errorCode = CHIP_ERROR_INTERNAL;
+    id decodedValue = MTRDecodeAttributeValue(attributePath, reader, &errorCode);
+    if (errorCode == CHIP_NO_ERROR) {
+        _path = path;
+        _value = decodedValue;
+        _error = nil;
+        return self;
+    }
+
+    if (errorCode == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB) {
+        LogStringAndReturnError(@"No known schema for decoding attribute value.", MTRErrorCodeUnknownSchema, error);
+        return nil;
+    }
+
+    // Treat all other errors as schema errors.
+    LogStringAndReturnError(@"Attribute decoding failed schema check.", MTRErrorCodeSchemaMismatch, error);
+    return nil;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [[MTRAttributeReport alloc] initWithPath:[self.path _asConcretePath] value:self.value error:self.error];
+}
+
 @end
 
 @interface MTREventReport () {
@@ -2257,12 +2457,17 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 @end
 
 @implementation MTREventReport
++ (void)initialize
+{
+    // One of our init methods ends up doing Platform::MemoryAlloc.
+    MTRFrameworkInit();
+}
+
 - (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path
                  eventNumber:(NSNumber *)eventNumber
                     priority:(PriorityLevel)priority
                    timestamp:(const Timestamp &)timestamp
-                       value:(id _Nullable)value
-                       error:(NSError * _Nullable)error
+                       value:(id)value
 {
     if (self = [super init]) {
         _path = [[MTREventPath alloc] initWithPath:path];
@@ -2282,9 +2487,123 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
             return nil;
         }
         _value = value;
+        _error = nil;
+    }
+    return self;
+}
+
+- (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path error:(NSError *)error
+{
+    if (self = [super init]) {
+        _path = [[MTREventPath alloc] initWithPath:path];
+        // Use some sort of initialized values for our members, even though
+        // those values are meaningless in this case.
+        _eventNumber = @(0);
+        _priority = @(MTREventPriorityDebug);
+        _eventTimeType = MTREventTimeTypeSystemUpTime;
+        _systemUpTime = 0;
+        _timestampDate = nil;
+        _value = nil;
         _error = error;
     }
     return self;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    // In theory, the types of all the things in the dictionary will be correct
+    // if our consumer passes in an actual response-value dictionary, but
+    // double-check just to be sure
+    if (!CheckMemberOfType(
+            responseValue, MTREventPathKey, [MTREventPath class], @"response-value event path is not an MTREventPath.", error)) {
+        return nil;
+    }
+    MTREventPath * path = responseValue[MTREventPathKey];
+
+    id _Nullable value = responseValue[MTRErrorKey];
+    if (value != nil) {
+        if (!CheckMemberOfType(responseValue, MTRErrorKey, [NSError class], @"response-value error is not an NSError.", error)) {
+            return nil;
+        }
+
+        return [self initWithPath:[path _asConcretePath] error:value];
+    }
+
+    if (!CheckMemberOfType(
+            responseValue, MTRDataKey, [NSDictionary class], @"response-value data is not a data-value dictionary.", error)) {
+        return nil;
+    }
+    NSDictionary * data = responseValue[MTRDataKey];
+
+    // Encode the data to TLV and then decode from that, to reuse existing code.
+    System::PacketBufferHandle buffer;
+    Platform::ScopedMemoryBuffer<uint8_t> flatBuffer;
+    TLV::TLVReader reader;
+    if (!EncodeDataValueToTLV(buffer, flatBuffer, data, reader, error)) {
+        return nil;
+    }
+    auto eventPath = [path _asConcretePath];
+
+    CHIP_ERROR errorCode = CHIP_ERROR_INTERNAL;
+    id decodedValue = MTRDecodeEventPayload(eventPath, reader, &errorCode);
+    if (errorCode == CHIP_NO_ERROR) {
+        // Validate our other members.
+        if (!CheckMemberOfType(
+                responseValue, MTREventNumberKey, [NSNumber class], @"response-value event number is not an NSNumber", error)) {
+            return nil;
+        }
+        _eventNumber = responseValue[MTREventNumberKey];
+
+        if (!CheckMemberOfType(
+                responseValue, MTREventPriorityKey, [NSNumber class], @"response-value event priority is not an NSNumber", error)) {
+            return nil;
+        }
+        _priority = responseValue[MTREventPriorityKey];
+
+        if (!CheckMemberOfType(responseValue, MTREventTimeTypeKey, [NSNumber class],
+                @"response-value event time type is not an NSNumber", error)) {
+            return nil;
+        }
+        NSNumber * wrappedTimeType = responseValue[MTREventTimeTypeKey];
+        if (wrappedTimeType.unsignedIntegerValue == MTREventTimeTypeSystemUpTime) {
+            if (!CheckMemberOfType(responseValue, MTREventSystemUpTimeKey, [NSNumber class],
+                    @"response-value event system uptime time is not an NSNumber", error)) {
+                return nil;
+            }
+            NSNumber * wrappedSystemTime = responseValue[MTREventSystemUpTimeKey];
+            _systemUpTime = wrappedSystemTime.doubleValue;
+        } else if (wrappedTimeType.unsignedIntegerValue == MTREventTimeTypeTimestampDate) {
+            if (!CheckMemberOfType(responseValue, MTREventTimestampDateKey, [NSDate class],
+                    @"response-value event timestampe is not an NSDate", error)) {
+                return nil;
+            }
+            _timestampDate = responseValue[MTREventTimestampDateKey];
+        } else {
+            LogStringAndReturnError([NSString stringWithFormat:@"Invalid event time type: %lu", wrappedTimeType.unsignedLongValue],
+                MTRErrorCodeInvalidArgument, error);
+            return nil;
+        }
+        _eventTimeType = static_cast<MTREventTimeType>(wrappedTimeType.unsignedIntegerValue);
+
+        _path = path;
+        _value = decodedValue;
+        _error = nil;
+        return self;
+    }
+
+    if (errorCode == CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB) {
+        LogStringAndReturnError(@"No known schema for decoding event payload.", MTRErrorCodeUnknownSchema, error);
+        return nil;
+    }
+
+    // Treat all other errors as schema errors.
+    LogStringAndReturnError(@"Event payload decoding failed schema check.", MTRErrorCodeSchemaMismatch, error);
+    return nil;
 }
 @end
 
@@ -2324,12 +2643,15 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
         return;
     }
 
-    [mEventReports addObject:[[MTREventReport alloc] initWithPath:aEventHeader.mPath
-                                                      eventNumber:@(aEventHeader.mEventNumber)
-                                                         priority:aEventHeader.mPriorityLevel
-                                                        timestamp:aEventHeader.mTimestamp
-                                                            value:value
-                                                            error:error]];
+    if (error != nil) {
+        [mEventReports addObject:[[MTREventReport alloc] initWithPath:aEventHeader.mPath error:error]];
+    } else {
+        [mEventReports addObject:[[MTREventReport alloc] initWithPath:aEventHeader.mPath
+                                                          eventNumber:@(aEventHeader.mEventNumber)
+                                                             priority:aEventHeader.mPriorityLevel
+                                                            timestamp:aEventHeader.mTimestamp
+                                                                value:value]];
+    }
 }
 
 void SubscriptionCallback::OnAttributeData(

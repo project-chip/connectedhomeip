@@ -33,7 +33,7 @@ import chip.platform.PreferencesKeyValueStoreManager
 import com.google.chip.chiptool.attestation.ExampleAttestationTrustStoreDelegate
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /** Lazily instantiates [ChipDeviceController] and holds a reference to it. */
 object ChipClient {
@@ -75,7 +75,7 @@ object ChipClient {
     // once we are done with the returned device pointer. Memory leak was introduced since the refactor
     // that introduced it was very large in order to fix a use after free, which was considered to be
     // worse than the memory leak that was introduced.
-    return suspendCoroutine { continuation ->
+    return suspendCancellableCoroutine { continuation ->
       getDeviceController(context).getConnectedDevicePointer(
         nodeId,
         object : GetConnectedDeviceCallback {
