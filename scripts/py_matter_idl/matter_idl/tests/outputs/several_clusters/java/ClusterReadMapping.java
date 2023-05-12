@@ -23,9 +23,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ClusterReadMapping {
-    public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
-        Map<String, Map<String, InteractionInfo>> readAttributeMap = new HashMap<>();
-        Map<String, InteractionInfo> readFirstInteractionInfo = new LinkedHashMap<>();Map<String, CommandParameterInfo> readFirstSomeIntegerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+
+    private static Map<String, InteractionInfo> readFirstInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readFirstSomeIntegerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readFirstSomeIntegerAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.FirstCluster) cluster).readSomeIntegerAttribute(
@@ -35,9 +36,12 @@ public class ClusterReadMapping {
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readFirstSomeIntegerCommandParams
         );
-        readFirstInteractionInfo.put("readSomeIntegerAttribute", readFirstSomeIntegerAttributeInteractionInfo);
-        readAttributeMap.put("first", readFirstInteractionInfo);
-        Map<String, InteractionInfo> readSecondInteractionInfo = new LinkedHashMap<>();Map<String, CommandParameterInfo> readSecondSomeBytesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        result.put("readSomeIntegerAttribute", readFirstSomeIntegerAttributeInteractionInfo);
+     
+       return result;
+    }
+    private static Map<String, InteractionInfo> readSecondInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readSecondSomeBytesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readSecondSomeBytesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.SecondCluster) cluster).readSomeBytesAttribute(
@@ -47,9 +51,12 @@ public class ClusterReadMapping {
           () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
           readSecondSomeBytesCommandParams
         );
-        readSecondInteractionInfo.put("readSomeBytesAttribute", readSecondSomeBytesAttributeInteractionInfo);
-        readAttributeMap.put("second", readSecondInteractionInfo);
-        Map<String, InteractionInfo> readThirdInteractionInfo = new LinkedHashMap<>();Map<String, CommandParameterInfo> readThirdSomeEnumCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        result.put("readSomeBytesAttribute", readSecondSomeBytesAttributeInteractionInfo);
+     
+       return result;
+    }
+    private static Map<String, InteractionInfo> readThirdInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readThirdSomeEnumCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThirdSomeEnumAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.ThirdCluster) cluster).readSomeEnumAttribute(
@@ -59,7 +66,8 @@ public class ClusterReadMapping {
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readThirdSomeEnumCommandParams
         );
-        readThirdInteractionInfo.put("readSomeEnumAttribute", readThirdSomeEnumAttributeInteractionInfo);Map<String, CommandParameterInfo> readThirdOptionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        result.put("readSomeEnumAttribute", readThirdSomeEnumAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThirdOptionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThirdOptionsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.ThirdCluster) cluster).readOptionsAttribute(
@@ -69,8 +77,17 @@ public class ClusterReadMapping {
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readThirdOptionsCommandParams
         );
-        readThirdInteractionInfo.put("readOptionsAttribute", readThirdOptionsAttributeInteractionInfo);
-        readAttributeMap.put("third", readThirdInteractionInfo);return readAttributeMap;
+        result.put("readOptionsAttribute", readThirdOptionsAttributeInteractionInfo);
+     
+       return result;
+    }
+    @SuppressWarnings("serial")
+    public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
+
+        return new HashMap<String, Map<String, InteractionInfo>>(){{
+            put("first", readFirstInteractionInfo());
+            put("second", readSecondInteractionInfo());
+            put("third", readThirdInteractionInfo());}};
     }
 }
 
