@@ -143,7 +143,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             mTransfer.AbortTransfer(StatusCode::kUnknown);
             return;
         }
-
+        ChipLogError(BDX, "kQueryReceived PacketBufferHandle allocated address %p", &blockBuf);
         std::ifstream otaFile(mFileDesignator, std::ifstream::in);
         if (!otaFile.good())
         {

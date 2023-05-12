@@ -291,7 +291,7 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
         NL_TEST_ASSERT(inSuite, false);
         return;
     }
-
+    ChipLogError(BDX, "SendAndVerifyArbitraryBlock PacketBufferHandle allocated address %p", &fakeDataBuf);
     uint8_t * fakeBlockData = fakeDataBuf->Start();
     fakeBlockData[0]        = dataCount++;
 
@@ -426,6 +426,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
         NL_TEST_ASSERT(inSuite, false);
         return;
     }
+    ChipLogError(BDX, "TestInitiatingReceiverReceiverDrive PacketBufferHandle allocated address %p", &fakeBuf);
     prematureBlock.Data   = fakeBuf->Start();
     prematureBlock.Length = testSmallerBlockSize;
     prematureBlock.IsEof  = false;
@@ -682,6 +683,12 @@ void TestDuplicateBlockError(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle blockCopy =
         System::PacketBufferHandle::NewWithData(eventWithBlock.MsgData->Start(), eventWithBlock.MsgData->DataLength());
 
+    if (blockCopy.IsNull())
+    {
+        NL_TEST_ASSERT(inSuite, false);
+        return;
+    }
+    ChipLogError(BDX, "TestDuplicateBlockError PacketBufferHandle allocated address %p", &blockCopy);
     // Pass Block message to receiver and verify matching Block is received
     err = AttachHeaderAndSend(eventWithBlock.msgTypeData, std::move(eventWithBlock.MsgData), initiatingReceiver);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);

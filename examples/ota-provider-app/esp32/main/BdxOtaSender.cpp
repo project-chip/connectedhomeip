@@ -133,7 +133,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             mTransfer.AbortTransfer(StatusCode::kUnknown);
             return;
         }
-
+        ChipLogError(BDX, "kQueryReceived PacketBufferHandle allocated address %p", &blockBuf);
         if (mOnBlockQueryCallback != nullptr && mOnBlockQueryCallback->mCall != nullptr)
         {
             if (CHIP_NO_ERROR !=

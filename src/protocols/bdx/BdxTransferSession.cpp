@@ -34,6 +34,7 @@ CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip
     {
         return CHIP_ERROR_NO_MEMORY;
     }
+    ChipLogError(BDX, "WriteToPacketBuffer PacketBufferHandle allocated address %p", &bbuf);
     msgStruct.WriteToBuffer(bbuf);
     msgBuf = bbuf.Finalize();
     if (msgBuf.IsNull())
@@ -875,8 +876,10 @@ void TransferSession::PrepareStatusReport(StatusCode code)
                                                   to_underlying(code));
     size_t msgSize = report.Size();
     Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgSize), msgSize);
+
     VerifyOrExit(!bbuf.IsNull(), mPendingOutput = OutputEventType::kInternalError);
 
+    ChipLogError(BDX, "PrepareStatusReport PacketBufferHandle allocated address %p", &bbuf);
     report.WriteToBuffer(bbuf);
     mPendingMsgHandle = bbuf.Finalize();
     if (mPendingMsgHandle.IsNull())

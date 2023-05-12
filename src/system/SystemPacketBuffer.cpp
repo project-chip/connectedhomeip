@@ -464,6 +464,7 @@ bool PacketBuffer::AlignPayload(uint16_t aAlignBytes)
 void PacketBuffer::AddRef()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+    ChipLogError(chipSystemLayer, "PacketBuffer: add ref");
     pbuf_ref(this);
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
     LOCK_BUF_POOL();
@@ -502,7 +503,7 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 
     lPacket = static_cast<PacketBuffer *>(
         pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lAllocSize), CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE));
-
+    ChipLogError(chipSystemLayer, "PacketBuffer: new");
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
@@ -583,9 +584,17 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
+    ChipLogError(chipSystemLayer, "calling free %p", aPacket);
     if (aPacket != nullptr)
     {
         pbuf_free(aPacket);
+        
+        ChipLogError(chipSystemLayer, "Releasing %p", aPacket);
+        if (aPacket != nullptr) {
+            ChipLogError(chipSystemLayer, "PacketBuffer: dtor called but not freed %p", aPacket);
+        } else {
+             ChipLogError(chipSystemLayer, "PacketBuffer: dtor - freed");
+        }
 
         SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
     }
@@ -623,7 +632,9 @@ void PacketBuffer::Free(PacketBuffer * aPacket)
     }
 
     UNLOCK_BUF_POOL();
-
+    if (aPacket != nullptr) {
+        ChipLogError(chipSystemLayer, "PacketBuffer: dtor called %p", aPacket);
+    }
 #else
 #error "Unimplemented PacketBuffer storage case"
 #endif
