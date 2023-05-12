@@ -130,9 +130,9 @@ tests:
           0x0001 and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
-          
+
           ./chip-tool scenes add-scene 0x0001 1 1 "Test Name" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": [value]}]}' nodeId endpointId
-          
+
           Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
 
           Verify the "status is success" on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
