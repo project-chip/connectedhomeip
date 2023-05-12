@@ -81,7 +81,7 @@ void sl_get_bluethooth_addr(uint8_t * addr, uint8_t length)
 {
     while (length > 0)
     {
-        *(addr + length) = chip::Crypto::GetRandU16() % 255;
+        *(addr + length) = chip::Crypto::GetRandU8();
         length--;
     }
 }
