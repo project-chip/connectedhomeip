@@ -58,11 +58,12 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
 
     // Save our initialization state that we can't recover later from a
     // created-but-shut-down system state.
-    mListenPort               = params.listenPort;
-    mFabricIndependentStorage = params.fabricIndependentStorage;
-    mOperationalKeystore      = params.operationalKeystore;
-    mOpCertStore              = params.opCertStore;
-    mEnableServerInteractions = params.enableServerInteractions;
+    mListenPort                = params.listenPort;
+    mFabricIndependentStorage  = params.fabricIndependentStorage;
+    mOperationalKeystore       = params.operationalKeystore;
+    mOpCertStore               = params.opCertStore;
+    mCertificateValidityPolicy = params.certificateValidityPolicy;
+    mEnableServerInteractions  = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -82,14 +83,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
-        params.listenPort               = mListenPort;
-        params.fabricIndependentStorage = mFabricIndependentStorage;
-        params.enableServerInteractions = mEnableServerInteractions;
-        params.groupDataProvider        = mSystemState->GetGroupDataProvider();
-        params.sessionKeystore          = mSystemState->GetSessionKeystore();
-        params.fabricTable              = mSystemState->Fabrics();
-        params.operationalKeystore      = mOperationalKeystore;
-        params.opCertStore              = mOpCertStore;
+        params.listenPort                = mListenPort;
+        params.fabricIndependentStorage  = mFabricIndependentStorage;
+        params.enableServerInteractions  = mEnableServerInteractions;
+        params.groupDataProvider         = mSystemState->GetGroupDataProvider();
+        params.sessionKeystore           = mSystemState->GetSessionKeystore();
+        params.fabricTable               = mSystemState->Fabrics();
+        params.operationalKeystore       = mOperationalKeystore;
+        params.opCertStore               = mOpCertStore;
+        params.certificateValidityPolicy = mCertificateValidityPolicy;
     }
 
     return InitSystemState(params);
@@ -363,9 +365,10 @@ void DeviceControllerFactory::Shutdown()
         Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
-    mFabricIndependentStorage = nullptr;
-    mOperationalKeystore      = nullptr;
-    mOpCertStore              = nullptr;
+    mFabricIndependentStorage  = nullptr;
+    mOperationalKeystore       = nullptr;
+    mOpCertStore               = nullptr;
+    mCertificateValidityPolicy = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()
