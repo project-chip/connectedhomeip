@@ -1,1 +1,1 @@
-0.7.8 Version bump reason: Update crosscompile sysroot to Ubuntu 22.04.01
+0.7.9 Version bump reason: Fix path for sysroot for crosscompile image
