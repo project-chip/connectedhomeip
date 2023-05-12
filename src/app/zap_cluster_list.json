@@ -90,9 +90,7 @@
         "ACCESS_CONTROL_CLUSTER": ["access-control-server"],
         "ACCOUNT_LOGIN_CLUSTER": ["account-login-server"],
         "ACTIONS_CLUSTER": [],
-        "ADMINISTRATOR_COMMISSIONING_CLUSTER": [
-            "administrator-commissioning-server"
-        ],
+        "ADMINISTRATOR_COMMISSIONING_CLUSTER": ["administrator-commissioning-server"],
         "ALARM_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],

@@ -270,10 +270,7 @@
             "CurrentMaxRate",
             "OverrunCount"
         ],
-        "Channel": [
-            "Lineup",
-            "CurrentChannel"
-        ],
+        "Channel": ["Lineup", "CurrentChannel"],
         "Media Playback": ["SampledPosition"],
         "Application Launcher": ["CurrentApp"],
         "Application Basic": ["Application"],
