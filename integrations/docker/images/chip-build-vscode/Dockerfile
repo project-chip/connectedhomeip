@@ -50,7 +50,6 @@ COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
 COPY --from=ti /opt/ti/sysconfig_1.13.0 /opt/ti/sysconfig_1.13.0
 
-COPY --from=openiotsdk /opt/gcc-arm-none-eabi-10.3-2021.10/ /opt/gcc-arm-none-eabi-10.3-2021.10/
 COPY --from=openiotsdk /opt/FVP_Corstone_SSE-300/ /opt/FVP_Corstone_SSE-300/
 
 COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
