@@ -20,19 +20,15 @@
 namespace chip {
 namespace DeviceLayer {
 
-ICDEventManager ICDEventManager::instance;
-
-/**
- * @brief Returns Unique Instance for the ICDEventManager
- *
- * @return ICDEventManager
- */
-ICDEventManager & ICDEventManager::GetInstance()
+CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
 {
-    return instance;
+    VerifyOrReturnError(icdManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mICDManager = icdManager;
+    
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ICDEventManager::Init()
+CHIP_ERROR ICDEventManager::Shutdown()
 {
     return CHIP_NO_ERROR;
 }

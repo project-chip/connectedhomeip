@@ -22,6 +22,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 
+// TODO define
+#include <platform/ICDManager.h>
+
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 #include "ICDSubscriptionCallback.h"
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
@@ -40,4 +43,8 @@ private:
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
     static ICDSubscriptionCallback mICDSubscriptionHandler;
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+
+#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+    static chip::DeviceLayer::ICDManager mICDManager;
+#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
 };

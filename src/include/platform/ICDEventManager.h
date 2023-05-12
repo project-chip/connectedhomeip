@@ -32,14 +32,12 @@ class ICDEventManager
 {
 
 public:
-    static ICDEventManager & GetInstance();
-    CHIP_ERROR Init();
+    ICDEventManager() = default;
+    CHIP_ERROR Init(ICDManager * icdManager);
+    CHIP_ERROR Shutdown();
 
 private:
-    ICDEventManager() = default;
-
-    ICDManager icdManager;
-    static ICDEventManager instance;
+    ICDManager * mICDManager;
 };
 
 } // namespace DeviceLayer

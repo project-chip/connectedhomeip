@@ -65,6 +65,9 @@
 #endif
 #include <transport/raw/UDP.h>
 
+#include <platform/ICDEventManager.h>
+#include <platform/ICDManager.h>
+
 namespace chip {
 
 constexpr size_t kMaxBlePendingPackets = 1;
@@ -89,7 +92,7 @@ struct ServerInitParams
     ServerInitParams() = default;
 
     // Not copyable
-    ServerInitParams(const ServerInitParams &) = delete;
+    ServerInitParams(const ServerInitParams &)             = delete;
     ServerInitParams & operator=(const ServerInitParams &) = delete;
 
     // Application delegate to handle some commissioning lifecycle events
@@ -135,6 +138,12 @@ struct ServerInitParams
     // Operational certificate store with access to the operational certs in persisted storage:
     // must not be null at timne of Server::Init().
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
+
+#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+    // ICD Manager: Must be injected. Used to process logic for ICD server behaviours
+    // Must NOT be initialized before provided
+    DeviceLayer::ICDManager * icdManager = nullptr;
+#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
 };
 
 /**
@@ -169,7 +178,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     CommonCaseDeviceServerInitParams() = default;
 
     // Not copyable
-    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &) = delete;
+    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &)             = delete;
     CommonCaseDeviceServerInitParams & operator=(const CommonCaseDeviceServerInitParams &) = delete;
 
     /**
@@ -595,6 +604,8 @@ private:
     Inet::InterfaceId mInterfaceId;
 
     System::Clock::Microseconds64 mInitTimestamp;
+
+    DeviceLayer::ICDEventManager mICDEventManager;
 };
 
 } // namespace chip

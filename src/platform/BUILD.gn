@@ -426,7 +426,7 @@ if (chip_device_platform != "none") {
       "${chip_root}/src/lib/support",
     ]
 
-    if (chip_enable_icd) {
+    if (chip_enable_icd_server) {
       sources += [
         "../include/platform/ICDEventManager.h",
         "../include/platform/ICDManager.h",
@@ -434,7 +434,7 @@ if (chip_device_platform != "none") {
         "ICDManager.cpp",
       ]
 
-      defines = [ "CHIP_DEVICE_CONFIG_ICD_ENABLE" ]
+      defines = [ "CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE" ]
     }
 
     if (chip_device_platform == "cc13x2_26x2") {

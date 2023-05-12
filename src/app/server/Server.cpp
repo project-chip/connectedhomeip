@@ -118,6 +118,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.operationalKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
+#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+    VerifyOrExit(initParams.icdManager != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
 
@@ -246,6 +250,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                        std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+
+#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+    mICDEventManager.Init(initParams.icdManager);
+#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
 
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler();

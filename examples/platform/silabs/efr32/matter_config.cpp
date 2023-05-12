@@ -60,6 +60,10 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 ICDSubscriptionCallback SilabsMatterConfig::mICDSubscriptionHandler;
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 
+#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+ICDManager SilabsMatterConfig::mICDManager;
+#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
 #include <openthread/cli.h>
@@ -192,6 +196,10 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
+
+#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+    initParams.icdManager = &mICDManager;
+#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
 
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);

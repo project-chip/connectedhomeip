@@ -13,5 +13,11 @@
 # limitations under the License.
 
 declare_args() {
-  chip_enable_icd = false
+  # Matter SDK Configuration falg to enabled ICD server functionnalities
+  # TODO - Add Specifics when the design is refined
+  chip_enable_icd_server = false
+
+  # Matter SDK Configuration falg to enabled ICD client functionnalities
+  # TODO - Add Specifics when the design is refined
+  chip_enable_icd_client = false
 }
