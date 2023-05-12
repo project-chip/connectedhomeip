@@ -29,7 +29,7 @@ server cluster OnOff = 6 {
     kLighting = 0x1;
   }
 
-  bitmap SceneFeature : BITMAP32 {
+  bitmap ScenesFeature : BITMAP32 {
     kSceneNames = 0x1;
   }
 

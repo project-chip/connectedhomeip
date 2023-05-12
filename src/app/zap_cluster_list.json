@@ -219,7 +219,7 @@
         "PWM_CLUSTER": [],
         "REFRIGERATOR_ALARM_CLUSTER": ["refrigerator-alarm-server"],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
-        "SCENES_CLUSTER": ["scenes"],
+        "SCENES_CLUSTER": ["scenes-server"],
         "SMOKE_CO_ALARM_CLUSTER": [],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
         "SWITCH_CLUSTER": ["switch-server"],

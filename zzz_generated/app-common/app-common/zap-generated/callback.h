@@ -10729,66 +10729,6 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::DecodableType & commandData);
 /**
- * @brief Scenes Cluster AddScene Command callback (from client)
- */
-bool emberAfScenesClusterAddSceneCallback(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath,
-                                          const chip::app::Clusters::Scenes::Commands::AddScene::DecodableType & commandData);
-/**
- * @brief Scenes Cluster ViewScene Command callback (from client)
- */
-bool emberAfScenesClusterViewSceneCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath,
-                                           const chip::app::Clusters::Scenes::Commands::ViewScene::DecodableType & commandData);
-/**
- * @brief Scenes Cluster RemoveScene Command callback (from client)
- */
-bool emberAfScenesClusterRemoveSceneCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath,
-                                             const chip::app::Clusters::Scenes::Commands::RemoveScene::DecodableType & commandData);
-/**
- * @brief Scenes Cluster RemoveAllScenes Command callback (from client)
- */
-bool emberAfScenesClusterRemoveAllScenesCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Scenes::Commands::RemoveAllScenes::DecodableType & commandData);
-/**
- * @brief Scenes Cluster StoreScene Command callback (from client)
- */
-bool emberAfScenesClusterStoreSceneCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath,
-                                            const chip::app::Clusters::Scenes::Commands::StoreScene::DecodableType & commandData);
-/**
- * @brief Scenes Cluster RecallScene Command callback (from client)
- */
-bool emberAfScenesClusterRecallSceneCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath,
-                                             const chip::app::Clusters::Scenes::Commands::RecallScene::DecodableType & commandData);
-/**
- * @brief Scenes Cluster GetSceneMembership Command callback (from client)
- */
-bool emberAfScenesClusterGetSceneMembershipCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Scenes::Commands::GetSceneMembership::DecodableType & commandData);
-/**
- * @brief Scenes Cluster EnhancedAddScene Command callback (from client)
- */
-bool emberAfScenesClusterEnhancedAddSceneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Scenes::Commands::EnhancedAddScene::DecodableType & commandData);
-/**
- * @brief Scenes Cluster EnhancedViewScene Command callback (from client)
- */
-bool emberAfScenesClusterEnhancedViewSceneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Scenes::Commands::EnhancedViewScene::DecodableType & commandData);
-/**
- * @brief Scenes Cluster CopyScene Command callback (from client)
- */
-bool emberAfScenesClusterCopySceneCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath,
-                                           const chip::app::Clusters::Scenes::Commands::CopyScene::DecodableType & commandData);
-/**
  * @brief On/Off Cluster Off Command callback (from client)
  */
 bool emberAfOnOffClusterOffCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,

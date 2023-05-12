@@ -268,7 +268,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
     //  the current scene as described in the attribute table is invalid,
     //  so mark it as invalid (just writes the valid/invalid attribute)
 
-    Scenes::ScenesServer::Instance().OnMakeInvalid();
+    Scenes::ScenesServer::Instance().MakeSceneInvalid();
 #endif // EMBER_AF_PLUGIN_SCENES
 
     // The returned status is based solely on the On/Off cluster.  Errors in the
@@ -418,7 +418,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
             {
                 groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
             }
-            Scenes::ScenesServer::Instance().OnStoreCurrentScene(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+            Scenes::ScenesServer::Instance().StoreCurrentScene(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
 #endif // EMBER_AF_PLUGIN_SCENES
             OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
         }
@@ -478,7 +478,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
         groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     }
 
-    Scenes::ScenesServer::Instance().OnRecallScene(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+    Scenes::ScenesServer::Instance().RecallScene(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
 #endif // EMBER_AF_PLUGIN_SCENES
 
     OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);

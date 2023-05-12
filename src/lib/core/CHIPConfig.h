@@ -1391,6 +1391,13 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @brief Maximum transition time for scenes in seconds
+ */
+#ifndef CHIP_CONFIG_SCENES_MAX_TRANSITION_TIME_SECONDS
+#define CHIP_CONFIG_SCENES_MAX_TRANSITION_TIME_SECONDS 6000
+#endif
+
+/**
  * @brief The maximum number of scenes allowed on a single fabric
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_PER_FABRIC

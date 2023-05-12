@@ -283,7 +283,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     // The level has changed, so the scene is no longer valid.
     if (emberAfContainsServer(endpoint, Scenes::Id))
     {
-        Scenes::ScenesServer::Instance().OnMakeInvalid();
+        Scenes::ScenesServer::Instance().MakeSceneInvalid();
     }
 #endif // EMBER_AF_PLUGIN_SCENES
 

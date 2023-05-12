@@ -37,23 +37,19 @@ public:
     static ScenesServer & Instance();
 
     CHIP_ERROR Init();
+    void Shutdown();
 
     // CommandHanlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-    CHIP_ERROR EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // Callbacks
-    void OnGroupRemoved(const FabricIndex & aFabricIx, const EndpointId & aEndpointId, const GroupId & aGroupId);
-    void OnMakeInvalid();
-    void OnStoreCurrentScene(const FabricIndex & aFabricIx, const EndpointId & aEndpointId, const GroupId & aGroupId,
-                             const SceneId & aSceneId);
-    void OnRecallScene(const FabricIndex & aFabricIx, const EndpointId & aEndpointId, const GroupId & aGroupId,
-                       const SceneId & aSceneId);
+    void GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId);
+    void MakeSceneInvalid();
+    void StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId);
+    void RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId);
 
 private:
     ScenesServer() : CommandHandlerInterface(Optional<EndpointId>(), Id), AttributeAccessInterface(Optional<EndpointId>(), Id) {}
@@ -79,7 +75,6 @@ private:
     BitFlags<ScenesFeature> mFeatureFlags;
 
     // Attributes
-    uint8_t mSceneCount   = 0;
     SceneId mCurrentScene = 0;
     GroupId mCurrentGroup = 0;
     bool mSceneValid      = false;
