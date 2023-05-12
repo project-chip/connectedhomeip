@@ -2667,6 +2667,458 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRTemperatureControlClusterTemperatureLevelStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _temperatureLevel = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
+
+    other.label = self.label;
+    other.temperatureLevel = self.temperatureLevel;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: label:%@; temperatureLevel:%@; >", NSStringFromClass([self class]), _label, _temperatureLevel];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRefrigeratorAlarmClusterNotifyEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _active = @(0);
+
+        _inactive = @(0);
+
+        _state = @(0);
+
+        _mask = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRRefrigeratorAlarmClusterNotifyEvent alloc] init];
+
+    other.active = self.active;
+    other.inactive = self.inactive;
+    other.state = self.state;
+    other.mask = self.mask;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: active:%@; inactive:%@; state:%@; mask:%@; >",
+                                             NSStringFromClass([self class]), _active, _inactive, _state, _mask];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDishwasherOperationalStateClusterErrorStateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorStateID = @(0);
+
+        _errorStateLabel = @"";
+
+        _errorStateDetails = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDishwasherOperationalStateClusterErrorStateStruct alloc] init];
+
+    other.errorStateID = self.errorStateID;
+    other.errorStateLabel = self.errorStateLabel;
+    other.errorStateDetails = self.errorStateDetails;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: errorStateID:%@; errorStateLabel:%@; errorStateDetails:%@; >",
+                                             NSStringFromClass([self class]), _errorStateID, _errorStateLabel, _errorStateDetails];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDishwasherOperationalStateClusterOperationalStateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _operationalStateID = @(0);
+
+        _operationalStateLabel = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDishwasherOperationalStateClusterOperationalStateStruct alloc] init];
+
+    other.operationalStateID = self.operationalStateID;
+    other.operationalStateLabel = self.operationalStateLabel;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: operationalStateID:%@; operationalStateLabel:%@; >",
+                                             NSStringFromClass([self class]), _operationalStateID, _operationalStateLabel];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDishwasherOperationalStateClusterOperationalErrorEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorState = [MTRDishwasherOperationalStateClusterErrorStateStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDishwasherOperationalStateClusterOperationalErrorEvent alloc] init];
+
+    other.errorState = self.errorState;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: errorState:%@; >", NSStringFromClass([self class]), _errorState];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDishwasherOperationalStateClusterOperationCompletionEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _completionErrorCode = @(0);
+
+        _totalOperationalTime = @(0);
+
+        _pausedTime = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDishwasherOperationalStateClusterOperationCompletionEvent alloc] init];
+
+    other.completionErrorCode = self.completionErrorCode;
+    other.totalOperationalTime = self.totalOperationalTime;
+    other.pausedTime = self.pausedTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: completionErrorCode:%@; totalOperationalTime:%@; pausedTime:%@; >",
+                  NSStringFromClass([self class]), _completionErrorCode, _totalOperationalTime, _pausedTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROperationalStateClusterErrorStateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorStateID = @(0);
+
+        _errorStateLabel = @"";
+
+        _errorStateDetails = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROperationalStateClusterErrorStateStruct alloc] init];
+
+    other.errorStateID = self.errorStateID;
+    other.errorStateLabel = self.errorStateLabel;
+    other.errorStateDetails = self.errorStateDetails;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: errorStateID:%@; errorStateLabel:%@; errorStateDetails:%@; >",
+                                             NSStringFromClass([self class]), _errorStateID, _errorStateLabel, _errorStateDetails];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROperationalStateClusterOperationalStateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _operationalStateID = @(0);
+
+        _operationalStateLabel = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROperationalStateClusterOperationalStateStruct alloc] init];
+
+    other.operationalStateID = self.operationalStateID;
+    other.operationalStateLabel = self.operationalStateLabel;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: operationalStateID:%@; operationalStateLabel:%@; >",
+                                             NSStringFromClass([self class]), _operationalStateID, _operationalStateLabel];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROperationalStateClusterOperationalErrorEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorState = [MTROperationalStateClusterErrorStateStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROperationalStateClusterOperationalErrorEvent alloc] init];
+
+    other.errorState = self.errorState;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: errorState:%@; >", NSStringFromClass([self class]), _errorState];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTROperationalStateClusterOperationCompletionEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _completionErrorCode = @(0);
+
+        _totalOperationalTime = @(0);
+
+        _pausedTime = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROperationalStateClusterOperationCompletionEvent alloc] init];
+
+    other.completionErrorCode = self.completionErrorCode;
+    other.totalOperationalTime = self.totalOperationalTime;
+    other.pausedTime = self.pausedTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: completionErrorCode:%@; totalOperationalTime:%@; pausedTime:%@; >",
+                  NSStringFromClass([self class]), _completionErrorCode, _totalOperationalTime, _pausedTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRoboticVacuumOperationalStateClusterErrorStateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorStateID = @(0);
+
+        _errorStateLabel = @"";
+
+        _errorStateDetails = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRRoboticVacuumOperationalStateClusterErrorStateStruct alloc] init];
+
+    other.errorStateID = self.errorStateID;
+    other.errorStateLabel = self.errorStateLabel;
+    other.errorStateDetails = self.errorStateDetails;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: errorStateID:%@; errorStateLabel:%@; errorStateDetails:%@; >",
+                                             NSStringFromClass([self class]), _errorStateID, _errorStateLabel, _errorStateDetails];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRoboticVacuumOperationalStateClusterOperationalStateStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _operationalStateID = @(0);
+
+        _operationalStateLabel = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRRoboticVacuumOperationalStateClusterOperationalStateStruct alloc] init];
+
+    other.operationalStateID = self.operationalStateID;
+    other.operationalStateLabel = self.operationalStateLabel;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: operationalStateID:%@; operationalStateLabel:%@; >",
+                                             NSStringFromClass([self class]), _operationalStateID, _operationalStateLabel];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRoboticVacuumOperationalStateClusterOperationalErrorEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _errorState = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRRoboticVacuumOperationalStateClusterOperationalErrorEvent alloc] init];
+
+    other.errorState = self.errorState;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: errorState:%@; >", NSStringFromClass([self class]), _errorState];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRoboticVacuumOperationalStateClusterOperationCompletionEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _completionErrorCode = @(0);
+
+        _totalOperationalTime = @(0);
+
+        _pausedTime = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRRoboticVacuumOperationalStateClusterOperationCompletionEvent alloc] init];
+
+    other.completionErrorCode = self.completionErrorCode;
+    other.totalOperationalTime = self.totalOperationalTime;
+    other.pausedTime = self.pausedTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: completionErrorCode:%@; totalOperationalTime:%@; pausedTime:%@; >",
+                  NSStringFromClass([self class]), _completionErrorCode, _totalOperationalTime, _pausedTime];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {
