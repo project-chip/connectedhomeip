@@ -194,7 +194,8 @@ class YamlLoader:
             'excludes': list,
             'hasMasksSet': list,
             'hasMasksClear': list,
-            'notValue': (type(None), bool, str, int, float, list, dict)
+            'notValue': (type(None), bool, str, int, float, list, dict),
+            'anyOf': list
         }
 
         self.__check(content, schema)
