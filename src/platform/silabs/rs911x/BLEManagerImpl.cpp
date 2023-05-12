@@ -79,12 +79,9 @@ using namespace ::chip::DeviceLayer::Internal;
 
 void sl_get_bluethooth_addr(uint8_t * addr, uint8_t length)
 {
-    uint16_t randNumber = chip::Crypto::GetRandU16();
-    srand(randNumber);
     while (length > 0)
     {
-        int value        = std::rand();
-        *(addr + length) = value % 255;
+        *(addr + length) = chip::Crypto::GetRandU16() % 255;
         length--;
     }
 }
@@ -104,6 +101,7 @@ void sl_ble_init()
                                     rsi_ble_on_event_indication_confirmation, NULL);
 
     //  Exchange of GATT info with BLE stack
+
     rsi_ble_add_matter_service();
 
     //  initializing the application events map
@@ -637,12 +635,36 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
 
     err = ConfigureAdvertisingData();
-    // SuccessOrExit(err);
+    SuccessOrExit(err);
 
     mFlags.Clear(Flags::kRestartAdvertising);
 
     sl_wfx_mac_address_t macaddr;
     wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
+
+		status = sInstance.SendBLEAdvertisementCommand();
+
+    if (status == RSI_SUCCESS)
+    {
+        ChipLogProgress(DeviceLayer, "rsi_ble_start_advertising Success");
+
+        if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+        {
+            StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+        }
+        mFlags.Set(Flags::kAdvertising);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "rsi_ble_start_advertising Failed with status: %lx", status);
+    }
+
+exit:
+    ChipLogError(DeviceLayer, "StartAdvertising() End error: %s", ErrorStr(err));
+    return CHIP_NO_ERROR; // err;
+}
+
+int32_t BLEManagerImpl::SendBLEAdvertisementCommand(void) {
 
     rsi_ble_req_adv_t ble_adv = { 0 };
 
@@ -663,27 +685,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     ble_adv.own_addr_type   = LE_RANDOM_ADDRESS;
     ble_adv.adv_channel_map = RSI_BLE_ADV_CHANNEL_MAP;
 
-    //! Set local name
-    status = rsi_ble_start_advertising_with_values(&ble_adv);
-
-    if (status == RSI_SUCCESS)
-    {
-        ChipLogProgress(DeviceLayer, "rsi_ble_start_advertising Success");
-
-        if (mFlags.Has(Flags::kFastAdvertisingEnabled))
-        {
-            StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
-        }
-        mFlags.Set(Flags::kAdvertising);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "rsi_ble_start_advertising Failed with status: %lx", status);
-    }
-
-    // learexit:
-    ChipLogError(DeviceLayer, "StartAdvertising() End error: %s", ErrorStr(err));
-    return CHIP_NO_ERROR; // err;
+    return rsi_ble_start_advertising_with_values(&ble_adv);
 }
 
 // TODO:: Implementation need to be done.
