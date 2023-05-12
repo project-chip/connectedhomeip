@@ -400,6 +400,7 @@ void AmebaOTAImageProcessor::HandleApply(intptr_t context)
     if (imageProcessor == nullptr)
     {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
+        GetRequestorInstance()->CancelImageUpdate();
         return;
     }
 
@@ -409,12 +410,14 @@ void AmebaOTAImageProcessor::HandleApply(intptr_t context)
     {
         ota_update_free(imageProcessor->pOtaTgtHdr);
         ChipLogError(SoftwareUpdate, "OTA update signature failed");
+        GetRequestorInstance()->CancelImageUpdate();
         return;
     }
 #elif defined(CONFIG_PLATFORM_8710C)
     if (update_ota_signature(imageProcessor->signature, imageProcessor->flash_addr) < 0)
     {
         ChipLogError(SoftwareUpdate, "OTA update signature failed");
+        GetRequestorInstance()->CancelImageUpdate();
         return;
     }
 #endif
