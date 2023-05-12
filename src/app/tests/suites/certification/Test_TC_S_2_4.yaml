@@ -179,7 +179,10 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Please execute the add scene command with extensionfieldsets in accordance with AC1 on DUT and enter 'y' if the command is successful"
+                value:
+                    "Please execute the add scene command with
+                    extensionfieldsets in accordance with AC1 on DUT and enter
+                    'y' if the command is successful"
               - name: "expectedValue"
                 value: "y"
 
@@ -200,7 +203,8 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "TH configures AC1 on DUT for all implemented application clusters
+    - label:
+          "TH configures AC1 on DUT for all implemented application clusters
           supporting scenes."
       verification: |
           Is DUT configured with AC1?
@@ -210,7 +214,9 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Please configure AC1 on DUT and enter 'y' after the configuration is complete"
+                value:
+                    "Please configure AC1 on DUT and enter 'y' after the
+                    configuration is complete"
               - name: "expectedValue"
                 value: "y"
 
@@ -251,7 +257,8 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "TH configures AC2 on DUT for all implemented application clusters
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
           supporting scenes."
       verification: |
           Is DUT configured with AC2?
@@ -261,7 +268,9 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Please configure AC2 on DUT and enter 'y' after the configuration is complete"
+                value:
+                    "Please configure AC2 on DUT and enter 'y' after the
+                    configuration is complete"
               - name: "expectedValue"
                 value: "y"
 
@@ -297,7 +306,8 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "TH configures AC2 on DUT for all implemented application clusters
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
           supporting scenes."
       verification: |
           Is DUT configured with AC2?
@@ -307,7 +317,9 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Please configure AC2 on DUT and enter 'y' after the configuration is complete"
+                value:
+                    "Please configure AC2 on DUT and enter 'y' after the
+                    configuration is complete"
               - name: "expectedValue"
                 value: "y"
 
@@ -345,7 +357,8 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "TH configures AC2 on DUT for all implemented application clusters
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
           supporting scenes."
       verification: |
           Is DUT configured with AC2?
@@ -355,7 +368,9 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Please configure AC2 on DUT and enter 'y' after the configuration is complete"
+                value:
+                    "Please configure AC2 on DUT and enter 'y' after the
+                    configuration is complete"
               - name: "expectedValue"
                 value: "y"
 
