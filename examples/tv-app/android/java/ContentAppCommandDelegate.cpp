@@ -73,7 +73,7 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
 
         jstring resp = (jstring) env->CallObjectMethod(
             mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
-            static_cast<jint>(handlerContext.mRequestPath.mClusterId), static_cast<jint>(handlerContext.mRequestPath.mCommandId),
+            static_cast<jlong>(handlerContext.mRequestPath.mClusterId), static_cast<jlong>(handlerContext.mRequestPath.mCommandId),
             jsonString.jniValue());
         if (env->ExceptionCheck())
         {
@@ -108,7 +108,7 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
 
         jstring resp =
             (jstring) env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(epId),
-                                            static_cast<jint>(clusterId), static_cast<jint>(commandId), jsonString.jniValue());
+                                            static_cast<jlong>(clusterId), static_cast<jlong>(commandId), jsonString.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentAppCommandDelegate::sendCommand");
