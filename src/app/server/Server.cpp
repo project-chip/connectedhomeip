@@ -492,6 +492,7 @@ void Server::Shutdown()
     mAccessControl.Finish();
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
+    mICDEventManager.Shutdown();
     mAttributePersister.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
