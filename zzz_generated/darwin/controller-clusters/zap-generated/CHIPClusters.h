@@ -366,6 +366,34 @@ public:
     ~ModeSelectCluster() {}
 };
 
+class DLL_EXPORT TemperatureControlCluster : public ClusterBase
+{
+public:
+    TemperatureControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~TemperatureControlCluster() {}
+};
+
+class DLL_EXPORT RefrigeratorAlarmCluster : public ClusterBase
+{
+public:
+    RefrigeratorAlarmCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~RefrigeratorAlarmCluster() {}
+};
+
+class DLL_EXPORT DishwasherOperationalStateCluster : public ClusterBase
+{
+public:
+    DishwasherOperationalStateCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                      EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~DishwasherOperationalStateCluster() {}
+};
+
 class DLL_EXPORT DoorLockCluster : public ClusterBase
 {
 public:

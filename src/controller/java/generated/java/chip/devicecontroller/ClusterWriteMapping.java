@@ -758,6 +758,34 @@ public class ClusterWriteMapping {
     );
     writeModeSelectInteractionInfo.put("writeOnModeAttribute", writeModeSelectOnModeAttributeInteractionInfo);
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
+    Map<String, InteractionInfo> writeTemperatureControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("temperatureControl", writeTemperatureControlInteractionInfo);
+    Map<String, InteractionInfo> writeRefrigeratorAlarmInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeRefrigeratorAlarmMaskCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo refrigeratorAlarmmaskCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeRefrigeratorAlarmMaskCommandParams.put(
+        "value",
+        refrigeratorAlarmmaskCommandParameterInfo
+    );
+    InteractionInfo writeRefrigeratorAlarmMaskAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.RefrigeratorAlarmCluster) cluster).writeMaskAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeRefrigeratorAlarmMaskCommandParams
+    );
+    writeRefrigeratorAlarmInteractionInfo.put("writeMaskAttribute", writeRefrigeratorAlarmMaskAttributeInteractionInfo);
+    writeAttributeMap.put("refrigeratorAlarm", writeRefrigeratorAlarmInteractionInfo);
+    Map<String, InteractionInfo> writeDishwasherOperationalStateInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("dishwasherOperationalState", writeDishwasherOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockdoorOpenEventsCommandParameterInfo =

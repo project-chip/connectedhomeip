@@ -1437,6 +1437,93 @@ public ArrayList<ChipStructs.ModeSelectClusterSemanticTagStruct> semanticTags;
   }
 }
 
+public static class TemperatureControlClusterTemperatureLevelStruct {
+public String label;
+public Integer temperatureLevel;
+
+  public TemperatureControlClusterTemperatureLevelStruct(
+    String label
+      , Integer temperatureLevel
+  ) {
+    this.label = label;
+    this.temperatureLevel = temperatureLevel;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("TemperatureControlClusterTemperatureLevelStruct {\n");
+    output.append("\tlabel: ");
+    output.append(label);
+        output.append("\n");
+    output.append("\ttemperatureLevel: ");
+    output.append(temperatureLevel);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class DishwasherOperationalStateClusterErrorStateStruct {
+public Integer errorStateID;
+public String errorStateLabel;
+public String errorStateDetails;
+
+  public DishwasherOperationalStateClusterErrorStateStruct(
+    Integer errorStateID
+      , String errorStateLabel
+      , String errorStateDetails
+  ) {
+    this.errorStateID = errorStateID;
+    this.errorStateLabel = errorStateLabel;
+    this.errorStateDetails = errorStateDetails;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DishwasherOperationalStateClusterErrorStateStruct {\n");
+    output.append("\terrorStateID: ");
+    output.append(errorStateID);
+        output.append("\n");
+    output.append("\terrorStateLabel: ");
+    output.append(errorStateLabel);
+        output.append("\n");
+    output.append("\terrorStateDetails: ");
+    output.append(errorStateDetails);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class DishwasherOperationalStateClusterOperationalStateStruct {
+public Integer operationalStateID;
+public String operationalStateLabel;
+
+  public DishwasherOperationalStateClusterOperationalStateStruct(
+    Integer operationalStateID
+      , String operationalStateLabel
+  ) {
+    this.operationalStateID = operationalStateID;
+    this.operationalStateLabel = operationalStateLabel;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DishwasherOperationalStateClusterOperationalStateStruct {\n");
+    output.append("\toperationalStateID: ");
+    output.append(operationalStateID);
+        output.append("\n");
+    output.append("\toperationalStateLabel: ");
+    output.append(operationalStateLabel);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class DoorLockClusterCredentialStruct {
 public Integer credentialType;
 public Integer credentialIndex;

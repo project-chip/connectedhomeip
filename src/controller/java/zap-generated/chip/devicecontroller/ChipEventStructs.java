@@ -954,6 +954,99 @@ public Boolean stateValue;
   }
 }
 
+public static class RefrigeratorAlarmClusterNotifyEvent {
+public Long active;
+public Long inactive;
+public Long state;
+public Long mask;
+
+  public RefrigeratorAlarmClusterNotifyEvent(
+    Long active
+      , Long inactive
+      , Long state
+      , Long mask
+  ) {
+    this.active = active;
+    this.inactive = inactive;
+    this.state = state;
+    this.mask = mask;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RefrigeratorAlarmClusterNotifyEvent {\n");
+    output.append("\tactive: ");
+    output.append(active);
+        output.append("\n");
+    output.append("\tinactive: ");
+    output.append(inactive);
+        output.append("\n");
+    output.append("\tstate: ");
+    output.append(state);
+        output.append("\n");
+    output.append("\tmask: ");
+    output.append(mask);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class DishwasherOperationalStateClusterOperationalErrorEvent {
+public ChipStructs.DishwasherOperationalStateClusterErrorStateStruct errorState;
+
+  public DishwasherOperationalStateClusterOperationalErrorEvent(
+    ChipStructs.DishwasherOperationalStateClusterErrorStateStruct errorState
+  ) {
+    this.errorState = errorState;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DishwasherOperationalStateClusterOperationalErrorEvent {\n");
+    output.append("\terrorState: ");
+    output.append(errorState);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class DishwasherOperationalStateClusterOperationCompletionEvent {
+public Integer completionErrorCode;
+public Long totalOperationalTime;
+public Long pausedTime;
+
+  public DishwasherOperationalStateClusterOperationCompletionEvent(
+    Integer completionErrorCode
+      , Long totalOperationalTime
+      , Long pausedTime
+  ) {
+    this.completionErrorCode = completionErrorCode;
+    this.totalOperationalTime = totalOperationalTime;
+    this.pausedTime = pausedTime;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DishwasherOperationalStateClusterOperationCompletionEvent {\n");
+    output.append("\tcompletionErrorCode: ");
+    output.append(completionErrorCode);
+        output.append("\n");
+    output.append("\ttotalOperationalTime: ");
+    output.append(totalOperationalTime);
+        output.append("\n");
+    output.append("\tpausedTime: ");
+    output.append(pausedTime);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class DoorLockClusterDoorLockAlarmEvent {
 public Integer alarmCode;
 

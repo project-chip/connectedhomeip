@@ -1429,21 +1429,6 @@ EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace CountdownTime
 
-namespace OperationalState {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::Type * value); // OperationalStateStruct
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::Type value);
-} // namespace OperationalState
-
-namespace OperationalError {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DishwasherOperationalState::Structs::ErrorStateStruct::Type * value); // ErrorStateStruct
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::DishwasherOperationalState::Structs::ErrorStateStruct::Type value);
-} // namespace OperationalError
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1474,18 +1459,6 @@ EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace CountdownTime
 
-namespace OperationalState {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type * value); // OperationalStateStruct
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type value);
-} // namespace OperationalState
-
-namespace OperationalError {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type * value); // ErrorStateStruct
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type value);
-} // namespace OperationalError
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1515,21 +1488,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace CountdownTime
-
-namespace OperationalState {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::Type * value); // OperationalStateStruct
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::Type value);
-} // namespace OperationalState
-
-namespace OperationalError {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::RoboticVacuumOperationalState::Structs::ErrorStateStruct::Type * value); // ErrorStateStruct
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::RoboticVacuumOperationalState::Structs::ErrorStateStruct::Type value);
-} // namespace OperationalError
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
