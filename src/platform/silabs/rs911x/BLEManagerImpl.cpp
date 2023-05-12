@@ -642,7 +642,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     sl_wfx_mac_address_t macaddr;
     wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
 
-		status = sInstance.SendBLEAdvertisementCommand();
+    status = sInstance.SendBLEAdvertisementCommand();
 
     if (status == RSI_SUCCESS)
     {
@@ -664,7 +664,8 @@ exit:
     return CHIP_NO_ERROR; // err;
 }
 
-int32_t BLEManagerImpl::SendBLEAdvertisementCommand(void) {
+int32_t BLEManagerImpl::SendBLEAdvertisementCommand(void)
+{
 
     rsi_ble_req_adv_t ble_adv = { 0 };
 
