@@ -582,11 +582,9 @@ class _ConstraintIsUpperCase(BaseConstraint):
         self._is_upper_case = is_upper_case
 
     def check_response(self, value, value_type_name) -> bool:
-        # isupper() on the whole string will return false for digit-only
-        # strings, which is not what we want here.  We want to treat digits as
-        # uppercase for purposes of isUpperCase.
-        isUpper = all(c.isdigit() or c.isupper() for c in value)
-        return isUpper == self._is_upper_case
+        # Make sure we don't have any lowercase characters.
+        hasLower = any(c.islower() for c in value)
+        return hasLower != self._is_upper_case
 
     def get_reason(self, value, value_type_name) -> str:
         if self._is_upper_case:
@@ -612,9 +610,7 @@ class _ConstraintIsLowerCase(BaseConstraint):
         self._is_lower_case = is_lower_case
 
     def check_response(self, value, value_type_name) -> bool:
-        # islower() on the whole string will return false for strings consisting
-        # of only digits, which is not what we want here.  We want to treat digits as
-        # lowercase for purposes of isLowerCase.
+        # Make sure we don't have any uppercase characters.
         hasUpper = any(c.isupper() for c in value)
         return hasUpper != self._is_lower_case
 
