@@ -251,11 +251,12 @@ private:
     CHIP_ERROR InitSystemState();
 
     uint16_t mListenPort;
-    DeviceControllerSystemState * mSystemState              = nullptr;
-    PersistentStorageDelegate * mFabricIndependentStorage   = nullptr;
-    Crypto::OperationalKeystore * mOperationalKeystore      = nullptr;
-    Credentials::OperationalCertificateStore * mOpCertStore = nullptr;
-    bool mEnableServerInteractions                          = false;
+    DeviceControllerSystemState * mSystemState                          = nullptr;
+    PersistentStorageDelegate * mFabricIndependentStorage               = nullptr;
+    Crypto::OperationalKeystore * mOperationalKeystore                  = nullptr;
+    Credentials::OperationalCertificateStore * mOpCertStore             = nullptr;
+    Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
+    bool mEnableServerInteractions                                      = false;
 };
 
 } // namespace Controller
