@@ -1939,9 +1939,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OccupancySensing::Occup
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideMeasurement::LevelValueEnum val)
 {
-    using EnumType = CarbonMonoxideMeasurement::LevelValueType;
+    using EnumType = CarbonMonoxideMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -1954,9 +1954,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideMeasureme
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = CarbonMonoxideMeasurement::MeasurementMediumType;
+    using EnumType = CarbonMonoxideMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -1967,9 +1967,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideMeasureme
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = CarbonMonoxideMeasurement::MeasurementUnitType;
+    using EnumType = CarbonMonoxideMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -1986,9 +1986,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideMeasureme
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideMeasurement::LevelValueEnum val)
 {
-    using EnumType = CarbonDioxideMeasurement::LevelValueType;
+    using EnumType = CarbonDioxideMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2001,9 +2001,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideMeasuremen
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = CarbonDioxideMeasurement::MeasurementMediumType;
+    using EnumType = CarbonDioxideMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2014,9 +2014,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideMeasuremen
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = CarbonDioxideMeasurement::MeasurementUnitType;
+    using EnumType = CarbonDioxideMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2033,9 +2033,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideMeasuremen
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneMeasurement::LevelValueEnum val)
 {
-    using EnumType = EthyleneMeasurement::LevelValueType;
+    using EnumType = EthyleneMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2048,9 +2048,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneMeasurement::Le
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = EthyleneMeasurement::MeasurementMediumType;
+    using EnumType = EthyleneMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2061,9 +2061,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneMeasurement::Me
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = EthyleneMeasurement::MeasurementUnitType;
+    using EnumType = EthyleneMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2080,9 +2080,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneMeasurement::Me
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideMeasurement::LevelValueEnum val)
 {
-    using EnumType = EthyleneOxideMeasurement::LevelValueType;
+    using EnumType = EthyleneOxideMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2095,9 +2095,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideMeasuremen
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = EthyleneOxideMeasurement::MeasurementMediumType;
+    using EnumType = EthyleneOxideMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2108,9 +2108,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideMeasuremen
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = EthyleneOxideMeasurement::MeasurementUnitType;
+    using EnumType = EthyleneOxideMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2127,9 +2127,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideMeasuremen
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenMeasurement::LevelValueEnum val)
 {
-    using EnumType = HydrogenMeasurement::LevelValueType;
+    using EnumType = HydrogenMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2142,9 +2142,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenMeasurement::Le
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = HydrogenMeasurement::MeasurementMediumType;
+    using EnumType = HydrogenMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2155,9 +2155,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenMeasurement::Me
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = HydrogenMeasurement::MeasurementUnitType;
+    using EnumType = HydrogenMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2174,9 +2174,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenMeasurement::Me
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideMeasurement::LevelValueEnum val)
 {
-    using EnumType = HydrogenSulfideMeasurement::LevelValueType;
+    using EnumType = HydrogenSulfideMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2189,9 +2189,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideMeasurem
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = HydrogenSulfideMeasurement::MeasurementMediumType;
+    using EnumType = HydrogenSulfideMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2202,9 +2202,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideMeasurem
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = HydrogenSulfideMeasurement::MeasurementUnitType;
+    using EnumType = HydrogenSulfideMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2221,9 +2221,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideMeasurem
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideMeasurement::LevelValueEnum val)
 {
-    using EnumType = NitricOxideMeasurement::LevelValueType;
+    using EnumType = NitricOxideMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2236,9 +2236,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideMeasurement:
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = NitricOxideMeasurement::MeasurementMediumType;
+    using EnumType = NitricOxideMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2249,9 +2249,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideMeasurement:
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = NitricOxideMeasurement::MeasurementUnitType;
+    using EnumType = NitricOxideMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2268,9 +2268,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideMeasurement:
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideMeasurement::LevelValueEnum val)
 {
-    using EnumType = NitrogenDioxideMeasurement::LevelValueType;
+    using EnumType = NitrogenDioxideMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2283,9 +2283,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideMeasurem
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = NitrogenDioxideMeasurement::MeasurementMediumType;
+    using EnumType = NitrogenDioxideMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2296,9 +2296,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideMeasurem
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = NitrogenDioxideMeasurement::MeasurementUnitType;
+    using EnumType = NitrogenDioxideMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2315,9 +2315,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideMeasurem
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenMeasurement::LevelValueEnum val)
 {
-    using EnumType = OxygenMeasurement::LevelValueType;
+    using EnumType = OxygenMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2330,9 +2330,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenMeasurement::Leve
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = OxygenMeasurement::MeasurementMediumType;
+    using EnumType = OxygenMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2343,9 +2343,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenMeasurement::Meas
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = OxygenMeasurement::MeasurementUnitType;
+    using EnumType = OxygenMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2362,9 +2362,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenMeasurement::Meas
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneMeasurement::LevelValueEnum val)
 {
-    using EnumType = OzoneMeasurement::LevelValueType;
+    using EnumType = OzoneMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2377,9 +2377,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneMeasurement::Level
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = OzoneMeasurement::MeasurementMediumType;
+    using EnumType = OzoneMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2390,9 +2390,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneMeasurement::Measu
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = OzoneMeasurement::MeasurementUnitType;
+    using EnumType = OzoneMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2409,9 +2409,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneMeasurement::Measu
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideMeasurement::LevelValueEnum val)
 {
-    using EnumType = SulfurDioxideMeasurement::LevelValueType;
+    using EnumType = SulfurDioxideMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2424,9 +2424,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideMeasuremen
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = SulfurDioxideMeasurement::MeasurementMediumType;
+    using EnumType = SulfurDioxideMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2437,9 +2437,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideMeasuremen
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = SulfurDioxideMeasurement::MeasurementUnitType;
+    using EnumType = SulfurDioxideMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2456,9 +2456,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideMeasuremen
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenMeasurement::LevelValueEnum val)
 {
-    using EnumType = DissolvedOxygenMeasurement::LevelValueType;
+    using EnumType = DissolvedOxygenMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2471,9 +2471,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenMeasurem
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = DissolvedOxygenMeasurement::MeasurementMediumType;
+    using EnumType = DissolvedOxygenMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2484,9 +2484,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenMeasurem
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = DissolvedOxygenMeasurement::MeasurementUnitType;
+    using EnumType = DissolvedOxygenMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2503,9 +2503,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenMeasurem
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(BromateMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromateMeasurement::LevelValueEnum val)
 {
-    using EnumType = BromateMeasurement::LevelValueType;
+    using EnumType = BromateMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2518,9 +2518,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromateMeasurement::Lev
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BromateMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromateMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = BromateMeasurement::MeasurementMediumType;
+    using EnumType = BromateMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2531,9 +2531,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromateMeasurement::Mea
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BromateMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromateMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = BromateMeasurement::MeasurementUnitType;
+    using EnumType = BromateMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2550,9 +2550,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromateMeasurement::Mea
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesMeasurement::LevelValueEnum val)
 {
-    using EnumType = ChloraminesMeasurement::LevelValueType;
+    using EnumType = ChloraminesMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2565,9 +2565,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesMeasurement:
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = ChloraminesMeasurement::MeasurementMediumType;
+    using EnumType = ChloraminesMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2578,9 +2578,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesMeasurement:
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = ChloraminesMeasurement::MeasurementUnitType;
+    using EnumType = ChloraminesMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2597,9 +2597,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesMeasurement:
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineMeasurement::LevelValueEnum val)
 {
-    using EnumType = ChlorineMeasurement::LevelValueType;
+    using EnumType = ChlorineMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2612,9 +2612,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineMeasurement::Le
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = ChlorineMeasurement::MeasurementMediumType;
+    using EnumType = ChlorineMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2625,9 +2625,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineMeasurement::Me
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = ChlorineMeasurement::MeasurementUnitType;
+    using EnumType = ChlorineMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2644,9 +2644,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineMeasurement::Me
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiMeasurement::LevelValueEnum val)
 {
-    using EnumType = FecalColiformEColiMeasurement::LevelValueType;
+    using EnumType = FecalColiformEColiMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2659,9 +2659,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiMeasu
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = FecalColiformEColiMeasurement::MeasurementMediumType;
+    using EnumType = FecalColiformEColiMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2672,9 +2672,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiMeasu
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = FecalColiformEColiMeasurement::MeasurementUnitType;
+    using EnumType = FecalColiformEColiMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2691,9 +2691,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiMeasu
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideMeasurement::LevelValueEnum val)
 {
-    using EnumType = FluorideMeasurement::LevelValueType;
+    using EnumType = FluorideMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2706,9 +2706,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideMeasurement::Le
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = FluorideMeasurement::MeasurementMediumType;
+    using EnumType = FluorideMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2719,9 +2719,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideMeasurement::Me
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = FluorideMeasurement::MeasurementUnitType;
+    using EnumType = FluorideMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2738,9 +2738,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideMeasurement::Me
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsMeasurement::LevelValueEnum val)
 {
-    using EnumType = HaloaceticAcidsMeasurement::LevelValueType;
+    using EnumType = HaloaceticAcidsMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2753,9 +2753,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsMeasurem
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = HaloaceticAcidsMeasurement::MeasurementMediumType;
+    using EnumType = HaloaceticAcidsMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2766,9 +2766,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsMeasurem
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = HaloaceticAcidsMeasurement::MeasurementUnitType;
+    using EnumType = HaloaceticAcidsMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2785,9 +2785,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsMeasurem
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesMeasurement::LevelValueEnum val)
 {
-    using EnumType = TotalTrihalomethanesMeasurement::LevelValueType;
+    using EnumType = TotalTrihalomethanesMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2800,9 +2800,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesMea
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = TotalTrihalomethanesMeasurement::MeasurementMediumType;
+    using EnumType = TotalTrihalomethanesMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2813,9 +2813,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesMea
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = TotalTrihalomethanesMeasurement::MeasurementUnitType;
+    using EnumType = TotalTrihalomethanesMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2832,9 +2832,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesMea
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaMeasurement::LevelValueEnum val)
 {
-    using EnumType = TotalColiformBacteriaMeasurement::LevelValueType;
+    using EnumType = TotalColiformBacteriaMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2847,9 +2847,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaMe
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = TotalColiformBacteriaMeasurement::MeasurementMediumType;
+    using EnumType = TotalColiformBacteriaMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2860,9 +2860,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaMe
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = TotalColiformBacteriaMeasurement::MeasurementUnitType;
+    using EnumType = TotalColiformBacteriaMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2879,9 +2879,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaMe
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityMeasurement::LevelValueEnum val)
 {
-    using EnumType = TurbidityMeasurement::LevelValueType;
+    using EnumType = TurbidityMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2894,9 +2894,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityMeasurement::L
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = TurbidityMeasurement::MeasurementMediumType;
+    using EnumType = TurbidityMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2907,9 +2907,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityMeasurement::M
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = TurbidityMeasurement::MeasurementUnitType;
+    using EnumType = TurbidityMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2926,9 +2926,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityMeasurement::M
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(CopperMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(CopperMeasurement::LevelValueEnum val)
 {
-    using EnumType = CopperMeasurement::LevelValueType;
+    using EnumType = CopperMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2941,9 +2941,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CopperMeasurement::Leve
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(CopperMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(CopperMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = CopperMeasurement::MeasurementMediumType;
+    using EnumType = CopperMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -2954,9 +2954,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CopperMeasurement::Meas
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(CopperMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(CopperMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = CopperMeasurement::MeasurementUnitType;
+    using EnumType = CopperMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -2973,9 +2973,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CopperMeasurement::Meas
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(LeadMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(LeadMeasurement::LevelValueEnum val)
 {
-    using EnumType = LeadMeasurement::LevelValueType;
+    using EnumType = LeadMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -2988,9 +2988,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LeadMeasurement::LevelV
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(LeadMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(LeadMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = LeadMeasurement::MeasurementMediumType;
+    using EnumType = LeadMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3001,9 +3001,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LeadMeasurement::Measur
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(LeadMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(LeadMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = LeadMeasurement::MeasurementUnitType;
+    using EnumType = LeadMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3020,9 +3020,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LeadMeasurement::Measur
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseMeasurement::LevelValueEnum val)
 {
-    using EnumType = ManganeseMeasurement::LevelValueType;
+    using EnumType = ManganeseMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3035,9 +3035,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseMeasurement::L
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = ManganeseMeasurement::MeasurementMediumType;
+    using EnumType = ManganeseMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3048,9 +3048,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseMeasurement::M
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = ManganeseMeasurement::MeasurementUnitType;
+    using EnumType = ManganeseMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3067,9 +3067,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseMeasurement::M
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateMeasurement::LevelValueEnum val)
 {
-    using EnumType = SulfateMeasurement::LevelValueType;
+    using EnumType = SulfateMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3082,9 +3082,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateMeasurement::Lev
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = SulfateMeasurement::MeasurementMediumType;
+    using EnumType = SulfateMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3095,9 +3095,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateMeasurement::Mea
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = SulfateMeasurement::MeasurementUnitType;
+    using EnumType = SulfateMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3114,9 +3114,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateMeasurement::Mea
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneMeasurement::LevelValueEnum val)
 {
-    using EnumType = BromodichloromethaneMeasurement::LevelValueType;
+    using EnumType = BromodichloromethaneMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3129,9 +3129,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneMea
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = BromodichloromethaneMeasurement::MeasurementMediumType;
+    using EnumType = BromodichloromethaneMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3142,9 +3142,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneMea
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = BromodichloromethaneMeasurement::MeasurementUnitType;
+    using EnumType = BromodichloromethaneMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3161,9 +3161,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneMea
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformMeasurement::LevelValueEnum val)
 {
-    using EnumType = BromoformMeasurement::LevelValueType;
+    using EnumType = BromoformMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3176,9 +3176,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformMeasurement::L
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = BromoformMeasurement::MeasurementMediumType;
+    using EnumType = BromoformMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3189,9 +3189,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformMeasurement::M
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = BromoformMeasurement::MeasurementUnitType;
+    using EnumType = BromoformMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3208,9 +3208,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformMeasurement::M
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneMeasurement::LevelValueEnum val)
 {
-    using EnumType = ChlorodibromomethaneMeasurement::LevelValueType;
+    using EnumType = ChlorodibromomethaneMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3223,9 +3223,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneMea
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = ChlorodibromomethaneMeasurement::MeasurementMediumType;
+    using EnumType = ChlorodibromomethaneMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3236,9 +3236,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneMea
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = ChlorodibromomethaneMeasurement::MeasurementUnitType;
+    using EnumType = ChlorodibromomethaneMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3255,9 +3255,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneMea
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformMeasurement::LevelValueEnum val)
 {
-    using EnumType = ChloroformMeasurement::LevelValueType;
+    using EnumType = ChloroformMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3270,9 +3270,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformMeasurement::
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = ChloroformMeasurement::MeasurementMediumType;
+    using EnumType = ChloroformMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3283,9 +3283,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformMeasurement::
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = ChloroformMeasurement::MeasurementUnitType;
+    using EnumType = ChloroformMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3302,9 +3302,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformMeasurement::
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumMeasurement::LevelValueEnum val)
 {
-    using EnumType = SodiumMeasurement::LevelValueType;
+    using EnumType = SodiumMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3317,9 +3317,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumMeasurement::Leve
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = SodiumMeasurement::MeasurementMediumType;
+    using EnumType = SodiumMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3330,9 +3330,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumMeasurement::Meas
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = SodiumMeasurement::MeasurementUnitType;
+    using EnumType = SodiumMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3349,9 +3349,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumMeasurement::Meas
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25Measurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25Measurement::LevelValueEnum val)
 {
-    using EnumType = Pm25Measurement::LevelValueType;
+    using EnumType = Pm25Measurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3364,9 +3364,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25Measurement::LevelV
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25Measurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25Measurement::MeasurementMediumEnum val)
 {
-    using EnumType = Pm25Measurement::MeasurementMediumType;
+    using EnumType = Pm25Measurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3377,9 +3377,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25Measurement::Measur
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25Measurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25Measurement::MeasurementUnitEnum val)
 {
-    using EnumType = Pm25Measurement::MeasurementUnitType;
+    using EnumType = Pm25Measurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3396,9 +3396,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25Measurement::Measur
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeMeasurement::LevelValueEnum val)
 {
-    using EnumType = FormaldehydeMeasurement::LevelValueType;
+    using EnumType = FormaldehydeMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3411,9 +3411,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeMeasurement
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = FormaldehydeMeasurement::MeasurementMediumType;
+    using EnumType = FormaldehydeMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3424,9 +3424,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeMeasurement
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = FormaldehydeMeasurement::MeasurementUnitType;
+    using EnumType = FormaldehydeMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3443,9 +3443,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeMeasurement
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1Measurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1Measurement::LevelValueEnum val)
 {
-    using EnumType = Pm1Measurement::LevelValueType;
+    using EnumType = Pm1Measurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3458,9 +3458,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1Measurement::LevelVa
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1Measurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1Measurement::MeasurementMediumEnum val)
 {
-    using EnumType = Pm1Measurement::MeasurementMediumType;
+    using EnumType = Pm1Measurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3471,9 +3471,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1Measurement::Measure
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1Measurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1Measurement::MeasurementUnitEnum val)
 {
-    using EnumType = Pm1Measurement::MeasurementUnitType;
+    using EnumType = Pm1Measurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3490,9 +3490,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1Measurement::Measure
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10Measurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10Measurement::LevelValueEnum val)
 {
-    using EnumType = Pm10Measurement::LevelValueType;
+    using EnumType = Pm10Measurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3505,9 +3505,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10Measurement::LevelV
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10Measurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10Measurement::MeasurementMediumEnum val)
 {
-    using EnumType = Pm10Measurement::MeasurementMediumType;
+    using EnumType = Pm10Measurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3518,9 +3518,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10Measurement::Measur
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10Measurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10Measurement::MeasurementUnitEnum val)
 {
-    using EnumType = Pm10Measurement::MeasurementUnitType;
+    using EnumType = Pm10Measurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3537,9 +3537,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10Measurement::Measur
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCompoundsMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum val)
 {
-    using EnumType = TotalVolatileOrganicCompoundsMeasurement::LevelValueType;
+    using EnumType = TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3552,9 +3552,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCom
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType;
+    using EnumType = TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3565,9 +3565,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCom
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType;
+    using EnumType = TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -3584,9 +3584,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCom
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(RadonMeasurement::LevelValueType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(RadonMeasurement::LevelValueEnum val)
 {
-    using EnumType = RadonMeasurement::LevelValueType;
+    using EnumType = RadonMeasurement::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -3599,9 +3599,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RadonMeasurement::Level
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(RadonMeasurement::MeasurementMediumType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(RadonMeasurement::MeasurementMediumEnum val)
 {
-    using EnumType = RadonMeasurement::MeasurementMediumType;
+    using EnumType = RadonMeasurement::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kGas:
@@ -3612,9 +3612,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RadonMeasurement::Measu
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(RadonMeasurement::MeasurementUnitType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(RadonMeasurement::MeasurementUnitEnum val)
 {
-    using EnumType = RadonMeasurement::MeasurementUnitType;
+    using EnumType = RadonMeasurement::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:

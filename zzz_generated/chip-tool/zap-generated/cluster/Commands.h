@@ -15298,13 +15298,13 @@ void registerClusterCarbonMonoxideMeasurement(Commands & commands, CredentialIss
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15406,13 +15406,13 @@ void registerClusterCarbonDioxideMeasurement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15514,13 +15514,13 @@ void registerClusterEthyleneMeasurement(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15622,13 +15622,13 @@ void registerClusterEthyleneOxideMeasurement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15730,13 +15730,13 @@ void registerClusterHydrogenMeasurement(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15838,13 +15838,13 @@ void registerClusterHydrogenSulfideMeasurement(Commands & commands, CredentialIs
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15946,13 +15946,13 @@ void registerClusterNitricOxideMeasurement(Commands & commands, CredentialIssuer
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16054,13 +16054,13 @@ void registerClusterNitrogenDioxideMeasurement(Commands & commands, CredentialIs
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16162,13 +16162,13 @@ void registerClusterOxygenMeasurement(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16270,13 +16270,13 @@ void registerClusterOzoneMeasurement(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16378,13 +16378,13 @@ void registerClusterSulfurDioxideMeasurement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16486,13 +16486,13 @@ void registerClusterDissolvedOxygenMeasurement(Commands & commands, CredentialIs
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16594,13 +16594,13 @@ void registerClusterBromateMeasurement(Commands & commands, CredentialIssuerComm
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16702,13 +16702,13 @@ void registerClusterChloraminesMeasurement(Commands & commands, CredentialIssuer
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16810,13 +16810,13 @@ void registerClusterChlorineMeasurement(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16918,13 +16918,13 @@ void registerClusterFecalColiformEColiMeasurement(Commands & commands, Credentia
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17026,13 +17026,13 @@ void registerClusterFluorideMeasurement(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17134,13 +17134,13 @@ void registerClusterHaloaceticAcidsMeasurement(Commands & commands, CredentialIs
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17242,13 +17242,13 @@ void registerClusterTotalTrihalomethanesMeasurement(Commands & commands, Credent
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17350,13 +17350,13 @@ void registerClusterTotalColiformBacteriaMeasurement(Commands & commands, Creden
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17458,13 +17458,13 @@ void registerClusterTurbidityMeasurement(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17566,13 +17566,13 @@ void registerClusterCopperMeasurement(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17674,13 +17674,13 @@ void registerClusterLeadMeasurement(Commands & commands, CredentialIssuerCommand
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17782,13 +17782,13 @@ void registerClusterManganeseMeasurement(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17890,13 +17890,13 @@ void registerClusterSulfateMeasurement(Commands & commands, CredentialIssuerComm
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17998,13 +17998,13 @@ void registerClusterBromodichloromethaneMeasurement(Commands & commands, Credent
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18106,13 +18106,13 @@ void registerClusterBromoformMeasurement(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18214,13 +18214,13 @@ void registerClusterChlorodibromomethaneMeasurement(Commands & commands, Credent
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18322,13 +18322,13 @@ void registerClusterChloroformMeasurement(Commands & commands, CredentialIssuerC
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18430,13 +18430,13 @@ void registerClusterSodiumMeasurement(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18538,13 +18538,13 @@ void registerClusterPm25Measurement(Commands & commands, CredentialIssuerCommand
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18646,13 +18646,13 @@ void registerClusterFormaldehydeMeasurement(Commands & commands, CredentialIssue
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18754,13 +18754,13 @@ void registerClusterPm1Measurement(Commands & commands, CredentialIssuerCommands
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18862,13 +18862,13 @@ void registerClusterPm10Measurement(Commands & commands, CredentialIssuerCommand
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18970,13 +18970,13 @@ void registerClusterTotalVolatileOrganicCompoundsMeasurement(Commands & commands
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -19078,13 +19078,13 @@ void registerClusterRadonMeasurement(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::MeasurementUnitType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::MeasurementMediumType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::LevelValueType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,

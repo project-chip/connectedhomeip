@@ -2545,8 +2545,8 @@ enum class OccupancySensorTypeBitmap : uint8_t
 
 namespace CarbonMonoxideMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -2560,8 +2560,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -2573,8 +2573,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -2605,8 +2605,8 @@ enum class Features : uint32_t
 
 namespace CarbonDioxideMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -2620,8 +2620,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -2633,8 +2633,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -2665,8 +2665,8 @@ enum class Features : uint32_t
 
 namespace EthyleneMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -2680,8 +2680,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -2693,8 +2693,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -2725,8 +2725,8 @@ enum class Features : uint32_t
 
 namespace EthyleneOxideMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -2740,8 +2740,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -2753,8 +2753,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -2785,8 +2785,8 @@ enum class Features : uint32_t
 
 namespace HydrogenMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -2800,8 +2800,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -2813,8 +2813,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -2845,8 +2845,8 @@ enum class Features : uint32_t
 
 namespace HydrogenSulfideMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -2860,8 +2860,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -2873,8 +2873,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -2905,8 +2905,8 @@ enum class Features : uint32_t
 
 namespace NitricOxideMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -2920,8 +2920,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -2933,8 +2933,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -2965,8 +2965,8 @@ enum class Features : uint32_t
 
 namespace NitrogenDioxideMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -2980,8 +2980,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -2993,8 +2993,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3025,8 +3025,8 @@ enum class Features : uint32_t
 
 namespace OxygenMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3040,8 +3040,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3053,8 +3053,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3085,8 +3085,8 @@ enum class Features : uint32_t
 
 namespace OzoneMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3100,8 +3100,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3113,8 +3113,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3145,8 +3145,8 @@ enum class Features : uint32_t
 
 namespace SulfurDioxideMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3160,8 +3160,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3173,8 +3173,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3205,8 +3205,8 @@ enum class Features : uint32_t
 
 namespace DissolvedOxygenMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3220,8 +3220,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3233,8 +3233,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3265,8 +3265,8 @@ enum class Features : uint32_t
 
 namespace BromateMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3280,8 +3280,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3293,8 +3293,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3325,8 +3325,8 @@ enum class Features : uint32_t
 
 namespace ChloraminesMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3340,8 +3340,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3353,8 +3353,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3385,8 +3385,8 @@ enum class Features : uint32_t
 
 namespace ChlorineMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3400,8 +3400,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3413,8 +3413,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3445,8 +3445,8 @@ enum class Features : uint32_t
 
 namespace FecalColiformEColiMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3460,8 +3460,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3473,8 +3473,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3505,8 +3505,8 @@ enum class Features : uint32_t
 
 namespace FluorideMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3520,8 +3520,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3533,8 +3533,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3565,8 +3565,8 @@ enum class Features : uint32_t
 
 namespace HaloaceticAcidsMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3580,8 +3580,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3593,8 +3593,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3625,8 +3625,8 @@ enum class Features : uint32_t
 
 namespace TotalTrihalomethanesMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3640,8 +3640,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3653,8 +3653,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3685,8 +3685,8 @@ enum class Features : uint32_t
 
 namespace TotalColiformBacteriaMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3700,8 +3700,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3713,8 +3713,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3745,8 +3745,8 @@ enum class Features : uint32_t
 
 namespace TurbidityMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3760,8 +3760,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3773,8 +3773,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3805,8 +3805,8 @@ enum class Features : uint32_t
 
 namespace CopperMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3820,8 +3820,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3833,8 +3833,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3865,8 +3865,8 @@ enum class Features : uint32_t
 
 namespace LeadMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3880,8 +3880,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3893,8 +3893,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3925,8 +3925,8 @@ enum class Features : uint32_t
 
 namespace ManganeseMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -3940,8 +3940,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -3953,8 +3953,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -3985,8 +3985,8 @@ enum class Features : uint32_t
 
 namespace SulfateMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4000,8 +4000,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4013,8 +4013,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4045,8 +4045,8 @@ enum class Features : uint32_t
 
 namespace BromodichloromethaneMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4060,8 +4060,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4073,8 +4073,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4105,8 +4105,8 @@ enum class Features : uint32_t
 
 namespace BromoformMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4120,8 +4120,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4133,8 +4133,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4165,8 +4165,8 @@ enum class Features : uint32_t
 
 namespace ChlorodibromomethaneMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4180,8 +4180,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4193,8 +4193,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4225,8 +4225,8 @@ enum class Features : uint32_t
 
 namespace ChloroformMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4240,8 +4240,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4253,8 +4253,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4285,8 +4285,8 @@ enum class Features : uint32_t
 
 namespace SodiumMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4300,8 +4300,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4313,8 +4313,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4345,8 +4345,8 @@ enum class Features : uint32_t
 
 namespace Pm25Measurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4360,8 +4360,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4373,8 +4373,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4405,8 +4405,8 @@ enum class Features : uint32_t
 
 namespace FormaldehydeMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4420,8 +4420,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4433,8 +4433,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4465,8 +4465,8 @@ enum class Features : uint32_t
 
 namespace Pm1Measurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4480,8 +4480,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4493,8 +4493,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4525,8 +4525,8 @@ enum class Features : uint32_t
 
 namespace Pm10Measurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4540,8 +4540,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4553,8 +4553,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4585,8 +4585,8 @@ enum class Features : uint32_t
 
 namespace TotalVolatileOrganicCompoundsMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4600,8 +4600,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4613,8 +4613,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,
@@ -4645,8 +4645,8 @@ enum class Features : uint32_t
 
 namespace RadonMeasurement {
 
-// Enum for LevelValueType
-enum class LevelValueType : uint8_t
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
 {
     kUnknown  = 0x00,
     kLow      = 0x01,
@@ -4660,8 +4660,8 @@ enum class LevelValueType : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for MeasurementMediumType
-enum class MeasurementMediumType : uint8_t
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
 {
     kGas    = 0x00,
     kLiquid = 0x01,
@@ -4673,8 +4673,8 @@ enum class MeasurementMediumType : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementUnitType
-enum class MeasurementUnitType : uint8_t
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
 {
     kPpm  = 0x00,
     kPpb  = 0x01,

@@ -21521,9 +21521,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -21533,9 +21533,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -21545,9 +21545,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -21608,11 +21608,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -21726,9 +21726,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -21738,9 +21738,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -21750,9 +21750,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -21813,11 +21813,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -21931,9 +21931,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -21943,9 +21943,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -21955,9 +21955,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::EthyleneMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::EthyleneMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::EthyleneMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::EthyleneMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -22018,11 +22018,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::EthyleneMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::EthyleneMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -22136,9 +22136,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -22148,9 +22148,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -22160,9 +22160,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -22223,11 +22223,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -22341,9 +22341,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -22353,9 +22353,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -22365,9 +22365,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::HydrogenMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::HydrogenMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::HydrogenMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::HydrogenMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -22428,11 +22428,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::HydrogenMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::HydrogenMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -22546,9 +22546,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -22558,9 +22558,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -22570,9 +22570,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -22633,11 +22633,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -22751,9 +22751,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -22763,9 +22763,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -22775,9 +22775,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::NitricOxideMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::NitricOxideMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::NitricOxideMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -22838,11 +22838,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::NitricOxideMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -22956,9 +22956,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -22968,9 +22968,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -22980,9 +22980,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -23043,11 +23043,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -23161,9 +23161,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OxygenMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::OxygenMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::OxygenMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -23173,9 +23173,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OxygenMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::OxygenMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::OxygenMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -23185,9 +23185,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OxygenMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::OxygenMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::OxygenMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::OxygenMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::OxygenMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::OxygenMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -23248,11 +23248,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::OxygenMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::OxygenMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::OxygenMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::OxygenMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -23366,9 +23366,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OzoneMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::OzoneMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::OzoneMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -23378,9 +23378,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OzoneMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::OzoneMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::OzoneMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -23390,9 +23390,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OzoneMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::OzoneMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::OzoneMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::OzoneMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::OzoneMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::OzoneMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -23453,11 +23453,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::OzoneMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::OzoneMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::OzoneMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::OzoneMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -23571,9 +23571,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -23583,9 +23583,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -23595,9 +23595,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -23658,11 +23658,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -23776,9 +23776,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -23788,9 +23788,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -23800,9 +23800,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -23863,11 +23863,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -23981,9 +23981,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::BromateMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::BromateMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::BromateMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -23993,9 +23993,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::BromateMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::BromateMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::BromateMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -24005,9 +24005,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::BromateMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::BromateMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::BromateMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::BromateMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::BromateMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::BromateMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -24068,11 +24068,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::BromateMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::BromateMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::BromateMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::BromateMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -24186,9 +24186,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -24198,9 +24198,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -24210,9 +24210,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChloraminesMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::ChloraminesMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::ChloraminesMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -24273,11 +24273,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::ChloraminesMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -24391,9 +24391,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -24403,9 +24403,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -24415,9 +24415,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChlorineMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::ChlorineMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::ChlorineMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::ChlorineMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::ChlorineMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorineMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -24478,11 +24478,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::ChlorineMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::ChlorineMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -24596,9 +24596,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -24608,9 +24608,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -24620,9 +24620,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -24683,11 +24683,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -24801,9 +24801,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FluorideMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::FluorideMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::FluorideMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -24813,9 +24813,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FluorideMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::FluorideMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::FluorideMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -24825,9 +24825,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FluorideMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::FluorideMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::FluorideMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::FluorideMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::FluorideMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::FluorideMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -24888,11 +24888,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::FluorideMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::FluorideMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::FluorideMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::FluorideMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -25006,9 +25006,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -25018,9 +25018,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -25030,9 +25030,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -25093,11 +25093,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -25211,9 +25211,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -25223,9 +25223,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -25235,9 +25235,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -25298,11 +25298,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -25416,9 +25416,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -25428,9 +25428,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -25440,9 +25440,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -25503,11 +25503,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -25621,9 +25621,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -25633,9 +25633,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -25645,9 +25645,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TurbidityMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::TurbidityMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::TurbidityMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::TurbidityMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::TurbidityMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::TurbidityMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -25708,11 +25708,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::TurbidityMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::TurbidityMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -25826,9 +25826,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::CopperMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::CopperMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::CopperMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -25838,9 +25838,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::CopperMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::CopperMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::CopperMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -25850,9 +25850,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::CopperMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::CopperMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::CopperMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::CopperMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::CopperMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::CopperMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -25913,11 +25913,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::CopperMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::CopperMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::CopperMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::CopperMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -26031,9 +26031,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::LeadMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::LeadMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::LeadMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -26043,9 +26043,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::LeadMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::LeadMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::LeadMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -26055,9 +26055,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::LeadMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::LeadMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::LeadMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::LeadMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::LeadMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::LeadMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -26118,11 +26118,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::LeadMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::LeadMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::LeadMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::LeadMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -26236,9 +26236,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -26248,9 +26248,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -26260,9 +26260,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ManganeseMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::ManganeseMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::ManganeseMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::ManganeseMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::ManganeseMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::ManganeseMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -26323,11 +26323,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::ManganeseMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::ManganeseMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -26441,9 +26441,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::SulfateMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::SulfateMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::SulfateMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -26453,9 +26453,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::SulfateMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::SulfateMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::SulfateMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -26465,9 +26465,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::SulfateMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::SulfateMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::SulfateMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::SulfateMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::SulfateMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::SulfateMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -26528,11 +26528,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::SulfateMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::SulfateMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::SulfateMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::SulfateMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -26646,9 +26646,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -26658,9 +26658,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -26670,9 +26670,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -26733,11 +26733,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -26851,9 +26851,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::BromoformMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::BromoformMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::BromoformMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -26863,9 +26863,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::BromoformMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::BromoformMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::BromoformMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -26875,9 +26875,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::BromoformMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::BromoformMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::BromoformMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::BromoformMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::BromoformMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::BromoformMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -26938,11 +26938,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::BromoformMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::BromoformMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::BromoformMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::BromoformMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -27056,9 +27056,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -27068,9 +27068,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -27080,9 +27080,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -27143,11 +27143,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -27261,9 +27261,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -27273,9 +27273,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -27285,9 +27285,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ChloroformMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::ChloroformMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::ChloroformMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::ChloroformMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::ChloroformMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::ChloroformMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -27348,11 +27348,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::ChloroformMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::ChloroformMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -27466,9 +27466,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::SodiumMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::SodiumMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::SodiumMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -27478,9 +27478,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::SodiumMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::SodiumMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::SodiumMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -27490,9 +27490,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::SodiumMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::SodiumMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::SodiumMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::SodiumMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::SodiumMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::SodiumMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -27553,11 +27553,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::SodiumMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::SodiumMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::SodiumMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::SodiumMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -27671,9 +27671,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Pm25Measurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::Pm25Measurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::Pm25Measurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Pm25Measurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -27683,9 +27683,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Pm25Measurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::Pm25Measurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::Pm25Measurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Pm25Measurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -27695,9 +27695,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Pm25Measurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::Pm25Measurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::Pm25Measurement::LevelValueType;
+    using Type             = chip::app::Clusters::Pm25Measurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::Pm25Measurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::Pm25Measurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Pm25Measurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -27758,11 +27758,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::Pm25Measurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::Pm25Measurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::Pm25Measurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::Pm25Measurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -27876,9 +27876,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -27888,9 +27888,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -27900,9 +27900,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FormaldehydeMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::FormaldehydeMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::FormaldehydeMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -27963,11 +27963,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::FormaldehydeMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -28081,9 +28081,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Pm1Measurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::Pm1Measurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::Pm1Measurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Pm1Measurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -28093,9 +28093,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Pm1Measurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::Pm1Measurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::Pm1Measurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Pm1Measurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -28105,9 +28105,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Pm1Measurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::Pm1Measurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::Pm1Measurement::LevelValueType;
+    using Type             = chip::app::Clusters::Pm1Measurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::Pm1Measurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::Pm1Measurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Pm1Measurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -28168,11 +28168,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::Pm1Measurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::Pm1Measurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::Pm1Measurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::Pm1Measurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -28286,9 +28286,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Pm10Measurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::Pm10Measurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::Pm10Measurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Pm10Measurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -28298,9 +28298,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Pm10Measurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::Pm10Measurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::Pm10Measurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Pm10Measurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -28310,9 +28310,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Pm10Measurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::Pm10Measurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::Pm10Measurement::LevelValueType;
+    using Type             = chip::app::Clusters::Pm10Measurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::Pm10Measurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::Pm10Measurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Pm10Measurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -28373,11 +28373,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::Pm10Measurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::Pm10Measurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::Pm10Measurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::Pm10Measurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -28491,9 +28491,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -28503,9 +28503,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -28515,9 +28515,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -28578,11 +28578,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -28696,9 +28696,9 @@ struct TypeInfo
 namespace MeasurementUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::RadonMeasurement::MeasurementUnitType;
-    using DecodableType    = chip::app::Clusters::RadonMeasurement::MeasurementUnitType;
-    using DecodableArgType = chip::app::Clusters::RadonMeasurement::MeasurementUnitType;
+    using Type             = chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RadonMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
@@ -28708,9 +28708,9 @@ struct TypeInfo
 namespace MeasurementMedium {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::RadonMeasurement::MeasurementMediumType;
-    using DecodableType    = chip::app::Clusters::RadonMeasurement::MeasurementMediumType;
-    using DecodableArgType = chip::app::Clusters::RadonMeasurement::MeasurementMediumType;
+    using Type             = chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RadonMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
@@ -28720,9 +28720,9 @@ struct TypeInfo
 namespace LevelValue {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::RadonMeasurement::LevelValueType;
-    using DecodableType    = chip::app::Clusters::RadonMeasurement::LevelValueType;
-    using DecodableArgType = chip::app::Clusters::RadonMeasurement::LevelValueType;
+    using Type             = chip::app::Clusters::RadonMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::RadonMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::RadonMeasurement::LevelValueEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RadonMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
@@ -28783,11 +28783,11 @@ struct TypeInfo
         Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
         Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
         Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
-            static_cast<chip::app::Clusters::RadonMeasurement::MeasurementUnitType>(0);
+            static_cast<chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum>(0);
         Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
-            static_cast<chip::app::Clusters::RadonMeasurement::MeasurementMediumType>(0);
+            static_cast<chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum>(0);
         Attributes::LevelValue::TypeInfo::DecodableType levelValue =
-            static_cast<chip::app::Clusters::RadonMeasurement::LevelValueType>(0);
+            static_cast<chip::app::Clusters::RadonMeasurement::LevelValueEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

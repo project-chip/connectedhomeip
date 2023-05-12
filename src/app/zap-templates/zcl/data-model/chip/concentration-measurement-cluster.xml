@@ -35,9 +35,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -59,9 +59,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -82,9 +82,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -105,9 +105,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -128,9 +128,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -151,9 +151,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -174,9 +174,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -197,9 +197,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -220,9 +220,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -243,9 +243,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -266,9 +266,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -289,9 +289,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -312,9 +312,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -335,9 +335,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -358,9 +358,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -381,9 +381,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -404,9 +404,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -427,9 +427,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -450,9 +450,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -473,9 +473,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -496,9 +496,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -519,9 +519,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -542,9 +542,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -565,9 +565,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -588,9 +588,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -611,9 +611,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -634,9 +634,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -657,9 +657,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -680,9 +680,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -703,9 +703,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -726,9 +726,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -749,9 +749,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -772,9 +772,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -795,9 +795,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -818,9 +818,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <cluster>
@@ -841,9 +841,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="AVG_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">AverageMeasuredValue</attribute>
     <attribute side="server" code="0x0006" define="AVG_MEASURED_VALUE_WINDOW" type="int32u" min="0" max="259200" writable="false" default="1" optional="true">AverageMeasuredValueWindow</attribute>
     <attribute side="server" code="0x0007" define="UNCERTAINTY" type="single" writable="false" default="0" optional="true">Uncertainty</attribute>
-    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitType" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
-    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumType" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
-    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueType" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
+    <attribute side="server" code="0x0008" define="MEASUREMENT_UNIT" type="MeasurementUnitEnum" min="0" max="7" writable="false" default="0" optional="true">MeasurementUnit</attribute>
+    <attribute side="server" code="0x0009" define="MEASUREMENT_MEDIUM" type="MeasurementMediumEnum" min="0" max="2" writable="false" default="0" optional="true">MeasurementMedium</attribute>
+    <attribute side="server" code="0x000a" define="LEVEL_VALUE" type="LevelValueEnum" min="0" max="4" writable="false" default="0" optional="true">LevelValue</attribute>
   </cluster>
 
   <!-- Feature Map -->
@@ -893,7 +893,7 @@ limitations under the License.
   </bitmap>
 
   <!-- Cluster Data Types -->
-  <enum name="LevelValueType" type="ENUM8">
+  <enum name="LevelValueEnum" type="ENUM8">
     <cluster code="0x040c"/>
     <cluster code="0x040d" />
     <cluster code="0x040e" />
@@ -937,7 +937,7 @@ limitations under the License.
     <item name="Critical" value="0x04"/>
   </enum>
 
-  <enum name="MeasurementUnitType" type="ENUM8">
+  <enum name="MeasurementUnitEnum" type="ENUM8">
     <cluster code="0x040c"/>
     <cluster code="0x040d" />
     <cluster code="0x040e" />
@@ -984,7 +984,7 @@ limitations under the License.
     <item name="BQM3" value="0x07"/>
   </enum>
 
-  <enum name="MeasurementMediumType" type="ENUM8">
+  <enum name="MeasurementMediumEnum" type="ENUM8">
     <cluster code="0x040c"/>
     <cluster code="0x040d" />
     <cluster code="0x040e" />

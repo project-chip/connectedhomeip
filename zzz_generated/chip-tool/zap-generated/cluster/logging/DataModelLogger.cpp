@@ -9013,17 +9013,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case CarbonMonoxideMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case CarbonMonoxideMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case CarbonMonoxideMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType value;
+            chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -9104,17 +9104,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case CarbonDioxideMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case CarbonDioxideMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case CarbonDioxideMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType value;
+            chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -9195,17 +9195,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case EthyleneMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case EthyleneMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case EthyleneMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::EthyleneMeasurement::LevelValueType value;
+            chip::app::Clusters::EthyleneMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -9286,17 +9286,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case EthyleneOxideMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case EthyleneOxideMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case EthyleneOxideMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType value;
+            chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -9377,17 +9377,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case HydrogenMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case HydrogenMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case HydrogenMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::HydrogenMeasurement::LevelValueType value;
+            chip::app::Clusters::HydrogenMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -9468,17 +9468,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case HydrogenSulfideMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case HydrogenSulfideMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case HydrogenSulfideMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType value;
+            chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -9559,17 +9559,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case NitricOxideMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case NitricOxideMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case NitricOxideMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::NitricOxideMeasurement::LevelValueType value;
+            chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -9650,17 +9650,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case NitrogenDioxideMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case NitrogenDioxideMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case NitrogenDioxideMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType value;
+            chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -9741,17 +9741,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case OxygenMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::OxygenMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case OxygenMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::OxygenMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case OxygenMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::OxygenMeasurement::LevelValueType value;
+            chip::app::Clusters::OxygenMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -9832,17 +9832,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case OzoneMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::OzoneMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case OzoneMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::OzoneMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case OzoneMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::OzoneMeasurement::LevelValueType value;
+            chip::app::Clusters::OzoneMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -9923,17 +9923,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case SulfurDioxideMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case SulfurDioxideMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case SulfurDioxideMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType value;
+            chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10014,17 +10014,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case DissolvedOxygenMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case DissolvedOxygenMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case DissolvedOxygenMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType value;
+            chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10105,17 +10105,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case BromateMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::BromateMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case BromateMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::BromateMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case BromateMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::BromateMeasurement::LevelValueType value;
+            chip::app::Clusters::BromateMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10196,17 +10196,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case ChloraminesMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case ChloraminesMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case ChloraminesMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::ChloraminesMeasurement::LevelValueType value;
+            chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10287,17 +10287,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case ChlorineMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case ChlorineMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case ChlorineMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::ChlorineMeasurement::LevelValueType value;
+            chip::app::Clusters::ChlorineMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10378,17 +10378,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case FecalColiformEColiMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case FecalColiformEColiMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case FecalColiformEColiMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType value;
+            chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10469,17 +10469,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case FluorideMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::FluorideMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case FluorideMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::FluorideMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case FluorideMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::FluorideMeasurement::LevelValueType value;
+            chip::app::Clusters::FluorideMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10560,17 +10560,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case HaloaceticAcidsMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case HaloaceticAcidsMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case HaloaceticAcidsMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType value;
+            chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10651,17 +10651,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case TotalTrihalomethanesMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case TotalTrihalomethanesMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case TotalTrihalomethanesMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType value;
+            chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10742,17 +10742,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case TotalColiformBacteriaMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case TotalColiformBacteriaMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case TotalColiformBacteriaMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType value;
+            chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10833,17 +10833,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case TurbidityMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case TurbidityMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case TurbidityMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::TurbidityMeasurement::LevelValueType value;
+            chip::app::Clusters::TurbidityMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -10924,17 +10924,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case CopperMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::CopperMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case CopperMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::CopperMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case CopperMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::CopperMeasurement::LevelValueType value;
+            chip::app::Clusters::CopperMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11015,17 +11015,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case LeadMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::LeadMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case LeadMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::LeadMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case LeadMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::LeadMeasurement::LevelValueType value;
+            chip::app::Clusters::LeadMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11106,17 +11106,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case ManganeseMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case ManganeseMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case ManganeseMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::ManganeseMeasurement::LevelValueType value;
+            chip::app::Clusters::ManganeseMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11197,17 +11197,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case SulfateMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::SulfateMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case SulfateMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::SulfateMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case SulfateMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::SulfateMeasurement::LevelValueType value;
+            chip::app::Clusters::SulfateMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11288,17 +11288,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case BromodichloromethaneMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case BromodichloromethaneMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case BromodichloromethaneMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType value;
+            chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11379,17 +11379,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case BromoformMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::BromoformMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case BromoformMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::BromoformMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case BromoformMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::BromoformMeasurement::LevelValueType value;
+            chip::app::Clusters::BromoformMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11470,17 +11470,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case ChlorodibromomethaneMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case ChlorodibromomethaneMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case ChlorodibromomethaneMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType value;
+            chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11561,17 +11561,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case ChloroformMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case ChloroformMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case ChloroformMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::ChloroformMeasurement::LevelValueType value;
+            chip::app::Clusters::ChloroformMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11652,17 +11652,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case SodiumMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::SodiumMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case SodiumMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::SodiumMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case SodiumMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::SodiumMeasurement::LevelValueType value;
+            chip::app::Clusters::SodiumMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11743,17 +11743,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case Pm25Measurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::Pm25Measurement::MeasurementUnitType value;
+            chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case Pm25Measurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::Pm25Measurement::MeasurementMediumType value;
+            chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case Pm25Measurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::Pm25Measurement::LevelValueType value;
+            chip::app::Clusters::Pm25Measurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11834,17 +11834,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case FormaldehydeMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case FormaldehydeMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case FormaldehydeMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::FormaldehydeMeasurement::LevelValueType value;
+            chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -11925,17 +11925,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case Pm1Measurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::Pm1Measurement::MeasurementUnitType value;
+            chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case Pm1Measurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::Pm1Measurement::MeasurementMediumType value;
+            chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case Pm1Measurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::Pm1Measurement::LevelValueType value;
+            chip::app::Clusters::Pm1Measurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -12016,17 +12016,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case Pm10Measurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::Pm10Measurement::MeasurementUnitType value;
+            chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case Pm10Measurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::Pm10Measurement::MeasurementMediumType value;
+            chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case Pm10Measurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::Pm10Measurement::LevelValueType value;
+            chip::app::Clusters::Pm10Measurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -12107,17 +12107,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case TotalVolatileOrganicCompoundsMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case TotalVolatileOrganicCompoundsMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case TotalVolatileOrganicCompoundsMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType value;
+            chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }
@@ -12198,17 +12198,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Uncertainty", 1, value);
         }
         case RadonMeasurement::Attributes::MeasurementUnit::Id: {
-            chip::app::Clusters::RadonMeasurement::MeasurementUnitType value;
+            chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementUnit", 1, value);
         }
         case RadonMeasurement::Attributes::MeasurementMedium::Id: {
-            chip::app::Clusters::RadonMeasurement::MeasurementMediumType value;
+            chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementMedium", 1, value);
         }
         case RadonMeasurement::Attributes::LevelValue::Id: {
-            chip::app::Clusters::RadonMeasurement::LevelValueType value;
+            chip::app::Clusters::RadonMeasurement::LevelValueEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LevelValue", 1, value);
         }

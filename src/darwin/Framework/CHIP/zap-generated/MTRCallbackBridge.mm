@@ -23858,15 +23858,15 @@ void MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackS
     }
 }
 
-void MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType value)
+void MTRCarbonMonoxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRCarbonMonoxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23881,8 +23881,8 @@ void MTRCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackSubscript
     }
 }
 
-void MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType> & value)
+void MTRNullableCarbonMonoxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23893,7 +23893,7 @@ void MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableCarbonMonoxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23908,15 +23908,15 @@ void MTRNullableCarbonMonoxideMeasurementClusterLevelValueTypeAttributeCallbackS
     }
 }
 
-void MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType value)
+void MTRCarbonMonoxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRCarbonMonoxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23931,8 +23931,8 @@ void MTRCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSu
     }
 }
 
-void MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType> & value)
+void MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23943,7 +23943,7 @@ void MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -23959,15 +23959,15 @@ void MTRNullableCarbonMonoxideMeasurementClusterMeasurementMediumTypeAttributeCa
     }
 }
 
-void MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType value)
+void MTRCarbonMonoxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRCarbonMonoxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23982,8 +23982,8 @@ void MTRCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubs
     }
 }
 
-void MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType> & value)
+void MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23994,7 +23994,7 @@ void MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24009,15 +24009,15 @@ void MTRNullableCarbonMonoxideMeasurementClusterMeasurementUnitTypeAttributeCall
     }
 }
 
-void MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType value)
+void MTRCarbonDioxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRCarbonDioxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24032,8 +24032,8 @@ void MTRCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType> & value)
+void MTRNullableCarbonDioxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24044,7 +24044,7 @@ void MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableCarbonDioxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24059,15 +24059,15 @@ void MTRNullableCarbonDioxideMeasurementClusterLevelValueTypeAttributeCallbackSu
     }
 }
 
-void MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType value)
+void MTRCarbonDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRCarbonDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24082,8 +24082,8 @@ void MTRCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType> & value)
+void MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24094,7 +24094,7 @@ void MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24109,15 +24109,15 @@ void MTRNullableCarbonDioxideMeasurementClusterMeasurementMediumTypeAttributeCal
     }
 }
 
-void MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType value)
+void MTRCarbonDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRCarbonDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24132,8 +24132,8 @@ void MTRCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubsc
     }
 }
 
-void MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType> & value)
+void MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24144,7 +24144,7 @@ void MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallb
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24159,15 +24159,15 @@ void MTRNullableCarbonDioxideMeasurementClusterMeasurementUnitTypeAttributeCallb
     }
 }
 
-void MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::EthyleneMeasurement::LevelValueType value)
+void MTREthyleneMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::EthyleneMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTREthyleneMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24182,8 +24182,8 @@ void MTREthyleneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::LevelValueType> & value)
+void MTRNullableEthyleneMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24194,7 +24194,7 @@ void MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableEthyleneMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24209,15 +24209,15 @@ void MTRNullableEthyleneMeasurementClusterLevelValueTypeAttributeCallbackSubscri
     }
 }
 
-void MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType value)
+void MTREthyleneMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTREthyleneMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24232,8 +24232,8 @@ void MTREthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType> & value)
+void MTRNullableEthyleneMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24244,7 +24244,7 @@ void MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableEthyleneMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24259,15 +24259,15 @@ void MTRNullableEthyleneMeasurementClusterMeasurementMediumTypeAttributeCallback
     }
 }
 
-void MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType value)
+void MTREthyleneMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTREthyleneMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24282,8 +24282,8 @@ void MTREthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType> & value)
+void MTRNullableEthyleneMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24294,7 +24294,7 @@ void MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableEthyleneMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24309,15 +24309,15 @@ void MTRNullableEthyleneMeasurementClusterMeasurementUnitTypeAttributeCallbackSu
     }
 }
 
-void MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType value)
+void MTREthyleneOxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTREthyleneOxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24332,8 +24332,8 @@ void MTREthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType> & value)
+void MTRNullableEthyleneOxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24344,7 +24344,7 @@ void MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableEthyleneOxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24359,15 +24359,15 @@ void MTRNullableEthyleneOxideMeasurementClusterLevelValueTypeAttributeCallbackSu
     }
 }
 
-void MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType value)
+void MTREthyleneOxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTREthyleneOxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24382,8 +24382,8 @@ void MTREthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType> & value)
+void MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24394,7 +24394,7 @@ void MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24409,15 +24409,15 @@ void MTRNullableEthyleneOxideMeasurementClusterMeasurementMediumTypeAttributeCal
     }
 }
 
-void MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType value)
+void MTREthyleneOxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTREthyleneOxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24432,8 +24432,8 @@ void MTREthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubsc
     }
 }
 
-void MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType> & value)
+void MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24444,7 +24444,7 @@ void MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallb
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24459,15 +24459,15 @@ void MTRNullableEthyleneOxideMeasurementClusterMeasurementUnitTypeAttributeCallb
     }
 }
 
-void MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HydrogenMeasurement::LevelValueType value)
+void MTRHydrogenMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::HydrogenMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRHydrogenMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24482,8 +24482,8 @@ void MTRHydrogenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::LevelValueType> & value)
+void MTRNullableHydrogenMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24494,7 +24494,7 @@ void MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableHydrogenMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24509,15 +24509,15 @@ void MTRNullableHydrogenMeasurementClusterLevelValueTypeAttributeCallbackSubscri
     }
 }
 
-void MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType value)
+void MTRHydrogenMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRHydrogenMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24532,8 +24532,8 @@ void MTRHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType> & value)
+void MTRNullableHydrogenMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24544,7 +24544,7 @@ void MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableHydrogenMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24559,15 +24559,15 @@ void MTRNullableHydrogenMeasurementClusterMeasurementMediumTypeAttributeCallback
     }
 }
 
-void MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType value)
+void MTRHydrogenMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRHydrogenMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24582,8 +24582,8 @@ void MTRHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType> & value)
+void MTRNullableHydrogenMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24594,7 +24594,7 @@ void MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableHydrogenMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24609,15 +24609,15 @@ void MTRNullableHydrogenMeasurementClusterMeasurementUnitTypeAttributeCallbackSu
     }
 }
 
-void MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType value)
+void MTRHydrogenSulfideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRHydrogenSulfideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24632,8 +24632,8 @@ void MTRHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType> & value)
+void MTRNullableHydrogenSulfideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24644,7 +24644,7 @@ void MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableHydrogenSulfideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24659,15 +24659,15 @@ void MTRNullableHydrogenSulfideMeasurementClusterLevelValueTypeAttributeCallback
     }
 }
 
-void MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType value)
+void MTRHydrogenSulfideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRHydrogenSulfideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24682,8 +24682,8 @@ void MTRHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackS
     }
 }
 
-void MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType> & value)
+void MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24694,7 +24694,7 @@ void MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -24710,15 +24710,15 @@ void MTRNullableHydrogenSulfideMeasurementClusterMeasurementMediumTypeAttributeC
     }
 }
 
-void MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType value)
+void MTRHydrogenSulfideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRHydrogenSulfideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24733,8 +24733,8 @@ void MTRHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType> & value)
+void MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24745,7 +24745,7 @@ void MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24760,15 +24760,15 @@ void MTRNullableHydrogenSulfideMeasurementClusterMeasurementUnitTypeAttributeCal
     }
 }
 
-void MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NitricOxideMeasurement::LevelValueType value)
+void MTRNitricOxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNitricOxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24783,8 +24783,8 @@ void MTRNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::LevelValueType> & value)
+void MTRNullableNitricOxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24795,7 +24795,7 @@ void MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableNitricOxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24810,15 +24810,15 @@ void MTRNullableNitricOxideMeasurementClusterLevelValueTypeAttributeCallbackSubs
     }
 }
 
-void MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType value)
+void MTRNitricOxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNitricOxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24833,8 +24833,8 @@ void MTRNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubsc
     }
 }
 
-void MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType> & value)
+void MTRNullableNitricOxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24845,7 +24845,7 @@ void MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallb
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableNitricOxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24860,15 +24860,15 @@ void MTRNullableNitricOxideMeasurementClusterMeasurementMediumTypeAttributeCallb
     }
 }
 
-void MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType value)
+void MTRNitricOxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNitricOxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24883,8 +24883,8 @@ void MTRNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscri
     }
 }
 
-void MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType> & value)
+void MTRNullableNitricOxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24895,7 +24895,7 @@ void MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbac
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableNitricOxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24910,15 +24910,15 @@ void MTRNullableNitricOxideMeasurementClusterMeasurementUnitTypeAttributeCallbac
     }
 }
 
-void MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType value)
+void MTRNitrogenDioxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNitrogenDioxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24933,8 +24933,8 @@ void MTRNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType> & value)
+void MTRNullableNitrogenDioxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24945,7 +24945,7 @@ void MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableNitrogenDioxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24960,15 +24960,15 @@ void MTRNullableNitrogenDioxideMeasurementClusterLevelValueTypeAttributeCallback
     }
 }
 
-void MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType value)
+void MTRNitrogenDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNitrogenDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24983,8 +24983,8 @@ void MTRNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackS
     }
 }
 
-void MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType> & value)
+void MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24995,7 +24995,7 @@ void MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -25011,15 +25011,15 @@ void MTRNullableNitrogenDioxideMeasurementClusterMeasurementMediumTypeAttributeC
     }
 }
 
-void MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType value)
+void MTRNitrogenDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNitrogenDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25034,8 +25034,8 @@ void MTRNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType> & value)
+void MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25046,7 +25046,7 @@ void MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25061,15 +25061,15 @@ void MTRNullableNitrogenDioxideMeasurementClusterMeasurementUnitTypeAttributeCal
     }
 }
 
-void MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OxygenMeasurement::LevelValueType value)
+void MTROxygenMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OxygenMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROxygenMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25084,8 +25084,8 @@ void MTROxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::LevelValueType> & value)
+void MTRNullableOxygenMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25096,7 +25096,7 @@ void MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOxygenMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25111,15 +25111,15 @@ void MTRNullableOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscript
     }
 }
 
-void MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OxygenMeasurement::MeasurementMediumType value)
+void MTROxygenMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROxygenMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25134,8 +25134,8 @@ void MTROxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::MeasurementMediumType> & value)
+void MTRNullableOxygenMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25146,7 +25146,7 @@ void MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOxygenMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25161,15 +25161,15 @@ void MTRNullableOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSu
     }
 }
 
-void MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OxygenMeasurement::MeasurementUnitType value)
+void MTROxygenMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROxygenMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25184,8 +25184,8 @@ void MTROxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::MeasurementUnitType> & value)
+void MTRNullableOxygenMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25196,7 +25196,7 @@ void MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOxygenMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25211,15 +25211,15 @@ void MTRNullableOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubs
     }
 }
 
-void MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OzoneMeasurement::LevelValueType value)
+void MTROzoneMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OzoneMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROzoneMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25234,8 +25234,8 @@ void MTROzoneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::LevelValueType> & value)
+void MTRNullableOzoneMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25246,7 +25246,7 @@ void MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOzoneMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25261,15 +25261,15 @@ void MTRNullableOzoneMeasurementClusterLevelValueTypeAttributeCallbackSubscripti
     }
 }
 
-void MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OzoneMeasurement::MeasurementMediumType value)
+void MTROzoneMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROzoneMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25284,8 +25284,8 @@ void MTROzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::MeasurementMediumType> & value)
+void MTRNullableOzoneMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25296,7 +25296,7 @@ void MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOzoneMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25311,15 +25311,15 @@ void MTRNullableOzoneMeasurementClusterMeasurementMediumTypeAttributeCallbackSub
     }
 }
 
-void MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OzoneMeasurement::MeasurementUnitType value)
+void MTROzoneMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROzoneMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25334,8 +25334,8 @@ void MTROzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::MeasurementUnitType> & value)
+void MTRNullableOzoneMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25346,7 +25346,7 @@ void MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOzoneMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25361,15 +25361,15 @@ void MTRNullableOzoneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubsc
     }
 }
 
-void MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType value)
+void MTRSulfurDioxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSulfurDioxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25384,8 +25384,8 @@ void MTRSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType> & value)
+void MTRNullableSulfurDioxideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25396,7 +25396,7 @@ void MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableSulfurDioxideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25411,15 +25411,15 @@ void MTRNullableSulfurDioxideMeasurementClusterLevelValueTypeAttributeCallbackSu
     }
 }
 
-void MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType value)
+void MTRSulfurDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSulfurDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25434,8 +25434,8 @@ void MTRSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType> & value)
+void MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25446,7 +25446,7 @@ void MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25461,15 +25461,15 @@ void MTRNullableSulfurDioxideMeasurementClusterMeasurementMediumTypeAttributeCal
     }
 }
 
-void MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType value)
+void MTRSulfurDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSulfurDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25484,8 +25484,8 @@ void MTRSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubsc
     }
 }
 
-void MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType> & value)
+void MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25496,7 +25496,7 @@ void MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallb
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25511,15 +25511,15 @@ void MTRNullableSulfurDioxideMeasurementClusterMeasurementUnitTypeAttributeCallb
     }
 }
 
-void MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType value)
+void MTRDissolvedOxygenMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDissolvedOxygenMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25534,8 +25534,8 @@ void MTRDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType> & value)
+void MTRNullableDissolvedOxygenMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25546,7 +25546,7 @@ void MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDissolvedOxygenMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25561,15 +25561,15 @@ void MTRNullableDissolvedOxygenMeasurementClusterLevelValueTypeAttributeCallback
     }
 }
 
-void MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType value)
+void MTRDissolvedOxygenMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDissolvedOxygenMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25584,8 +25584,8 @@ void MTRDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackS
     }
 }
 
-void MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType> & value)
+void MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25596,7 +25596,7 @@ void MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -25612,15 +25612,15 @@ void MTRNullableDissolvedOxygenMeasurementClusterMeasurementMediumTypeAttributeC
     }
 }
 
-void MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType value)
+void MTRDissolvedOxygenMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRDissolvedOxygenMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25635,8 +25635,8 @@ void MTRDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType> & value)
+void MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25647,7 +25647,7 @@ void MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25662,15 +25662,15 @@ void MTRNullableDissolvedOxygenMeasurementClusterMeasurementUnitTypeAttributeCal
     }
 }
 
-void MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BromateMeasurement::LevelValueType value)
+void MTRBromateMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BromateMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBromateMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25685,8 +25685,8 @@ void MTRBromateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::LevelValueType> & value)
+void MTRNullableBromateMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25697,7 +25697,7 @@ void MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableBromateMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25712,15 +25712,15 @@ void MTRNullableBromateMeasurementClusterLevelValueTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BromateMeasurement::MeasurementMediumType value)
+void MTRBromateMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBromateMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25735,8 +25735,8 @@ void MTRBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscript
     }
 }
 
-void MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::MeasurementMediumType> & value)
+void MTRNullableBromateMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25747,7 +25747,7 @@ void MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableBromateMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25762,15 +25762,15 @@ void MTRNullableBromateMeasurementClusterMeasurementMediumTypeAttributeCallbackS
     }
 }
 
-void MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BromateMeasurement::MeasurementUnitType value)
+void MTRBromateMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBromateMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25785,8 +25785,8 @@ void MTRBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::MeasurementUnitType> & value)
+void MTRNullableBromateMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25797,7 +25797,7 @@ void MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableBromateMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25812,15 +25812,15 @@ void MTRNullableBromateMeasurementClusterMeasurementUnitTypeAttributeCallbackSub
     }
 }
 
-void MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChloraminesMeasurement::LevelValueType value)
+void MTRChloraminesMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChloraminesMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25835,8 +25835,8 @@ void MTRChloraminesMeasurementClusterLevelValueTypeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::LevelValueType> & value)
+void MTRNullableChloraminesMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25847,7 +25847,7 @@ void MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableChloraminesMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25862,15 +25862,15 @@ void MTRNullableChloraminesMeasurementClusterLevelValueTypeAttributeCallbackSubs
     }
 }
 
-void MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType value)
+void MTRChloraminesMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChloraminesMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25885,8 +25885,8 @@ void MTRChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubsc
     }
 }
 
-void MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType> & value)
+void MTRNullableChloraminesMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25897,7 +25897,7 @@ void MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallb
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableChloraminesMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25912,15 +25912,15 @@ void MTRNullableChloraminesMeasurementClusterMeasurementMediumTypeAttributeCallb
     }
 }
 
-void MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType value)
+void MTRChloraminesMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChloraminesMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25935,8 +25935,8 @@ void MTRChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscri
     }
 }
 
-void MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType> & value)
+void MTRNullableChloraminesMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25947,7 +25947,7 @@ void MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbac
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableChloraminesMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25962,15 +25962,15 @@ void MTRNullableChloraminesMeasurementClusterMeasurementUnitTypeAttributeCallbac
     }
 }
 
-void MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChlorineMeasurement::LevelValueType value)
+void MTRChlorineMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChlorineMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChlorineMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25985,8 +25985,8 @@ void MTRChlorineMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::LevelValueType> & value)
+void MTRNullableChlorineMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25997,7 +25997,7 @@ void MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableChlorineMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26012,15 +26012,15 @@ void MTRNullableChlorineMeasurementClusterLevelValueTypeAttributeCallbackSubscri
     }
 }
 
-void MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType value)
+void MTRChlorineMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChlorineMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26035,8 +26035,8 @@ void MTRChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType> & value)
+void MTRNullableChlorineMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26047,7 +26047,7 @@ void MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableChlorineMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26062,15 +26062,15 @@ void MTRNullableChlorineMeasurementClusterMeasurementMediumTypeAttributeCallback
     }
 }
 
-void MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType value)
+void MTRChlorineMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChlorineMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26085,8 +26085,8 @@ void MTRChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType> & value)
+void MTRNullableChlorineMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26097,7 +26097,7 @@ void MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableChlorineMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26112,15 +26112,15 @@ void MTRNullableChlorineMeasurementClusterMeasurementUnitTypeAttributeCallbackSu
     }
 }
 
-void MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType value)
+void MTRFecalColiformEColiMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFecalColiformEColiMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26135,8 +26135,8 @@ void MTRFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackSubsc
     }
 }
 
-void MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType> & value)
+void MTRNullableFecalColiformEColiMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26147,7 +26147,7 @@ void MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallb
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFecalColiformEColiMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26162,15 +26162,15 @@ void MTRNullableFecalColiformEColiMeasurementClusterLevelValueTypeAttributeCallb
     }
 }
 
-void MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType value)
+void MTRFecalColiformEColiMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFecalColiformEColiMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26185,8 +26185,8 @@ void MTRFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallba
     }
 }
 
-void MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType> & value)
+void MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26197,7 +26197,7 @@ void MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttribu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -26213,15 +26213,15 @@ void MTRNullableFecalColiformEColiMeasurementClusterMeasurementMediumTypeAttribu
     }
 }
 
-void MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType value)
+void MTRFecalColiformEColiMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFecalColiformEColiMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26236,8 +26236,8 @@ void MTRFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallback
     }
 }
 
-void MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType> & value)
+void MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26248,7 +26248,7 @@ void MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttribute
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -26264,15 +26264,15 @@ void MTRNullableFecalColiformEColiMeasurementClusterMeasurementUnitTypeAttribute
     }
 }
 
-void MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FluorideMeasurement::LevelValueType value)
+void MTRFluorideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FluorideMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFluorideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26287,8 +26287,8 @@ void MTRFluorideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::LevelValueType> & value)
+void MTRNullableFluorideMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26299,7 +26299,7 @@ void MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFluorideMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26314,15 +26314,15 @@ void MTRNullableFluorideMeasurementClusterLevelValueTypeAttributeCallbackSubscri
     }
 }
 
-void MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FluorideMeasurement::MeasurementMediumType value)
+void MTRFluorideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFluorideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26337,8 +26337,8 @@ void MTRFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::MeasurementMediumType> & value)
+void MTRNullableFluorideMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26349,7 +26349,7 @@ void MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFluorideMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26364,15 +26364,15 @@ void MTRNullableFluorideMeasurementClusterMeasurementMediumTypeAttributeCallback
     }
 }
 
-void MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FluorideMeasurement::MeasurementUnitType value)
+void MTRFluorideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFluorideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26387,8 +26387,8 @@ void MTRFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::MeasurementUnitType> & value)
+void MTRNullableFluorideMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26399,7 +26399,7 @@ void MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFluorideMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26414,15 +26414,15 @@ void MTRNullableFluorideMeasurementClusterMeasurementUnitTypeAttributeCallbackSu
     }
 }
 
-void MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType value)
+void MTRHaloaceticAcidsMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRHaloaceticAcidsMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26437,8 +26437,8 @@ void MTRHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType> & value)
+void MTRNullableHaloaceticAcidsMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26449,7 +26449,7 @@ void MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableHaloaceticAcidsMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26464,15 +26464,15 @@ void MTRNullableHaloaceticAcidsMeasurementClusterLevelValueTypeAttributeCallback
     }
 }
 
-void MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType value)
+void MTRHaloaceticAcidsMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRHaloaceticAcidsMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26487,8 +26487,8 @@ void MTRHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackS
     }
 }
 
-void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType> & value)
+void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26499,7 +26499,7 @@ void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -26515,15 +26515,15 @@ void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementMediumTypeAttributeC
     }
 }
 
-void MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType value)
+void MTRHaloaceticAcidsMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRHaloaceticAcidsMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26538,8 +26538,8 @@ void MTRHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType> & value)
+void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26550,7 +26550,7 @@ void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26565,15 +26565,15 @@ void MTRNullableHaloaceticAcidsMeasurementClusterMeasurementUnitTypeAttributeCal
     }
 }
 
-void MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType value)
+void MTRTotalTrihalomethanesMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTotalTrihalomethanesMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26588,8 +26588,8 @@ void MTRTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType> & value)
+void MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26600,7 +26600,7 @@ void MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26615,15 +26615,15 @@ void MTRNullableTotalTrihalomethanesMeasurementClusterLevelValueTypeAttributeCal
     }
 }
 
-void MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType value)
+void MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26638,8 +26638,8 @@ void MTRTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCall
     }
 }
 
-void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType> & value)
+void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26650,7 +26650,7 @@ void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -26666,15 +26666,15 @@ void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementMediumTypeAttri
     }
 }
 
-void MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType value)
+void MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26689,8 +26689,8 @@ void MTRTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallba
     }
 }
 
-void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType> & value)
+void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26701,7 +26701,7 @@ void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttribu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -26717,15 +26717,15 @@ void MTRNullableTotalTrihalomethanesMeasurementClusterMeasurementUnitTypeAttribu
     }
 }
 
-void MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType value)
+void MTRTotalColiformBacteriaMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTotalColiformBacteriaMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26740,8 +26740,8 @@ void MTRTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackSu
     }
 }
 
-void MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType> & value)
+void MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26752,7 +26752,7 @@ void MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -26768,15 +26768,15 @@ void MTRNullableTotalColiformBacteriaMeasurementClusterLevelValueTypeAttributeCa
     }
 }
 
-void MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType value)
+void MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26791,8 +26791,8 @@ void MTRTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCal
     }
 }
 
-void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType> & value)
+void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26803,7 +26803,7 @@ void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -26819,15 +26819,15 @@ void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementMediumTypeAttr
     }
 }
 
-void MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType value)
+void MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26842,8 +26842,8 @@ void MTRTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallb
     }
 }
 
-void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType> & value)
+void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26854,7 +26854,7 @@ void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttrib
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -26870,15 +26870,15 @@ void MTRNullableTotalColiformBacteriaMeasurementClusterMeasurementUnitTypeAttrib
     }
 }
 
-void MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TurbidityMeasurement::LevelValueType value)
+void MTRTurbidityMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TurbidityMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTurbidityMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26893,8 +26893,8 @@ void MTRTurbidityMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::LevelValueType> & value)
+void MTRNullableTurbidityMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26905,7 +26905,7 @@ void MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableTurbidityMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26920,15 +26920,15 @@ void MTRNullableTurbidityMeasurementClusterLevelValueTypeAttributeCallbackSubscr
     }
 }
 
-void MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType value)
+void MTRTurbidityMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTurbidityMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26943,8 +26943,8 @@ void MTRTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscri
     }
 }
 
-void MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType> & value)
+void MTRNullableTurbidityMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26955,7 +26955,7 @@ void MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbac
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableTurbidityMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26970,15 +26970,15 @@ void MTRNullableTurbidityMeasurementClusterMeasurementMediumTypeAttributeCallbac
     }
 }
 
-void MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType value)
+void MTRTurbidityMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTurbidityMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26993,8 +26993,8 @@ void MTRTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscript
     }
 }
 
-void MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType> & value)
+void MTRNullableTurbidityMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27005,7 +27005,7 @@ void MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableTurbidityMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27020,15 +27020,15 @@ void MTRNullableTurbidityMeasurementClusterMeasurementUnitTypeAttributeCallbackS
     }
 }
 
-void MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CopperMeasurement::LevelValueType value)
+void MTRCopperMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::CopperMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRCopperMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27043,8 +27043,8 @@ void MTRCopperMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::LevelValueType> & value)
+void MTRNullableCopperMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27055,7 +27055,7 @@ void MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableCopperMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27070,15 +27070,15 @@ void MTRNullableCopperMeasurementClusterLevelValueTypeAttributeCallbackSubscript
     }
 }
 
-void MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CopperMeasurement::MeasurementMediumType value)
+void MTRCopperMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRCopperMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27093,8 +27093,8 @@ void MTRCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::MeasurementMediumType> & value)
+void MTRNullableCopperMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27105,7 +27105,7 @@ void MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableCopperMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27120,15 +27120,15 @@ void MTRNullableCopperMeasurementClusterMeasurementMediumTypeAttributeCallbackSu
     }
 }
 
-void MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CopperMeasurement::MeasurementUnitType value)
+void MTRCopperMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRCopperMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27143,8 +27143,8 @@ void MTRCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::MeasurementUnitType> & value)
+void MTRNullableCopperMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27155,7 +27155,7 @@ void MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableCopperMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27170,15 +27170,15 @@ void MTRNullableCopperMeasurementClusterMeasurementUnitTypeAttributeCallbackSubs
     }
 }
 
-void MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LeadMeasurement::LevelValueType value)
+void MTRLeadMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LeadMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRLeadMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27193,8 +27193,8 @@ void MTRLeadMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::LevelValueType> & value)
+void MTRNullableLeadMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27205,7 +27205,7 @@ void MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableLeadMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27220,15 +27220,15 @@ void MTRNullableLeadMeasurementClusterLevelValueTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LeadMeasurement::MeasurementMediumType value)
+void MTRLeadMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRLeadMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27243,8 +27243,8 @@ void MTRLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::MeasurementMediumType> & value)
+void MTRNullableLeadMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27255,7 +27255,7 @@ void MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableLeadMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27270,15 +27270,15 @@ void MTRNullableLeadMeasurementClusterMeasurementMediumTypeAttributeCallbackSubs
     }
 }
 
-void MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LeadMeasurement::MeasurementUnitType value)
+void MTRLeadMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRLeadMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27293,8 +27293,8 @@ void MTRLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::MeasurementUnitType> & value)
+void MTRNullableLeadMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27305,7 +27305,7 @@ void MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableLeadMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27320,15 +27320,15 @@ void MTRNullableLeadMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscr
     }
 }
 
-void MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ManganeseMeasurement::LevelValueType value)
+void MTRManganeseMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ManganeseMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRManganeseMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27343,8 +27343,8 @@ void MTRManganeseMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::LevelValueType> & value)
+void MTRNullableManganeseMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27355,7 +27355,7 @@ void MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableManganeseMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27370,15 +27370,15 @@ void MTRNullableManganeseMeasurementClusterLevelValueTypeAttributeCallbackSubscr
     }
 }
 
-void MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType value)
+void MTRManganeseMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRManganeseMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27393,8 +27393,8 @@ void MTRManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscri
     }
 }
 
-void MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType> & value)
+void MTRNullableManganeseMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27405,7 +27405,7 @@ void MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbac
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableManganeseMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27420,15 +27420,15 @@ void MTRNullableManganeseMeasurementClusterMeasurementMediumTypeAttributeCallbac
     }
 }
 
-void MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType value)
+void MTRManganeseMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRManganeseMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27443,8 +27443,8 @@ void MTRManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscript
     }
 }
 
-void MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType> & value)
+void MTRNullableManganeseMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27455,7 +27455,7 @@ void MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableManganeseMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27470,15 +27470,15 @@ void MTRNullableManganeseMeasurementClusterMeasurementUnitTypeAttributeCallbackS
     }
 }
 
-void MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SulfateMeasurement::LevelValueType value)
+void MTRSulfateMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::SulfateMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSulfateMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27493,8 +27493,8 @@ void MTRSulfateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::LevelValueType> & value)
+void MTRNullableSulfateMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27505,7 +27505,7 @@ void MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableSulfateMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27520,15 +27520,15 @@ void MTRNullableSulfateMeasurementClusterLevelValueTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SulfateMeasurement::MeasurementMediumType value)
+void MTRSulfateMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSulfateMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27543,8 +27543,8 @@ void MTRSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscript
     }
 }
 
-void MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::MeasurementMediumType> & value)
+void MTRNullableSulfateMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27555,7 +27555,7 @@ void MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableSulfateMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27570,15 +27570,15 @@ void MTRNullableSulfateMeasurementClusterMeasurementMediumTypeAttributeCallbackS
     }
 }
 
-void MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SulfateMeasurement::MeasurementUnitType value)
+void MTRSulfateMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSulfateMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27593,8 +27593,8 @@ void MTRSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::MeasurementUnitType> & value)
+void MTRNullableSulfateMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27605,7 +27605,7 @@ void MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableSulfateMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27620,15 +27620,15 @@ void MTRNullableSulfateMeasurementClusterMeasurementUnitTypeAttributeCallbackSub
     }
 }
 
-void MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType value)
+void MTRBromodichloromethaneMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBromodichloromethaneMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27643,8 +27643,8 @@ void MTRBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType> & value)
+void MTRNullableBromodichloromethaneMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27655,7 +27655,7 @@ void MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableBromodichloromethaneMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27670,15 +27670,15 @@ void MTRNullableBromodichloromethaneMeasurementClusterLevelValueTypeAttributeCal
     }
 }
 
-void MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType value)
+void MTRBromodichloromethaneMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBromodichloromethaneMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27693,8 +27693,8 @@ void MTRBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCall
     }
 }
 
-void MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType> & value)
+void MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27705,7 +27705,7 @@ void MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -27721,15 +27721,15 @@ void MTRNullableBromodichloromethaneMeasurementClusterMeasurementMediumTypeAttri
     }
 }
 
-void MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType value)
+void MTRBromodichloromethaneMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBromodichloromethaneMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27744,8 +27744,8 @@ void MTRBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallba
     }
 }
 
-void MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType> & value)
+void MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27756,7 +27756,7 @@ void MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttribu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -27772,15 +27772,15 @@ void MTRNullableBromodichloromethaneMeasurementClusterMeasurementUnitTypeAttribu
     }
 }
 
-void MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BromoformMeasurement::LevelValueType value)
+void MTRBromoformMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BromoformMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBromoformMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27795,8 +27795,8 @@ void MTRBromoformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::LevelValueType> & value)
+void MTRNullableBromoformMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27807,7 +27807,7 @@ void MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableBromoformMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27822,15 +27822,15 @@ void MTRNullableBromoformMeasurementClusterLevelValueTypeAttributeCallbackSubscr
     }
 }
 
-void MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BromoformMeasurement::MeasurementMediumType value)
+void MTRBromoformMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBromoformMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27845,8 +27845,8 @@ void MTRBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscri
     }
 }
 
-void MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::MeasurementMediumType> & value)
+void MTRNullableBromoformMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27857,7 +27857,7 @@ void MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbac
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableBromoformMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27872,15 +27872,15 @@ void MTRNullableBromoformMeasurementClusterMeasurementMediumTypeAttributeCallbac
     }
 }
 
-void MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BromoformMeasurement::MeasurementUnitType value)
+void MTRBromoformMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBromoformMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27895,8 +27895,8 @@ void MTRBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscript
     }
 }
 
-void MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::MeasurementUnitType> & value)
+void MTRNullableBromoformMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27907,7 +27907,7 @@ void MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableBromoformMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27922,15 +27922,15 @@ void MTRNullableBromoformMeasurementClusterMeasurementUnitTypeAttributeCallbackS
     }
 }
 
-void MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType value)
+void MTRChlorodibromomethaneMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChlorodibromomethaneMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27945,8 +27945,8 @@ void MTRChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackSub
     }
 }
 
-void MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType> & value)
+void MTRNullableChlorodibromomethaneMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27957,7 +27957,7 @@ void MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableChlorodibromomethaneMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27972,15 +27972,15 @@ void MTRNullableChlorodibromomethaneMeasurementClusterLevelValueTypeAttributeCal
     }
 }
 
-void MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType value)
+void MTRChlorodibromomethaneMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChlorodibromomethaneMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27995,8 +27995,8 @@ void MTRChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCall
     }
 }
 
-void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType> & value)
+void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28007,7 +28007,7 @@ void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -28023,15 +28023,15 @@ void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementMediumTypeAttri
     }
 }
 
-void MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType value)
+void MTRChlorodibromomethaneMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChlorodibromomethaneMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28046,8 +28046,8 @@ void MTRChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallba
     }
 }
 
-void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType> & value)
+void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28058,7 +28058,7 @@ void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttribu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -28074,15 +28074,15 @@ void MTRNullableChlorodibromomethaneMeasurementClusterMeasurementUnitTypeAttribu
     }
 }
 
-void MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChloroformMeasurement::LevelValueType value)
+void MTRChloroformMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChloroformMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChloroformMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28097,8 +28097,8 @@ void MTRChloroformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::LevelValueType> & value)
+void MTRNullableChloroformMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28109,7 +28109,7 @@ void MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableChloroformMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28124,15 +28124,15 @@ void MTRNullableChloroformMeasurementClusterLevelValueTypeAttributeCallbackSubsc
     }
 }
 
-void MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType value)
+void MTRChloroformMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChloroformMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28147,8 +28147,8 @@ void MTRChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscr
     }
 }
 
-void MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType> & value)
+void MTRNullableChloroformMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28159,7 +28159,7 @@ void MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableChloroformMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28174,15 +28174,15 @@ void MTRNullableChloroformMeasurementClusterMeasurementMediumTypeAttributeCallba
     }
 }
 
-void MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType value)
+void MTRChloroformMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRChloroformMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28197,8 +28197,8 @@ void MTRChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType> & value)
+void MTRNullableChloroformMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28209,7 +28209,7 @@ void MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableChloroformMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28224,15 +28224,15 @@ void MTRNullableChloroformMeasurementClusterMeasurementUnitTypeAttributeCallback
     }
 }
 
-void MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SodiumMeasurement::LevelValueType value)
+void MTRSodiumMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::SodiumMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSodiumMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28247,8 +28247,8 @@ void MTRSodiumMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::LevelValueType> & value)
+void MTRNullableSodiumMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28259,7 +28259,7 @@ void MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableSodiumMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28274,15 +28274,15 @@ void MTRNullableSodiumMeasurementClusterLevelValueTypeAttributeCallbackSubscript
     }
 }
 
-void MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SodiumMeasurement::MeasurementMediumType value)
+void MTRSodiumMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSodiumMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28297,8 +28297,8 @@ void MTRSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::MeasurementMediumType> & value)
+void MTRNullableSodiumMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28309,7 +28309,7 @@ void MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableSodiumMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28324,15 +28324,15 @@ void MTRNullableSodiumMeasurementClusterMeasurementMediumTypeAttributeCallbackSu
     }
 }
 
-void MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SodiumMeasurement::MeasurementUnitType value)
+void MTRSodiumMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRSodiumMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28347,8 +28347,8 @@ void MTRSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::MeasurementUnitType> & value)
+void MTRNullableSodiumMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28359,7 +28359,7 @@ void MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableSodiumMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28374,15 +28374,15 @@ void MTRNullableSodiumMeasurementClusterMeasurementUnitTypeAttributeCallbackSubs
     }
 }
 
-void MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm25Measurement::LevelValueType value)
+void MTRPM25MeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Pm25Measurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPM25MeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28397,8 +28397,8 @@ void MTRPM25MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::LevelValueType> & value)
+void MTRNullablePM25MeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28409,7 +28409,7 @@ void MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePM25MeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28424,15 +28424,15 @@ void MTRNullablePM25MeasurementClusterLevelValueTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm25Measurement::MeasurementMediumType value)
+void MTRPM25MeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPM25MeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28447,8 +28447,8 @@ void MTRPM25MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscription
     }
 }
 
-void MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::MeasurementMediumType> & value)
+void MTRNullablePM25MeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28459,7 +28459,7 @@ void MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePM25MeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28474,15 +28474,15 @@ void MTRNullablePM25MeasurementClusterMeasurementMediumTypeAttributeCallbackSubs
     }
 }
 
-void MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm25Measurement::MeasurementUnitType value)
+void MTRPM25MeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPM25MeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28497,8 +28497,8 @@ void MTRPM25MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::MeasurementUnitType> & value)
+void MTRNullablePM25MeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28509,7 +28509,7 @@ void MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePM25MeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28524,15 +28524,15 @@ void MTRNullablePM25MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscr
     }
 }
 
-void MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FormaldehydeMeasurement::LevelValueType value)
+void MTRFormaldehydeMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFormaldehydeMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28547,8 +28547,8 @@ void MTRFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::LevelValueType> & value)
+void MTRNullableFormaldehydeMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28559,7 +28559,7 @@ void MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFormaldehydeMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28574,15 +28574,15 @@ void MTRNullableFormaldehydeMeasurementClusterLevelValueTypeAttributeCallbackSub
     }
 }
 
-void MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType value)
+void MTRFormaldehydeMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFormaldehydeMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28597,8 +28597,8 @@ void MTRFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackSubs
     }
 }
 
-void MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType> & value)
+void MTRNullableFormaldehydeMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28609,7 +28609,7 @@ void MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFormaldehydeMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28624,15 +28624,15 @@ void MTRNullableFormaldehydeMeasurementClusterMeasurementMediumTypeAttributeCall
     }
 }
 
-void MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType value)
+void MTRFormaldehydeMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFormaldehydeMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28647,8 +28647,8 @@ void MTRFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscr
     }
 }
 
-void MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType> & value)
+void MTRNullableFormaldehydeMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28659,7 +28659,7 @@ void MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFormaldehydeMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28674,15 +28674,15 @@ void MTRNullableFormaldehydeMeasurementClusterMeasurementUnitTypeAttributeCallba
     }
 }
 
-void MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm1Measurement::LevelValueType value)
+void MTRPM1MeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Pm1Measurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPM1MeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28697,8 +28697,8 @@ void MTRPM1MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::LevelValueType> & value)
+void MTRNullablePM1MeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28709,7 +28709,7 @@ void MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePM1MeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28724,15 +28724,15 @@ void MTRNullablePM1MeasurementClusterLevelValueTypeAttributeCallbackSubscription
     }
 }
 
-void MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm1Measurement::MeasurementMediumType value)
+void MTRPM1MeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPM1MeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28747,8 +28747,8 @@ void MTRPM1MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::MeasurementMediumType> & value)
+void MTRNullablePM1MeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28759,7 +28759,7 @@ void MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePM1MeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28774,15 +28774,15 @@ void MTRNullablePM1MeasurementClusterMeasurementMediumTypeAttributeCallbackSubsc
     }
 }
 
-void MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm1Measurement::MeasurementUnitType value)
+void MTRPM1MeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPM1MeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28797,8 +28797,8 @@ void MTRPM1MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::MeasurementUnitType> & value)
+void MTRNullablePM1MeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28809,7 +28809,7 @@ void MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePM1MeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28824,15 +28824,15 @@ void MTRNullablePM1MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscri
     }
 }
 
-void MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm10Measurement::LevelValueType value)
+void MTRPM10MeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Pm10Measurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPM10MeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28847,8 +28847,8 @@ void MTRPM10MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::LevelValueType> & value)
+void MTRNullablePM10MeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28859,7 +28859,7 @@ void MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePM10MeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28874,15 +28874,15 @@ void MTRNullablePM10MeasurementClusterLevelValueTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm10Measurement::MeasurementMediumType value)
+void MTRPM10MeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPM10MeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28897,8 +28897,8 @@ void MTRPM10MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscription
     }
 }
 
-void MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::MeasurementMediumType> & value)
+void MTRNullablePM10MeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28909,7 +28909,7 @@ void MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePM10MeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28924,15 +28924,15 @@ void MTRNullablePM10MeasurementClusterMeasurementMediumTypeAttributeCallbackSubs
     }
 }
 
-void MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm10Measurement::MeasurementUnitType value)
+void MTRPM10MeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPM10MeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28947,8 +28947,8 @@ void MTRPM10MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::MeasurementUnitType> & value)
+void MTRNullablePM10MeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28959,7 +28959,7 @@ void MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePM10MeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28974,15 +28974,15 @@ void MTRNullablePM10MeasurementClusterMeasurementUnitTypeAttributeCallbackSubscr
     }
 }
 
-void MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType value)
+void MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::
+void MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -28998,8 +28998,8 @@ void MTRTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCa
     }
 }
 
-void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType> & value)
+void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29010,7 +29010,7 @@ void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAtt
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -29026,15 +29026,15 @@ void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterLevelValueTypeAtt
     }
 }
 
-void MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType value)
+void MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -29050,9 +29050,9 @@ void MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttr
     }
 }
 
-void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
+void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
     void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType> &
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum> &
         value)
 {
     NSNumber * _Nullable objCValue;
@@ -29064,7 +29064,7 @@ void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMedium
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -29080,15 +29080,15 @@ void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementMedium
     }
 }
 
-void MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType value)
+void MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::
+void MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -29104,9 +29104,9 @@ void MTRTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttrib
     }
 }
 
-void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
+void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
     void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType> &
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum> &
         value)
 {
     NSNumber * _Nullable objCValue;
@@ -29118,7 +29118,7 @@ void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTy
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::
+void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -29134,15 +29134,15 @@ void MTRNullableTotalVolatileOrganicCompoundsMeasurementClusterMeasurementUnitTy
     }
 }
 
-void MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RadonMeasurement::LevelValueType value)
+void MTRRadonMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RadonMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRadonMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -29157,8 +29157,8 @@ void MTRRadonMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::LevelValueType> & value)
+void MTRNullableRadonMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29169,7 +29169,7 @@ void MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableRadonMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -29184,15 +29184,15 @@ void MTRNullableRadonMeasurementClusterLevelValueTypeAttributeCallbackSubscripti
     }
 }
 
-void MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RadonMeasurement::MeasurementMediumType value)
+void MTRRadonMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRadonMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -29207,8 +29207,8 @@ void MTRRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::MeasurementMediumType> & value)
+void MTRNullableRadonMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29219,7 +29219,7 @@ void MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableRadonMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -29234,15 +29234,15 @@ void MTRNullableRadonMeasurementClusterMeasurementMediumTypeAttributeCallbackSub
     }
 }
 
-void MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RadonMeasurement::MeasurementUnitType value)
+void MTRRadonMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRadonMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -29257,8 +29257,8 @@ void MTRRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::MeasurementUnitType> & value)
+void MTRNullableRadonMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29269,7 +29269,7 @@ void MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRadonMeasurementClusterMeasurementUnitTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableRadonMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

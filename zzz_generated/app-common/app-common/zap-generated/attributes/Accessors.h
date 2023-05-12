@@ -3100,20 +3100,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType value);
+                  chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -3184,20 +3184,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType value);
+                  chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -3268,19 +3268,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -3351,20 +3351,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType value);
+                  chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -3435,19 +3435,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -3518,20 +3518,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType value);
+                  chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -3602,19 +3602,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -3685,20 +3685,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType value);
+                  chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -3769,19 +3769,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OxygenMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OxygenMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -3852,19 +3852,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OzoneMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OzoneMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -3935,20 +3935,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType value);
+                  chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4019,20 +4019,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType value);
+                  chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4103,19 +4103,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::BromateMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::BromateMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4186,19 +4186,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4269,19 +4269,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4352,20 +4352,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType value);
+                  chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4436,19 +4436,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FluorideMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FluorideMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4519,20 +4519,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType value);
+                  chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4603,20 +4603,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType value);
+                  chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4687,20 +4687,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType value);
+                  chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4771,19 +4771,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4854,19 +4854,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CopperMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CopperMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -4937,19 +4937,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::LeadMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::LeadMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5020,19 +5020,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5103,19 +5103,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::SulfateMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::SulfateMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5186,20 +5186,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType value);
+                  chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5270,19 +5270,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::BromoformMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::BromoformMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5353,20 +5353,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType value);
+                  chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5437,19 +5437,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5520,19 +5520,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::SodiumMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::SodiumMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5603,19 +5603,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm25Measurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementUnitType value);
+                  chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm25Measurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementMediumType value);
+                  chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5686,20 +5686,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FormaldehydeMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::LevelValueType value);
+                  chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5770,19 +5770,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm1Measurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementUnitType value);
+                  chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm1Measurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementMediumType value);
+                  chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5853,19 +5853,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm10Measurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementUnitType value);
+                  chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm10Measurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementMediumType value);
+                  chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -5937,23 +5937,23 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 namespace MeasurementUnit {
 EmberAfStatus
 Get(chip::EndpointId endpoint,
-    chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType * value); // MeasurementUnitType
+    chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus
 Get(chip::EndpointId endpoint,
-    chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType * value); // MeasurementMediumType
+    chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType value);
+                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {
@@ -6024,19 +6024,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value);
 
 namespace MeasurementUnit {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::RadonMeasurement::MeasurementUnitType * value); // MeasurementUnitType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementUnitType value);
+                  chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum value);
 } // namespace MeasurementUnit
 
 namespace MeasurementMedium {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::RadonMeasurement::MeasurementMediumType * value); // MeasurementMediumType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementMediumType value);
+                  chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum value);
 } // namespace MeasurementMedium
 
 namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::LevelValueType * value); // LevelValueType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::LevelValueType value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::LevelValueEnum * value); // LevelValueEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::LevelValueEnum value);
 } // namespace LevelValue
 
 namespace FeatureMap {

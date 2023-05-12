@@ -18051,9 +18051,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::CarbonMonoxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -18065,9 +18065,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxide
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -18082,9 +18082,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxide
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::CarbonMonoxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -18096,9 +18096,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxide
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -18113,9 +18113,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxide
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::CarbonMonoxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -18127,9 +18127,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxide
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -18570,9 +18570,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::CarbonDioxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -18584,9 +18584,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideM
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -18601,9 +18601,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideM
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::CarbonDioxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -18615,9 +18615,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideM
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -18632,9 +18632,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideM
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::CarbonDioxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -18646,9 +18646,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideM
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -19089,9 +19089,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EthyleneMeasurement::Id, Id, readable, sizeof(temp));
@@ -19103,9 +19103,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -19120,9 +19120,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasur
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EthyleneMeasurement::Id, Id, readable, sizeof(temp));
@@ -19134,9 +19134,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -19151,9 +19151,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasur
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EthyleneMeasurement::Id, Id, readable, sizeof(temp));
@@ -19165,9 +19165,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -19608,9 +19608,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EthyleneOxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -19622,9 +19622,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideM
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -19639,9 +19639,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideM
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EthyleneOxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -19653,9 +19653,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideM
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -19670,9 +19670,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideM
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::EthyleneOxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -19684,9 +19684,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideM
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -20127,9 +20127,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::HydrogenMeasurement::Id, Id, readable, sizeof(temp));
@@ -20141,9 +20141,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -20158,9 +20158,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasur
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::HydrogenMeasurement::Id, Id, readable, sizeof(temp));
@@ -20172,9 +20172,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -20189,9 +20189,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasur
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::HydrogenMeasurement::Id, Id, readable, sizeof(temp));
@@ -20203,9 +20203,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -20646,9 +20646,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::HydrogenSulfideMeasurement::Id, Id, readable, sizeof(temp));
@@ -20660,9 +20660,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfid
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -20677,9 +20677,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfid
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::HydrogenSulfideMeasurement::Id, Id, readable, sizeof(temp));
@@ -20691,9 +20691,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfid
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -20708,9 +20708,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfid
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::HydrogenSulfideMeasurement::Id, Id, readable, sizeof(temp));
@@ -20722,9 +20722,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfid
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -21165,9 +21165,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NitricOxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -21179,9 +21179,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMea
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -21196,9 +21196,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMea
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NitricOxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -21210,9 +21210,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMea
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -21227,9 +21227,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMea
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NitricOxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -21241,9 +21241,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMea
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -21684,9 +21684,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NitrogenDioxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -21698,9 +21698,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxid
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -21715,9 +21715,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxid
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NitrogenDioxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -21729,9 +21729,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxid
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -21746,9 +21746,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxid
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NitrogenDioxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -21760,9 +21760,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxid
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -22203,9 +22203,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OxygenMeasurement::Id, Id, readable, sizeof(temp));
@@ -22217,9 +22217,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurem
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -22234,9 +22234,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurem
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OxygenMeasurement::Id, Id, readable, sizeof(temp));
@@ -22248,9 +22248,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurem
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -22265,9 +22265,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurem
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OxygenMeasurement::Id, Id, readable, sizeof(temp));
@@ -22279,9 +22279,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurem
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OxygenMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OxygenMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -22722,9 +22722,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OzoneMeasurement::Id, Id, readable, sizeof(temp));
@@ -22736,9 +22736,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasureme
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -22753,9 +22753,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasureme
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OzoneMeasurement::Id, Id, readable, sizeof(temp));
@@ -22767,9 +22767,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasureme
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -22784,9 +22784,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasureme
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OzoneMeasurement::Id, Id, readable, sizeof(temp));
@@ -22798,9 +22798,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasureme
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OzoneMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -23241,9 +23241,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SulfurDioxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -23255,9 +23255,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideM
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -23272,9 +23272,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideM
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SulfurDioxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -23286,9 +23286,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideM
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -23303,9 +23303,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideM
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SulfurDioxideMeasurement::Id, Id, readable, sizeof(temp));
@@ -23317,9 +23317,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideM
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -23760,9 +23760,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DissolvedOxygenMeasurement::Id, Id, readable, sizeof(temp));
@@ -23774,9 +23774,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxyge
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -23791,9 +23791,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxyge
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DissolvedOxygenMeasurement::Id, Id, readable, sizeof(temp));
@@ -23805,9 +23805,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxyge
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -23822,9 +23822,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxyge
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DissolvedOxygenMeasurement::Id, Id, readable, sizeof(temp));
@@ -23836,9 +23836,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxyge
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -24279,9 +24279,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BromateMeasurement::Id, Id, readable, sizeof(temp));
@@ -24293,9 +24293,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasure
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -24310,9 +24310,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasure
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BromateMeasurement::Id, Id, readable, sizeof(temp));
@@ -24324,9 +24324,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasure
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -24341,9 +24341,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasure
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BromateMeasurement::Id, Id, readable, sizeof(temp));
@@ -24355,9 +24355,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasure
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromateMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromateMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -24798,9 +24798,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ChloraminesMeasurement::Id, Id, readable, sizeof(temp));
@@ -24812,9 +24812,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMea
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -24829,9 +24829,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMea
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ChloraminesMeasurement::Id, Id, readable, sizeof(temp));
@@ -24843,9 +24843,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMea
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -24860,9 +24860,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMea
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ChloraminesMeasurement::Id, Id, readable, sizeof(temp));
@@ -24874,9 +24874,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMea
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -25317,9 +25317,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ChlorineMeasurement::Id, Id, readable, sizeof(temp));
@@ -25331,9 +25331,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -25348,9 +25348,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasur
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ChlorineMeasurement::Id, Id, readable, sizeof(temp));
@@ -25362,9 +25362,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -25379,9 +25379,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasur
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ChlorineMeasurement::Id, Id, readable, sizeof(temp));
@@ -25393,9 +25393,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorineMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorineMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -25836,9 +25836,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FecalColiformEColiMeasurement::Id, Id, readable, sizeof(temp));
@@ -25850,9 +25850,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformE
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -25867,9 +25867,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformE
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FecalColiformEColiMeasurement::Id, Id, readable, sizeof(temp));
@@ -25881,9 +25881,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformE
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -25898,9 +25898,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformE
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FecalColiformEColiMeasurement::Id, Id, readable, sizeof(temp));
@@ -25912,9 +25912,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformE
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -26355,9 +26355,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FluorideMeasurement::Id, Id, readable, sizeof(temp));
@@ -26369,9 +26369,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -26386,9 +26386,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasur
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FluorideMeasurement::Id, Id, readable, sizeof(temp));
@@ -26400,9 +26400,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -26417,9 +26417,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasur
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FluorideMeasurement::Id, Id, readable, sizeof(temp));
@@ -26431,9 +26431,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasur
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FluorideMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FluorideMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -26874,9 +26874,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::HaloaceticAcidsMeasurement::Id, Id, readable, sizeof(temp));
@@ -26888,9 +26888,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcid
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -26905,9 +26905,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcid
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::HaloaceticAcidsMeasurement::Id, Id, readable, sizeof(temp));
@@ -26919,9 +26919,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcid
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -26936,9 +26936,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcid
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::HaloaceticAcidsMeasurement::Id, Id, readable, sizeof(temp));
@@ -26950,9 +26950,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcid
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -27401,9 +27401,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -27416,9 +27416,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalome
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -27433,9 +27433,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalome
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -27448,9 +27448,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalome
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -27465,9 +27465,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalome
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -27480,9 +27480,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalome
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -27934,9 +27934,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -27949,9 +27949,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformB
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -27966,9 +27966,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformB
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -27981,9 +27981,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformB
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -27998,9 +27998,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformB
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -28013,9 +28013,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformB
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -28459,9 +28459,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TurbidityMeasurement::Id, Id, readable, sizeof(temp));
@@ -28473,9 +28473,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasu
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -28490,9 +28490,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasu
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TurbidityMeasurement::Id, Id, readable, sizeof(temp));
@@ -28504,9 +28504,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasu
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -28521,9 +28521,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasu
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TurbidityMeasurement::Id, Id, readable, sizeof(temp));
@@ -28535,9 +28535,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasu
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TurbidityMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TurbidityMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -28978,9 +28978,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::CopperMeasurement::Id, Id, readable, sizeof(temp));
@@ -28992,9 +28992,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurem
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -29009,9 +29009,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurem
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::CopperMeasurement::Id, Id, readable, sizeof(temp));
@@ -29023,9 +29023,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurem
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -29040,9 +29040,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurem
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::CopperMeasurement::Id, Id, readable, sizeof(temp));
@@ -29054,9 +29054,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurem
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CopperMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CopperMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -29497,9 +29497,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LeadMeasurement::Id, Id, readable, sizeof(temp));
@@ -29511,9 +29511,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasuremen
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -29528,9 +29528,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasuremen
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LeadMeasurement::Id, Id, readable, sizeof(temp));
@@ -29542,9 +29542,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasuremen
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -29559,9 +29559,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasuremen
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::LeadMeasurement::Id, Id, readable, sizeof(temp));
@@ -29573,9 +29573,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasuremen
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LeadMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::LeadMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -30016,9 +30016,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ManganeseMeasurement::Id, Id, readable, sizeof(temp));
@@ -30030,9 +30030,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasu
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -30047,9 +30047,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasu
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ManganeseMeasurement::Id, Id, readable, sizeof(temp));
@@ -30061,9 +30061,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasu
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -30078,9 +30078,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasu
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ManganeseMeasurement::Id, Id, readable, sizeof(temp));
@@ -30092,9 +30092,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasu
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ManganeseMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ManganeseMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -30535,9 +30535,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SulfateMeasurement::Id, Id, readable, sizeof(temp));
@@ -30549,9 +30549,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasure
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -30566,9 +30566,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasure
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SulfateMeasurement::Id, Id, readable, sizeof(temp));
@@ -30580,9 +30580,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasure
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -30597,9 +30597,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasure
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SulfateMeasurement::Id, Id, readable, sizeof(temp));
@@ -30611,9 +30611,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasure
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SulfateMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SulfateMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -31062,9 +31062,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -31077,9 +31077,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Bromodichlorom
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -31094,9 +31094,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Bromodichlorom
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -31109,9 +31109,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Bromodichlorom
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -31126,9 +31126,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Bromodichlorom
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -31141,9 +31141,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Bromodichlorom
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -31587,9 +31587,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BromoformMeasurement::Id, Id, readable, sizeof(temp));
@@ -31601,9 +31601,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasu
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -31618,9 +31618,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasu
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BromoformMeasurement::Id, Id, readable, sizeof(temp));
@@ -31632,9 +31632,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasu
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -31649,9 +31649,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasu
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BromoformMeasurement::Id, Id, readable, sizeof(temp));
@@ -31663,9 +31663,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasu
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BromoformMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::BromoformMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -32114,9 +32114,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -32129,9 +32129,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Chlorodibromom
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -32146,9 +32146,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Chlorodibromom
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -32161,9 +32161,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Chlorodibromom
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -32178,9 +32178,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Chlorodibromom
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -32193,9 +32193,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Chlorodibromom
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -32639,9 +32639,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ChloroformMeasurement::Id, Id, readable, sizeof(temp));
@@ -32653,9 +32653,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeas
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -32670,9 +32670,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeas
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ChloroformMeasurement::Id, Id, readable, sizeof(temp));
@@ -32684,9 +32684,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeas
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -32701,9 +32701,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeas
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ChloroformMeasurement::Id, Id, readable, sizeof(temp));
@@ -32715,9 +32715,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeas
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ChloroformMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ChloroformMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -33158,9 +33158,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SodiumMeasurement::Id, Id, readable, sizeof(temp));
@@ -33172,9 +33172,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurem
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -33189,9 +33189,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurem
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SodiumMeasurement::Id, Id, readable, sizeof(temp));
@@ -33203,9 +33203,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurem
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -33220,9 +33220,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurem
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::SodiumMeasurement::Id, Id, readable, sizeof(temp));
@@ -33234,9 +33234,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurem
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SodiumMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::SodiumMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -33677,9 +33677,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm25Measurement::Id, Id, readable, sizeof(temp));
@@ -33691,9 +33691,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measuremen
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -33708,9 +33708,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measuremen
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm25Measurement::Id, Id, readable, sizeof(temp));
@@ -33722,9 +33722,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measuremen
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -33739,9 +33739,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measuremen
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm25Measurement::Id, Id, readable, sizeof(temp));
@@ -33753,9 +33753,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measuremen
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25Measurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm25Measurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -34196,9 +34196,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FormaldehydeMeasurement::Id, Id, readable, sizeof(temp));
@@ -34210,9 +34210,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMe
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -34227,9 +34227,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMe
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FormaldehydeMeasurement::Id, Id, readable, sizeof(temp));
@@ -34241,9 +34241,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMe
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -34258,9 +34258,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMe
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::FormaldehydeMeasurement::Id, Id, readable, sizeof(temp));
@@ -34272,9 +34272,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMe
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -34715,9 +34715,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm1Measurement::Id, Id, readable, sizeof(temp));
@@ -34729,9 +34729,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -34746,9 +34746,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm1Measurement::Id, Id, readable, sizeof(temp));
@@ -34760,9 +34760,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -34777,9 +34777,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm1Measurement::Id, Id, readable, sizeof(temp));
@@ -34791,9 +34791,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1Measurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm1Measurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -35234,9 +35234,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm10Measurement::Id, Id, readable, sizeof(temp));
@@ -35248,9 +35248,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measuremen
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -35265,9 +35265,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measuremen
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm10Measurement::Id, Id, readable, sizeof(temp));
@@ -35279,9 +35279,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measuremen
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -35296,9 +35296,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measuremen
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Pm10Measurement::Id, Id, readable, sizeof(temp));
@@ -35310,9 +35310,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measuremen
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10Measurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Pm10Measurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -35775,9 +35775,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 namespace MeasurementUnit {
 
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType * value)
+                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -35791,9 +35791,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType value)
+                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -35810,9 +35810,9 @@ EmberAfStatus Set(chip::EndpointId endpoint,
 namespace MeasurementMedium {
 
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType * value)
+                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -35826,9 +35826,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType value)
+                  chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -35844,9 +35844,9 @@ EmberAfStatus Set(chip::EndpointId endpoint,
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -35859,9 +35859,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TotalVolatileO
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -36307,9 +36307,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
 
 namespace MeasurementUnit {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementUnitType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RadonMeasurement::Id, Id, readable, sizeof(temp));
@@ -36321,9 +36321,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasureme
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementUnitType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::MeasurementUnitType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -36338,9 +36338,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasureme
 
 namespace MeasurementMedium {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementMediumType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RadonMeasurement::Id, Id, readable, sizeof(temp));
@@ -36352,9 +36352,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasureme
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementMediumType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::MeasurementMediumType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -36369,9 +36369,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasureme
 
 namespace LevelValue {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::LevelValueType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::LevelValueEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::LevelValueEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RadonMeasurement::Id, Id, readable, sizeof(temp));
@@ -36383,9 +36383,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasureme
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::LevelValueType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonMeasurement::LevelValueEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::LevelValueType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::RadonMeasurement::LevelValueEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
