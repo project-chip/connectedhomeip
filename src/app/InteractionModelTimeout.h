@@ -19,7 +19,7 @@
 
 #include <system/SystemClock.h>
 #include <transport/Session.h>
-#include <transport/SessionHandle.h>
+#include <transport/Session.h>
 
 namespace chip {
 namespace app {
