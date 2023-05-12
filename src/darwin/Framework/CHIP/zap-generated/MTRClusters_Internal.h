@@ -278,182 +278,182 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterCarbonMonoxideMeasurement ()
+@interface MTRClusterCarbonMonoxideConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterCarbonDioxideMeasurement ()
+@interface MTRClusterCarbonDioxideConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterEthyleneMeasurement ()
+@interface MTRClusterEthyleneConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterEthyleneOxideMeasurement ()
+@interface MTRClusterEthyleneOxideConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterHydrogenMeasurement ()
+@interface MTRClusterHydrogenConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterHydrogenSulfideMeasurement ()
+@interface MTRClusterHydrogenSulfideConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterNitricOxideMeasurement ()
+@interface MTRClusterNitricOxideConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterNitrogenDioxideMeasurement ()
+@interface MTRClusterNitrogenDioxideConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterOxygenMeasurement ()
+@interface MTRClusterOxygenConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterOzoneMeasurement ()
+@interface MTRClusterOzoneConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterSulfurDioxideMeasurement ()
+@interface MTRClusterSulfurDioxideConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterDissolvedOxygenMeasurement ()
+@interface MTRClusterDissolvedOxygenConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterBromateMeasurement ()
+@interface MTRClusterBromateConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterChloraminesMeasurement ()
+@interface MTRClusterChloraminesConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterChlorineMeasurement ()
+@interface MTRClusterChlorineConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterFecalColiformEColiMeasurement ()
+@interface MTRClusterFecalColiformEColiConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterFluorideMeasurement ()
+@interface MTRClusterFluorideConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterHaloaceticAcidsMeasurement ()
+@interface MTRClusterHaloaceticAcidsConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterTotalTrihalomethanesMeasurement ()
+@interface MTRClusterTotalTrihalomethanesConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterTotalColiformBacteriaMeasurement ()
+@interface MTRClusterTotalColiformBacteriaConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterTurbidityMeasurement ()
+@interface MTRClusterTurbidityConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterCopperMeasurement ()
+@interface MTRClusterCopperConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterLeadMeasurement ()
+@interface MTRClusterLeadConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterManganeseMeasurement ()
+@interface MTRClusterManganeseConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterSulfateMeasurement ()
+@interface MTRClusterSulfateConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterBromodichloromethaneMeasurement ()
+@interface MTRClusterBromodichloromethaneConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterBromoformMeasurement ()
+@interface MTRClusterBromoformConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterChlorodibromomethaneMeasurement ()
+@interface MTRClusterChlorodibromomethaneConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterChloroformMeasurement ()
+@interface MTRClusterChloroformConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterSodiumMeasurement ()
+@interface MTRClusterSodiumConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterPM25Measurement ()
+@interface MTRClusterPM25ConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterFormaldehydeMeasurement ()
+@interface MTRClusterFormaldehydeConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterPM1Measurement ()
+@interface MTRClusterPM1ConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterPM10Measurement ()
+@interface MTRClusterPM10ConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterTotalVolatileOrganicCompoundsMeasurement ()
+@interface MTRClusterTotalVolatileOrganicCompoundsConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterRadonMeasurement ()
+@interface MTRClusterRadonConcentrationMeasurement ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end

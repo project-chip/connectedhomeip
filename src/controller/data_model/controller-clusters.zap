@@ -16608,7 +16608,7 @@
           "name": "Carbon Monoxide Measurement",
           "code": 1036,
           "mfgCode": null,
-          "define": "CARBON_MONOXIDE_MEASUREMENT_CLUSTER",
+          "define": "CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -16650,7 +16650,7 @@
           "name": "Carbon Monoxide Measurement",
           "code": 1036,
           "mfgCode": null,
-          "define": "CARBON_MONOXIDE_MEASUREMENT_CLUSTER",
+          "define": "CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -16932,7 +16932,7 @@
           "name": "Carbon Dioxide Measurement",
           "code": 1037,
           "mfgCode": null,
-          "define": "CARBON_DIOXIDE_MEASUREMENT_CLUSTER",
+          "define": "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -16974,7 +16974,7 @@
           "name": "Carbon Dioxide Measurement",
           "code": 1037,
           "mfgCode": null,
-          "define": "CARBON_DIOXIDE_MEASUREMENT_CLUSTER",
+          "define": "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -17256,7 +17256,7 @@
           "name": "Ethylene Measurement",
           "code": 1038,
           "mfgCode": null,
-          "define": "ETHYLENE_MEASUREMENT_CLUSTER",
+          "define": "ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -17298,7 +17298,7 @@
           "name": "Ethylene Measurement",
           "code": 1038,
           "mfgCode": null,
-          "define": "ETHYLENE_MEASUREMENT_CLUSTER",
+          "define": "ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -17580,7 +17580,7 @@
           "name": "Ethylene Oxide Measurement",
           "code": 1039,
           "mfgCode": null,
-          "define": "ETHYLENE_OXIDE_MEASUREMENT_CLUSTER",
+          "define": "ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -17622,7 +17622,7 @@
           "name": "Ethylene Oxide Measurement",
           "code": 1039,
           "mfgCode": null,
-          "define": "ETHYLENE_OXIDE_MEASUREMENT_CLUSTER",
+          "define": "ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -17904,7 +17904,7 @@
           "name": "Hydrogen Measurement",
           "code": 1040,
           "mfgCode": null,
-          "define": "HYDROGEN_MEASUREMENT_CLUSTER",
+          "define": "HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -17946,7 +17946,7 @@
           "name": "Hydrogen Measurement",
           "code": 1040,
           "mfgCode": null,
-          "define": "HYDROGEN_MEASUREMENT_CLUSTER",
+          "define": "HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -18228,7 +18228,7 @@
           "name": "Hydrogen Sulfide Measurement",
           "code": 1041,
           "mfgCode": null,
-          "define": "HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER",
+          "define": "HYDROGEN_SULFIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -18270,7 +18270,7 @@
           "name": "Hydrogen Sulfide Measurement",
           "code": 1041,
           "mfgCode": null,
-          "define": "HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER",
+          "define": "HYDROGEN_SULFIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -18552,7 +18552,7 @@
           "name": "Nitric Oxide Measurement",
           "code": 1042,
           "mfgCode": null,
-          "define": "NITRIC_OXIDE_MEASUREMENT_CLUSTER",
+          "define": "NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -18594,7 +18594,7 @@
           "name": "Nitric Oxide Measurement",
           "code": 1042,
           "mfgCode": null,
-          "define": "NITRIC_OXIDE_MEASUREMENT_CLUSTER",
+          "define": "NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -18876,7 +18876,7 @@
           "name": "Nitrogen Dioxide Measurement",
           "code": 1043,
           "mfgCode": null,
-          "define": "NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER",
+          "define": "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -18918,7 +18918,7 @@
           "name": "Nitrogen Dioxide Measurement",
           "code": 1043,
           "mfgCode": null,
-          "define": "NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER",
+          "define": "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -19200,7 +19200,7 @@
           "name": "Oxygen Measurement",
           "code": 1044,
           "mfgCode": null,
-          "define": "OXYGEN_MEASUREMENT_CLUSTER",
+          "define": "OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -19242,7 +19242,7 @@
           "name": "Oxygen Measurement",
           "code": 1044,
           "mfgCode": null,
-          "define": "OXYGEN_MEASUREMENT_CLUSTER",
+          "define": "OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -19524,7 +19524,7 @@
           "name": "Ozone Measurement",
           "code": 1045,
           "mfgCode": null,
-          "define": "OZONE_MEASUREMENT_CLUSTER",
+          "define": "OZONE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -19566,7 +19566,7 @@
           "name": "Ozone Measurement",
           "code": 1045,
           "mfgCode": null,
-          "define": "OZONE_MEASUREMENT_CLUSTER",
+          "define": "OZONE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -19848,7 +19848,7 @@
           "name": "Sulfur Dioxide Measurement",
           "code": 1046,
           "mfgCode": null,
-          "define": "SULFUR_DIOXIDE_MEASUREMENT_CLUSTER",
+          "define": "SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -19890,7 +19890,7 @@
           "name": "Sulfur Dioxide Measurement",
           "code": 1046,
           "mfgCode": null,
-          "define": "SULFUR_DIOXIDE_MEASUREMENT_CLUSTER",
+          "define": "SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -20172,7 +20172,7 @@
           "name": "Dissolved Oxygen Measurement",
           "code": 1047,
           "mfgCode": null,
-          "define": "DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER",
+          "define": "DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -20214,7 +20214,7 @@
           "name": "Dissolved Oxygen Measurement",
           "code": 1047,
           "mfgCode": null,
-          "define": "DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER",
+          "define": "DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -20496,7 +20496,7 @@
           "name": "Bromate Measurement",
           "code": 1048,
           "mfgCode": null,
-          "define": "BROMATE_MEASUREMENT_CLUSTER",
+          "define": "BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -20538,7 +20538,7 @@
           "name": "Bromate Measurement",
           "code": 1048,
           "mfgCode": null,
-          "define": "BROMATE_MEASUREMENT_CLUSTER",
+          "define": "BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -20820,7 +20820,7 @@
           "name": "Chloramines Measurement",
           "code": 1049,
           "mfgCode": null,
-          "define": "CHLORAMINES_MEASUREMENT_CLUSTER",
+          "define": "CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -20862,7 +20862,7 @@
           "name": "Chloramines Measurement",
           "code": 1049,
           "mfgCode": null,
-          "define": "CHLORAMINES_MEASUREMENT_CLUSTER",
+          "define": "CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -21144,7 +21144,7 @@
           "name": "Chlorine Measurement",
           "code": 1050,
           "mfgCode": null,
-          "define": "CHLORINE_MEASUREMENT_CLUSTER",
+          "define": "CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -21186,7 +21186,7 @@
           "name": "Chlorine Measurement",
           "code": 1050,
           "mfgCode": null,
-          "define": "CHLORINE_MEASUREMENT_CLUSTER",
+          "define": "CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -21468,7 +21468,7 @@
           "name": "Fecal coliform & E. Coli Measurement",
           "code": 1051,
           "mfgCode": null,
-          "define": "FECAL_COLIFORM_MEASUREMENT_CLUSTER",
+          "define": "FECAL_COLIFORM_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -21510,7 +21510,7 @@
           "name": "Fecal coliform & E. Coli Measurement",
           "code": 1051,
           "mfgCode": null,
-          "define": "FECAL_COLIFORM_MEASUREMENT_CLUSTER",
+          "define": "FECAL_COLIFORM_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -21792,7 +21792,7 @@
           "name": "Fluoride Measurement",
           "code": 1052,
           "mfgCode": null,
-          "define": "FLUORIDE_MEASUREMENT_CLUSTER",
+          "define": "FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -21834,7 +21834,7 @@
           "name": "Fluoride Measurement",
           "code": 1052,
           "mfgCode": null,
-          "define": "FLUORIDE_MEASUREMENT_CLUSTER",
+          "define": "FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -22116,7 +22116,7 @@
           "name": "Haloacetic Acids Measurement",
           "code": 1053,
           "mfgCode": null,
-          "define": "HALOACETIC_ACIDS_MEASUREMENT_CLUSTER",
+          "define": "HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -22158,7 +22158,7 @@
           "name": "Haloacetic Acids Measurement",
           "code": 1053,
           "mfgCode": null,
-          "define": "HALOACETIC_ACIDS_MEASUREMENT_CLUSTER",
+          "define": "HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -22440,7 +22440,7 @@
           "name": "Total Trihalomethanes Measurement",
           "code": 1054,
           "mfgCode": null,
-          "define": "TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER",
+          "define": "TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -22482,7 +22482,7 @@
           "name": "Total Trihalomethanes Measurement",
           "code": 1054,
           "mfgCode": null,
-          "define": "TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER",
+          "define": "TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -22764,7 +22764,7 @@
           "name": "Total Coliform Bacteria Measurement",
           "code": 1055,
           "mfgCode": null,
-          "define": "TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER",
+          "define": "TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -22806,7 +22806,7 @@
           "name": "Total Coliform Bacteria Measurement",
           "code": 1055,
           "mfgCode": null,
-          "define": "TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER",
+          "define": "TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -23088,7 +23088,7 @@
           "name": "Turbidity Measurement",
           "code": 1056,
           "mfgCode": null,
-          "define": "TURBIDITY_MEASUREMENT_CLUSTER",
+          "define": "TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -23130,7 +23130,7 @@
           "name": "Turbidity Measurement",
           "code": 1056,
           "mfgCode": null,
-          "define": "TURBIDITY_MEASUREMENT_CLUSTER",
+          "define": "TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -23412,7 +23412,7 @@
           "name": "Copper Measurement",
           "code": 1057,
           "mfgCode": null,
-          "define": "COPPER_MEASUREMENT_CLUSTER",
+          "define": "COPPER_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -23454,7 +23454,7 @@
           "name": "Copper Measurement",
           "code": 1057,
           "mfgCode": null,
-          "define": "COPPER_MEASUREMENT_CLUSTER",
+          "define": "COPPER_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -23736,7 +23736,7 @@
           "name": "Lead Measurement",
           "code": 1058,
           "mfgCode": null,
-          "define": "LEAD_MEASUREMENT_CLUSTER",
+          "define": "LEAD_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -23778,7 +23778,7 @@
           "name": "Lead Measurement",
           "code": 1058,
           "mfgCode": null,
-          "define": "LEAD_MEASUREMENT_CLUSTER",
+          "define": "LEAD_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -24060,7 +24060,7 @@
           "name": "Manganese Measurement",
           "code": 1059,
           "mfgCode": null,
-          "define": "MANGANESE_MEASUREMENT_CLUSTER",
+          "define": "MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -24102,7 +24102,7 @@
           "name": "Manganese Measurement",
           "code": 1059,
           "mfgCode": null,
-          "define": "MANGANESE_MEASUREMENT_CLUSTER",
+          "define": "MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -24384,7 +24384,7 @@
           "name": "Sulfate Measurement",
           "code": 1060,
           "mfgCode": null,
-          "define": "SULFATE_MEASUREMENT_CLUSTER",
+          "define": "SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -24426,7 +24426,7 @@
           "name": "Sulfate Measurement",
           "code": 1060,
           "mfgCode": null,
-          "define": "SULFATE_MEASUREMENT_CLUSTER",
+          "define": "SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -24708,7 +24708,7 @@
           "name": "Bromodichloromethane Measurement",
           "code": 1061,
           "mfgCode": null,
-          "define": "BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER",
+          "define": "BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -24750,7 +24750,7 @@
           "name": "Bromodichloromethane Measurement",
           "code": 1061,
           "mfgCode": null,
-          "define": "BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER",
+          "define": "BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -25032,7 +25032,7 @@
           "name": "Bromoform Measurement",
           "code": 1062,
           "mfgCode": null,
-          "define": "BROMOFORM_MEASUREMENT_CLUSTER",
+          "define": "BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -25074,7 +25074,7 @@
           "name": "Bromoform Measurement",
           "code": 1062,
           "mfgCode": null,
-          "define": "BROMOFORM_MEASUREMENT_CLUSTER",
+          "define": "BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -25356,7 +25356,7 @@
           "name": "Chlorodibromomethane Measurement",
           "code": 1063,
           "mfgCode": null,
-          "define": "CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER",
+          "define": "CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -25398,7 +25398,7 @@
           "name": "Chlorodibromomethane Measurement",
           "code": 1063,
           "mfgCode": null,
-          "define": "CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER",
+          "define": "CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -25680,7 +25680,7 @@
           "name": "Chloroform Measurement",
           "code": 1064,
           "mfgCode": null,
-          "define": "CHLOROFORM_MEASUREMENT_CLUSTER",
+          "define": "CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -25722,7 +25722,7 @@
           "name": "Chloroform Measurement",
           "code": 1064,
           "mfgCode": null,
-          "define": "CHLOROFORM_MEASUREMENT_CLUSTER",
+          "define": "CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -26004,7 +26004,7 @@
           "name": "Sodium Measurement",
           "code": 1065,
           "mfgCode": null,
-          "define": "SODIUM_MEASUREMENT_CLUSTER",
+          "define": "SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -26046,7 +26046,7 @@
           "name": "Sodium Measurement",
           "code": 1065,
           "mfgCode": null,
-          "define": "SODIUM_MEASUREMENT_CLUSTER",
+          "define": "SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -26328,7 +26328,7 @@
           "name": "PM2.5 Measurement",
           "code": 1066,
           "mfgCode": null,
-          "define": "PM2_5_MEASUREMENT_CLUSTER",
+          "define": "PM2_5_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -26370,7 +26370,7 @@
           "name": "PM2.5 Measurement",
           "code": 1066,
           "mfgCode": null,
-          "define": "PM2_5_MEASUREMENT_CLUSTER",
+          "define": "PM2_5_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -26652,7 +26652,7 @@
           "name": "Formaldehyde Measurement",
           "code": 1067,
           "mfgCode": null,
-          "define": "FORMALDEHYDE_MEASUREMENT_CLUSTER",
+          "define": "FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -26694,7 +26694,7 @@
           "name": "Formaldehyde Measurement",
           "code": 1067,
           "mfgCode": null,
-          "define": "FORMALDEHYDE_MEASUREMENT_CLUSTER",
+          "define": "FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -26976,7 +26976,7 @@
           "name": "PM1 Measurement",
           "code": 1068,
           "mfgCode": null,
-          "define": "PM1_MEASUREMENT_CLUSTER",
+          "define": "PM1_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -27018,7 +27018,7 @@
           "name": "PM1 Measurement",
           "code": 1068,
           "mfgCode": null,
-          "define": "PM1_MEASUREMENT_CLUSTER",
+          "define": "PM1_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -27300,7 +27300,7 @@
           "name": "PM10 Measurement",
           "code": 1069,
           "mfgCode": null,
-          "define": "PM10_MEASUREMENT_CLUSTER",
+          "define": "PM10_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -27342,7 +27342,7 @@
           "name": "PM10 Measurement",
           "code": 1069,
           "mfgCode": null,
-          "define": "PM10_MEASUREMENT_CLUSTER",
+          "define": "PM10_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -27624,7 +27624,7 @@
           "name": "Total Volatile Organic Compounds Measurement",
           "code": 1070,
           "mfgCode": null,
-          "define": "VOC_MEASUREMENT_CLUSTER",
+          "define": "VOC_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -27666,7 +27666,7 @@
           "name": "Total Volatile Organic Compounds Measurement",
           "code": 1070,
           "mfgCode": null,
-          "define": "VOC_MEASUREMENT_CLUSTER",
+          "define": "VOC_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -27948,7 +27948,7 @@
           "name": "Radon Measurement",
           "code": 1071,
           "mfgCode": null,
-          "define": "RADON_MEASUREMENT_CLUSTER",
+          "define": "RADON_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -27990,7 +27990,7 @@
           "name": "Radon Measurement",
           "code": 1071,
           "mfgCode": null,
-          "define": "RADON_MEASUREMENT_CLUSTER",
+          "define": "RADON_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [

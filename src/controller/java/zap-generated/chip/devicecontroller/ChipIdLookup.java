@@ -179,112 +179,112 @@ public final class ChipIdLookup {
       return "OccupancySensing";
     }
     if (clusterId == 1036L) {
-      return "CarbonMonoxideMeasurement";
+      return "CarbonMonoxideConcentrationMeasurement";
     }
     if (clusterId == 1037L) {
-      return "CarbonDioxideMeasurement";
+      return "CarbonDioxideConcentrationMeasurement";
     }
     if (clusterId == 1038L) {
-      return "EthyleneMeasurement";
+      return "EthyleneConcentrationMeasurement";
     }
     if (clusterId == 1039L) {
-      return "EthyleneOxideMeasurement";
+      return "EthyleneOxideConcentrationMeasurement";
     }
     if (clusterId == 1040L) {
-      return "HydrogenMeasurement";
+      return "HydrogenConcentrationMeasurement";
     }
     if (clusterId == 1041L) {
-      return "HydrogenSulfideMeasurement";
+      return "HydrogenSulfideConcentrationMeasurement";
     }
     if (clusterId == 1042L) {
-      return "NitricOxideMeasurement";
+      return "NitricOxideConcentrationMeasurement";
     }
     if (clusterId == 1043L) {
-      return "NitrogenDioxideMeasurement";
+      return "NitrogenDioxideConcentrationMeasurement";
     }
     if (clusterId == 1044L) {
-      return "OxygenMeasurement";
+      return "OxygenConcentrationMeasurement";
     }
     if (clusterId == 1045L) {
-      return "OzoneMeasurement";
+      return "OzoneConcentrationMeasurement";
     }
     if (clusterId == 1046L) {
-      return "SulfurDioxideMeasurement";
+      return "SulfurDioxideConcentrationMeasurement";
     }
     if (clusterId == 1047L) {
-      return "DissolvedOxygenMeasurement";
+      return "DissolvedOxygenConcentrationMeasurement";
     }
     if (clusterId == 1048L) {
-      return "BromateMeasurement";
+      return "BromateConcentrationMeasurement";
     }
     if (clusterId == 1049L) {
-      return "ChloraminesMeasurement";
+      return "ChloraminesConcentrationMeasurement";
     }
     if (clusterId == 1050L) {
-      return "ChlorineMeasurement";
+      return "ChlorineConcentrationMeasurement";
     }
     if (clusterId == 1051L) {
-      return "FecalColiformEColiMeasurement";
+      return "FecalColiformEColiConcentrationMeasurement";
     }
     if (clusterId == 1052L) {
-      return "FluorideMeasurement";
+      return "FluorideConcentrationMeasurement";
     }
     if (clusterId == 1053L) {
-      return "HaloaceticAcidsMeasurement";
+      return "HaloaceticAcidsConcentrationMeasurement";
     }
     if (clusterId == 1054L) {
-      return "TotalTrihalomethanesMeasurement";
+      return "TotalTrihalomethanesConcentrationMeasurement";
     }
     if (clusterId == 1055L) {
-      return "TotalColiformBacteriaMeasurement";
+      return "TotalColiformBacteriaConcentrationMeasurement";
     }
     if (clusterId == 1056L) {
-      return "TurbidityMeasurement";
+      return "TurbidityConcentrationMeasurement";
     }
     if (clusterId == 1057L) {
-      return "CopperMeasurement";
+      return "CopperConcentrationMeasurement";
     }
     if (clusterId == 1058L) {
-      return "LeadMeasurement";
+      return "LeadConcentrationMeasurement";
     }
     if (clusterId == 1059L) {
-      return "ManganeseMeasurement";
+      return "ManganeseConcentrationMeasurement";
     }
     if (clusterId == 1060L) {
-      return "SulfateMeasurement";
+      return "SulfateConcentrationMeasurement";
     }
     if (clusterId == 1061L) {
-      return "BromodichloromethaneMeasurement";
+      return "BromodichloromethaneConcentrationMeasurement";
     }
     if (clusterId == 1062L) {
-      return "BromoformMeasurement";
+      return "BromoformConcentrationMeasurement";
     }
     if (clusterId == 1063L) {
-      return "ChlorodibromomethaneMeasurement";
+      return "ChlorodibromomethaneConcentrationMeasurement";
     }
     if (clusterId == 1064L) {
-      return "ChloroformMeasurement";
+      return "ChloroformConcentrationMeasurement";
     }
     if (clusterId == 1065L) {
-      return "SodiumMeasurement";
+      return "SodiumConcentrationMeasurement";
     }
     if (clusterId == 1066L) {
-      return "Pm25Measurement";
+      return "Pm25ConcentrationMeasurement";
     }
     if (clusterId == 1067L) {
-      return "FormaldehydeMeasurement";
+      return "FormaldehydeConcentrationMeasurement";
     }
     if (clusterId == 1068L) {
-      return "Pm1Measurement";
+      return "Pm1ConcentrationMeasurement";
     }
     if (clusterId == 1069L) {
-      return "Pm10Measurement";
+      return "Pm10ConcentrationMeasurement";
     }
     if (clusterId == 1070L) {
-      return "TotalVolatileOrganicCompoundsMeasurement";
+      return "TotalVolatileOrganicCompoundsConcentrationMeasurement";
     }
     if (clusterId == 1071L) {
-      return "RadonMeasurement";
+      return "RadonConcentrationMeasurement";
     }
     if (clusterId == 1283L) {
       return "WakeOnLan";

@@ -3887,7 +3887,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace OccupancySensing
 
-namespace CarbonMonoxideMeasurement {
+namespace CarbonMonoxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -3959,9 +3959,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace CarbonMonoxideMeasurement
+} // namespace CarbonMonoxideConcentrationMeasurement
 
-namespace CarbonDioxideMeasurement {
+namespace CarbonDioxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4033,9 +4033,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace CarbonDioxideMeasurement
+} // namespace CarbonDioxideConcentrationMeasurement
 
-namespace EthyleneMeasurement {
+namespace EthyleneConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4107,9 +4107,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace EthyleneMeasurement
+} // namespace EthyleneConcentrationMeasurement
 
-namespace EthyleneOxideMeasurement {
+namespace EthyleneOxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4181,9 +4181,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace EthyleneOxideMeasurement
+} // namespace EthyleneOxideConcentrationMeasurement
 
-namespace HydrogenMeasurement {
+namespace HydrogenConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4255,9 +4255,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace HydrogenMeasurement
+} // namespace HydrogenConcentrationMeasurement
 
-namespace HydrogenSulfideMeasurement {
+namespace HydrogenSulfideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4329,9 +4329,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace HydrogenSulfideMeasurement
+} // namespace HydrogenSulfideConcentrationMeasurement
 
-namespace NitricOxideMeasurement {
+namespace NitricOxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4403,9 +4403,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace NitricOxideMeasurement
+} // namespace NitricOxideConcentrationMeasurement
 
-namespace NitrogenDioxideMeasurement {
+namespace NitrogenDioxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4477,9 +4477,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace NitrogenDioxideMeasurement
+} // namespace NitrogenDioxideConcentrationMeasurement
 
-namespace OxygenMeasurement {
+namespace OxygenConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4551,9 +4551,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace OxygenMeasurement
+} // namespace OxygenConcentrationMeasurement
 
-namespace OzoneMeasurement {
+namespace OzoneConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4625,9 +4625,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace OzoneMeasurement
+} // namespace OzoneConcentrationMeasurement
 
-namespace SulfurDioxideMeasurement {
+namespace SulfurDioxideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4699,9 +4699,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace SulfurDioxideMeasurement
+} // namespace SulfurDioxideConcentrationMeasurement
 
-namespace DissolvedOxygenMeasurement {
+namespace DissolvedOxygenConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4773,9 +4773,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace DissolvedOxygenMeasurement
+} // namespace DissolvedOxygenConcentrationMeasurement
 
-namespace BromateMeasurement {
+namespace BromateConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4847,9 +4847,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace BromateMeasurement
+} // namespace BromateConcentrationMeasurement
 
-namespace ChloraminesMeasurement {
+namespace ChloraminesConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4921,9 +4921,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace ChloraminesMeasurement
+} // namespace ChloraminesConcentrationMeasurement
 
-namespace ChlorineMeasurement {
+namespace ChlorineConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -4995,9 +4995,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace ChlorineMeasurement
+} // namespace ChlorineConcentrationMeasurement
 
-namespace FecalColiformEColiMeasurement {
+namespace FecalColiformEColiConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5069,9 +5069,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace FecalColiformEColiMeasurement
+} // namespace FecalColiformEColiConcentrationMeasurement
 
-namespace FluorideMeasurement {
+namespace FluorideConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5143,9 +5143,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace FluorideMeasurement
+} // namespace FluorideConcentrationMeasurement
 
-namespace HaloaceticAcidsMeasurement {
+namespace HaloaceticAcidsConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5217,9 +5217,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace HaloaceticAcidsMeasurement
+} // namespace HaloaceticAcidsConcentrationMeasurement
 
-namespace TotalTrihalomethanesMeasurement {
+namespace TotalTrihalomethanesConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5291,9 +5291,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TotalTrihalomethanesMeasurement
+} // namespace TotalTrihalomethanesConcentrationMeasurement
 
-namespace TotalColiformBacteriaMeasurement {
+namespace TotalColiformBacteriaConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5365,9 +5365,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TotalColiformBacteriaMeasurement
+} // namespace TotalColiformBacteriaConcentrationMeasurement
 
-namespace TurbidityMeasurement {
+namespace TurbidityConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5439,9 +5439,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TurbidityMeasurement
+} // namespace TurbidityConcentrationMeasurement
 
-namespace CopperMeasurement {
+namespace CopperConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5513,9 +5513,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace CopperMeasurement
+} // namespace CopperConcentrationMeasurement
 
-namespace LeadMeasurement {
+namespace LeadConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5587,9 +5587,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace LeadMeasurement
+} // namespace LeadConcentrationMeasurement
 
-namespace ManganeseMeasurement {
+namespace ManganeseConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5661,9 +5661,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace ManganeseMeasurement
+} // namespace ManganeseConcentrationMeasurement
 
-namespace SulfateMeasurement {
+namespace SulfateConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5735,9 +5735,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace SulfateMeasurement
+} // namespace SulfateConcentrationMeasurement
 
-namespace BromodichloromethaneMeasurement {
+namespace BromodichloromethaneConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5809,9 +5809,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace BromodichloromethaneMeasurement
+} // namespace BromodichloromethaneConcentrationMeasurement
 
-namespace BromoformMeasurement {
+namespace BromoformConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5883,9 +5883,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace BromoformMeasurement
+} // namespace BromoformConcentrationMeasurement
 
-namespace ChlorodibromomethaneMeasurement {
+namespace ChlorodibromomethaneConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -5957,9 +5957,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace ChlorodibromomethaneMeasurement
+} // namespace ChlorodibromomethaneConcentrationMeasurement
 
-namespace ChloroformMeasurement {
+namespace ChloroformConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -6031,9 +6031,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace ChloroformMeasurement
+} // namespace ChloroformConcentrationMeasurement
 
-namespace SodiumMeasurement {
+namespace SodiumConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -6105,9 +6105,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace SodiumMeasurement
+} // namespace SodiumConcentrationMeasurement
 
-namespace Pm25Measurement {
+namespace Pm25ConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -6179,9 +6179,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace Pm25Measurement
+} // namespace Pm25ConcentrationMeasurement
 
-namespace FormaldehydeMeasurement {
+namespace FormaldehydeConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -6253,9 +6253,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace FormaldehydeMeasurement
+} // namespace FormaldehydeConcentrationMeasurement
 
-namespace Pm1Measurement {
+namespace Pm1ConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -6327,9 +6327,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace Pm1Measurement
+} // namespace Pm1ConcentrationMeasurement
 
-namespace Pm10Measurement {
+namespace Pm10ConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -6401,9 +6401,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace Pm10Measurement
+} // namespace Pm10ConcentrationMeasurement
 
-namespace TotalVolatileOrganicCompoundsMeasurement {
+namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -6475,9 +6475,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TotalVolatileOrganicCompoundsMeasurement
+} // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
 
-namespace RadonMeasurement {
+namespace RadonConcentrationMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
@@ -6549,7 +6549,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RadonMeasurement
+} // namespace RadonConcentrationMeasurement
 
 namespace WakeOnLan {
 namespace Attributes {

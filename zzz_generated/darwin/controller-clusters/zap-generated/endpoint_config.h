@@ -726,7 +726,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Carbon Monoxide Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Carbon Monoxide Concentration Measurement (client) */ \
       .clusterId = 0x0000040C, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -739,7 +739,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Carbon Dioxide Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Carbon Dioxide Concentration Measurement (client) */ \
       .clusterId = 0x0000040D, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -752,7 +752,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Ethylene Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Ethylene Concentration Measurement (client) */ \
       .clusterId = 0x0000040E, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -765,7 +765,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Ethylene Oxide Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Ethylene Oxide Concentration Measurement (client) */ \
       .clusterId = 0x0000040F, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -778,7 +778,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Hydrogen Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Hydrogen Concentration Measurement (client) */ \
       .clusterId = 0x00000410, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -791,7 +791,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Hydrogen Sulfide Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Hydrogen Sulfide Concentration Measurement (client) */ \
       .clusterId = 0x00000411, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -804,7 +804,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Nitric Oxide Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Nitric Oxide Concentration Measurement (client) */ \
       .clusterId = 0x00000412, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -817,7 +817,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Nitrogen Dioxide Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Nitrogen Dioxide Concentration Measurement (client) */ \
       .clusterId = 0x00000413, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -830,7 +830,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Oxygen Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Oxygen Concentration Measurement (client) */ \
       .clusterId = 0x00000414, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -843,7 +843,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Ozone Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Ozone Concentration Measurement (client) */ \
       .clusterId = 0x00000415, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -856,7 +856,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Sulfur Dioxide Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Sulfur Dioxide Concentration Measurement (client) */ \
       .clusterId = 0x00000416, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -869,7 +869,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Dissolved Oxygen Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Dissolved Oxygen Concentration Measurement (client) */ \
       .clusterId = 0x00000417, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -882,7 +882,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Bromate Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Bromate Concentration Measurement (client) */ \
       .clusterId = 0x00000418, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -895,7 +895,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Chloramines Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Chloramines Concentration Measurement (client) */ \
       .clusterId = 0x00000419, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -908,7 +908,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Chlorine Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Chlorine Concentration Measurement (client) */ \
       .clusterId = 0x0000041A, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -921,7 +921,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Fecal coliform & E. Coli Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Fecal coliform & E. Coli Concentration Measurement (client) */ \
       .clusterId = 0x0000041B, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -934,7 +934,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Fluoride Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Fluoride Concentration Measurement (client) */ \
       .clusterId = 0x0000041C, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -947,7 +947,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Haloacetic Acids Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Haloacetic Acids Concentration Measurement (client) */ \
       .clusterId = 0x0000041D, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -960,7 +960,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Total Trihalomethanes Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Total Trihalomethanes Concentration Measurement (client) */ \
       .clusterId = 0x0000041E, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -973,7 +973,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Total Coliform Bacteria Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Total Coliform Bacteria Concentration Measurement (client) */ \
       .clusterId = 0x0000041F, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -986,7 +986,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Turbidity Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Turbidity Concentration Measurement (client) */ \
       .clusterId = 0x00000420, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -999,7 +999,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Copper Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Copper Concentration Measurement (client) */ \
       .clusterId = 0x00000421, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1012,7 +1012,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Lead Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Lead Concentration Measurement (client) */ \
       .clusterId = 0x00000422, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1025,7 +1025,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Manganese Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Manganese Concentration Measurement (client) */ \
       .clusterId = 0x00000423, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1038,7 +1038,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Sulfate Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Sulfate Concentration Measurement (client) */ \
       .clusterId = 0x00000424, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1051,7 +1051,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Bromodichloromethane Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Bromodichloromethane Concentration Measurement (client) */ \
       .clusterId = 0x00000425, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1064,7 +1064,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Bromoform Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Bromoform Concentration Measurement (client) */ \
       .clusterId = 0x00000426, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1077,7 +1077,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Chlorodibromomethane Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Chlorodibromomethane Concentration Measurement (client) */ \
       .clusterId = 0x00000427, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1090,7 +1090,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Chloroform Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Chloroform Concentration Measurement (client) */ \
       .clusterId = 0x00000428, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1103,7 +1103,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Sodium Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Sodium Concentration Measurement (client) */ \
       .clusterId = 0x00000429, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1116,7 +1116,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: PM2.5 Measurement (client) */ \
+      /* Endpoint: 1, Cluster: PM2.5 Concentration Measurement (client) */ \
       .clusterId = 0x0000042A, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1129,7 +1129,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Formaldehyde Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Formaldehyde Concentration Measurement (client) */ \
       .clusterId = 0x0000042B, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1142,7 +1142,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: PM1 Measurement (client) */ \
+      /* Endpoint: 1, Cluster: PM1 Concentration Measurement (client) */ \
       .clusterId = 0x0000042C, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1155,7 +1155,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: PM10 Measurement (client) */ \
+      /* Endpoint: 1, Cluster: PM10 Concentration Measurement (client) */ \
       .clusterId = 0x0000042D, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1168,7 +1168,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Total Volatile Organic Compounds Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Total Volatile Organic Compounds Concentration Measurement (client) */ \
       .clusterId = 0x0000042E, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -1181,7 +1181,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Radon Measurement (client) */ \
+      /* Endpoint: 1, Cluster: Radon Concentration Measurement (client) */ \
       .clusterId = 0x0000042F, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \

@@ -18,11 +18,11 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <cluster>
-    <name>Carbon Monoxide Measurement</name>
+    <name>Carbon Monoxide Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting carbon monoxide concentration measurements</description>
     <code>0x040C</code>
-    <define>CARBON_MONOXIDE_MEASUREMENT_CLUSTER</define>
+    <define>CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -41,11 +41,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Carbon Dioxide Measurement</name>
+    <name>Carbon Dioxide Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting carbon dioxide concentration measurements</description>
     <code>0x040D</code>
-    <define>CARBON_DIOXIDE_MEASUREMENT_CLUSTER</define>
+    <define>CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -65,11 +65,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Ethylene Measurement</name>
+    <name>Ethylene Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting ethylene concentration measurements</description>
     <code>0x040e</code>
-    <define>ETHYLENE_MEASUREMENT_CLUSTER</define>
+    <define>ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -88,11 +88,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Ethylene Oxide Measurement</name>
+    <name>Ethylene Oxide Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting ethylene oxide concentration measurements</description>
     <code>0x040f</code>
-    <define>ETHYLENE_OXIDE_MEASUREMENT_CLUSTER</define>
+    <define>ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -111,11 +111,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Hydrogen Measurement</name>
+    <name>Hydrogen Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting hydrogen concentration measurements</description>
     <code>0x0410</code>
-    <define>HYDROGEN_MEASUREMENT_CLUSTER</define>
+    <define>HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -134,11 +134,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Hydrogen Sulfide Measurement</name>
+    <name>Hydrogen Sulfide Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting hydrogen sulfide concentration measurements</description>
     <code>0x0411</code>
-    <define>HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER</define>
+    <define>HYDROGEN_SULFIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -157,11 +157,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Nitric Oxide Measurement</name>
+    <name>Nitric Oxide Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting nitric oxide concentration measurements</description>
     <code>0x0412</code>
-    <define>NITRIC_OXIDE_MEASUREMENT_CLUSTER</define>
+    <define>NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -180,11 +180,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Nitrogen Dioxide Measurement</name>
+    <name>Nitrogen Dioxide Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting nitrogen dioxide concentration measurements</description>
     <code>0x0413</code>
-    <define>NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER</define>
+    <define>NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -203,11 +203,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Oxygen Measurement</name>
+    <name>Oxygen Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting oxygen concentration measurements</description>
     <code>0x0414</code>
-    <define>OXYGEN_MEASUREMENT_CLUSTER</define>
+    <define>OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -226,11 +226,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Ozone Measurement</name>
+    <name>Ozone Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting ozone concentration measurements</description>
     <code>0x0415</code>
-    <define>OZONE_MEASUREMENT_CLUSTER</define>
+    <define>OZONE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -249,11 +249,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Sulfur Dioxide Measurement</name>
+    <name>Sulfur Dioxide Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting sulfur dioxide concentration measurements</description>
     <code>0x0416</code>
-    <define>SULFUR_DIOXIDE_MEASUREMENT_CLUSTER</define>
+    <define>SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -272,11 +272,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Dissolved Oxygen Measurement</name>
+    <name>Dissolved Oxygen Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting dissolved oxygen concentration measurements</description>
     <code>0x0417</code>
-    <define>DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER</define>
+    <define>DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -295,11 +295,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Bromate Measurement</name>
+    <name>Bromate Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting bromate concentration measurements</description>
     <code>0x0418</code>
-    <define>BROMATE_MEASUREMENT_CLUSTER</define>
+    <define>BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -318,11 +318,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Chloramines Measurement</name>
+    <name>Chloramines Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting chloramines concentration measurements</description>
     <code>0x0419</code>
-    <define>CHLORAMINES_MEASUREMENT_CLUSTER</define>
+    <define>CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -341,11 +341,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Chlorine Measurement</name>
+    <name>Chlorine Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting chlorine concentration measurements</description>
     <code>0x041a</code>
-    <define>CHLORINE_MEASUREMENT_CLUSTER</define>
+    <define>CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -364,11 +364,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Fecal coliform &amp; E. Coli Measurement</name>
+    <name>Fecal coliform &amp; E. Coli Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting fecal coliform and e. coli concentration measurements</description>
     <code>0x041b</code>
-    <define>FECAL_COLIFORM_MEASUREMENT_CLUSTER</define>
+    <define>FECAL_COLIFORM_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -387,11 +387,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Fluoride Measurement</name>
+    <name>Fluoride Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting fluoride concentration measurements</description>
     <code>0x041c</code>
-    <define>FLUORIDE_MEASUREMENT_CLUSTER</define>
+    <define>FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -410,11 +410,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Haloacetic Acids Measurement</name>
+    <name>Haloacetic Acids Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting haloacetic acids concentration measurements</description>
     <code>0x041d</code>
-    <define>HALOACETIC_ACIDS_MEASUREMENT_CLUSTER</define>
+    <define>HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -433,11 +433,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Total Trihalomethanes Measurement</name>
+    <name>Total Trihalomethanes Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting total trihalomethanes concentration measurements</description>
     <code>0x041e</code>
-    <define>TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER</define>
+    <define>TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -456,11 +456,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Total Coliform Bacteria Measurement</name>
+    <name>Total Coliform Bacteria Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting total coliform bacteria concentration measurements</description>
     <code>0x041f</code>
-    <define>TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER</define>
+    <define>TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -479,11 +479,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Turbidity Measurement</name>
+    <name>Turbidity Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting turbidity concentration measurements</description>
     <code>0x0420</code>
-    <define>TURBIDITY_MEASUREMENT_CLUSTER</define>
+    <define>TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -502,11 +502,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Copper Measurement</name>
+    <name>Copper Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting copper concentration measurements</description>
     <code>0x0421</code>
-    <define>COPPER_MEASUREMENT_CLUSTER</define>
+    <define>COPPER_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -525,11 +525,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Lead Measurement</name>
+    <name>Lead Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting lead concentration measurements</description>
     <code>0x0422</code>
-    <define>LEAD_MEASUREMENT_CLUSTER</define>
+    <define>LEAD_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -548,11 +548,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Manganese Measurement</name>
+    <name>Manganese Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting manganese concentration measurements</description>
     <code>0x0423</code>
-    <define>MANGANESE_MEASUREMENT_CLUSTER</define>
+    <define>MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -571,11 +571,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Sulfate Measurement</name>
+    <name>Sulfate Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting sulfate concentration measurements</description>
     <code>0x0424</code>
-    <define>SULFATE_MEASUREMENT_CLUSTER</define>
+    <define>SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -594,11 +594,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Bromodichloromethane Measurement</name>
+    <name>Bromodichloromethane Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting bromodichloromethane concentration measurements</description>
     <code>0x0425</code>
-    <define>BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER</define>
+    <define>BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -617,11 +617,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Bromoform Measurement</name>
+    <name>Bromoform Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting bromoform concentration measurements</description>
     <code>0x0426</code>
-    <define>BROMOFORM_MEASUREMENT_CLUSTER</define>
+    <define>BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -640,11 +640,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Chlorodibromomethane Measurement</name>
+    <name>Chlorodibromomethane Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting chlorodibromomethane concentration measurements</description>
     <code>0x0427</code>
-    <define>CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER</define>
+    <define>CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -663,11 +663,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Chloroform Measurement</name>
+    <name>Chloroform Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting chloroform concentration measurements</description>
     <code>0x0428</code>
-    <define>CHLOROFORM_MEASUREMENT_CLUSTER</define>
+    <define>CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -686,11 +686,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Sodium Measurement</name>
+    <name>Sodium Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting sodium concentration measurements</description>
     <code>0x0429</code>
-    <define>SODIUM_MEASUREMENT_CLUSTER</define>
+    <define>SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -709,11 +709,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>PM2.5 Measurement</name>
+    <name>PM2.5 Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting PM2.5 concentration measurements</description>
     <code>0x042a</code>
-    <define>PM2_5_MEASUREMENT_CLUSTER</define>
+    <define>PM2_5_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -732,11 +732,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Formaldehyde Measurement</name>
+    <name>Formaldehyde Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting formaldehyde concentration measurements</description>
     <code>0x042b</code>
-    <define>FORMALDEHYDE_MEASUREMENT_CLUSTER</define>
+    <define>FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -755,11 +755,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>PM1 Measurement</name>
+    <name>PM1 Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting PM1 concentration measurements</description>
     <code>0x042c</code>
-    <define>PM1_MEASUREMENT_CLUSTER</define>
+    <define>PM1_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -778,11 +778,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>PM10 Measurement</name>
+    <name>PM10 Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting PM10 concentration measurements</description>
     <code>0x042d</code>
-    <define>PM10_MEASUREMENT_CLUSTER</define>
+    <define>PM10_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -801,11 +801,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Total Volatile Organic Compounds Measurement</name>
+    <name>Total Volatile Organic Compounds Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting total volatile organic compounds concentration measurements</description>
     <code>0x042e</code>
-    <define>VOC_MEASUREMENT_CLUSTER</define>
+    <define>VOC_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -824,11 +824,11 @@ limitations under the License.
   </cluster>
 
   <cluster>
-    <name>Radon Measurement</name>
+    <name>Radon Concentration Measurement</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting radon concentration measurements</description>
     <code>0x042f</code>
-    <define>RADON_MEASUREMENT_CLUSTER</define>
+    <define>RADON_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>

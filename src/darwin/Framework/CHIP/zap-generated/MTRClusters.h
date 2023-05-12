@@ -4910,11 +4910,11 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
- * Cluster Carbon Monoxide Measurement
+ * Cluster Carbon Monoxide Concentration Measurement
  *    Attributes for reporting carbon monoxide concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterCarbonMonoxideMeasurement : MTRCluster
+@interface MTRClusterCarbonMonoxideConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -4960,11 +4960,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Carbon Dioxide Measurement
+ * Cluster Carbon Dioxide Concentration Measurement
  *    Attributes for reporting carbon dioxide concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterCarbonDioxideMeasurement : MTRCluster
+@interface MTRClusterCarbonDioxideConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5010,11 +5010,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Ethylene Measurement
+ * Cluster Ethylene Concentration Measurement
  *    Attributes for reporting ethylene concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterEthyleneMeasurement : MTRCluster
+@interface MTRClusterEthyleneConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5060,11 +5060,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Ethylene Oxide Measurement
+ * Cluster Ethylene Oxide Concentration Measurement
  *    Attributes for reporting ethylene oxide concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterEthyleneOxideMeasurement : MTRCluster
+@interface MTRClusterEthyleneOxideConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5110,11 +5110,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Hydrogen Measurement
+ * Cluster Hydrogen Concentration Measurement
  *    Attributes for reporting hydrogen concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterHydrogenMeasurement : MTRCluster
+@interface MTRClusterHydrogenConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5160,11 +5160,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Hydrogen Sulfide Measurement
+ * Cluster Hydrogen Sulfide Concentration Measurement
  *    Attributes for reporting hydrogen sulfide concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterHydrogenSulfideMeasurement : MTRCluster
+@interface MTRClusterHydrogenSulfideConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5210,11 +5210,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Nitric Oxide Measurement
+ * Cluster Nitric Oxide Concentration Measurement
  *    Attributes for reporting nitric oxide concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterNitricOxideMeasurement : MTRCluster
+@interface MTRClusterNitricOxideConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5260,11 +5260,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Nitrogen Dioxide Measurement
+ * Cluster Nitrogen Dioxide Concentration Measurement
  *    Attributes for reporting nitrogen dioxide concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterNitrogenDioxideMeasurement : MTRCluster
+@interface MTRClusterNitrogenDioxideConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5310,11 +5310,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Oxygen Measurement
+ * Cluster Oxygen Concentration Measurement
  *    Attributes for reporting oxygen concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterOxygenMeasurement : MTRCluster
+@interface MTRClusterOxygenConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5360,11 +5360,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Ozone Measurement
+ * Cluster Ozone Concentration Measurement
  *    Attributes for reporting ozone concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterOzoneMeasurement : MTRCluster
+@interface MTRClusterOzoneConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5410,11 +5410,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Sulfur Dioxide Measurement
+ * Cluster Sulfur Dioxide Concentration Measurement
  *    Attributes for reporting sulfur dioxide concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterSulfurDioxideMeasurement : MTRCluster
+@interface MTRClusterSulfurDioxideConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5460,11 +5460,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Dissolved Oxygen Measurement
+ * Cluster Dissolved Oxygen Concentration Measurement
  *    Attributes for reporting dissolved oxygen concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterDissolvedOxygenMeasurement : MTRCluster
+@interface MTRClusterDissolvedOxygenConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5510,11 +5510,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Bromate Measurement
+ * Cluster Bromate Concentration Measurement
  *    Attributes for reporting bromate concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterBromateMeasurement : MTRCluster
+@interface MTRClusterBromateConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5560,11 +5560,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Chloramines Measurement
+ * Cluster Chloramines Concentration Measurement
  *    Attributes for reporting chloramines concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterChloraminesMeasurement : MTRCluster
+@interface MTRClusterChloraminesConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5610,11 +5610,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Chlorine Measurement
+ * Cluster Chlorine Concentration Measurement
  *    Attributes for reporting chlorine concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterChlorineMeasurement : MTRCluster
+@interface MTRClusterChlorineConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5660,11 +5660,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Fecal coliform & E. Coli Measurement
+ * Cluster Fecal coliform & E. Coli Concentration Measurement
  *    Attributes for reporting fecal coliform and e. coli concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterFecalColiformEColiMeasurement : MTRCluster
+@interface MTRClusterFecalColiformEColiConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5710,11 +5710,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Fluoride Measurement
+ * Cluster Fluoride Concentration Measurement
  *    Attributes for reporting fluoride concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterFluorideMeasurement : MTRCluster
+@interface MTRClusterFluorideConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5760,11 +5760,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Haloacetic Acids Measurement
+ * Cluster Haloacetic Acids Concentration Measurement
  *    Attributes for reporting haloacetic acids concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterHaloaceticAcidsMeasurement : MTRCluster
+@interface MTRClusterHaloaceticAcidsConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5810,11 +5810,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Total Trihalomethanes Measurement
+ * Cluster Total Trihalomethanes Concentration Measurement
  *    Attributes for reporting total trihalomethanes concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterTotalTrihalomethanesMeasurement : MTRCluster
+@interface MTRClusterTotalTrihalomethanesConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5860,11 +5860,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Total Coliform Bacteria Measurement
+ * Cluster Total Coliform Bacteria Concentration Measurement
  *    Attributes for reporting total coliform bacteria concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterTotalColiformBacteriaMeasurement : MTRCluster
+@interface MTRClusterTotalColiformBacteriaConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5910,11 +5910,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Turbidity Measurement
+ * Cluster Turbidity Concentration Measurement
  *    Attributes for reporting turbidity concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterTurbidityMeasurement : MTRCluster
+@interface MTRClusterTurbidityConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5960,11 +5960,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Copper Measurement
+ * Cluster Copper Concentration Measurement
  *    Attributes for reporting copper concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterCopperMeasurement : MTRCluster
+@interface MTRClusterCopperConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6010,11 +6010,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Lead Measurement
+ * Cluster Lead Concentration Measurement
  *    Attributes for reporting lead concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterLeadMeasurement : MTRCluster
+@interface MTRClusterLeadConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6060,11 +6060,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Manganese Measurement
+ * Cluster Manganese Concentration Measurement
  *    Attributes for reporting manganese concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterManganeseMeasurement : MTRCluster
+@interface MTRClusterManganeseConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6110,11 +6110,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Sulfate Measurement
+ * Cluster Sulfate Concentration Measurement
  *    Attributes for reporting sulfate concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterSulfateMeasurement : MTRCluster
+@interface MTRClusterSulfateConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6160,11 +6160,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Bromodichloromethane Measurement
+ * Cluster Bromodichloromethane Concentration Measurement
  *    Attributes for reporting bromodichloromethane concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterBromodichloromethaneMeasurement : MTRCluster
+@interface MTRClusterBromodichloromethaneConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6210,11 +6210,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Bromoform Measurement
+ * Cluster Bromoform Concentration Measurement
  *    Attributes for reporting bromoform concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterBromoformMeasurement : MTRCluster
+@interface MTRClusterBromoformConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6260,11 +6260,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Chlorodibromomethane Measurement
+ * Cluster Chlorodibromomethane Concentration Measurement
  *    Attributes for reporting chlorodibromomethane concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterChlorodibromomethaneMeasurement : MTRCluster
+@interface MTRClusterChlorodibromomethaneConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6310,11 +6310,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Chloroform Measurement
+ * Cluster Chloroform Concentration Measurement
  *    Attributes for reporting chloroform concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterChloroformMeasurement : MTRCluster
+@interface MTRClusterChloroformConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6360,11 +6360,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Sodium Measurement
+ * Cluster Sodium Concentration Measurement
  *    Attributes for reporting sodium concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterSodiumMeasurement : MTRCluster
+@interface MTRClusterSodiumConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6410,11 +6410,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster PM2.5 Measurement
+ * Cluster PM2.5 Concentration Measurement
  *    Attributes for reporting PM2.5 concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterPM25Measurement : MTRCluster
+@interface MTRClusterPM25ConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6460,11 +6460,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Formaldehyde Measurement
+ * Cluster Formaldehyde Concentration Measurement
  *    Attributes for reporting formaldehyde concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterFormaldehydeMeasurement : MTRCluster
+@interface MTRClusterFormaldehydeConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6510,11 +6510,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster PM1 Measurement
+ * Cluster PM1 Concentration Measurement
  *    Attributes for reporting PM1 concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterPM1Measurement : MTRCluster
+@interface MTRClusterPM1ConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6560,11 +6560,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster PM10 Measurement
+ * Cluster PM10 Concentration Measurement
  *    Attributes for reporting PM10 concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterPM10Measurement : MTRCluster
+@interface MTRClusterPM10ConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6610,11 +6610,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Total Volatile Organic Compounds Measurement
+ * Cluster Total Volatile Organic Compounds Concentration Measurement
  *    Attributes for reporting total volatile organic compounds concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterTotalVolatileOrganicCompoundsMeasurement : MTRCluster
+@interface MTRClusterTotalVolatileOrganicCompoundsConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -6660,11 +6660,11 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Radon Measurement
+ * Cluster Radon Concentration Measurement
  *    Attributes for reporting radon concentration measurements
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterRadonMeasurement : MTRCluster
+@interface MTRClusterRadonConcentrationMeasurement : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID

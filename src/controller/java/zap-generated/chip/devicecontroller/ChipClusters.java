@@ -22579,10 +22579,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class CarbonMonoxideMeasurementCluster extends BaseChipCluster {
+  public static class CarbonMonoxideConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1036L;
 
-    public CarbonMonoxideMeasurementCluster(long devicePtr, int endpointId) {
+    public CarbonMonoxideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -22942,10 +22942,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class CarbonDioxideMeasurementCluster extends BaseChipCluster {
+  public static class CarbonDioxideConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1037L;
 
-    public CarbonDioxideMeasurementCluster(long devicePtr, int endpointId) {
+    public CarbonDioxideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -23305,10 +23305,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class EthyleneMeasurementCluster extends BaseChipCluster {
+  public static class EthyleneConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1038L;
 
-    public EthyleneMeasurementCluster(long devicePtr, int endpointId) {
+    public EthyleneConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -23668,10 +23668,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class EthyleneOxideMeasurementCluster extends BaseChipCluster {
+  public static class EthyleneOxideConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1039L;
 
-    public EthyleneOxideMeasurementCluster(long devicePtr, int endpointId) {
+    public EthyleneOxideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -24031,10 +24031,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class HydrogenMeasurementCluster extends BaseChipCluster {
+  public static class HydrogenConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1040L;
 
-    public HydrogenMeasurementCluster(long devicePtr, int endpointId) {
+    public HydrogenConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -24394,10 +24394,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class HydrogenSulfideMeasurementCluster extends BaseChipCluster {
+  public static class HydrogenSulfideConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1041L;
 
-    public HydrogenSulfideMeasurementCluster(long devicePtr, int endpointId) {
+    public HydrogenSulfideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -24757,10 +24757,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class NitricOxideMeasurementCluster extends BaseChipCluster {
+  public static class NitricOxideConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1042L;
 
-    public NitricOxideMeasurementCluster(long devicePtr, int endpointId) {
+    public NitricOxideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -25120,10 +25120,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class NitrogenDioxideMeasurementCluster extends BaseChipCluster {
+  public static class NitrogenDioxideConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1043L;
 
-    public NitrogenDioxideMeasurementCluster(long devicePtr, int endpointId) {
+    public NitrogenDioxideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -25483,10 +25483,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class OxygenMeasurementCluster extends BaseChipCluster {
+  public static class OxygenConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1044L;
 
-    public OxygenMeasurementCluster(long devicePtr, int endpointId) {
+    public OxygenConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -25846,10 +25846,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class OzoneMeasurementCluster extends BaseChipCluster {
+  public static class OzoneConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1045L;
 
-    public OzoneMeasurementCluster(long devicePtr, int endpointId) {
+    public OzoneConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -26209,10 +26209,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class SulfurDioxideMeasurementCluster extends BaseChipCluster {
+  public static class SulfurDioxideConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1046L;
 
-    public SulfurDioxideMeasurementCluster(long devicePtr, int endpointId) {
+    public SulfurDioxideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -26572,10 +26572,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class DissolvedOxygenMeasurementCluster extends BaseChipCluster {
+  public static class DissolvedOxygenConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1047L;
 
-    public DissolvedOxygenMeasurementCluster(long devicePtr, int endpointId) {
+    public DissolvedOxygenConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -26935,10 +26935,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class BromateMeasurementCluster extends BaseChipCluster {
+  public static class BromateConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1048L;
 
-    public BromateMeasurementCluster(long devicePtr, int endpointId) {
+    public BromateConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -27298,10 +27298,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class ChloraminesMeasurementCluster extends BaseChipCluster {
+  public static class ChloraminesConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1049L;
 
-    public ChloraminesMeasurementCluster(long devicePtr, int endpointId) {
+    public ChloraminesConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -27661,10 +27661,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class ChlorineMeasurementCluster extends BaseChipCluster {
+  public static class ChlorineConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1050L;
 
-    public ChlorineMeasurementCluster(long devicePtr, int endpointId) {
+    public ChlorineConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -28024,10 +28024,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class FecalColiformEColiMeasurementCluster extends BaseChipCluster {
+  public static class FecalColiformEColiConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1051L;
 
-    public FecalColiformEColiMeasurementCluster(long devicePtr, int endpointId) {
+    public FecalColiformEColiConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -28387,10 +28387,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class FluorideMeasurementCluster extends BaseChipCluster {
+  public static class FluorideConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1052L;
 
-    public FluorideMeasurementCluster(long devicePtr, int endpointId) {
+    public FluorideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -28750,10 +28750,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class HaloaceticAcidsMeasurementCluster extends BaseChipCluster {
+  public static class HaloaceticAcidsConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1053L;
 
-    public HaloaceticAcidsMeasurementCluster(long devicePtr, int endpointId) {
+    public HaloaceticAcidsConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -29113,10 +29113,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class TotalTrihalomethanesMeasurementCluster extends BaseChipCluster {
+  public static class TotalTrihalomethanesConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1054L;
 
-    public TotalTrihalomethanesMeasurementCluster(long devicePtr, int endpointId) {
+    public TotalTrihalomethanesConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -29476,10 +29476,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class TotalColiformBacteriaMeasurementCluster extends BaseChipCluster {
+  public static class TotalColiformBacteriaConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1055L;
 
-    public TotalColiformBacteriaMeasurementCluster(long devicePtr, int endpointId) {
+    public TotalColiformBacteriaConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -29839,10 +29839,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class TurbidityMeasurementCluster extends BaseChipCluster {
+  public static class TurbidityConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1056L;
 
-    public TurbidityMeasurementCluster(long devicePtr, int endpointId) {
+    public TurbidityConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -30202,10 +30202,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class CopperMeasurementCluster extends BaseChipCluster {
+  public static class CopperConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1057L;
 
-    public CopperMeasurementCluster(long devicePtr, int endpointId) {
+    public CopperConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -30565,10 +30565,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class LeadMeasurementCluster extends BaseChipCluster {
+  public static class LeadConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1058L;
 
-    public LeadMeasurementCluster(long devicePtr, int endpointId) {
+    public LeadConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -30928,10 +30928,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class ManganeseMeasurementCluster extends BaseChipCluster {
+  public static class ManganeseConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1059L;
 
-    public ManganeseMeasurementCluster(long devicePtr, int endpointId) {
+    public ManganeseConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -31291,10 +31291,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class SulfateMeasurementCluster extends BaseChipCluster {
+  public static class SulfateConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1060L;
 
-    public SulfateMeasurementCluster(long devicePtr, int endpointId) {
+    public SulfateConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -31654,10 +31654,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class BromodichloromethaneMeasurementCluster extends BaseChipCluster {
+  public static class BromodichloromethaneConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1061L;
 
-    public BromodichloromethaneMeasurementCluster(long devicePtr, int endpointId) {
+    public BromodichloromethaneConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -32017,10 +32017,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class BromoformMeasurementCluster extends BaseChipCluster {
+  public static class BromoformConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1062L;
 
-    public BromoformMeasurementCluster(long devicePtr, int endpointId) {
+    public BromoformConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -32380,10 +32380,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class ChlorodibromomethaneMeasurementCluster extends BaseChipCluster {
+  public static class ChlorodibromomethaneConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1063L;
 
-    public ChlorodibromomethaneMeasurementCluster(long devicePtr, int endpointId) {
+    public ChlorodibromomethaneConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -32743,10 +32743,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class ChloroformMeasurementCluster extends BaseChipCluster {
+  public static class ChloroformConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1064L;
 
-    public ChloroformMeasurementCluster(long devicePtr, int endpointId) {
+    public ChloroformConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -33106,10 +33106,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class SodiumMeasurementCluster extends BaseChipCluster {
+  public static class SodiumConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1065L;
 
-    public SodiumMeasurementCluster(long devicePtr, int endpointId) {
+    public SodiumConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -33469,10 +33469,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class Pm25MeasurementCluster extends BaseChipCluster {
+  public static class Pm25ConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1066L;
 
-    public Pm25MeasurementCluster(long devicePtr, int endpointId) {
+    public Pm25ConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -33832,10 +33832,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class FormaldehydeMeasurementCluster extends BaseChipCluster {
+  public static class FormaldehydeConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1067L;
 
-    public FormaldehydeMeasurementCluster(long devicePtr, int endpointId) {
+    public FormaldehydeConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -34195,10 +34195,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class Pm1MeasurementCluster extends BaseChipCluster {
+  public static class Pm1ConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1068L;
 
-    public Pm1MeasurementCluster(long devicePtr, int endpointId) {
+    public Pm1ConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -34558,10 +34558,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class Pm10MeasurementCluster extends BaseChipCluster {
+  public static class Pm10ConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1069L;
 
-    public Pm10MeasurementCluster(long devicePtr, int endpointId) {
+    public Pm10ConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -34921,10 +34921,12 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class TotalVolatileOrganicCompoundsMeasurementCluster extends BaseChipCluster {
+  public static class TotalVolatileOrganicCompoundsConcentrationMeasurementCluster
+      extends BaseChipCluster {
     public static final long CLUSTER_ID = 1070L;
 
-    public TotalVolatileOrganicCompoundsMeasurementCluster(long devicePtr, int endpointId) {
+    public TotalVolatileOrganicCompoundsConcentrationMeasurementCluster(
+        long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -35284,10 +35286,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class RadonMeasurementCluster extends BaseChipCluster {
+  public static class RadonConcentrationMeasurementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 1071L;
 
-    public RadonMeasurementCluster(long devicePtr, int endpointId) {
+    public RadonConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 

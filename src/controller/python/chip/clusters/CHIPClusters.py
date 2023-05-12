@@ -6632,8 +6632,8 @@ class ChipClusters:
             },
         },
     }
-    _CARBON_MONOXIDE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "CarbonMonoxideMeasurement",
+    _CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "CarbonMonoxideConcentrationMeasurement",
         "clusterId": 0x0000040C,
         "commands": {
         },
@@ -6742,8 +6742,8 @@ class ChipClusters:
             },
         },
     }
-    _CARBON_DIOXIDE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "CarbonDioxideMeasurement",
+    _CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "CarbonDioxideConcentrationMeasurement",
         "clusterId": 0x0000040D,
         "commands": {
         },
@@ -6852,8 +6852,8 @@ class ChipClusters:
             },
         },
     }
-    _ETHYLENE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "EthyleneMeasurement",
+    _ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "EthyleneConcentrationMeasurement",
         "clusterId": 0x0000040E,
         "commands": {
         },
@@ -6962,8 +6962,8 @@ class ChipClusters:
             },
         },
     }
-    _ETHYLENE_OXIDE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "EthyleneOxideMeasurement",
+    _ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "EthyleneOxideConcentrationMeasurement",
         "clusterId": 0x0000040F,
         "commands": {
         },
@@ -7072,8 +7072,8 @@ class ChipClusters:
             },
         },
     }
-    _HYDROGEN_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "HydrogenMeasurement",
+    _HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "HydrogenConcentrationMeasurement",
         "clusterId": 0x00000410,
         "commands": {
         },
@@ -7182,8 +7182,8 @@ class ChipClusters:
             },
         },
     }
-    _HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "HydrogenSulfideMeasurement",
+    _HYDROGEN_SULFIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "HydrogenSulfideConcentrationMeasurement",
         "clusterId": 0x00000411,
         "commands": {
         },
@@ -7292,8 +7292,8 @@ class ChipClusters:
             },
         },
     }
-    _NITRIC_OXIDE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "NitricOxideMeasurement",
+    _NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "NitricOxideConcentrationMeasurement",
         "clusterId": 0x00000412,
         "commands": {
         },
@@ -7402,8 +7402,8 @@ class ChipClusters:
             },
         },
     }
-    _NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "NitrogenDioxideMeasurement",
+    _NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "NitrogenDioxideConcentrationMeasurement",
         "clusterId": 0x00000413,
         "commands": {
         },
@@ -7512,8 +7512,8 @@ class ChipClusters:
             },
         },
     }
-    _OXYGEN_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "OxygenMeasurement",
+    _OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "OxygenConcentrationMeasurement",
         "clusterId": 0x00000414,
         "commands": {
         },
@@ -7622,8 +7622,8 @@ class ChipClusters:
             },
         },
     }
-    _OZONE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "OzoneMeasurement",
+    _OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "OzoneConcentrationMeasurement",
         "clusterId": 0x00000415,
         "commands": {
         },
@@ -7732,8 +7732,8 @@ class ChipClusters:
             },
         },
     }
-    _SULFUR_DIOXIDE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "SulfurDioxideMeasurement",
+    _SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "SulfurDioxideConcentrationMeasurement",
         "clusterId": 0x00000416,
         "commands": {
         },
@@ -7842,8 +7842,8 @@ class ChipClusters:
             },
         },
     }
-    _DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "DissolvedOxygenMeasurement",
+    _DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "DissolvedOxygenConcentrationMeasurement",
         "clusterId": 0x00000417,
         "commands": {
         },
@@ -7952,8 +7952,8 @@ class ChipClusters:
             },
         },
     }
-    _BROMATE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "BromateMeasurement",
+    _BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "BromateConcentrationMeasurement",
         "clusterId": 0x00000418,
         "commands": {
         },
@@ -8062,8 +8062,8 @@ class ChipClusters:
             },
         },
     }
-    _CHLORAMINES_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "ChloraminesMeasurement",
+    _CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "ChloraminesConcentrationMeasurement",
         "clusterId": 0x00000419,
         "commands": {
         },
@@ -8172,8 +8172,8 @@ class ChipClusters:
             },
         },
     }
-    _CHLORINE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "ChlorineMeasurement",
+    _CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "ChlorineConcentrationMeasurement",
         "clusterId": 0x0000041A,
         "commands": {
         },
@@ -8282,8 +8282,8 @@ class ChipClusters:
             },
         },
     }
-    _FECAL_COLIFORM_E_COLI_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "FecalColiformEColiMeasurement",
+    _FECAL_COLIFORM_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "FecalColiformEColiConcentrationMeasurement",
         "clusterId": 0x0000041B,
         "commands": {
         },
@@ -8392,8 +8392,8 @@ class ChipClusters:
             },
         },
     }
-    _FLUORIDE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "FluorideMeasurement",
+    _FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "FluorideConcentrationMeasurement",
         "clusterId": 0x0000041C,
         "commands": {
         },
@@ -8502,8 +8502,8 @@ class ChipClusters:
             },
         },
     }
-    _HALOACETIC_ACIDS_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "HaloaceticAcidsMeasurement",
+    _HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "HaloaceticAcidsConcentrationMeasurement",
         "clusterId": 0x0000041D,
         "commands": {
         },
@@ -8612,8 +8612,8 @@ class ChipClusters:
             },
         },
     }
-    _TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "TotalTrihalomethanesMeasurement",
+    _TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "TotalTrihalomethanesConcentrationMeasurement",
         "clusterId": 0x0000041E,
         "commands": {
         },
@@ -8722,8 +8722,8 @@ class ChipClusters:
             },
         },
     }
-    _TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "TotalColiformBacteriaMeasurement",
+    _TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "TotalColiformBacteriaConcentrationMeasurement",
         "clusterId": 0x0000041F,
         "commands": {
         },
@@ -8832,8 +8832,8 @@ class ChipClusters:
             },
         },
     }
-    _TURBIDITY_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "TurbidityMeasurement",
+    _TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "TurbidityConcentrationMeasurement",
         "clusterId": 0x00000420,
         "commands": {
         },
@@ -8942,8 +8942,8 @@ class ChipClusters:
             },
         },
     }
-    _COPPER_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "CopperMeasurement",
+    _COPPER_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "CopperConcentrationMeasurement",
         "clusterId": 0x00000421,
         "commands": {
         },
@@ -9052,8 +9052,8 @@ class ChipClusters:
             },
         },
     }
-    _LEAD_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "LeadMeasurement",
+    _LEAD_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "LeadConcentrationMeasurement",
         "clusterId": 0x00000422,
         "commands": {
         },
@@ -9162,8 +9162,8 @@ class ChipClusters:
             },
         },
     }
-    _MANGANESE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "ManganeseMeasurement",
+    _MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "ManganeseConcentrationMeasurement",
         "clusterId": 0x00000423,
         "commands": {
         },
@@ -9272,8 +9272,8 @@ class ChipClusters:
             },
         },
     }
-    _SULFATE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "SulfateMeasurement",
+    _SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "SulfateConcentrationMeasurement",
         "clusterId": 0x00000424,
         "commands": {
         },
@@ -9382,8 +9382,8 @@ class ChipClusters:
             },
         },
     }
-    _BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "BromodichloromethaneMeasurement",
+    _BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "BromodichloromethaneConcentrationMeasurement",
         "clusterId": 0x00000425,
         "commands": {
         },
@@ -9492,8 +9492,8 @@ class ChipClusters:
             },
         },
     }
-    _BROMOFORM_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "BromoformMeasurement",
+    _BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "BromoformConcentrationMeasurement",
         "clusterId": 0x00000426,
         "commands": {
         },
@@ -9602,8 +9602,8 @@ class ChipClusters:
             },
         },
     }
-    _CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "ChlorodibromomethaneMeasurement",
+    _CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "ChlorodibromomethaneConcentrationMeasurement",
         "clusterId": 0x00000427,
         "commands": {
         },
@@ -9712,8 +9712,8 @@ class ChipClusters:
             },
         },
     }
-    _CHLOROFORM_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "ChloroformMeasurement",
+    _CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "ChloroformConcentrationMeasurement",
         "clusterId": 0x00000428,
         "commands": {
         },
@@ -9822,8 +9822,8 @@ class ChipClusters:
             },
         },
     }
-    _SODIUM_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "SodiumMeasurement",
+    _SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "SodiumConcentrationMeasurement",
         "clusterId": 0x00000429,
         "commands": {
         },
@@ -9932,8 +9932,8 @@ class ChipClusters:
             },
         },
     }
-    _PM2__5_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "Pm25Measurement",
+    _PM2__5_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "Pm25ConcentrationMeasurement",
         "clusterId": 0x0000042A,
         "commands": {
         },
@@ -10042,8 +10042,8 @@ class ChipClusters:
             },
         },
     }
-    _FORMALDEHYDE_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "FormaldehydeMeasurement",
+    _FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "FormaldehydeConcentrationMeasurement",
         "clusterId": 0x0000042B,
         "commands": {
         },
@@ -10152,8 +10152,8 @@ class ChipClusters:
             },
         },
     }
-    _PM1_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "Pm1Measurement",
+    _PM1_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "Pm1ConcentrationMeasurement",
         "clusterId": 0x0000042C,
         "commands": {
         },
@@ -10262,8 +10262,8 @@ class ChipClusters:
             },
         },
     }
-    _PM10_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "Pm10Measurement",
+    _PM10_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "Pm10ConcentrationMeasurement",
         "clusterId": 0x0000042D,
         "commands": {
         },
@@ -10372,8 +10372,8 @@ class ChipClusters:
             },
         },
     }
-    _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "TotalVolatileOrganicCompoundsMeasurement",
+    _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "TotalVolatileOrganicCompoundsConcentrationMeasurement",
         "clusterId": 0x0000042E,
         "commands": {
         },
@@ -10482,8 +10482,8 @@ class ChipClusters:
             },
         },
     }
-    _RADON_MEASUREMENT_CLUSTER_INFO = {
-        "clusterName": "RadonMeasurement",
+    _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "RadonConcentrationMeasurement",
         "clusterId": 0x0000042F,
         "commands": {
         },
@@ -13170,42 +13170,42 @@ class ChipClusters:
         0x00000404: _FLOW_MEASUREMENT_CLUSTER_INFO,
         0x00000405: _RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_INFO,
         0x00000406: _OCCUPANCY_SENSING_CLUSTER_INFO,
-        0x0000040C: _CARBON_MONOXIDE_MEASUREMENT_CLUSTER_INFO,
-        0x0000040D: _CARBON_DIOXIDE_MEASUREMENT_CLUSTER_INFO,
-        0x0000040E: _ETHYLENE_MEASUREMENT_CLUSTER_INFO,
-        0x0000040F: _ETHYLENE_OXIDE_MEASUREMENT_CLUSTER_INFO,
-        0x00000410: _HYDROGEN_MEASUREMENT_CLUSTER_INFO,
-        0x00000411: _HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER_INFO,
-        0x00000412: _NITRIC_OXIDE_MEASUREMENT_CLUSTER_INFO,
-        0x00000413: _NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER_INFO,
-        0x00000414: _OXYGEN_MEASUREMENT_CLUSTER_INFO,
-        0x00000415: _OZONE_MEASUREMENT_CLUSTER_INFO,
-        0x00000416: _SULFUR_DIOXIDE_MEASUREMENT_CLUSTER_INFO,
-        0x00000417: _DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER_INFO,
-        0x00000418: _BROMATE_MEASUREMENT_CLUSTER_INFO,
-        0x00000419: _CHLORAMINES_MEASUREMENT_CLUSTER_INFO,
-        0x0000041A: _CHLORINE_MEASUREMENT_CLUSTER_INFO,
-        0x0000041B: _FECAL_COLIFORM_E_COLI_MEASUREMENT_CLUSTER_INFO,
-        0x0000041C: _FLUORIDE_MEASUREMENT_CLUSTER_INFO,
-        0x0000041D: _HALOACETIC_ACIDS_MEASUREMENT_CLUSTER_INFO,
-        0x0000041E: _TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER_INFO,
-        0x0000041F: _TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER_INFO,
-        0x00000420: _TURBIDITY_MEASUREMENT_CLUSTER_INFO,
-        0x00000421: _COPPER_MEASUREMENT_CLUSTER_INFO,
-        0x00000422: _LEAD_MEASUREMENT_CLUSTER_INFO,
-        0x00000423: _MANGANESE_MEASUREMENT_CLUSTER_INFO,
-        0x00000424: _SULFATE_MEASUREMENT_CLUSTER_INFO,
-        0x00000425: _BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER_INFO,
-        0x00000426: _BROMOFORM_MEASUREMENT_CLUSTER_INFO,
-        0x00000427: _CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER_INFO,
-        0x00000428: _CHLOROFORM_MEASUREMENT_CLUSTER_INFO,
-        0x00000429: _SODIUM_MEASUREMENT_CLUSTER_INFO,
-        0x0000042A: _PM2__5_MEASUREMENT_CLUSTER_INFO,
-        0x0000042B: _FORMALDEHYDE_MEASUREMENT_CLUSTER_INFO,
-        0x0000042C: _PM1_MEASUREMENT_CLUSTER_INFO,
-        0x0000042D: _PM10_MEASUREMENT_CLUSTER_INFO,
-        0x0000042E: _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_MEASUREMENT_CLUSTER_INFO,
-        0x0000042F: _RADON_MEASUREMENT_CLUSTER_INFO,
+        0x0000040C: _CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000040D: _CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000040E: _ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000040F: _ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000410: _HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000411: _HYDROGEN_SULFIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000412: _NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000413: _NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000414: _OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000415: _OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000416: _SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000417: _DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000418: _BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000419: _CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000041A: _CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000041B: _FECAL_COLIFORM_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000041C: _FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000041D: _HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000041E: _TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000041F: _TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000420: _TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000421: _COPPER_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000422: _LEAD_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000423: _MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000424: _SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000425: _BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000426: _BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000427: _CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000428: _CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x00000429: _SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000042A: _PM2__5_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000042B: _FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000042C: _PM1_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000042D: _PM10_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000042E: _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        0x0000042F: _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
         0x00000504: _CHANNEL_CLUSTER_INFO,
         0x00000505: _TARGET_NAVIGATOR_CLUSTER_INFO,
@@ -13274,42 +13274,42 @@ class ChipClusters:
         "FlowMeasurement": _FLOW_MEASUREMENT_CLUSTER_INFO,
         "RelativeHumidityMeasurement": _RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_INFO,
         "OccupancySensing": _OCCUPANCY_SENSING_CLUSTER_INFO,
-        "CarbonMonoxideMeasurement": _CARBON_MONOXIDE_MEASUREMENT_CLUSTER_INFO,
-        "CarbonDioxideMeasurement": _CARBON_DIOXIDE_MEASUREMENT_CLUSTER_INFO,
-        "EthyleneMeasurement": _ETHYLENE_MEASUREMENT_CLUSTER_INFO,
-        "EthyleneOxideMeasurement": _ETHYLENE_OXIDE_MEASUREMENT_CLUSTER_INFO,
-        "HydrogenMeasurement": _HYDROGEN_MEASUREMENT_CLUSTER_INFO,
-        "HydrogenSulfideMeasurement": _HYDROGEN_SULFIDE_MEASUREMENT_CLUSTER_INFO,
-        "NitricOxideMeasurement": _NITRIC_OXIDE_MEASUREMENT_CLUSTER_INFO,
-        "NitrogenDioxideMeasurement": _NITROGEN_DIOXIDE_MEASUREMENT_CLUSTER_INFO,
-        "OxygenMeasurement": _OXYGEN_MEASUREMENT_CLUSTER_INFO,
-        "OzoneMeasurement": _OZONE_MEASUREMENT_CLUSTER_INFO,
-        "SulfurDioxideMeasurement": _SULFUR_DIOXIDE_MEASUREMENT_CLUSTER_INFO,
-        "DissolvedOxygenMeasurement": _DISSOLVED_OXYGEN_MEASUREMENT_CLUSTER_INFO,
-        "BromateMeasurement": _BROMATE_MEASUREMENT_CLUSTER_INFO,
-        "ChloraminesMeasurement": _CHLORAMINES_MEASUREMENT_CLUSTER_INFO,
-        "ChlorineMeasurement": _CHLORINE_MEASUREMENT_CLUSTER_INFO,
-        "FecalColiformEColiMeasurement": _FECAL_COLIFORM_E_COLI_MEASUREMENT_CLUSTER_INFO,
-        "FluorideMeasurement": _FLUORIDE_MEASUREMENT_CLUSTER_INFO,
-        "HaloaceticAcidsMeasurement": _HALOACETIC_ACIDS_MEASUREMENT_CLUSTER_INFO,
-        "TotalTrihalomethanesMeasurement": _TOTAL_TRIHALOMETHANES_MEASUREMENT_CLUSTER_INFO,
-        "TotalColiformBacteriaMeasurement": _TOTAL_COLIFORM_BACTERIA_MEASUREMENT_CLUSTER_INFO,
-        "TurbidityMeasurement": _TURBIDITY_MEASUREMENT_CLUSTER_INFO,
-        "CopperMeasurement": _COPPER_MEASUREMENT_CLUSTER_INFO,
-        "LeadMeasurement": _LEAD_MEASUREMENT_CLUSTER_INFO,
-        "ManganeseMeasurement": _MANGANESE_MEASUREMENT_CLUSTER_INFO,
-        "SulfateMeasurement": _SULFATE_MEASUREMENT_CLUSTER_INFO,
-        "BromodichloromethaneMeasurement": _BROMODICHLOROMETHANE_MEASUREMENT_CLUSTER_INFO,
-        "BromoformMeasurement": _BROMOFORM_MEASUREMENT_CLUSTER_INFO,
-        "ChlorodibromomethaneMeasurement": _CHLORODIBROMOMETHANE_MEASUREMENT_CLUSTER_INFO,
-        "ChloroformMeasurement": _CHLOROFORM_MEASUREMENT_CLUSTER_INFO,
-        "SodiumMeasurement": _SODIUM_MEASUREMENT_CLUSTER_INFO,
-        "Pm25Measurement": _PM2__5_MEASUREMENT_CLUSTER_INFO,
-        "FormaldehydeMeasurement": _FORMALDEHYDE_MEASUREMENT_CLUSTER_INFO,
-        "Pm1Measurement": _PM1_MEASUREMENT_CLUSTER_INFO,
-        "Pm10Measurement": _PM10_MEASUREMENT_CLUSTER_INFO,
-        "TotalVolatileOrganicCompoundsMeasurement": _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_MEASUREMENT_CLUSTER_INFO,
-        "RadonMeasurement": _RADON_MEASUREMENT_CLUSTER_INFO,
+        "CarbonMonoxideConcentrationMeasurement": _CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "CarbonDioxideConcentrationMeasurement": _CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "EthyleneConcentrationMeasurement": _ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "EthyleneOxideConcentrationMeasurement": _ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "HydrogenConcentrationMeasurement": _HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "HydrogenSulfideConcentrationMeasurement": _HYDROGEN_SULFIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "NitricOxideConcentrationMeasurement": _NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "NitrogenDioxideConcentrationMeasurement": _NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "OxygenConcentrationMeasurement": _OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "OzoneConcentrationMeasurement": _OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "SulfurDioxideConcentrationMeasurement": _SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "DissolvedOxygenConcentrationMeasurement": _DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "BromateConcentrationMeasurement": _BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "ChloraminesConcentrationMeasurement": _CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "ChlorineConcentrationMeasurement": _CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "FecalColiformEColiConcentrationMeasurement": _FECAL_COLIFORM_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "FluorideConcentrationMeasurement": _FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "HaloaceticAcidsConcentrationMeasurement": _HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "TotalTrihalomethanesConcentrationMeasurement": _TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "TotalColiformBacteriaConcentrationMeasurement": _TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "TurbidityConcentrationMeasurement": _TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "CopperConcentrationMeasurement": _COPPER_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "LeadConcentrationMeasurement": _LEAD_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "ManganeseConcentrationMeasurement": _MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "SulfateConcentrationMeasurement": _SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "BromodichloromethaneConcentrationMeasurement": _BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "BromoformConcentrationMeasurement": _BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "ChlorodibromomethaneConcentrationMeasurement": _CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "ChloroformConcentrationMeasurement": _CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "SodiumConcentrationMeasurement": _SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "Pm25ConcentrationMeasurement": _PM2__5_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "FormaldehydeConcentrationMeasurement": _FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "Pm1ConcentrationMeasurement": _PM1_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "Pm10ConcentrationMeasurement": _PM10_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "TotalVolatileOrganicCompoundsConcentrationMeasurement": _TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
+        "RadonConcentrationMeasurement": _RADON_CONCENTRATION_MEASUREMENT_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "Channel": _CHANNEL_CLUSTER_INFO,
         "TargetNavigator": _TARGET_NAVIGATOR_CLUSTER_INFO,

@@ -506,345 +506,364 @@ public:
     ~OccupancySensingCluster() {}
 };
 
-class DLL_EXPORT CarbonMonoxideMeasurementCluster : public ClusterBase
+class DLL_EXPORT CarbonMonoxideConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    CarbonMonoxideMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                     EndpointId endpoint) :
+    CarbonMonoxideConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                  EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~CarbonMonoxideMeasurementCluster() {}
+    ~CarbonMonoxideConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT CarbonDioxideMeasurementCluster : public ClusterBase
+class DLL_EXPORT CarbonDioxideConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    CarbonDioxideMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                    EndpointId endpoint) :
+    CarbonDioxideConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                 EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~CarbonDioxideMeasurementCluster() {}
+    ~CarbonDioxideConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT EthyleneMeasurementCluster : public ClusterBase
+class DLL_EXPORT EthyleneConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    EthyleneMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~EthyleneMeasurementCluster() {}
-};
-
-class DLL_EXPORT EthyleneOxideMeasurementCluster : public ClusterBase
-{
-public:
-    EthyleneOxideMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                    EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~EthyleneOxideMeasurementCluster() {}
-};
-
-class DLL_EXPORT HydrogenMeasurementCluster : public ClusterBase
-{
-public:
-    HydrogenMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~HydrogenMeasurementCluster() {}
-};
-
-class DLL_EXPORT HydrogenSulfideMeasurementCluster : public ClusterBase
-{
-public:
-    HydrogenSulfideMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                      EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~HydrogenSulfideMeasurementCluster() {}
-};
-
-class DLL_EXPORT NitricOxideMeasurementCluster : public ClusterBase
-{
-public:
-    NitricOxideMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                  EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~NitricOxideMeasurementCluster() {}
-};
-
-class DLL_EXPORT NitrogenDioxideMeasurementCluster : public ClusterBase
-{
-public:
-    NitrogenDioxideMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                      EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~NitrogenDioxideMeasurementCluster() {}
-};
-
-class DLL_EXPORT OxygenMeasurementCluster : public ClusterBase
-{
-public:
-    OxygenMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~OxygenMeasurementCluster() {}
-};
-
-class DLL_EXPORT OzoneMeasurementCluster : public ClusterBase
-{
-public:
-    OzoneMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~OzoneMeasurementCluster() {}
-};
-
-class DLL_EXPORT SulfurDioxideMeasurementCluster : public ClusterBase
-{
-public:
-    SulfurDioxideMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                    EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~SulfurDioxideMeasurementCluster() {}
-};
-
-class DLL_EXPORT DissolvedOxygenMeasurementCluster : public ClusterBase
-{
-public:
-    DissolvedOxygenMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                      EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~DissolvedOxygenMeasurementCluster() {}
-};
-
-class DLL_EXPORT BromateMeasurementCluster : public ClusterBase
-{
-public:
-    BromateMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~BromateMeasurementCluster() {}
-};
-
-class DLL_EXPORT ChloraminesMeasurementCluster : public ClusterBase
-{
-public:
-    ChloraminesMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                  EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~ChloraminesMeasurementCluster() {}
-};
-
-class DLL_EXPORT ChlorineMeasurementCluster : public ClusterBase
-{
-public:
-    ChlorineMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~ChlorineMeasurementCluster() {}
-};
-
-class DLL_EXPORT FecalColiformEColiMeasurementCluster : public ClusterBase
-{
-public:
-    FecalColiformEColiMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                         EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~FecalColiformEColiMeasurementCluster() {}
-};
-
-class DLL_EXPORT FluorideMeasurementCluster : public ClusterBase
-{
-public:
-    FluorideMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~FluorideMeasurementCluster() {}
-};
-
-class DLL_EXPORT HaloaceticAcidsMeasurementCluster : public ClusterBase
-{
-public:
-    HaloaceticAcidsMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                      EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~HaloaceticAcidsMeasurementCluster() {}
-};
-
-class DLL_EXPORT TotalTrihalomethanesMeasurementCluster : public ClusterBase
-{
-public:
-    TotalTrihalomethanesMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                           EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~TotalTrihalomethanesMeasurementCluster() {}
-};
-
-class DLL_EXPORT TotalColiformBacteriaMeasurementCluster : public ClusterBase
-{
-public:
-    TotalColiformBacteriaMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+    EthyleneConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
                                             EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~TotalColiformBacteriaMeasurementCluster() {}
+    ~EthyleneConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT TurbidityMeasurementCluster : public ClusterBase
+class DLL_EXPORT EthyleneOxideConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    TurbidityMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    EthyleneOxideConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                 EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~TurbidityMeasurementCluster() {}
+    ~EthyleneOxideConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT CopperMeasurementCluster : public ClusterBase
+class DLL_EXPORT HydrogenConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    CopperMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    HydrogenConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                            EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~CopperMeasurementCluster() {}
+    ~HydrogenConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT LeadMeasurementCluster : public ClusterBase
+class DLL_EXPORT HydrogenSulfideConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    LeadMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    HydrogenSulfideConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                   EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~LeadMeasurementCluster() {}
+    ~HydrogenSulfideConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT ManganeseMeasurementCluster : public ClusterBase
+class DLL_EXPORT NitricOxideConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    ManganeseMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    NitricOxideConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                               EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~ManganeseMeasurementCluster() {}
+    ~NitricOxideConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT SulfateMeasurementCluster : public ClusterBase
+class DLL_EXPORT NitrogenDioxideConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    SulfateMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    NitrogenDioxideConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                   EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~SulfateMeasurementCluster() {}
+    ~NitrogenDioxideConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT BromodichloromethaneMeasurementCluster : public ClusterBase
+class DLL_EXPORT OxygenConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    BromodichloromethaneMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+    OxygenConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                          EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~OxygenConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT OzoneConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    OzoneConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                         EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~OzoneConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT SulfurDioxideConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    SulfurDioxideConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                 EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~SulfurDioxideConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT DissolvedOxygenConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    DissolvedOxygenConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                   EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~DissolvedOxygenConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT BromateConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    BromateConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
                                            EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~BromodichloromethaneMeasurementCluster() {}
+    ~BromateConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT BromoformMeasurementCluster : public ClusterBase
+class DLL_EXPORT ChloraminesConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    BromoformMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    ChloraminesConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                               EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~BromoformMeasurementCluster() {}
+    ~ChloraminesConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT ChlorodibromomethaneMeasurementCluster : public ClusterBase
+class DLL_EXPORT ChlorineConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    ChlorodibromomethaneMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+    ChlorineConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                            EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~ChlorineConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT FecalColiformEColiConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    FecalColiformEColiConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                      EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~FecalColiformEColiConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT FluorideConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    FluorideConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                            EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~FluorideConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT HaloaceticAcidsConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    HaloaceticAcidsConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                   EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~HaloaceticAcidsConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT TotalTrihalomethanesConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    TotalTrihalomethanesConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                        EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~TotalTrihalomethanesConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT TotalColiformBacteriaConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    TotalColiformBacteriaConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager,
+                                                         const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~TotalColiformBacteriaConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT TurbidityConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    TurbidityConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                             EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~TurbidityConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT CopperConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    CopperConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                          EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~CopperConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT LeadConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    LeadConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                        EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~LeadConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT ManganeseConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    ManganeseConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                             EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~ManganeseConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT SulfateConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    SulfateConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
                                            EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~ChlorodibromomethaneMeasurementCluster() {}
+    ~SulfateConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT ChloroformMeasurementCluster : public ClusterBase
+class DLL_EXPORT BromodichloromethaneConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    ChloroformMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    BromodichloromethaneConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                        EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~ChloroformMeasurementCluster() {}
+    ~BromodichloromethaneConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT SodiumMeasurementCluster : public ClusterBase
+class DLL_EXPORT BromoformConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    SodiumMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    BromoformConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                             EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~SodiumMeasurementCluster() {}
+    ~BromoformConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT Pm25MeasurementCluster : public ClusterBase
+class DLL_EXPORT ChlorodibromomethaneConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    Pm25MeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    ChlorodibromomethaneConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                        EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~Pm25MeasurementCluster() {}
+    ~ChlorodibromomethaneConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT FormaldehydeMeasurementCluster : public ClusterBase
+class DLL_EXPORT ChloroformConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    FormaldehydeMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                   EndpointId endpoint) :
+    ChloroformConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                              EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~FormaldehydeMeasurementCluster() {}
+    ~ChloroformConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT Pm1MeasurementCluster : public ClusterBase
+class DLL_EXPORT SodiumConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    Pm1MeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    SodiumConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                          EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~Pm1MeasurementCluster() {}
+    ~SodiumConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT Pm10MeasurementCluster : public ClusterBase
+class DLL_EXPORT Pm25ConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    Pm10MeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    Pm25ConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                        EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~Pm10MeasurementCluster() {}
+    ~Pm25ConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT TotalVolatileOrganicCompoundsMeasurementCluster : public ClusterBase
+class DLL_EXPORT FormaldehydeConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    TotalVolatileOrganicCompoundsMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                                    EndpointId endpoint) :
+    FormaldehydeConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~TotalVolatileOrganicCompoundsMeasurementCluster() {}
+    ~FormaldehydeConcentrationMeasurementCluster() {}
 };
 
-class DLL_EXPORT RadonMeasurementCluster : public ClusterBase
+class DLL_EXPORT Pm1ConcentrationMeasurementCluster : public ClusterBase
 {
 public:
-    RadonMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    Pm1ConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                       EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~RadonMeasurementCluster() {}
+    ~Pm1ConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT Pm10ConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    Pm10ConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                        EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~Pm10ConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT TotalVolatileOrganicCompoundsConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    TotalVolatileOrganicCompoundsConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager,
+                                                                 const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~TotalVolatileOrganicCompoundsConcentrationMeasurementCluster() {}
+};
+
+class DLL_EXPORT RadonConcentrationMeasurementCluster : public ClusterBase
+{
+public:
+    RadonConcentrationMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                         EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~RadonConcentrationMeasurementCluster() {}
 };
 
 class DLL_EXPORT WakeOnLanCluster : public ClusterBase

@@ -88,42 +88,42 @@
 | FlowMeasurement                                                     | 0x0404 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
 | OccupancySensing                                                    | 0x0406 |
-| CarbonMonoxideMeasurement                                           | 0x040C |
-| CarbonDioxideMeasurement                                            | 0x040D |
-| EthyleneMeasurement                                                 | 0x040E |
-| EthyleneOxideMeasurement                                            | 0x040F |
-| HydrogenMeasurement                                                 | 0x0410 |
-| HydrogenSulfideMeasurement                                          | 0x0411 |
-| NitricOxideMeasurement                                              | 0x0412 |
-| NitrogenDioxideMeasurement                                          | 0x0413 |
-| OxygenMeasurement                                                   | 0x0414 |
-| OzoneMeasurement                                                    | 0x0415 |
-| SulfurDioxideMeasurement                                            | 0x0416 |
-| DissolvedOxygenMeasurement                                          | 0x0417 |
-| BromateMeasurement                                                  | 0x0418 |
-| ChloraminesMeasurement                                              | 0x0419 |
-| ChlorineMeasurement                                                 | 0x041A |
-| FecalColiformEColiMeasurement                                       | 0x041B |
-| FluorideMeasurement                                                 | 0x041C |
-| HaloaceticAcidsMeasurement                                          | 0x041D |
-| TotalTrihalomethanesMeasurement                                     | 0x041E |
-| TotalColiformBacteriaMeasurement                                    | 0x041F |
-| TurbidityMeasurement                                                | 0x0420 |
-| CopperMeasurement                                                   | 0x0421 |
-| LeadMeasurement                                                     | 0x0422 |
-| ManganeseMeasurement                                                | 0x0423 |
-| SulfateMeasurement                                                  | 0x0424 |
-| BromodichloromethaneMeasurement                                     | 0x0425 |
-| BromoformMeasurement                                                | 0x0426 |
-| ChlorodibromomethaneMeasurement                                     | 0x0427 |
-| ChloroformMeasurement                                               | 0x0428 |
-| SodiumMeasurement                                                   | 0x0429 |
-| Pm25Measurement                                                     | 0x042A |
-| FormaldehydeMeasurement                                             | 0x042B |
-| Pm1Measurement                                                      | 0x042C |
-| Pm10Measurement                                                     | 0x042D |
-| TotalVolatileOrganicCompoundsMeasurement                            | 0x042E |
-| RadonMeasurement                                                    | 0x042F |
+| CarbonMonoxideConcentrationMeasurement                              | 0x040C |
+| CarbonDioxideConcentrationMeasurement                               | 0x040D |
+| EthyleneConcentrationMeasurement                                    | 0x040E |
+| EthyleneOxideConcentrationMeasurement                               | 0x040F |
+| HydrogenConcentrationMeasurement                                    | 0x0410 |
+| HydrogenSulfideConcentrationMeasurement                             | 0x0411 |
+| NitricOxideConcentrationMeasurement                                 | 0x0412 |
+| NitrogenDioxideConcentrationMeasurement                             | 0x0413 |
+| OxygenConcentrationMeasurement                                      | 0x0414 |
+| OzoneConcentrationMeasurement                                       | 0x0415 |
+| SulfurDioxideConcentrationMeasurement                               | 0x0416 |
+| DissolvedOxygenConcentrationMeasurement                             | 0x0417 |
+| BromateConcentrationMeasurement                                     | 0x0418 |
+| ChloraminesConcentrationMeasurement                                 | 0x0419 |
+| ChlorineConcentrationMeasurement                                    | 0x041A |
+| FecalColiformEColiConcentrationMeasurement                          | 0x041B |
+| FluorideConcentrationMeasurement                                    | 0x041C |
+| HaloaceticAcidsConcentrationMeasurement                             | 0x041D |
+| TotalTrihalomethanesConcentrationMeasurement                        | 0x041E |
+| TotalColiformBacteriaConcentrationMeasurement                       | 0x041F |
+| TurbidityConcentrationMeasurement                                   | 0x0420 |
+| CopperConcentrationMeasurement                                      | 0x0421 |
+| LeadConcentrationMeasurement                                        | 0x0422 |
+| ManganeseConcentrationMeasurement                                   | 0x0423 |
+| SulfateConcentrationMeasurement                                     | 0x0424 |
+| BromodichloromethaneConcentrationMeasurement                        | 0x0425 |
+| BromoformConcentrationMeasurement                                   | 0x0426 |
+| ChlorodibromomethaneConcentrationMeasurement                        | 0x0427 |
+| ChloroformConcentrationMeasurement                                  | 0x0428 |
+| SodiumConcentrationMeasurement                                      | 0x0429 |
+| Pm25ConcentrationMeasurement                                        | 0x042A |
+| FormaldehydeConcentrationMeasurement                                | 0x042B |
+| Pm1ConcentrationMeasurement                                         | 0x042C |
+| Pm10ConcentrationMeasurement                                        | 0x042D |
+| TotalVolatileOrganicCompoundsConcentrationMeasurement               | 0x042E |
+| RadonConcentrationMeasurement                                       | 0x042F |
 | WakeOnLan                                                           | 0x0503 |
 | Channel                                                             | 0x0504 |
 | TargetNavigator                                                     | 0x0505 |
@@ -6149,7 +6149,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster CarbonMonoxideMeasurement                                   | 0x040C |
+| Cluster CarbonMonoxideConcentrationMeasurement                      | 0x040C |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6176,7 +6176,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster CarbonDioxideMeasurement                                    | 0x040D |
+| Cluster CarbonDioxideConcentrationMeasurement                       | 0x040D |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6203,7 +6203,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster EthyleneMeasurement                                         | 0x040E |
+| Cluster EthyleneConcentrationMeasurement                            | 0x040E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6230,7 +6230,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster EthyleneOxideMeasurement                                    | 0x040F |
+| Cluster EthyleneOxideConcentrationMeasurement                       | 0x040F |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6257,7 +6257,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster HydrogenMeasurement                                         | 0x0410 |
+| Cluster HydrogenConcentrationMeasurement                            | 0x0410 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6284,7 +6284,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster HydrogenSulfideMeasurement                                  | 0x0411 |
+| Cluster HydrogenSulfideConcentrationMeasurement                     | 0x0411 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6311,7 +6311,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster NitricOxideMeasurement                                      | 0x0412 |
+| Cluster NitricOxideConcentrationMeasurement                         | 0x0412 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6338,7 +6338,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster NitrogenDioxideMeasurement                                  | 0x0413 |
+| Cluster NitrogenDioxideConcentrationMeasurement                     | 0x0413 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6365,7 +6365,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster OxygenMeasurement                                           | 0x0414 |
+| Cluster OxygenConcentrationMeasurement                              | 0x0414 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6392,7 +6392,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster OzoneMeasurement                                            | 0x0415 |
+| Cluster OzoneConcentrationMeasurement                               | 0x0415 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6419,7 +6419,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster SulfurDioxideMeasurement                                    | 0x0416 |
+| Cluster SulfurDioxideConcentrationMeasurement                       | 0x0416 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6446,7 +6446,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster DissolvedOxygenMeasurement                                  | 0x0417 |
+| Cluster DissolvedOxygenConcentrationMeasurement                     | 0x0417 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6473,7 +6473,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster BromateMeasurement                                          | 0x0418 |
+| Cluster BromateConcentrationMeasurement                             | 0x0418 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6500,7 +6500,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster ChloraminesMeasurement                                      | 0x0419 |
+| Cluster ChloraminesConcentrationMeasurement                         | 0x0419 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6527,7 +6527,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster ChlorineMeasurement                                         | 0x041A |
+| Cluster ChlorineConcentrationMeasurement                            | 0x041A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6554,7 +6554,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster FecalColiformEColiMeasurement                               | 0x041B |
+| Cluster FecalColiformEColiConcentrationMeasurement                  | 0x041B |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6581,7 +6581,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster FluorideMeasurement                                         | 0x041C |
+| Cluster FluorideConcentrationMeasurement                            | 0x041C |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6608,7 +6608,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster HaloaceticAcidsMeasurement                                  | 0x041D |
+| Cluster HaloaceticAcidsConcentrationMeasurement                     | 0x041D |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6635,7 +6635,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster TotalTrihalomethanesMeasurement                             | 0x041E |
+| Cluster TotalTrihalomethanesConcentrationMeasurement                | 0x041E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6662,7 +6662,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster TotalColiformBacteriaMeasurement                            | 0x041F |
+| Cluster TotalColiformBacteriaConcentrationMeasurement               | 0x041F |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6689,7 +6689,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster TurbidityMeasurement                                        | 0x0420 |
+| Cluster TurbidityConcentrationMeasurement                           | 0x0420 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6716,7 +6716,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster CopperMeasurement                                           | 0x0421 |
+| Cluster CopperConcentrationMeasurement                              | 0x0421 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6743,7 +6743,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster LeadMeasurement                                             | 0x0422 |
+| Cluster LeadConcentrationMeasurement                                | 0x0422 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6770,7 +6770,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster ManganeseMeasurement                                        | 0x0423 |
+| Cluster ManganeseConcentrationMeasurement                           | 0x0423 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6797,7 +6797,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster SulfateMeasurement                                          | 0x0424 |
+| Cluster SulfateConcentrationMeasurement                             | 0x0424 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6824,7 +6824,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster BromodichloromethaneMeasurement                             | 0x0425 |
+| Cluster BromodichloromethaneConcentrationMeasurement                | 0x0425 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6851,7 +6851,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster BromoformMeasurement                                        | 0x0426 |
+| Cluster BromoformConcentrationMeasurement                           | 0x0426 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6878,7 +6878,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster ChlorodibromomethaneMeasurement                             | 0x0427 |
+| Cluster ChlorodibromomethaneConcentrationMeasurement                | 0x0427 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6905,7 +6905,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster ChloroformMeasurement                                       | 0x0428 |
+| Cluster ChloroformConcentrationMeasurement                          | 0x0428 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6932,7 +6932,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster SodiumMeasurement                                           | 0x0429 |
+| Cluster SodiumConcentrationMeasurement                              | 0x0429 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6959,7 +6959,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster Pm25Measurement                                             | 0x042A |
+| Cluster Pm25ConcentrationMeasurement                                | 0x042A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -6986,7 +6986,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster FormaldehydeMeasurement                                     | 0x042B |
+| Cluster FormaldehydeConcentrationMeasurement                        | 0x042B |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -7013,7 +7013,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster Pm1Measurement                                              | 0x042C |
+| Cluster Pm1ConcentrationMeasurement                                 | 0x042C |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -7040,7 +7040,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster Pm10Measurement                                             | 0x042D |
+| Cluster Pm10ConcentrationMeasurement                                | 0x042D |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -7067,7 +7067,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster TotalVolatileOrganicCompoundsMeasurement                    | 0x042E |
+| Cluster TotalVolatileOrganicCompoundsConcentrationMeasurement       | 0x042E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -7094,7 +7094,7 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
-| Cluster RadonMeasurement                                            | 0x042F |
+| Cluster RadonConcentrationMeasurement                               | 0x042F |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -15240,11 +15240,11 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterCarbonMonoxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterCarbonMonoxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::CarbonMonoxideMeasurement;
+    using namespace chip::app::Clusters::CarbonMonoxideConcentrationMeasurement;
 
-    const char * clusterName = "CarbonMonoxideMeasurement";
+    const char * clusterName = "CarbonMonoxideConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -15298,13 +15298,13 @@ void registerClusterCarbonMonoxideMeasurement(Commands & commands, CredentialIss
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15348,11 +15348,11 @@ void registerClusterCarbonMonoxideMeasurement(Commands & commands, CredentialIss
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterCarbonDioxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterCarbonDioxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::CarbonDioxideMeasurement;
+    using namespace chip::app::Clusters::CarbonDioxideConcentrationMeasurement;
 
-    const char * clusterName = "CarbonDioxideMeasurement";
+    const char * clusterName = "CarbonDioxideConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -15406,13 +15406,13 @@ void registerClusterCarbonDioxideMeasurement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15456,11 +15456,11 @@ void registerClusterCarbonDioxideMeasurement(Commands & commands, CredentialIssu
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterEthyleneMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterEthyleneConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::EthyleneMeasurement;
+    using namespace chip::app::Clusters::EthyleneConcentrationMeasurement;
 
-    const char * clusterName = "EthyleneMeasurement";
+    const char * clusterName = "EthyleneConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -15514,13 +15514,13 @@ void registerClusterEthyleneMeasurement(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15564,11 +15564,11 @@ void registerClusterEthyleneMeasurement(Commands & commands, CredentialIssuerCom
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterEthyleneOxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterEthyleneOxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::EthyleneOxideMeasurement;
+    using namespace chip::app::Clusters::EthyleneOxideConcentrationMeasurement;
 
-    const char * clusterName = "EthyleneOxideMeasurement";
+    const char * clusterName = "EthyleneOxideConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -15622,13 +15622,13 @@ void registerClusterEthyleneOxideMeasurement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::EthyleneOxideConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15672,11 +15672,11 @@ void registerClusterEthyleneOxideMeasurement(Commands & commands, CredentialIssu
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterHydrogenMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterHydrogenConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::HydrogenMeasurement;
+    using namespace chip::app::Clusters::HydrogenConcentrationMeasurement;
 
-    const char * clusterName = "HydrogenMeasurement";
+    const char * clusterName = "HydrogenConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -15730,13 +15730,13 @@ void registerClusterHydrogenMeasurement(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15780,11 +15780,11 @@ void registerClusterHydrogenMeasurement(Commands & commands, CredentialIssuerCom
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterHydrogenSulfideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterHydrogenSulfideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::HydrogenSulfideMeasurement;
+    using namespace chip::app::Clusters::HydrogenSulfideConcentrationMeasurement;
 
-    const char * clusterName = "HydrogenSulfideMeasurement";
+    const char * clusterName = "HydrogenSulfideConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -15838,13 +15838,13 @@ void registerClusterHydrogenSulfideMeasurement(Commands & commands, CredentialIs
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15888,11 +15888,11 @@ void registerClusterHydrogenSulfideMeasurement(Commands & commands, CredentialIs
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterNitricOxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterNitricOxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::NitricOxideMeasurement;
+    using namespace chip::app::Clusters::NitricOxideConcentrationMeasurement;
 
-    const char * clusterName = "NitricOxideMeasurement";
+    const char * clusterName = "NitricOxideConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -15946,13 +15946,13 @@ void registerClusterNitricOxideMeasurement(Commands & commands, CredentialIssuer
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitricOxideConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -15996,11 +15996,11 @@ void registerClusterNitricOxideMeasurement(Commands & commands, CredentialIssuer
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterNitrogenDioxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterNitrogenDioxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::NitrogenDioxideMeasurement;
+    using namespace chip::app::Clusters::NitrogenDioxideConcentrationMeasurement;
 
-    const char * clusterName = "NitrogenDioxideMeasurement";
+    const char * clusterName = "NitrogenDioxideConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -16054,13 +16054,13 @@ void registerClusterNitrogenDioxideMeasurement(Commands & commands, CredentialIs
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16104,11 +16104,11 @@ void registerClusterNitrogenDioxideMeasurement(Commands & commands, CredentialIs
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterOxygenMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterOxygenConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::OxygenMeasurement;
+    using namespace chip::app::Clusters::OxygenConcentrationMeasurement;
 
-    const char * clusterName = "OxygenMeasurement";
+    const char * clusterName = "OxygenConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -16162,13 +16162,13 @@ void registerClusterOxygenMeasurement(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OxygenMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OxygenConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16212,11 +16212,11 @@ void registerClusterOxygenMeasurement(Commands & commands, CredentialIssuerComma
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterOzoneMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterOzoneConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::OzoneMeasurement;
+    using namespace chip::app::Clusters::OzoneConcentrationMeasurement;
 
-    const char * clusterName = "OzoneMeasurement";
+    const char * clusterName = "OzoneConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -16270,13 +16270,13 @@ void registerClusterOzoneMeasurement(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::OzoneMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16320,11 +16320,11 @@ void registerClusterOzoneMeasurement(Commands & commands, CredentialIssuerComman
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterSulfurDioxideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterSulfurDioxideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::SulfurDioxideMeasurement;
+    using namespace chip::app::Clusters::SulfurDioxideConcentrationMeasurement;
 
-    const char * clusterName = "SulfurDioxideMeasurement";
+    const char * clusterName = "SulfurDioxideConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -16378,13 +16378,13 @@ void registerClusterSulfurDioxideMeasurement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfurDioxideConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16428,11 +16428,11 @@ void registerClusterSulfurDioxideMeasurement(Commands & commands, CredentialIssu
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterDissolvedOxygenMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterDissolvedOxygenConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::DissolvedOxygenMeasurement;
+    using namespace chip::app::Clusters::DissolvedOxygenConcentrationMeasurement;
 
-    const char * clusterName = "DissolvedOxygenMeasurement";
+    const char * clusterName = "DissolvedOxygenConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -16486,13 +16486,13 @@ void registerClusterDissolvedOxygenMeasurement(Commands & commands, CredentialIs
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16536,11 +16536,11 @@ void registerClusterDissolvedOxygenMeasurement(Commands & commands, CredentialIs
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterBromateMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterBromateConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::BromateMeasurement;
+    using namespace chip::app::Clusters::BromateConcentrationMeasurement;
 
-    const char * clusterName = "BromateMeasurement";
+    const char * clusterName = "BromateConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -16594,13 +16594,13 @@ void registerClusterBromateMeasurement(Commands & commands, CredentialIssuerComm
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromateConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromateConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromateMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromateConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16644,11 +16644,11 @@ void registerClusterBromateMeasurement(Commands & commands, CredentialIssuerComm
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterChloraminesMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterChloraminesConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::ChloraminesMeasurement;
+    using namespace chip::app::Clusters::ChloraminesConcentrationMeasurement;
 
-    const char * clusterName = "ChloraminesMeasurement";
+    const char * clusterName = "ChloraminesConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -16702,13 +16702,13 @@ void registerClusterChloraminesMeasurement(Commands & commands, CredentialIssuer
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloraminesConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16752,11 +16752,11 @@ void registerClusterChloraminesMeasurement(Commands & commands, CredentialIssuer
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterChlorineMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterChlorineConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::ChlorineMeasurement;
+    using namespace chip::app::Clusters::ChlorineConcentrationMeasurement;
 
-    const char * clusterName = "ChlorineMeasurement";
+    const char * clusterName = "ChlorineConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -16810,13 +16810,13 @@ void registerClusterChlorineMeasurement(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorineMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorineConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16860,11 +16860,11 @@ void registerClusterChlorineMeasurement(Commands & commands, CredentialIssuerCom
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterFecalColiformEColiMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterFecalColiformEColiConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::FecalColiformEColiMeasurement;
+    using namespace chip::app::Clusters::FecalColiformEColiConcentrationMeasurement;
 
-    const char * clusterName = "FecalColiformEColiMeasurement";
+    const char * clusterName = "FecalColiformEColiConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -16918,13 +16918,13 @@ void registerClusterFecalColiformEColiMeasurement(Commands & commands, Credentia
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -16968,11 +16968,11 @@ void registerClusterFecalColiformEColiMeasurement(Commands & commands, Credentia
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterFluorideMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterFluorideConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::FluorideMeasurement;
+    using namespace chip::app::Clusters::FluorideConcentrationMeasurement;
 
-    const char * clusterName = "FluorideMeasurement";
+    const char * clusterName = "FluorideConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -17026,13 +17026,13 @@ void registerClusterFluorideMeasurement(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FluorideMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FluorideConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17076,11 +17076,11 @@ void registerClusterFluorideMeasurement(Commands & commands, CredentialIssuerCom
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterHaloaceticAcidsMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterHaloaceticAcidsConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::HaloaceticAcidsMeasurement;
+    using namespace chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement;
 
-    const char * clusterName = "HaloaceticAcidsMeasurement";
+    const char * clusterName = "HaloaceticAcidsConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -17134,13 +17134,13 @@ void registerClusterHaloaceticAcidsMeasurement(Commands & commands, CredentialIs
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17184,11 +17184,11 @@ void registerClusterHaloaceticAcidsMeasurement(Commands & commands, CredentialIs
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterTotalTrihalomethanesMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterTotalTrihalomethanesConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::TotalTrihalomethanesMeasurement;
+    using namespace chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement;
 
-    const char * clusterName = "TotalTrihalomethanesMeasurement";
+    const char * clusterName = "TotalTrihalomethanesConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -17242,13 +17242,13 @@ void registerClusterTotalTrihalomethanesMeasurement(Commands & commands, Credent
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17292,11 +17292,11 @@ void registerClusterTotalTrihalomethanesMeasurement(Commands & commands, Credent
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterTotalColiformBacteriaMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterTotalColiformBacteriaConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::TotalColiformBacteriaMeasurement;
+    using namespace chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement;
 
-    const char * clusterName = "TotalColiformBacteriaMeasurement";
+    const char * clusterName = "TotalColiformBacteriaConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -17350,13 +17350,13 @@ void registerClusterTotalColiformBacteriaMeasurement(Commands & commands, Creden
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17400,11 +17400,11 @@ void registerClusterTotalColiformBacteriaMeasurement(Commands & commands, Creden
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterTurbidityMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterTurbidityConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::TurbidityMeasurement;
+    using namespace chip::app::Clusters::TurbidityConcentrationMeasurement;
 
-    const char * clusterName = "TurbidityMeasurement";
+    const char * clusterName = "TurbidityConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -17458,13 +17458,13 @@ void registerClusterTurbidityMeasurement(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TurbidityMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TurbidityConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17508,11 +17508,11 @@ void registerClusterTurbidityMeasurement(Commands & commands, CredentialIssuerCo
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterCopperMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterCopperConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::CopperMeasurement;
+    using namespace chip::app::Clusters::CopperConcentrationMeasurement;
 
-    const char * clusterName = "CopperMeasurement";
+    const char * clusterName = "CopperConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -17566,13 +17566,13 @@ void registerClusterCopperMeasurement(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CopperConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CopperConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::CopperMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::CopperConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17616,11 +17616,11 @@ void registerClusterCopperMeasurement(Commands & commands, CredentialIssuerComma
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterLeadMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterLeadConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::LeadMeasurement;
+    using namespace chip::app::Clusters::LeadConcentrationMeasurement;
 
-    const char * clusterName = "LeadMeasurement";
+    const char * clusterName = "LeadConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -17674,13 +17674,13 @@ void registerClusterLeadMeasurement(Commands & commands, CredentialIssuerCommand
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::LeadConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::LeadConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::LeadMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::LeadConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17724,11 +17724,11 @@ void registerClusterLeadMeasurement(Commands & commands, CredentialIssuerCommand
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterManganeseMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterManganeseConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::ManganeseMeasurement;
+    using namespace chip::app::Clusters::ManganeseConcentrationMeasurement;
 
-    const char * clusterName = "ManganeseMeasurement";
+    const char * clusterName = "ManganeseConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -17782,13 +17782,13 @@ void registerClusterManganeseMeasurement(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ManganeseMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ManganeseConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17832,11 +17832,11 @@ void registerClusterManganeseMeasurement(Commands & commands, CredentialIssuerCo
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterSulfateMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterSulfateConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::SulfateMeasurement;
+    using namespace chip::app::Clusters::SulfateConcentrationMeasurement;
 
-    const char * clusterName = "SulfateMeasurement";
+    const char * clusterName = "SulfateConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -17890,13 +17890,13 @@ void registerClusterSulfateMeasurement(Commands & commands, CredentialIssuerComm
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SulfateMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SulfateConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -17940,11 +17940,11 @@ void registerClusterSulfateMeasurement(Commands & commands, CredentialIssuerComm
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterBromodichloromethaneMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterBromodichloromethaneConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::BromodichloromethaneMeasurement;
+    using namespace chip::app::Clusters::BromodichloromethaneConcentrationMeasurement;
 
-    const char * clusterName = "BromodichloromethaneMeasurement";
+    const char * clusterName = "BromodichloromethaneConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -17998,13 +17998,13 @@ void registerClusterBromodichloromethaneMeasurement(Commands & commands, Credent
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18048,11 +18048,11 @@ void registerClusterBromodichloromethaneMeasurement(Commands & commands, Credent
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterBromoformMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterBromoformConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::BromoformMeasurement;
+    using namespace chip::app::Clusters::BromoformConcentrationMeasurement;
 
-    const char * clusterName = "BromoformMeasurement";
+    const char * clusterName = "BromoformConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -18106,13 +18106,13 @@ void registerClusterBromoformMeasurement(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::BromoformMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::BromoformConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18156,11 +18156,11 @@ void registerClusterBromoformMeasurement(Commands & commands, CredentialIssuerCo
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterChlorodibromomethaneMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterChlorodibromomethaneConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::ChlorodibromomethaneMeasurement;
+    using namespace chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement;
 
-    const char * clusterName = "ChlorodibromomethaneMeasurement";
+    const char * clusterName = "ChlorodibromomethaneConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -18214,13 +18214,13 @@ void registerClusterChlorodibromomethaneMeasurement(Commands & commands, Credent
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18264,11 +18264,11 @@ void registerClusterChlorodibromomethaneMeasurement(Commands & commands, Credent
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterChloroformMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterChloroformConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::ChloroformMeasurement;
+    using namespace chip::app::Clusters::ChloroformConcentrationMeasurement;
 
-    const char * clusterName = "ChloroformMeasurement";
+    const char * clusterName = "ChloroformConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -18322,13 +18322,13 @@ void registerClusterChloroformMeasurement(Commands & commands, CredentialIssuerC
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ChloroformMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::ChloroformConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18372,11 +18372,11 @@ void registerClusterChloroformMeasurement(Commands & commands, CredentialIssuerC
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterSodiumMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterSodiumConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::SodiumMeasurement;
+    using namespace chip::app::Clusters::SodiumConcentrationMeasurement;
 
-    const char * clusterName = "SodiumMeasurement";
+    const char * clusterName = "SodiumConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -18430,13 +18430,13 @@ void registerClusterSodiumMeasurement(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::SodiumMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::SodiumConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18480,11 +18480,11 @@ void registerClusterSodiumMeasurement(Commands & commands, CredentialIssuerComma
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterPm25Measurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterPm25ConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::Pm25Measurement;
+    using namespace chip::app::Clusters::Pm25ConcentrationMeasurement;
 
-    const char * clusterName = "Pm25Measurement";
+    const char * clusterName = "Pm25ConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -18538,13 +18538,13 @@ void registerClusterPm25Measurement(Commands & commands, CredentialIssuerCommand
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm25Measurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18588,11 +18588,11 @@ void registerClusterPm25Measurement(Commands & commands, CredentialIssuerCommand
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterFormaldehydeMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterFormaldehydeConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::FormaldehydeMeasurement;
+    using namespace chip::app::Clusters::FormaldehydeConcentrationMeasurement;
 
-    const char * clusterName = "FormaldehydeMeasurement";
+    const char * clusterName = "FormaldehydeConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -18646,13 +18646,13 @@ void registerClusterFormaldehydeMeasurement(Commands & commands, CredentialIssue
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18696,11 +18696,11 @@ void registerClusterFormaldehydeMeasurement(Commands & commands, CredentialIssue
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterPm1Measurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterPm1ConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::Pm1Measurement;
+    using namespace chip::app::Clusters::Pm1ConcentrationMeasurement;
 
-    const char * clusterName = "Pm1Measurement";
+    const char * clusterName = "Pm1ConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -18754,13 +18754,13 @@ void registerClusterPm1Measurement(Commands & commands, CredentialIssuerCommands
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm1Measurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18804,11 +18804,11 @@ void registerClusterPm1Measurement(Commands & commands, CredentialIssuerCommands
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterPm10Measurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterPm10ConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::Pm10Measurement;
+    using namespace chip::app::Clusters::Pm10ConcentrationMeasurement;
 
-    const char * clusterName = "Pm10Measurement";
+    const char * clusterName = "Pm10ConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -18862,13 +18862,13 @@ void registerClusterPm10Measurement(Commands & commands, CredentialIssuerCommand
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Pm10Measurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -18912,11 +18912,12 @@ void registerClusterPm10Measurement(Commands & commands, CredentialIssuerCommand
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterTotalVolatileOrganicCompoundsMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterTotalVolatileOrganicCompoundsConcentrationMeasurement(Commands & commands,
+                                                                          CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement;
+    using namespace chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement;
 
-    const char * clusterName = "TotalVolatileOrganicCompoundsMeasurement";
+    const char * clusterName = "TotalVolatileOrganicCompoundsConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -18970,13 +18971,15 @@ void registerClusterTotalVolatileOrganicCompoundsMeasurement(Commands & commands
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementUnitEnum>>(
+        make_unique<
+            WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::MeasurementMediumEnum>>(
+        make_unique<
+            WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -19020,11 +19023,11 @@ void registerClusterTotalVolatileOrganicCompoundsMeasurement(Commands & commands
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterRadonMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterRadonConcentrationMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::RadonMeasurement;
+    using namespace chip::app::Clusters::RadonConcentrationMeasurement;
 
-    const char * clusterName = "RadonMeasurement";
+    const char * clusterName = "RadonConcentrationMeasurement";
 
     commands_list clusterCommands = {
         //
@@ -19078,13 +19081,13 @@ void registerClusterRadonMeasurement(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<float>>(Id, "uncertainty", -std::numeric_limits<float>::infinity(),
                                            std::numeric_limits<float>::infinity(), Attributes::Uncertainty::Id,
                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::MeasurementUnitEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum>>(
             Id, "measurement-unit", 0, UINT8_MAX, Attributes::MeasurementUnit::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::MeasurementMediumEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum>>(
             Id, "measurement-medium", 0, UINT8_MAX, Attributes::MeasurementMedium::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::RadonMeasurement::LevelValueEnum>>(
+        make_unique<WriteAttribute<chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum>>(
             Id, "level-value", 0, UINT8_MAX, Attributes::LevelValue::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -21247,42 +21250,42 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterFlowMeasurement(commands, credsIssuerConfig);
     registerClusterRelativeHumidityMeasurement(commands, credsIssuerConfig);
     registerClusterOccupancySensing(commands, credsIssuerConfig);
-    registerClusterCarbonMonoxideMeasurement(commands, credsIssuerConfig);
-    registerClusterCarbonDioxideMeasurement(commands, credsIssuerConfig);
-    registerClusterEthyleneMeasurement(commands, credsIssuerConfig);
-    registerClusterEthyleneOxideMeasurement(commands, credsIssuerConfig);
-    registerClusterHydrogenMeasurement(commands, credsIssuerConfig);
-    registerClusterHydrogenSulfideMeasurement(commands, credsIssuerConfig);
-    registerClusterNitricOxideMeasurement(commands, credsIssuerConfig);
-    registerClusterNitrogenDioxideMeasurement(commands, credsIssuerConfig);
-    registerClusterOxygenMeasurement(commands, credsIssuerConfig);
-    registerClusterOzoneMeasurement(commands, credsIssuerConfig);
-    registerClusterSulfurDioxideMeasurement(commands, credsIssuerConfig);
-    registerClusterDissolvedOxygenMeasurement(commands, credsIssuerConfig);
-    registerClusterBromateMeasurement(commands, credsIssuerConfig);
-    registerClusterChloraminesMeasurement(commands, credsIssuerConfig);
-    registerClusterChlorineMeasurement(commands, credsIssuerConfig);
-    registerClusterFecalColiformEColiMeasurement(commands, credsIssuerConfig);
-    registerClusterFluorideMeasurement(commands, credsIssuerConfig);
-    registerClusterHaloaceticAcidsMeasurement(commands, credsIssuerConfig);
-    registerClusterTotalTrihalomethanesMeasurement(commands, credsIssuerConfig);
-    registerClusterTotalColiformBacteriaMeasurement(commands, credsIssuerConfig);
-    registerClusterTurbidityMeasurement(commands, credsIssuerConfig);
-    registerClusterCopperMeasurement(commands, credsIssuerConfig);
-    registerClusterLeadMeasurement(commands, credsIssuerConfig);
-    registerClusterManganeseMeasurement(commands, credsIssuerConfig);
-    registerClusterSulfateMeasurement(commands, credsIssuerConfig);
-    registerClusterBromodichloromethaneMeasurement(commands, credsIssuerConfig);
-    registerClusterBromoformMeasurement(commands, credsIssuerConfig);
-    registerClusterChlorodibromomethaneMeasurement(commands, credsIssuerConfig);
-    registerClusterChloroformMeasurement(commands, credsIssuerConfig);
-    registerClusterSodiumMeasurement(commands, credsIssuerConfig);
-    registerClusterPm25Measurement(commands, credsIssuerConfig);
-    registerClusterFormaldehydeMeasurement(commands, credsIssuerConfig);
-    registerClusterPm1Measurement(commands, credsIssuerConfig);
-    registerClusterPm10Measurement(commands, credsIssuerConfig);
-    registerClusterTotalVolatileOrganicCompoundsMeasurement(commands, credsIssuerConfig);
-    registerClusterRadonMeasurement(commands, credsIssuerConfig);
+    registerClusterCarbonMonoxideConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterCarbonDioxideConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterEthyleneConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterEthyleneOxideConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterHydrogenConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterHydrogenSulfideConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterNitricOxideConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterNitrogenDioxideConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterOxygenConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterOzoneConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterSulfurDioxideConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterDissolvedOxygenConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterBromateConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterChloraminesConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterChlorineConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterFecalColiformEColiConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterFluorideConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterHaloaceticAcidsConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterTotalTrihalomethanesConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterTotalColiformBacteriaConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterTurbidityConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterCopperConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterLeadConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterManganeseConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterSulfateConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterBromodichloromethaneConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterBromoformConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterChlorodibromomethaneConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterChloroformConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterSodiumConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterPm25ConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterFormaldehydeConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterPm1ConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterPm10ConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterTotalVolatileOrganicCompoundsConcentrationMeasurement(commands, credsIssuerConfig);
+    registerClusterRadonConcentrationMeasurement(commands, credsIssuerConfig);
     registerClusterWakeOnLan(commands, credsIssuerConfig);
     registerClusterChannel(commands, credsIssuerConfig);
     registerClusterTargetNavigator(commands, credsIssuerConfig);

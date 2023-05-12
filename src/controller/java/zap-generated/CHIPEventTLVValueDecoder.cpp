@@ -3306,8 +3306,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::CarbonMonoxideMeasurement::Id: {
-        using namespace app::Clusters::CarbonMonoxideMeasurement;
+    case app::Clusters::CarbonMonoxideConcentrationMeasurement::Id: {
+        using namespace app::Clusters::CarbonMonoxideConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3316,8 +3316,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::CarbonDioxideMeasurement::Id: {
-        using namespace app::Clusters::CarbonDioxideMeasurement;
+    case app::Clusters::CarbonDioxideConcentrationMeasurement::Id: {
+        using namespace app::Clusters::CarbonDioxideConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3326,8 +3326,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::EthyleneMeasurement::Id: {
-        using namespace app::Clusters::EthyleneMeasurement;
+    case app::Clusters::EthyleneConcentrationMeasurement::Id: {
+        using namespace app::Clusters::EthyleneConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3336,8 +3336,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::EthyleneOxideMeasurement::Id: {
-        using namespace app::Clusters::EthyleneOxideMeasurement;
+    case app::Clusters::EthyleneOxideConcentrationMeasurement::Id: {
+        using namespace app::Clusters::EthyleneOxideConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3346,8 +3346,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::HydrogenMeasurement::Id: {
-        using namespace app::Clusters::HydrogenMeasurement;
+    case app::Clusters::HydrogenConcentrationMeasurement::Id: {
+        using namespace app::Clusters::HydrogenConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3356,8 +3356,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::HydrogenSulfideMeasurement::Id: {
-        using namespace app::Clusters::HydrogenSulfideMeasurement;
+    case app::Clusters::HydrogenSulfideConcentrationMeasurement::Id: {
+        using namespace app::Clusters::HydrogenSulfideConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3366,8 +3366,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::NitricOxideMeasurement::Id: {
-        using namespace app::Clusters::NitricOxideMeasurement;
+    case app::Clusters::NitricOxideConcentrationMeasurement::Id: {
+        using namespace app::Clusters::NitricOxideConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3376,8 +3376,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::NitrogenDioxideMeasurement::Id: {
-        using namespace app::Clusters::NitrogenDioxideMeasurement;
+    case app::Clusters::NitrogenDioxideConcentrationMeasurement::Id: {
+        using namespace app::Clusters::NitrogenDioxideConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3386,8 +3386,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::OxygenMeasurement::Id: {
-        using namespace app::Clusters::OxygenMeasurement;
+    case app::Clusters::OxygenConcentrationMeasurement::Id: {
+        using namespace app::Clusters::OxygenConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3396,8 +3396,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::OzoneMeasurement::Id: {
-        using namespace app::Clusters::OzoneMeasurement;
+    case app::Clusters::OzoneConcentrationMeasurement::Id: {
+        using namespace app::Clusters::OzoneConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3406,8 +3406,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::SulfurDioxideMeasurement::Id: {
-        using namespace app::Clusters::SulfurDioxideMeasurement;
+    case app::Clusters::SulfurDioxideConcentrationMeasurement::Id: {
+        using namespace app::Clusters::SulfurDioxideConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3416,8 +3416,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::DissolvedOxygenMeasurement::Id: {
-        using namespace app::Clusters::DissolvedOxygenMeasurement;
+    case app::Clusters::DissolvedOxygenConcentrationMeasurement::Id: {
+        using namespace app::Clusters::DissolvedOxygenConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3426,8 +3426,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::BromateMeasurement::Id: {
-        using namespace app::Clusters::BromateMeasurement;
+    case app::Clusters::BromateConcentrationMeasurement::Id: {
+        using namespace app::Clusters::BromateConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3436,8 +3436,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::ChloraminesMeasurement::Id: {
-        using namespace app::Clusters::ChloraminesMeasurement;
+    case app::Clusters::ChloraminesConcentrationMeasurement::Id: {
+        using namespace app::Clusters::ChloraminesConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3446,8 +3446,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::ChlorineMeasurement::Id: {
-        using namespace app::Clusters::ChlorineMeasurement;
+    case app::Clusters::ChlorineConcentrationMeasurement::Id: {
+        using namespace app::Clusters::ChlorineConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3456,8 +3456,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::FecalColiformEColiMeasurement::Id: {
-        using namespace app::Clusters::FecalColiformEColiMeasurement;
+    case app::Clusters::FecalColiformEColiConcentrationMeasurement::Id: {
+        using namespace app::Clusters::FecalColiformEColiConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3466,8 +3466,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::FluorideMeasurement::Id: {
-        using namespace app::Clusters::FluorideMeasurement;
+    case app::Clusters::FluorideConcentrationMeasurement::Id: {
+        using namespace app::Clusters::FluorideConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3476,8 +3476,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::HaloaceticAcidsMeasurement::Id: {
-        using namespace app::Clusters::HaloaceticAcidsMeasurement;
+    case app::Clusters::HaloaceticAcidsConcentrationMeasurement::Id: {
+        using namespace app::Clusters::HaloaceticAcidsConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3486,8 +3486,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::TotalTrihalomethanesMeasurement::Id: {
-        using namespace app::Clusters::TotalTrihalomethanesMeasurement;
+    case app::Clusters::TotalTrihalomethanesConcentrationMeasurement::Id: {
+        using namespace app::Clusters::TotalTrihalomethanesConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3496,8 +3496,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::TotalColiformBacteriaMeasurement::Id: {
-        using namespace app::Clusters::TotalColiformBacteriaMeasurement;
+    case app::Clusters::TotalColiformBacteriaConcentrationMeasurement::Id: {
+        using namespace app::Clusters::TotalColiformBacteriaConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3506,8 +3506,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::TurbidityMeasurement::Id: {
-        using namespace app::Clusters::TurbidityMeasurement;
+    case app::Clusters::TurbidityConcentrationMeasurement::Id: {
+        using namespace app::Clusters::TurbidityConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3516,8 +3516,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::CopperMeasurement::Id: {
-        using namespace app::Clusters::CopperMeasurement;
+    case app::Clusters::CopperConcentrationMeasurement::Id: {
+        using namespace app::Clusters::CopperConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3526,8 +3526,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::LeadMeasurement::Id: {
-        using namespace app::Clusters::LeadMeasurement;
+    case app::Clusters::LeadConcentrationMeasurement::Id: {
+        using namespace app::Clusters::LeadConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3536,8 +3536,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::ManganeseMeasurement::Id: {
-        using namespace app::Clusters::ManganeseMeasurement;
+    case app::Clusters::ManganeseConcentrationMeasurement::Id: {
+        using namespace app::Clusters::ManganeseConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3546,8 +3546,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::SulfateMeasurement::Id: {
-        using namespace app::Clusters::SulfateMeasurement;
+    case app::Clusters::SulfateConcentrationMeasurement::Id: {
+        using namespace app::Clusters::SulfateConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3556,8 +3556,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::BromodichloromethaneMeasurement::Id: {
-        using namespace app::Clusters::BromodichloromethaneMeasurement;
+    case app::Clusters::BromodichloromethaneConcentrationMeasurement::Id: {
+        using namespace app::Clusters::BromodichloromethaneConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3566,8 +3566,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::BromoformMeasurement::Id: {
-        using namespace app::Clusters::BromoformMeasurement;
+    case app::Clusters::BromoformConcentrationMeasurement::Id: {
+        using namespace app::Clusters::BromoformConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3576,8 +3576,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::ChlorodibromomethaneMeasurement::Id: {
-        using namespace app::Clusters::ChlorodibromomethaneMeasurement;
+    case app::Clusters::ChlorodibromomethaneConcentrationMeasurement::Id: {
+        using namespace app::Clusters::ChlorodibromomethaneConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3586,8 +3586,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::ChloroformMeasurement::Id: {
-        using namespace app::Clusters::ChloroformMeasurement;
+    case app::Clusters::ChloroformConcentrationMeasurement::Id: {
+        using namespace app::Clusters::ChloroformConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3596,8 +3596,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::SodiumMeasurement::Id: {
-        using namespace app::Clusters::SodiumMeasurement;
+    case app::Clusters::SodiumConcentrationMeasurement::Id: {
+        using namespace app::Clusters::SodiumConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3606,8 +3606,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::Pm25Measurement::Id: {
-        using namespace app::Clusters::Pm25Measurement;
+    case app::Clusters::Pm25ConcentrationMeasurement::Id: {
+        using namespace app::Clusters::Pm25ConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3616,8 +3616,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::FormaldehydeMeasurement::Id: {
-        using namespace app::Clusters::FormaldehydeMeasurement;
+    case app::Clusters::FormaldehydeConcentrationMeasurement::Id: {
+        using namespace app::Clusters::FormaldehydeConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3626,8 +3626,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::Pm1Measurement::Id: {
-        using namespace app::Clusters::Pm1Measurement;
+    case app::Clusters::Pm1ConcentrationMeasurement::Id: {
+        using namespace app::Clusters::Pm1ConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3636,8 +3636,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::Pm10Measurement::Id: {
-        using namespace app::Clusters::Pm10Measurement;
+    case app::Clusters::Pm10ConcentrationMeasurement::Id: {
+        using namespace app::Clusters::Pm10ConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3646,8 +3646,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::TotalVolatileOrganicCompoundsMeasurement::Id: {
-        using namespace app::Clusters::TotalVolatileOrganicCompoundsMeasurement;
+    case app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id: {
+        using namespace app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:
@@ -3656,8 +3656,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::RadonMeasurement::Id: {
-        using namespace app::Clusters::RadonMeasurement;
+    case app::Clusters::RadonConcentrationMeasurement::Id: {
+        using namespace app::Clusters::RadonConcentrationMeasurement;
         switch (aPath.mEventId)
         {
         default:

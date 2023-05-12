@@ -4147,7 +4147,7 @@ client cluster OccupancySensing = 1030 {
 }
 
 /** Attributes for reporting carbon monoxide concentration measurements */
-client cluster CarbonMonoxideMeasurement = 1036 {
+client cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4202,7 +4202,7 @@ client cluster CarbonMonoxideMeasurement = 1036 {
 }
 
 /** Attributes for reporting carbon dioxide concentration measurements */
-client cluster CarbonDioxideMeasurement = 1037 {
+client cluster CarbonDioxideConcentrationMeasurement = 1037 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4257,7 +4257,7 @@ client cluster CarbonDioxideMeasurement = 1037 {
 }
 
 /** Attributes for reporting ethylene concentration measurements */
-client cluster EthyleneMeasurement = 1038 {
+client cluster EthyleneConcentrationMeasurement = 1038 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4312,7 +4312,7 @@ client cluster EthyleneMeasurement = 1038 {
 }
 
 /** Attributes for reporting ethylene oxide concentration measurements */
-client cluster EthyleneOxideMeasurement = 1039 {
+client cluster EthyleneOxideConcentrationMeasurement = 1039 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4367,7 +4367,7 @@ client cluster EthyleneOxideMeasurement = 1039 {
 }
 
 /** Attributes for reporting hydrogen concentration measurements */
-client cluster HydrogenMeasurement = 1040 {
+client cluster HydrogenConcentrationMeasurement = 1040 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4422,7 +4422,7 @@ client cluster HydrogenMeasurement = 1040 {
 }
 
 /** Attributes for reporting hydrogen sulfide concentration measurements */
-client cluster HydrogenSulfideMeasurement = 1041 {
+client cluster HydrogenSulfideConcentrationMeasurement = 1041 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4477,7 +4477,7 @@ client cluster HydrogenSulfideMeasurement = 1041 {
 }
 
 /** Attributes for reporting nitric oxide concentration measurements */
-client cluster NitricOxideMeasurement = 1042 {
+client cluster NitricOxideConcentrationMeasurement = 1042 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4532,7 +4532,7 @@ client cluster NitricOxideMeasurement = 1042 {
 }
 
 /** Attributes for reporting nitrogen dioxide concentration measurements */
-client cluster NitrogenDioxideMeasurement = 1043 {
+client cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4587,7 +4587,7 @@ client cluster NitrogenDioxideMeasurement = 1043 {
 }
 
 /** Attributes for reporting oxygen concentration measurements */
-client cluster OxygenMeasurement = 1044 {
+client cluster OxygenConcentrationMeasurement = 1044 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4642,7 +4642,7 @@ client cluster OxygenMeasurement = 1044 {
 }
 
 /** Attributes for reporting ozone concentration measurements */
-client cluster OzoneMeasurement = 1045 {
+client cluster OzoneConcentrationMeasurement = 1045 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4697,7 +4697,7 @@ client cluster OzoneMeasurement = 1045 {
 }
 
 /** Attributes for reporting sulfur dioxide concentration measurements */
-client cluster SulfurDioxideMeasurement = 1046 {
+client cluster SulfurDioxideConcentrationMeasurement = 1046 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4752,7 +4752,7 @@ client cluster SulfurDioxideMeasurement = 1046 {
 }
 
 /** Attributes for reporting dissolved oxygen concentration measurements */
-client cluster DissolvedOxygenMeasurement = 1047 {
+client cluster DissolvedOxygenConcentrationMeasurement = 1047 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4807,7 +4807,7 @@ client cluster DissolvedOxygenMeasurement = 1047 {
 }
 
 /** Attributes for reporting bromate concentration measurements */
-client cluster BromateMeasurement = 1048 {
+client cluster BromateConcentrationMeasurement = 1048 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4862,7 +4862,7 @@ client cluster BromateMeasurement = 1048 {
 }
 
 /** Attributes for reporting chloramines concentration measurements */
-client cluster ChloraminesMeasurement = 1049 {
+client cluster ChloraminesConcentrationMeasurement = 1049 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4917,7 +4917,7 @@ client cluster ChloraminesMeasurement = 1049 {
 }
 
 /** Attributes for reporting chlorine concentration measurements */
-client cluster ChlorineMeasurement = 1050 {
+client cluster ChlorineConcentrationMeasurement = 1050 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -4972,7 +4972,7 @@ client cluster ChlorineMeasurement = 1050 {
 }
 
 /** Attributes for reporting fecal coliform and e. coli concentration measurements */
-client cluster FecalColiformEColiMeasurement = 1051 {
+client cluster FecalColiformEColiConcentrationMeasurement = 1051 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5027,7 +5027,7 @@ client cluster FecalColiformEColiMeasurement = 1051 {
 }
 
 /** Attributes for reporting fluoride concentration measurements */
-client cluster FluorideMeasurement = 1052 {
+client cluster FluorideConcentrationMeasurement = 1052 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5082,7 +5082,7 @@ client cluster FluorideMeasurement = 1052 {
 }
 
 /** Attributes for reporting haloacetic acids concentration measurements */
-client cluster HaloaceticAcidsMeasurement = 1053 {
+client cluster HaloaceticAcidsConcentrationMeasurement = 1053 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5137,7 +5137,7 @@ client cluster HaloaceticAcidsMeasurement = 1053 {
 }
 
 /** Attributes for reporting total trihalomethanes concentration measurements */
-client cluster TotalTrihalomethanesMeasurement = 1054 {
+client cluster TotalTrihalomethanesConcentrationMeasurement = 1054 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5192,7 +5192,7 @@ client cluster TotalTrihalomethanesMeasurement = 1054 {
 }
 
 /** Attributes for reporting total coliform bacteria concentration measurements */
-client cluster TotalColiformBacteriaMeasurement = 1055 {
+client cluster TotalColiformBacteriaConcentrationMeasurement = 1055 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5247,7 +5247,7 @@ client cluster TotalColiformBacteriaMeasurement = 1055 {
 }
 
 /** Attributes for reporting turbidity concentration measurements */
-client cluster TurbidityMeasurement = 1056 {
+client cluster TurbidityConcentrationMeasurement = 1056 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5302,7 +5302,7 @@ client cluster TurbidityMeasurement = 1056 {
 }
 
 /** Attributes for reporting copper concentration measurements */
-client cluster CopperMeasurement = 1057 {
+client cluster CopperConcentrationMeasurement = 1057 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5357,7 +5357,7 @@ client cluster CopperMeasurement = 1057 {
 }
 
 /** Attributes for reporting lead concentration measurements */
-client cluster LeadMeasurement = 1058 {
+client cluster LeadConcentrationMeasurement = 1058 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5412,7 +5412,7 @@ client cluster LeadMeasurement = 1058 {
 }
 
 /** Attributes for reporting manganese concentration measurements */
-client cluster ManganeseMeasurement = 1059 {
+client cluster ManganeseConcentrationMeasurement = 1059 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5467,7 +5467,7 @@ client cluster ManganeseMeasurement = 1059 {
 }
 
 /** Attributes for reporting sulfate concentration measurements */
-client cluster SulfateMeasurement = 1060 {
+client cluster SulfateConcentrationMeasurement = 1060 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5522,7 +5522,7 @@ client cluster SulfateMeasurement = 1060 {
 }
 
 /** Attributes for reporting bromodichloromethane concentration measurements */
-client cluster BromodichloromethaneMeasurement = 1061 {
+client cluster BromodichloromethaneConcentrationMeasurement = 1061 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5577,7 +5577,7 @@ client cluster BromodichloromethaneMeasurement = 1061 {
 }
 
 /** Attributes for reporting bromoform concentration measurements */
-client cluster BromoformMeasurement = 1062 {
+client cluster BromoformConcentrationMeasurement = 1062 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5632,7 +5632,7 @@ client cluster BromoformMeasurement = 1062 {
 }
 
 /** Attributes for reporting chlorodibromomethane concentration measurements */
-client cluster ChlorodibromomethaneMeasurement = 1063 {
+client cluster ChlorodibromomethaneConcentrationMeasurement = 1063 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5687,7 +5687,7 @@ client cluster ChlorodibromomethaneMeasurement = 1063 {
 }
 
 /** Attributes for reporting chloroform concentration measurements */
-client cluster ChloroformMeasurement = 1064 {
+client cluster ChloroformConcentrationMeasurement = 1064 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5742,7 +5742,7 @@ client cluster ChloroformMeasurement = 1064 {
 }
 
 /** Attributes for reporting sodium concentration measurements */
-client cluster SodiumMeasurement = 1065 {
+client cluster SodiumConcentrationMeasurement = 1065 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5797,7 +5797,7 @@ client cluster SodiumMeasurement = 1065 {
 }
 
 /** Attributes for reporting PM2.5 concentration measurements */
-client cluster Pm25Measurement = 1066 {
+client cluster Pm25ConcentrationMeasurement = 1066 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5852,7 +5852,7 @@ client cluster Pm25Measurement = 1066 {
 }
 
 /** Attributes for reporting formaldehyde concentration measurements */
-client cluster FormaldehydeMeasurement = 1067 {
+client cluster FormaldehydeConcentrationMeasurement = 1067 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5907,7 +5907,7 @@ client cluster FormaldehydeMeasurement = 1067 {
 }
 
 /** Attributes for reporting PM1 concentration measurements */
-client cluster Pm1Measurement = 1068 {
+client cluster Pm1ConcentrationMeasurement = 1068 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -5962,7 +5962,7 @@ client cluster Pm1Measurement = 1068 {
 }
 
 /** Attributes for reporting PM10 concentration measurements */
-client cluster Pm10Measurement = 1069 {
+client cluster Pm10ConcentrationMeasurement = 1069 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -6017,7 +6017,7 @@ client cluster Pm10Measurement = 1069 {
 }
 
 /** Attributes for reporting total volatile organic compounds concentration measurements */
-client cluster TotalVolatileOrganicCompoundsMeasurement = 1070 {
+client cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -6072,7 +6072,7 @@ client cluster TotalVolatileOrganicCompoundsMeasurement = 1070 {
 }
 
 /** Attributes for reporting radon concentration measurements */
-client cluster RadonMeasurement = 1071 {
+client cluster RadonConcentrationMeasurement = 1071 {
   enum LevelValueEnum : ENUM8 {
     kUnknown = 0;
     kLow = 1;
@@ -7449,42 +7449,42 @@ endpoint 1 {
   binding cluster FlowMeasurement;
   binding cluster RelativeHumidityMeasurement;
   binding cluster OccupancySensing;
-  binding cluster CarbonMonoxideMeasurement;
-  binding cluster CarbonDioxideMeasurement;
-  binding cluster EthyleneMeasurement;
-  binding cluster EthyleneOxideMeasurement;
-  binding cluster HydrogenMeasurement;
-  binding cluster HydrogenSulfideMeasurement;
-  binding cluster NitricOxideMeasurement;
-  binding cluster NitrogenDioxideMeasurement;
-  binding cluster OxygenMeasurement;
-  binding cluster OzoneMeasurement;
-  binding cluster SulfurDioxideMeasurement;
-  binding cluster DissolvedOxygenMeasurement;
-  binding cluster BromateMeasurement;
-  binding cluster ChloraminesMeasurement;
-  binding cluster ChlorineMeasurement;
-  binding cluster FecalColiformEColiMeasurement;
-  binding cluster FluorideMeasurement;
-  binding cluster HaloaceticAcidsMeasurement;
-  binding cluster TotalTrihalomethanesMeasurement;
-  binding cluster TotalColiformBacteriaMeasurement;
-  binding cluster TurbidityMeasurement;
-  binding cluster CopperMeasurement;
-  binding cluster LeadMeasurement;
-  binding cluster ManganeseMeasurement;
-  binding cluster SulfateMeasurement;
-  binding cluster BromodichloromethaneMeasurement;
-  binding cluster BromoformMeasurement;
-  binding cluster ChlorodibromomethaneMeasurement;
-  binding cluster ChloroformMeasurement;
-  binding cluster SodiumMeasurement;
-  binding cluster Pm25Measurement;
-  binding cluster FormaldehydeMeasurement;
-  binding cluster Pm1Measurement;
-  binding cluster Pm10Measurement;
-  binding cluster TotalVolatileOrganicCompoundsMeasurement;
-  binding cluster RadonMeasurement;
+  binding cluster CarbonMonoxideConcentrationMeasurement;
+  binding cluster CarbonDioxideConcentrationMeasurement;
+  binding cluster EthyleneConcentrationMeasurement;
+  binding cluster EthyleneOxideConcentrationMeasurement;
+  binding cluster HydrogenConcentrationMeasurement;
+  binding cluster HydrogenSulfideConcentrationMeasurement;
+  binding cluster NitricOxideConcentrationMeasurement;
+  binding cluster NitrogenDioxideConcentrationMeasurement;
+  binding cluster OxygenConcentrationMeasurement;
+  binding cluster OzoneConcentrationMeasurement;
+  binding cluster SulfurDioxideConcentrationMeasurement;
+  binding cluster DissolvedOxygenConcentrationMeasurement;
+  binding cluster BromateConcentrationMeasurement;
+  binding cluster ChloraminesConcentrationMeasurement;
+  binding cluster ChlorineConcentrationMeasurement;
+  binding cluster FecalColiformEColiConcentrationMeasurement;
+  binding cluster FluorideConcentrationMeasurement;
+  binding cluster HaloaceticAcidsConcentrationMeasurement;
+  binding cluster TotalTrihalomethanesConcentrationMeasurement;
+  binding cluster TotalColiformBacteriaConcentrationMeasurement;
+  binding cluster TurbidityConcentrationMeasurement;
+  binding cluster CopperConcentrationMeasurement;
+  binding cluster LeadConcentrationMeasurement;
+  binding cluster ManganeseConcentrationMeasurement;
+  binding cluster SulfateConcentrationMeasurement;
+  binding cluster BromodichloromethaneConcentrationMeasurement;
+  binding cluster BromoformConcentrationMeasurement;
+  binding cluster ChlorodibromomethaneConcentrationMeasurement;
+  binding cluster ChloroformConcentrationMeasurement;
+  binding cluster SodiumConcentrationMeasurement;
+  binding cluster Pm25ConcentrationMeasurement;
+  binding cluster FormaldehydeConcentrationMeasurement;
+  binding cluster Pm1ConcentrationMeasurement;
+  binding cluster Pm10ConcentrationMeasurement;
+  binding cluster TotalVolatileOrganicCompoundsConcentrationMeasurement;
+  binding cluster RadonConcentrationMeasurement;
   binding cluster WakeOnLan;
   binding cluster Channel;
   binding cluster TargetNavigator;

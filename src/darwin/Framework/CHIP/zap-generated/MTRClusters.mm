@@ -22029,7 +22029,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 @end
 
-@implementation MTRClusterCarbonMonoxideMeasurement
+@implementation MTRClusterCarbonMonoxideConcentrationMeasurement
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
@@ -22046,2869 +22046,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributePeakMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeAverageMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeMeasurementMediumID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeGeneratedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeAcceptedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonMonoxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterCarbonDioxideMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeAverageMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeGeneratedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeAcceptedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCarbonDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterEthyleneMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributePeakMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterEthyleneOxideMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeAverageMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeGeneratedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeAcceptedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeEthyleneOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterHydrogenMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributePeakMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterHydrogenSulfideMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeMinMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeMaxMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributePeakMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeAverageMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeMeasurementMediumID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeGeneratedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeAcceptedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHydrogenSulfideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterNitricOxideMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeAverageMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeGeneratedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitricOxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterNitrogenDioxideMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeMinMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeMaxMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributePeakMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeAverageMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeMeasurementMediumID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeGeneratedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeAcceptedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeNitrogenDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterOxygenMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeAverageMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOxygenMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterOzoneMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeAverageMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOzoneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOzoneMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterSulfurDioxideMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeAverageMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeGeneratedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeAcceptedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfurDioxideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterDissolvedOxygenMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeMinMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeMaxMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributePeakMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeAverageMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeMeasurementMediumID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeGeneratedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeAcceptedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeDissolvedOxygenMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterBromateMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeAverageMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromateMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterChloraminesMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeAverageMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeGeneratedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloraminesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloraminesMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterChlorineMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributePeakMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorineMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorineMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterFecalColiformEColiMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeMinMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeMaxMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributePeakMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeAverageMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeMeasurementUnitID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeMeasurementMediumID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeGeneratedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeAcceptedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeAttributeListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeFecalColiformEColiMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiMeasurementAttributeClusterRevisionID)
-                                          params:params];
-}
-
-@end
-
-@implementation MTRClusterFluorideMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributePeakMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFluorideMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFluorideMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterHaloaceticAcidsMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeMinMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeMaxMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributePeakMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeAverageMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeMeasurementMediumID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeGeneratedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeAcceptedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterTotalTrihalomethanesMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeMinMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeMaxMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributePeakMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeAverageMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeUncertaintyID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeMeasurementUnitID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeMeasurementMediumID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeGeneratedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeAcceptedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeAttributeListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesMeasurementAttributeClusterRevisionID)
-                             params:params];
-}
-
-@end
-
-@implementation MTRClusterTotalColiformBacteriaMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeMeasuredValueID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMeasuredValueID)
                              params:params];
 }
 
@@ -24916,8 +22057,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeMinMeasuredValueID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMinMeasuredValueID)
                              params:params];
 }
 
@@ -24925,8 +22066,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeMaxMeasuredValueID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMaxMeasuredValueID)
                              params:params];
 }
 
@@ -24934,8 +22075,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributePeakMeasuredValueID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributePeakMeasuredValueID)
                              params:params];
 }
 
@@ -24943,901 +22084,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeAverageMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
                         attributeID:
-                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeUncertaintyID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeMeasurementUnitID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeMeasurementMediumID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeLevelValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeGeneratedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeAcceptedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeAttributeListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeFeatureMapID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaMeasurementAttributeClusterRevisionID)
-                             params:params];
-}
-
-@end
-
-@implementation MTRClusterTurbidityMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributePeakMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeTurbidityMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterTurbidityMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterCopperMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeAverageMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeCopperMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterCopperMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterLeadMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeAverageMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLeadMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLeadMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterManganeseMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributePeakMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeManganeseMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterManganeseMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterSulfateMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeAverageMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSulfateMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSulfateMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterBromodichloromethaneMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeMinMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeMaxMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributePeakMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributePeakMeasuredValueWindowID)
+                            @(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributePeakMeasuredValueWindowID)
                              params:params];
 }
 
@@ -25845,1353 +22094,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeAverageMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeUncertaintyID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeMeasurementUnitID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeMeasurementMediumID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeGeneratedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeAcceptedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeAttributeListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromodichloromethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneMeasurementAttributeClusterRevisionID)
-                             params:params];
-}
-
-@end
-
-@implementation MTRClusterBromoformMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributePeakMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeBromoformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterBromoformMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterChlorodibromomethaneMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeMinMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeMaxMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributePeakMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeAverageMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeUncertaintyID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeMeasurementUnitID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeMeasurementMediumID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeGeneratedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeAcceptedCommandListID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeAttributeListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneMeasurementAttributeClusterRevisionID)
-                             params:params];
-}
-
-@end
-
-@implementation MTRClusterChloroformMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributePeakMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeChloroformMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterChloroformMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterSodiumMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeAverageMeasuredValueWindowID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeSodiumMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterSodiumMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterPM25Measurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeAverageMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM25MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM25MeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterFormaldehydeMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeAverageMeasuredValueID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeAverageMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeGeneratedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeAcceptedCommandListID)
-                                          params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeFormaldehydeMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeMeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterPM1Measurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeAverageMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM1MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM1MeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterPM10Measurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeMinMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributePeakMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeAverageMeasuredValueWindowID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeUncertaintyID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeMeasurementUnitID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeMeasurementMediumID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeLevelValueID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypePM10MeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterPM10MeasurementAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterTotalVolatileOrganicCompoundsMeasurement
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeMinMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeMaxMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributePeakMeasuredValueID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
                         attributeID:
-                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributePeakMeasuredValueWindowID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:
-                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeAverageMeasuredValueID)
+                            @(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAverageMeasuredValueID)
                              params:params];
 }
 
@@ -27199,9 +22104,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
                         attributeID:
-                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeAverageMeasuredValueWindowID)
+                            @(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
                              params:params];
 }
 
@@ -27209,8 +22114,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeUncertaintyID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeUncertaintyID)
                              params:params];
 }
 
@@ -27218,8 +22123,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeMeasurementUnitID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMeasurementUnitID)
                              params:params];
 }
 
@@ -27227,8 +22132,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeMeasurementMediumID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeMeasurementMediumID)
                              params:params];
 }
 
@@ -27236,8 +22141,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeLevelValueID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeLevelValueID)
                              params:params];
 }
 
@@ -27245,9 +22150,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
                         attributeID:
-                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeGeneratedCommandListID)
+                            @(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeGeneratedCommandListID)
                              params:params];
 }
 
@@ -27255,9 +22160,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:
-                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeAcceptedCommandListID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAcceptedCommandListID)
                              params:params];
 }
 
@@ -27265,8 +22169,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeAttributeListID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeAttributeListID)
                              params:params];
 }
 
@@ -27274,8 +22178,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeFeatureMapID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeFeatureMapID)
                              params:params];
 }
 
@@ -27283,14 +22187,3452 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsMeasurementID)
-                        attributeID:@(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsMeasurementAttributeClusterRevisionID)
+                          clusterID:@(MTRClusterIDTypeCarbonMonoxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonMonoxideConcentrationMeasurementAttributeClusterRevisionID)
                              params:params];
 }
 
 @end
 
-@implementation MTRClusterRadonMeasurement
+@implementation MTRClusterCarbonDioxideConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCarbonDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCarbonDioxideConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterEthyleneConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeUncertaintyID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeLevelValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeFeatureMapID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterEthyleneOxideConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeEthyleneOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterEthyleneOxideConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterHydrogenConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeUncertaintyID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeLevelValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeFeatureMapID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterHydrogenSulfideConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHydrogenSulfideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHydrogenSulfideConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterNitricOxideConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitricOxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitricOxideConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterNitrogenDioxideConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeNitrogenDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterNitrogenDioxideConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterOxygenConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeUncertaintyID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeLevelValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeAttributeListID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOxygenConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterOzoneConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeUncertaintyID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMeasurementUnitID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeLevelValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeAttributeListID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeOzoneConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOzoneConcentrationMeasurementAttributeClusterRevisionID)
+                                          params:params];
+}
+
+@end
+
+@implementation MTRClusterSulfurDioxideConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfurDioxideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfurDioxideConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterDissolvedOxygenConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDissolvedOxygenConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterDissolvedOxygenConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterBromateConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeUncertaintyID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeLevelValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeAttributeListID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromateConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterChloraminesConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloraminesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloraminesConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterChlorineConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeUncertaintyID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeLevelValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeFeatureMapID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorineConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorineConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterFecalColiformEColiConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFecalColiformEColiConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFecalColiformEColiConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterFluorideConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeUncertaintyID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeLevelValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeFeatureMapID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFluorideConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFluorideConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterHaloaceticAcidsConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeHaloaceticAcidsConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterHaloaceticAcidsConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterTotalTrihalomethanesConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalTrihalomethanesConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalTrihalomethanesConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterTotalColiformBacteriaConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalColiformBacteriaConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalColiformBacteriaConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterTurbidityConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeUncertaintyID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeLevelValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeFeatureMapID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTurbidityConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterTurbidityConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterCopperConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeUncertaintyID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeLevelValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeAttributeListID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeCopperConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterCopperConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterLeadConcentrationMeasurement
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
@@ -27308,130 +25650,2253 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeMeasuredValueID)
+                                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeMeasuredValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeMinMeasuredValueID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeMinMeasuredValueID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeMaxMeasuredValueID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeMaxMeasuredValueID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributePeakMeasuredValueID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributePeakMeasuredValueWindowID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeAverageMeasuredValueID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
 {
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                     attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeAverageMeasuredValueWindowID)
-                                          params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeUncertaintyID)
+                                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeUncertaintyID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeMeasurementUnitID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeMeasurementUnitID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeMeasurementMediumID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeLevelValueID)
+                                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeLevelValueID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeGeneratedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeAcceptedCommandListID)
-                                             params:params];
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeLeadConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterLeadConcentrationMeasurementAttributeClusterRevisionID)
+                                          params:params];
+}
+
+@end
+
+@implementation MTRClusterManganeseConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeUncertaintyID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeLevelValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeFeatureMapID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeManganeseConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterManganeseConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterSulfateConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeUncertaintyID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRadonMeasurementID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRadonMeasurementAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeLevelValueID)
                                              params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeAttributeListID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSulfateConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSulfateConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterBromodichloromethaneConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromodichloromethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromodichloromethaneConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterBromoformConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeUncertaintyID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeLevelValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeFeatureMapID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeBromoformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterBromoformConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterChlorodibromomethaneConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChlorodibromomethaneConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChlorodibromomethaneConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterChloroformConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeLevelValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeFeatureMapID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeChloroformConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterChloroformConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterSodiumConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeUncertaintyID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeLevelValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeAttributeListID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeSodiumConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterSodiumConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterPM25ConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMeasuredValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMinMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMaxMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeUncertaintyID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMeasurementUnitID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeLevelValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM25ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM25ConcentrationMeasurementAttributeClusterRevisionID)
+                                          params:params];
+}
+
+@end
+
+@implementation MTRClusterFormaldehydeConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeFormaldehydeConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterFormaldehydeConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterPM1ConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMeasuredValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMinMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMaxMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributePeakMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeUncertaintyID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMeasurementUnitID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeMeasurementMediumID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeLevelValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM1ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM1ConcentrationMeasurementAttributeClusterRevisionID)
+                                          params:params];
+}
+
+@end
+
+@implementation MTRClusterPM10ConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMeasuredValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMinMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMaxMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeUncertaintyID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMeasurementUnitID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeLevelValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypePM10ConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterPM10ConcentrationMeasurementAttributeClusterRevisionID)
+                                          params:params];
+}
+
+@end
+
+@implementation MTRClusterTotalVolatileOrganicCompoundsConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeUncertaintyID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMeasurementUnitID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeLevelValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeAttributeListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeFeatureMapID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTotalVolatileOrganicCompoundsConcentrationMeasurementID)
+                        attributeID:
+                            @(MTRAttributeIDTypeClusterTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeClusterRevisionID)
+                             params:params];
+}
+
+@end
+
+@implementation MTRClusterRadonConcentrationMeasurement
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMeasuredValueID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMinMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMaxMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributePeakMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributePeakMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAverageMeasuredValueID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAverageMeasuredValueWindowID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeUncertaintyID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMeasurementUnitID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeMeasurementMediumID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeLevelValueID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeAttributeListID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeRadonConcentrationMeasurementID)
+                                     attributeID:@(MTRAttributeIDTypeClusterRadonConcentrationMeasurementAttributeClusterRevisionID)
+                                          params:params];
 }
 
 @end

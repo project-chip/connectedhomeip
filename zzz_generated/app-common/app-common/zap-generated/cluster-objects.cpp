@@ -16038,7 +16038,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace OccupancySensing
-namespace CarbonMonoxideMeasurement {
+namespace CarbonMonoxideConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16108,8 +16108,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace CarbonMonoxideMeasurement
-namespace CarbonDioxideMeasurement {
+} // namespace CarbonMonoxideConcentrationMeasurement
+namespace CarbonDioxideConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16179,8 +16179,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace CarbonDioxideMeasurement
-namespace EthyleneMeasurement {
+} // namespace CarbonDioxideConcentrationMeasurement
+namespace EthyleneConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16250,8 +16250,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace EthyleneMeasurement
-namespace EthyleneOxideMeasurement {
+} // namespace EthyleneConcentrationMeasurement
+namespace EthyleneOxideConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16321,8 +16321,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace EthyleneOxideMeasurement
-namespace HydrogenMeasurement {
+} // namespace EthyleneOxideConcentrationMeasurement
+namespace HydrogenConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16392,8 +16392,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace HydrogenMeasurement
-namespace HydrogenSulfideMeasurement {
+} // namespace HydrogenConcentrationMeasurement
+namespace HydrogenSulfideConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16463,8 +16463,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace HydrogenSulfideMeasurement
-namespace NitricOxideMeasurement {
+} // namespace HydrogenSulfideConcentrationMeasurement
+namespace NitricOxideConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16534,8 +16534,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace NitricOxideMeasurement
-namespace NitrogenDioxideMeasurement {
+} // namespace NitricOxideConcentrationMeasurement
+namespace NitrogenDioxideConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16605,8 +16605,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace NitrogenDioxideMeasurement
-namespace OxygenMeasurement {
+} // namespace NitrogenDioxideConcentrationMeasurement
+namespace OxygenConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16676,8 +16676,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace OxygenMeasurement
-namespace OzoneMeasurement {
+} // namespace OxygenConcentrationMeasurement
+namespace OzoneConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16747,8 +16747,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace OzoneMeasurement
-namespace SulfurDioxideMeasurement {
+} // namespace OzoneConcentrationMeasurement
+namespace SulfurDioxideConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16818,8 +16818,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace SulfurDioxideMeasurement
-namespace DissolvedOxygenMeasurement {
+} // namespace SulfurDioxideConcentrationMeasurement
+namespace DissolvedOxygenConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16889,8 +16889,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace DissolvedOxygenMeasurement
-namespace BromateMeasurement {
+} // namespace DissolvedOxygenConcentrationMeasurement
+namespace BromateConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -16960,8 +16960,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace BromateMeasurement
-namespace ChloraminesMeasurement {
+} // namespace BromateConcentrationMeasurement
+namespace ChloraminesConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17031,8 +17031,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace ChloraminesMeasurement
-namespace ChlorineMeasurement {
+} // namespace ChloraminesConcentrationMeasurement
+namespace ChlorineConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17102,8 +17102,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace ChlorineMeasurement
-namespace FecalColiformEColiMeasurement {
+} // namespace ChlorineConcentrationMeasurement
+namespace FecalColiformEColiConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17173,8 +17173,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace FecalColiformEColiMeasurement
-namespace FluorideMeasurement {
+} // namespace FecalColiformEColiConcentrationMeasurement
+namespace FluorideConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17244,8 +17244,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace FluorideMeasurement
-namespace HaloaceticAcidsMeasurement {
+} // namespace FluorideConcentrationMeasurement
+namespace HaloaceticAcidsConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17315,8 +17315,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace HaloaceticAcidsMeasurement
-namespace TotalTrihalomethanesMeasurement {
+} // namespace HaloaceticAcidsConcentrationMeasurement
+namespace TotalTrihalomethanesConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17386,8 +17386,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace TotalTrihalomethanesMeasurement
-namespace TotalColiformBacteriaMeasurement {
+} // namespace TotalTrihalomethanesConcentrationMeasurement
+namespace TotalColiformBacteriaConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17457,8 +17457,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace TotalColiformBacteriaMeasurement
-namespace TurbidityMeasurement {
+} // namespace TotalColiformBacteriaConcentrationMeasurement
+namespace TurbidityConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17528,8 +17528,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace TurbidityMeasurement
-namespace CopperMeasurement {
+} // namespace TurbidityConcentrationMeasurement
+namespace CopperConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17599,8 +17599,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace CopperMeasurement
-namespace LeadMeasurement {
+} // namespace CopperConcentrationMeasurement
+namespace LeadConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17670,8 +17670,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace LeadMeasurement
-namespace ManganeseMeasurement {
+} // namespace LeadConcentrationMeasurement
+namespace ManganeseConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17741,8 +17741,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace ManganeseMeasurement
-namespace SulfateMeasurement {
+} // namespace ManganeseConcentrationMeasurement
+namespace SulfateConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17812,8 +17812,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace SulfateMeasurement
-namespace BromodichloromethaneMeasurement {
+} // namespace SulfateConcentrationMeasurement
+namespace BromodichloromethaneConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17883,8 +17883,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace BromodichloromethaneMeasurement
-namespace BromoformMeasurement {
+} // namespace BromodichloromethaneConcentrationMeasurement
+namespace BromoformConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -17954,8 +17954,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace BromoformMeasurement
-namespace ChlorodibromomethaneMeasurement {
+} // namespace BromoformConcentrationMeasurement
+namespace ChlorodibromomethaneConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -18025,8 +18025,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace ChlorodibromomethaneMeasurement
-namespace ChloroformMeasurement {
+} // namespace ChlorodibromomethaneConcentrationMeasurement
+namespace ChloroformConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -18096,8 +18096,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace ChloroformMeasurement
-namespace SodiumMeasurement {
+} // namespace ChloroformConcentrationMeasurement
+namespace SodiumConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -18167,8 +18167,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace SodiumMeasurement
-namespace Pm25Measurement {
+} // namespace SodiumConcentrationMeasurement
+namespace Pm25ConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -18238,8 +18238,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace Pm25Measurement
-namespace FormaldehydeMeasurement {
+} // namespace Pm25ConcentrationMeasurement
+namespace FormaldehydeConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -18309,8 +18309,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace FormaldehydeMeasurement
-namespace Pm1Measurement {
+} // namespace FormaldehydeConcentrationMeasurement
+namespace Pm1ConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -18380,8 +18380,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace Pm1Measurement
-namespace Pm10Measurement {
+} // namespace Pm1ConcentrationMeasurement
+namespace Pm10ConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -18451,8 +18451,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace Pm10Measurement
-namespace TotalVolatileOrganicCompoundsMeasurement {
+} // namespace Pm10ConcentrationMeasurement
+namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -18522,8 +18522,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace TotalVolatileOrganicCompoundsMeasurement
-namespace RadonMeasurement {
+} // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
+namespace RadonConcentrationMeasurement {
 
 namespace Commands {} // namespace Commands
 
@@ -18593,7 +18593,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace RadonMeasurement
+} // namespace RadonConcentrationMeasurement
 namespace WakeOnLan {
 
 namespace Commands {} // namespace Commands
