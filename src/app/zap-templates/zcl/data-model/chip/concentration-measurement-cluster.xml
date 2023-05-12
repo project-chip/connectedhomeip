@@ -847,7 +847,7 @@ limitations under the License.
   </cluster>
 
   <!-- Feature Map -->
-  <bitmap name="Features" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x040c"/>
     <cluster code="0x040d" />
     <cluster code="0x040e" />
