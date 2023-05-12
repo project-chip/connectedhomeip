@@ -148,6 +148,21 @@ static constexpr ClusterId Id = 0x00000045;
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
+namespace TemperatureControl {
+static constexpr ClusterId Id = 0x00000056;
+} // namespace TemperatureControl
+namespace RefrigeratorAlarm {
+static constexpr ClusterId Id = 0x00000057;
+} // namespace RefrigeratorAlarm
+namespace DishwasherOperationalState {
+static constexpr ClusterId Id = 0x0000005A;
+} // namespace DishwasherOperationalState
+namespace OperationalState {
+static constexpr ClusterId Id = 0x00000060;
+} // namespace OperationalState
+namespace RoboticVacuumOperationalState {
+static constexpr ClusterId Id = 0x00000061;
+} // namespace RoboticVacuumOperationalState
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

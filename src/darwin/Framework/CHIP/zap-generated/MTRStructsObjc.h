@@ -675,6 +675,95 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSArray * _Nonnull semanticTags API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRTemperatureControlClusterTemperatureLevelStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull temperatureLevel MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRRefrigeratorAlarmClusterNotifyEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull active MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull inactive MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull state MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull mask MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRDishwasherOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull errorStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull errorStateDetails MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRDishwasherOperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull operationalStateLabel MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRDishwasherOperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRDishwasherOperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRDishwasherOperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull totalOperationalTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull pausedTime MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROperationalStateClusterErrorStateStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull errorStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull errorStateDetails MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull operationalStateLabel MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTROperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull totalOperationalTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull pausedTime MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRRoboticVacuumOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull errorStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull errorStateDetails MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRRoboticVacuumOperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull operationalStateLabel MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRRoboticVacuumOperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRRoboticVacuumOperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull totalOperationalTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull pausedTime MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDoorLockClusterCredentialStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull credentialType API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));

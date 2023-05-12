@@ -12649,6 +12649,1599 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 @end
 
+@implementation MTRClusterTemperatureControl
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (void)setTemperatureWithParams:(MTRTemperatureControlClusterSetTemperatureParams *)params
+                  expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      completion:(MTRStatusCompletion)completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeTemperatureControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterTemperatureControlCommandSetTemperatureID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge = static_cast<MTRCommandSuccessCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                TemperatureControl::Commands::SetTemperature::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+                request.targetTemperature = params.targetTemperature.shortValue;
+                request.targetTemperatureLevel = params.targetTemperatureLevel.unsignedCharValue;
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeTemperatureSetpointWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeTemperatureSetpointID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMinTemperatureWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeMinTemperatureID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaxTemperatureWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeMaxTemperatureID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeStepWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeStepID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeCurrentTemperatureLevelIndexWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeCurrentTemperatureLevelIndexID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeSupportedTemperatureLevelsWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                     attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeSupportedTemperatureLevelsID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeGeneratedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeAcceptedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeClusterRevisionID)
+                                             params:params];
+}
+
+@end
+
+@implementation MTRClusterRefrigeratorAlarm
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (void)resetWithParams:(MTRRefrigeratorAlarmClusterResetParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(MTRStatusCompletion)completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeRefrigeratorAlarmID,
+                                     (unsigned int) MTRCommandIDTypeClusterRefrigeratorAlarmCommandResetID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge = static_cast<MTRCommandSuccessCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                RefrigeratorAlarm::Commands::Reset::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+                request.alarms = static_cast<std::remove_reference_t<decltype(request.alarms)>>(params.alarms.unsignedIntValue);
+                request.mask = static_cast<std::remove_reference_t<decltype(request.mask)>>(params.mask.unsignedIntValue);
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeMaskWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeMaskID)
+                                             params:params];
+}
+
+- (void)writeAttributeMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeMaskWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                             params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(_endpoint)
+                                    clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                  attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeMaskID)
+                                        value:dataValueDictionary
+                        expectedValueInterval:expectedValueIntervalMs
+                            timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLatchWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeLatchID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeStateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeStateID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeGeneratedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeAcceptedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeClusterRevisionID)
+                                             params:params];
+}
+
+@end
+
+@implementation MTRClusterDishwasherOperationalState
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     completion:(void (^)(MTRDishwasherOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
+{
+    [self pauseWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)pauseWithParams:(MTRDishwasherOperationalStateClusterPauseParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTRDishwasherOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDishwasherOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterDishwasherOperationalStateCommandPauseID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DishwasherOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge
+                    = static_cast<MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                DishwasherOperationalState::Commands::Pause::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)stopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completion:(void (^)(MTRDishwasherOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
+{
+    [self stopWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)stopWithParams:(MTRDishwasherOperationalStateClusterStopParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTRDishwasherOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDishwasherOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterDishwasherOperationalStateCommandStopID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DishwasherOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge
+                    = static_cast<MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                DishwasherOperationalState::Commands::Stop::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)startWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     completion:(void (^)(MTRDishwasherOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
+{
+    [self startWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)startWithParams:(MTRDishwasherOperationalStateClusterStartParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTRDishwasherOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDishwasherOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterDishwasherOperationalStateCommandStartID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DishwasherOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge
+                    = static_cast<MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                DishwasherOperationalState::Commands::Start::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)resumeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      completion:(void (^)(MTRDishwasherOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion
+{
+    [self resumeWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)resumeWithParams:(MTRDishwasherOperationalStateClusterResumeParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTRDishwasherOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDishwasherOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterDishwasherOperationalStateCommandResumeID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                DishwasherOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge
+                    = static_cast<MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                DishwasherOperationalState::Commands::Resume::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributePhaseListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeCurrentPhaseWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeCurrentPhaseID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeCountdownTimeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeCountdownTimeID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeOperationalStateListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                        attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeOperationalStateListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeOperationalStateWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                                     attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeOperationalStateID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeOperationalErrorWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                                     attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeOperationalErrorID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                        attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                        attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeClusterRevisionID)
+                                             params:params];
+}
+
+@end
+
+@implementation MTRClusterOperationalState
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
+{
+    [self pauseWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)pauseWithParams:(MTROperationalStateClusterPauseParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandPauseID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTROperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge = static_cast<MTROperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                OperationalState::Commands::Pause::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)stopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
+{
+    [self stopWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)stopWithParams:(MTROperationalStateClusterStopParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandStopID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTROperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge = static_cast<MTROperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                OperationalState::Commands::Stop::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)startWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
+{
+    [self startWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)startWithParams:(MTROperationalStateClusterStartParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandStartID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTROperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge = static_cast<MTROperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                OperationalState::Commands::Start::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)resumeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion
+{
+    [self resumeWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)resumeWithParams:(MTROperationalStateClusterResumeParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandResumeID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTROperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                OperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge = static_cast<MTROperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                OperationalState::Commands::Resume::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributePhaseListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeCurrentPhaseWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeCurrentPhaseID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeCountdownTimeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeCountdownTimeID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeOperationalStateListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeOperationalStateListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeOperationalStateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeOperationalStateID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeOperationalErrorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeOperationalErrorID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeGeneratedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeAcceptedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOperationalStateAttributeClusterRevisionID)
+                                             params:params];
+}
+
+@end
+
+@implementation MTRClusterRoboticVacuumOperationalState
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
+{
+    [self pauseWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)pauseWithParams:(MTRRoboticVacuumOperationalStateClusterPauseParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeRoboticVacuumOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterRoboticVacuumOperationalStateCommandPauseID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                RoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge
+                    = static_cast<MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                RoboticVacuumOperationalState::Commands::Pause::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)stopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                    completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                   NSError * _Nullable error))completion
+{
+    [self stopWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)stopWithParams:(MTRRoboticVacuumOperationalStateClusterStopParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeRoboticVacuumOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterRoboticVacuumOperationalStateCommandStopID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                RoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge
+                    = static_cast<MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                RoboticVacuumOperationalState::Commands::Stop::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)startWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                     completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completion
+{
+    [self startWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)startWithParams:(MTRRoboticVacuumOperationalStateClusterStartParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeRoboticVacuumOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterRoboticVacuumOperationalStateCommandStartID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                RoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge
+                    = static_cast<MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                RoboticVacuumOperationalState::Commands::Start::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)resumeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                      completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completion
+{
+    [self resumeWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)resumeWithParams:(MTRRoboticVacuumOperationalStateClusterResumeParams * _Nullable)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+               completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                              NSError * _Nullable error))completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeRoboticVacuumOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterRoboticVacuumOperationalStateCommandResumeID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                RoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                auto * typedBridge
+                    = static_cast<MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                Optional<uint16_t> timedInvokeTimeoutMs;
+                Optional<Timeout> invokeTimeout;
+                ListFreer listFreer;
+                RoboticVacuumOperationalState::Commands::Resume::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                if (params != nil) {
+                    if (params.serverSideProcessingTimeout != nil) {
+                        // Clamp to a number of seconds that will not overflow 32-bit
+                        // int when converted to ms.
+                        auto * serverSideProcessingTimeout
+                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+                    }
+                }
+
+                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
+                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (NSDictionary<NSString *, id> *)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributePhaseListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeCurrentPhaseWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeCurrentPhaseID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeCountdownTimeWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                                     attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeCountdownTimeID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeOperationalStateListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeOperationalStateListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeOperationalStateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeOperationalStateID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeOperationalErrorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeOperationalErrorID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeGeneratedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeAcceptedCommandListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                                     attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeAttributeListID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
+                                     attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeClusterRevisionID)
+                                          params:params];
+}
+
+@end
+
 @implementation MTRClusterDoorLock
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
