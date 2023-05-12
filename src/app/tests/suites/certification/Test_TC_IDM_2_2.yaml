@@ -580,7 +580,7 @@ tests:
           "TH sends the Read Request Message to the DUT to read an attribute
           which is not readable. DUT responds with the report data action."
       verification: |
-          DUT implementation required to verify read an attribute which is not having a read access 
+          DUT implementation required to verify read an attribute which is not having a read access
           If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
@@ -638,7 +638,7 @@ tests:
           [1659419722.671092][1915:1920] CHIP:DMG:         InteractionModelRevision = 1
           [1659419722.671120][1915:1920] CHIP:DMG: }
           [1659419722.671244][1915:1920] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on 
+          [1659419722.671314][1915:1920] CHIP:EM: Sending Standalone Ack for MessageCounter:153124628 on
 
 
 
@@ -728,7 +728,7 @@ tests:
 
            ./chip-tool identify read identify-time 1 1 --data-version 0xd7cb76c6
 
-          Verify on TH(chip-tool) that DUT should not send a report data action with the attribute value to the TH 
+          Verify on TH(chip-tool) that DUT should not send a report data action with the attribute value to the TH
 
           [1653633771.729259][9806:9811] CHIP:DMG: ReportDataMessage =
           [1653633771.729282][9806:9811] CHIP:DMG: {
@@ -796,7 +796,7 @@ tests:
 
            TH sends a below mentioned  second read request to read an attribute from the same cluster with the DataVersionFilter Field set with the dataversion value received before, and verify that DUT should send a report data action with the attribute value to the TH.
 
-           ./chip-tool identify read identify-time 1 1 --data-version 0xd7cb76c3 
+           ./chip-tool identify read identify-time 1 1 --data-version 0xd7cb76c3
 
           [1653633215.246620][9664:9669] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435654
           [1653633215.246671][9664:9669] CHIP:TOO:   identify time: 0
@@ -1051,7 +1051,7 @@ tests:
           spec can be chunked +"
       PICS: MCORE.IDM.S.LargeData
       verification: |
-          DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes) 
+          DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes)
           If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "\Not Applicable\"
       disabled: true
 
@@ -1106,7 +1106,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
 
 
-          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command 
+          To Setup the TH(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
           Here by sending below mentioned ACL command giving only access for ACL cluster(31), So except ACL cluster command if try to send any other command will get status as unsupported access
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[1,112233], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0

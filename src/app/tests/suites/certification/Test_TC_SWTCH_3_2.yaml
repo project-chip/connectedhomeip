@@ -204,7 +204,7 @@ tests:
           2. switch subscribe-event switch-latched 1 100 1 1
 
           Verify switch latched event has newposition set to 0 on DUT (chip-tool) logs:
-           
+
           [1659679766.774013][2535:2540] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659679766.774035][2535:2540] CHIP:TOO:          Event number: 3
           [1659679766.774055][2535:2540] CHIP:TOO:          Priority: Info

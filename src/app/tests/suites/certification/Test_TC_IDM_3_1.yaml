@@ -726,7 +726,7 @@ tests:
           [1655796724.512195][7331:7331] CHIP:DMG: },
           [1655796724.512344][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=o
 
-          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response  
+          If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
 
           [1657884369.932192][2923:2928] CHIP:DMG: WriteResponseMessage =
           [1657884369.932226][2923:2928] CHIP:DMG: {

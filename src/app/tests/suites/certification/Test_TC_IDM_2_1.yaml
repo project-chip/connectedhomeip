@@ -155,7 +155,7 @@ tests:
           send a report data action with the attribute value to the DUT."
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
-           
+
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0xFFFF
 
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command

@@ -31,8 +31,8 @@ tests:
       PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "Gaby sHoffman", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1 
-          ./chip-tv-casting-app contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "Gaby sHoffman", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1 
+          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "Gaby sHoffman", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "Gaby sHoffman", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
 
           On TH  verify the success response (value 0) received  from DUT
           [1651225059.893636][4190:4195] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002

@@ -1562,7 +1562,7 @@ tests:
           ./chip-tool operationalcredentials remove-fabric 1 1 0
 
           Verify that the TH receives RemoveFabric Command on TH(all-clusters-app) Log
-           
+
           [1666945062.193989][5129:5129] CHIP:EM: Handling via exchange: 55862r, Delegate: 0xaaaac10e0288
           [1666945062.194151][5129:5129] CHIP:DMG: InvokeRequestMessage =
           [1666945062.194246][5129:5129] CHIP:DMG: {
