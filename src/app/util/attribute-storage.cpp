@@ -878,7 +878,7 @@ static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEn
     return kEmberInvalidEndpointIndex;
 }
 
-uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster)
+uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
 {
     uint16_t epIndex = findIndexFromEndpoint(endpoint, true /*ignoreDisabledEndpoints*/);
 
@@ -889,6 +889,34 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
         {
             // The provided endpoint do not contain the given cluster server.
             return kEmberInvalidEndpointIndex;
+        }
+
+        if (epIndex < FIXED_ENDPOINT_COUNT)
+        {
+            // This endpoint is a fixed one.
+            // ajust the return index to be in the scope of the ClusterServer[0 to fixedClusterServerEndpointCount]
+            // in chronological order of appearance of the cluster server in the endpoint database
+            uint16_t ajustedEndpointIndex = 0;
+            for (uint16_t i = 0; i < epIndex; i++)
+            {
+                // increase ajustedEndpointIndex for every endpoint containing the cluster server
+                // before our endpoint of interest
+                if (emAfEndpoints[i].endpoint != kInvalidEndpointId &&
+                    (emberAfFindClusterInType(emAfEndpoints[i].endpointType, cluster, CLUSTER_MASK_SERVER) != nullptr))
+                {
+                    ajustedEndpointIndex++;
+                }
+            }
+
+            // If this asserts, The provided fixedClusterServerEndpointCount doesn't match the app data model"
+            VerifyOrDie(ajustedEndpointIndex < fixedClusterServerEndpointCount);
+            epIndex = ajustedEndpointIndex;
+        }
+        else
+        {
+            // This is a Dynamic endpoint
+            // ajust index after the fixedClusterServerEndpointCount index
+            epIndex = static_cast<uint16_t>(fixedClusterServerEndpointCount + (epIndex - FIXED_ENDPOINT_COUNT));
         }
     }
 
