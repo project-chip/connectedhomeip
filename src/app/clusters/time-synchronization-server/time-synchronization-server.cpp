@@ -327,26 +327,84 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(chip::EndpointId ep, uint64_t u
 
 CHIP_ERROR TimeSynchronizationServer::GetLocalTime(chip::EndpointId ep, uint64_t & localTime)
 {
-    int32_t timeZoneOffset = 0, dstOffset = 0;
+    uint64_t timeZoneOffset = 0, dstOffset = 0;
     System::Clock::Microseconds64 utcTime;
     ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
-    auto tz  = TimeSynchronizationServer::Instance().GetTimeZone().begin();
-    auto dst = TimeSynchronizationServer::Instance().GetDSTOffset().begin();
-    if (tz->validAt <= utcTime.count())
+    if (isTimeZoneAvailable())
     {
-        timeZoneOffset = tz->offset;
+        auto tz        = TimeSynchronizationServer::Instance().GetTimeZone().begin();
+        timeZoneOffset = chip::kMicrosecondsPerSecond * static_cast<uint64_t>(tz->offset);
     }
-    if (dst->validStarting <= utcTime.count())
+    if (isDSTOffsetAvailable())
     {
-        dstOffset = dst->offset;
+        auto dst  = TimeSynchronizationServer::Instance().GetDSTOffset().begin();
+        dstOffset = chip::kMicrosecondsPerSecond * static_cast<uint64_t>(dst->offset);
     }
-    localTime = (utcTime.count() + static_cast<uint64_t>(timeZoneOffset) + static_cast<uint64_t>(dstOffset));
+    localTime = utcTime.count() + timeZoneOffset + dstOffset;
     return CHIP_NO_ERROR;
 }
 
-void TimeSynchronizationServer::validateTimeZoneList() {}
+bool TimeSynchronizationServer::isTimeZoneAvailable()
+{
+    System::Clock::Microseconds64 utcTime;
+    auto tzList           = TimeSynchronizationServer::Instance().GetTimeZone();
+    uint8_t activeTzIndex = 0;
 
-void TimeSynchronizationServer::validateDSTOffsetList() {}
+    VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, false);
+    VerifyOrReturnValue(tzList.size() != 0, false);
+
+    for (uint8_t i = 0; i < tzList.size(); i++)
+    {
+        if (tzList[i].validAt != 0 && tzList[i].validAt <= utcTime.count())
+        {
+            tzList[i].validAt = 0;
+            activeTzIndex     = i;
+        }
+    }
+    if (activeTzIndex != 0)
+    {
+        mTimeZoneListSize    = (uint8_t) tzList.size() - activeTzIndex;
+        auto newTimeZoneList = tzList.SubSpan(activeTzIndex);
+        VerifyOrReturnValue(mTimeSyncDataProvider.StoreTimeZone(newTimeZoneList) == CHIP_NO_ERROR, false);
+        VerifyOrReturnValue(mTimeSyncDataProvider.LoadTimeZone(TimeSynchronizationServer::Instance().GetTimeZone(),
+                                                               mTimeZoneListSize) == CHIP_NO_ERROR,
+                            false);
+    }
+    return true;
+}
+
+bool TimeSynchronizationServer::isDSTOffsetAvailable()
+{
+    System::Clock::Microseconds64 utcTime;
+    uint8_t activeDstIndex = 0;
+    auto dstList           = TimeSynchronizationServer::Instance().GetDSTOffset();
+
+    VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, false);
+    VerifyOrReturnValue(dstList.size() != 0, false);
+
+    for (uint8_t i = 0; i < dstList.size(); i++)
+    {
+        if (dstList[i].validStarting <= utcTime.count())
+        {
+            activeDstIndex = i;
+        }
+    }
+    // if offset is zero and validUntil is null then no DST is used
+    if (dstList[activeDstIndex].offset == 0 && dstList[activeDstIndex].validUntil.IsNull())
+    {
+        return false;
+    }
+    if (activeDstIndex != 0)
+    {
+        mDstOffsetListSize    = (uint8_t) dstList.size() - activeDstIndex;
+        auto newDstOffsetList = dstList.SubSpan(activeDstIndex);
+        VerifyOrReturnValue(mTimeSyncDataProvider.StoreDSTOffset(newDstOffsetList) == CHIP_NO_ERROR, false);
+        VerifyOrReturnValue(mTimeSyncDataProvider.LoadDSTOffset(TimeSynchronizationServer::Instance().GetDSTOffset(),
+                                                                mDstOffsetListSize) == CHIP_NO_ERROR,
+                            false);
+    }
+    return true;
+}
 
 namespace {
 
