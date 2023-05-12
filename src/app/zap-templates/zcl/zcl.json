@@ -70,6 +70,7 @@
         "pwm-cluster.xml",
         "relative-humidity-measurement-cluster.xml",
         "scene.xml",
+        "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",
         "switch-cluster.xml",
         "target-navigator-cluster.xml",

@@ -3463,6 +3463,92 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::SmokeAlarm::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const SmokeCoAlarm::Events::COAlarm::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::LowBattery::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::HardwareFault::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::EndOfService::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::SelfTestComplete::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::AlarmMuted::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::MuteEnded::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::InterconnectSmokeAlarm::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::InterconnectCOAlarm::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const SmokeCoAlarm::Events::AllClear::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DoorLock::Events::DoorLockAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");

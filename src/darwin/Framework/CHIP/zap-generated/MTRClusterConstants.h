@@ -276,6 +276,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeProxyValidID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000044,
     MTRClusterIDTypeBooleanStateID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
+    MTRClusterIDTypeSmokeCOAlarmID MTR_NEWLY_AVAILABLE = 0x0000005C,
     MTRClusterIDTypeDoorLockID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000101,
     MTRClusterIDTypeWindowCoveringID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000102,
     MTRClusterIDTypeBarrierControlID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000103,
@@ -3646,6 +3647,30 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterModeSelectAttributeFeatureMapID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster SmokeCOAlarm attributes
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpressedStateID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSmokeStateID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeCOStateID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeBatteryAlertID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeDeviceMutedID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeTestInProgressID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeHardwareFaultAlertID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeEndOfServiceAlertID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectSmokeAlarmID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectCOAlarmID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeContaminationStateID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSensitivityLevelID MTR_NEWLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID MTR_NEWLY_AVAILABLE = 0x0000000C,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster DoorLock deprecated attribute names
@@ -8734,6 +8759,9 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterModeSelectCommandChangeToModeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000000,
 
+    // Cluster SmokeCOAlarm commands
+    MTRCommandIDTypeClusterSmokeCOAlarmCommandSelfTestRequestID MTR_NEWLY_AVAILABLE = 0x00000000,
+
     // Cluster DoorLock deprecated command id names
     MTRClusterDoorLockCommandLockDoorID MTR_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandLockDoorID",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -9850,6 +9878,19 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster BooleanState events
     MTREventIDTypeClusterBooleanStateEventStateChangeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000000,
+
+    // Cluster SmokeCOAlarm events
+    MTREventIDTypeClusterSmokeCOAlarmEventSmokeAlarmID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterSmokeCOAlarmEventCOAlarmID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterSmokeCOAlarmEventLowBatteryID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTREventIDTypeClusterSmokeCOAlarmEventHardwareFaultID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTREventIDTypeClusterSmokeCOAlarmEventEndOfServiceID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTREventIDTypeClusterSmokeCOAlarmEventSelfTestCompleteID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTREventIDTypeClusterSmokeCOAlarmEventAlarmMutedID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTREventIDTypeClusterSmokeCOAlarmEventMuteEndedID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTREventIDTypeClusterSmokeCOAlarmEventInterconnectSmokeAlarmID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTREventIDTypeClusterSmokeCOAlarmEventInterconnectCOAlarmID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTREventIDTypeClusterSmokeCOAlarmEventAllClearID MTR_NEWLY_AVAILABLE = 0x0000000A,
 
     // Cluster DoorLock deprecated event names
     MTRClusterDoorLockEventDoorLockAlarmID MTR_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventDoorLockAlarmID",
