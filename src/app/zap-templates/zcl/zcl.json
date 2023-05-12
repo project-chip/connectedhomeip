@@ -274,15 +274,9 @@
             "Lineup",
             "CurrentChannel"
         ],
-        "Media Playback": [
-            "SampledPosition"
-        ],
-        "Application Launcher": [
-            "CurrentApp"
-        ],
-        "Application Basic": [
-            "Application"
-        ],
+        "Media Playback": ["SampledPosition"],
+        "Application Launcher": ["CurrentApp"],
+        "Application Basic": ["Application"],
         "Time Synchronization": [
             "TrustedTimeSource",
             "DefaultNTP",
