@@ -23,9 +23,9 @@ namespace DeviceLayer {
 /**
  * @brief Initialisation function of the ICDEventManager.
  *        Init function MUST be called before using the object
- * 
+ *
  * @param icdManager pointer to the ICDManager object
- * @return CHIP_ERROR 
+ * @return CHIP_ERROR
  */
 CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
 {
@@ -46,14 +46,14 @@ CHIP_ERROR ICDEventManager::Shutdown()
 /**
  * @brief Event Handler callback given to the PlatformManager
  *        Function dispatchs the event to the ICDManager member
- * 
- * @param event 
- * @param arg 
+ *
+ * @param event
+ * @param arg
  */
 void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
     // TODO
 }
 
-} // namespace DeviceLaye
+} // namespace DeviceLayer
 } // namespace chip
