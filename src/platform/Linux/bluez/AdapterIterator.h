@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "lib/core/CHIPError.h"
+
 #include "Types.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -60,7 +62,7 @@ public:
 
 private:
     /// Sets up the DBUS manager and loads the list
-    void Initialize();
+    static CHIP_ERROR Initialize(AdapterIterator * self);
 
     /// Loads the next value in the list.
     ///
