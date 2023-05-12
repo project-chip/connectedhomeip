@@ -292,6 +292,12 @@
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_TEMPERATURE_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_TEMPERATURE_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER { chip::app::Clusters::TemperatureControl::Id, "Temperature Control" },
+#else
+#define CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER
+#endif
+
 #if defined(ZCL_USING_AIR_QUALITY_CLUSTER_SERVER) || defined(ZCL_USING_AIR_QUALITY_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER { chip::app::Clusters::AirQuality::Id, "Air Quality" },
 #else
@@ -619,6 +625,7 @@
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
