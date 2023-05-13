@@ -2001,6 +2001,57 @@ exit:
     return err;
 }
 
+namespace {
+CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certificate, MutableByteSpan & dn)
+{
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    int result                           = 1;
+    X509 * x509certificate               = nullptr;
+    auto * pCertificate                  = Uint8::to_const_uchar(certificate.data());
+    const unsigned char ** ppCertificate = &pCertificate;
+    X509_NAME * distinguishedName        = nullptr;
+    const uint8_t * pDistinguishedName   = nullptr;
+    size_t distinguishedNameLen          = 0;
+
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    x509certificate = d2i_X509(nullptr, ppCertificate, static_cast<long>(certificate.size()));
+    VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    if (extractSubject)
+    {
+        distinguishedName = X509_get_subject_name(x509certificate);
+    }
+    else
+    {
+        distinguishedName = X509_get_issuer_name(x509certificate);
+    }
+    VerifyOrExit(distinguishedName != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    result = X509_NAME_get0_der(distinguishedName, &pDistinguishedName, &distinguishedNameLen);
+    VerifyOrExit(result == 1, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(distinguishedNameLen <= dn.size(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(dn.data(), pDistinguishedName, distinguishedNameLen);
+    dn.reduce_size(distinguishedNameLen);
+
+exit:
+    X509_free(x509certificate);
+
+    return err;
+}
+} // namespace
+
+CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteSpan & subject)
+{
+    return ExtractRawDNFromX509Cert(true, certificate, subject);
+}
+
+CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer)
+{
+    return ExtractRawDNFromX509Cert(false, certificate, issuer);
+}
+
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)
 {
     ASN1_OBJECT * commonNameObj = OBJ_txt2obj("2.5.4.3", 1);
