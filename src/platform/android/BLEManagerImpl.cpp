@@ -125,7 +125,7 @@ void BLEManagerImpl::InitializeWithObject(jobject manager)
         env->ExceptionClear();
     }
 
-    mOnNewConnectionMethod = env->GetMethodID(BLEManagerClass, "onNewConnection", "(I)V");
+    mOnNewConnectionMethod = env->GetMethodID(BLEManagerClass, "onNewConnection", "(IZJJ)V");
     if (mOnNewConnectionMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access BLEManager 'onNewConnection' method");
@@ -186,16 +186,19 @@ bool BLEManagerImpl::_IsAdvertising()
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
+    ChipLogDetail(DeviceLayer, "%s, %u", __FUNCTION__, static_cast<uint8_t>(mode));
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
+    ChipLogDetail(DeviceLayer, "%s, %s", __FUNCTION__, buf);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
+    ChipLogDetail(DeviceLayer, "%s, %s", __FUNCTION__, deviceName);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -449,6 +452,18 @@ exit:
 
 // ===== start implement virtual methods on BleConnectionDelegate.
 
+void BLEManagerImpl::OnConnectSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)
+{
+    chip::DeviceLayer::StackLock lock;
+    BleConnectionDelegate::OnConnectionComplete(appState, connObj);
+}
+
+void BLEManagerImpl::OnConnectFailed(void * appState, CHIP_ERROR err)
+{
+    chip::DeviceLayer::StackLock lock;
+    BleConnectionDelegate::OnConnectionError(appState, err);
+}
+
 void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -474,7 +489,10 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     {
         discriminator = connDiscriminator.GetLongValue();
     }
-    env->CallVoidMethod(mBLEManagerObject, mOnNewConnectionMethod, static_cast<jint>(discriminator));
+
+    env->CallVoidMethod(mBLEManagerObject, mOnNewConnectionMethod, static_cast<jint>(discriminator),
+                        static_cast<jboolean>(connDiscriminator.IsShortDiscriminator()), reinterpret_cast<jlong>(this),
+                        reinterpret_cast<jlong>(appState));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:

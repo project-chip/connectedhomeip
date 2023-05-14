@@ -1,1 +1,1 @@
-0.7.5 Version bump reason: [OIS] Remove GCC toolchain
+0.7.9 Version bump reason: Fix path for sysroot for crosscompile image

@@ -15,13 +15,10 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_codegen.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/python.gni")
 
-import("${chip_root}/src/lib/core/core.gni")
-
 _app_root = get_path_info(".", "abspath")
-
-_zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 
 # Defines a source_set for CHIP data model.
 #
@@ -193,12 +190,9 @@ template("chip_data_model") {
     ]
 
     if (defined(invoker.zap_file)) {
-      _zap_path = rebase_path(invoker.zap_file, root_build_dir)
-      _script_path = rebase_path(_zap_cluster_list_script, root_build_dir)
-      _script_args = [ "--zap_file=" + _zap_path ]
-
-      _cluster_sources = exec_script("${build_root}/gn_run_binary.py",
-                                     [ _script_path ] + _script_args,
+      _zap_file = rebase_path(invoker.zap_file, root_build_dir)
+      _cluster_sources = exec_script("${_app_root}/zap_cluster_list.py",
+                                     [ "--zap_file=" + _zap_file ],
                                      "list lines",
                                      [ invoker.zap_file ])
     }
