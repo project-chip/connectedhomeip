@@ -1853,6 +1853,33 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-room-airconditioner</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Room Air Conditioner</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0072</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>ON_OFF</requireAttribute>
+                <requireCommand>Off</requireCommand>
+                <requireCommand>On</requireCommand>
+                <requireCommand>Toggle</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Scenes" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-all-clusters-app</name>
         <domain>CHIP</domain>
         <typeName>Matter All-clusters-app Server Example</typeName>

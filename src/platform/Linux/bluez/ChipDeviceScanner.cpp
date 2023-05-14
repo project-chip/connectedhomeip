@@ -141,6 +141,7 @@ exit:
 
 CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 {
+    assertChipStackLockedByCurrentThread();
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     mIsScanning = true; // optimistic, to allow all callbacks to check this
@@ -157,9 +158,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         return CHIP_ERROR_INTERNAL;
     }
 
-    DeviceLayer::PlatformMgr().LockChipStack();
     CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
-    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if (err != CHIP_NO_ERROR)
     {

@@ -61,14 +61,13 @@ NS_ASSUME_NONNULL_BEGIN
     MTR_NEWLY_AVAILABLE;
 
 /**
- * As above, but defaults to a 10-year validity period starting now.
+ * As above, but defaults to no expiration time.
  */
 + (MTRCertificateDERBytes _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
                                                  issuerID:(NSNumber * _Nullable)issuerID
                                                  fabricID:(NSNumber * _Nullable)fabricID
                                                     error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use the version that specifies an explicit validity period");
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Create an intermediate X.509 DER encoded certificate that has the
@@ -100,7 +99,7 @@ NS_ASSUME_NONNULL_BEGIN
     MTR_NEWLY_AVAILABLE;
 
 /**
- * As above, but defaults to a 10-year validity period starting now.
+ * As above, but defaults to no expiration time.
  */
 + (MTRCertificateDERBytes _Nullable)createIntermediateCertificate:(id<MTRKeypair>)rootKeypair
                                                   rootCertificate:(MTRCertificateDERBytes)rootCertificate
@@ -108,8 +107,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          issuerID:(NSNumber * _Nullable)issuerID
                                                          fabricID:(NSNumber * _Nullable)fabricID
                                                             error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use the version that specifies an explicit validity period");
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Create an X.509 DER encoded certificate that has the
@@ -147,7 +145,7 @@ NS_ASSUME_NONNULL_BEGIN
     MTR_NEWLY_AVAILABLE;
 
 /**
- * As above, but defaults to a 10-year validity period starting now.
+ * As above, but defaults to no expiration time.
  */
 + (MTRCertificateDERBytes _Nullable)createOperationalCertificate:(id<MTRKeypair>)signingKeypair
                                               signingCertificate:(MTRCertificateDERBytes)signingCertificate
@@ -156,8 +154,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           nodeID:(NSNumber *)nodeID
                                            caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use the version that specifies an explicit validity period");
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Check whether the given keypair's public key matches the given certificate's

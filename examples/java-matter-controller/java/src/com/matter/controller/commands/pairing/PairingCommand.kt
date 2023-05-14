@@ -18,6 +18,7 @@
 package com.matter.controller.commands.pairing
 
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.NetworkCredentials
 import com.matter.controller.commands.common.CredentialsIssuer
 import com.matter.controller.commands.common.IPAddress
 import com.matter.controller.commands.common.MatterCommand
@@ -225,6 +226,22 @@ abstract class PairingCommand(
 
   fun getTimeoutMillis(): Long {
     return timeoutMillis.get()
+  }
+
+  fun getOnboardingPayload(): String {
+    return onboardingPayload.toString()
+  }
+
+  fun getWifiNetworkCredentials(): NetworkCredentials {
+    return NetworkCredentials.forWiFi(NetworkCredentials.WiFiCredentials(ssid.toString(), password.toString()))
+  }
+
+  fun getThreadNetworkCredentials(): NetworkCredentials {
+    return NetworkCredentials.forThread(NetworkCredentials.ThreadCredentials(operationalDataset.toString().hexToByteArray()))
+  }
+
+  private fun String.hexToByteArray(): ByteArray {
+    return chunked(2).map { byteStr -> byteStr.toUByte(16).toByte() }.toByteArray()
   }
 
   companion object {

@@ -32,9 +32,6 @@
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/shell/Commands.h>
-#include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
