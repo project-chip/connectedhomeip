@@ -20,19 +20,21 @@
 // Prevent multiple inclusion
 #pragma once
 
-#include <app/util/endpoint-config-defines.h>
 #include <lib/core/CHIPConfig.h>
+#include <app/util/endpoint-config-defines.h>
+
 
 // Default values for the attributes longer than a pointer,
 // in a form of a binary blob
 // Separate block is generated for big-endian and little-endian cases.
 #if BIGENDIAN_CPU
-#define GENERATED_DEFAULTS                                                                                                         \
-    {}
+#define GENERATED_DEFAULTS { \
+}
+
 
 #else // !BIGENDIAN_CPU
-#define GENERATED_DEFAULTS                                                                                                         \
-    {}
+#define GENERATED_DEFAULTS { \
+}
 
 #endif // BIGENDIAN_CPU
 
@@ -40,13 +42,15 @@
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 0
-#define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
-    {}
+#define GENERATED_MIN_MAX_DEFAULTS { \
+}
+
 
 // This is an array of EmberAfAttributeMetadata structures.
 #define GENERATED_ATTRIBUTE_COUNT 0
-#define GENERATED_ATTRIBUTES                                                                                                       \
-    {}
+#define GENERATED_ATTRIBUTES { \
+}
+
 
 // clang-format off
 #define GENERATED_EVENT_COUNT 0
@@ -56,10 +60,13 @@
 // clang-format on
 
 // Cluster function static arrays
-#define GENERATED_FUNCTION_ARRAYS
+#define GENERATED_FUNCTION_ARRAYS   \
+
+
+
 
 // This is an array of EmberAfCluster structures.
-#define GENERATED_CLUSTER_COUNT 65
+#define GENERATED_CLUSTER_COUNT 66
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
@@ -531,6 +538,19 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: Smoke CO Alarm (client) */ \
+      .clusterId = 0x0000005C, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Door Lock (client) */ \
       .clusterId = 0x00000101, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -914,15 +934,17 @@
 #define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 0
 
 // This is an array of EmberAfEndpointType structures.
-#define GENERATED_ENDPOINT_TYPES                                                                                                   \
-    {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 65, 0 },                                                                                           \
-    }
+#define GENERATED_ENDPOINT_TYPES { \
+  { ZAP_CLUSTER_INDEX(0), 66, 0 }, \
+}
+
+
 
 // Largest attribute size is needed for various buffers
 #define ATTRIBUTE_LARGEST (1)
 
-static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE, "ATTRIBUTE_LARGEST larger than expected");
+static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
+              "ATTRIBUTE_LARGEST larger than expected");
 
 // Total size of singleton attributes
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
@@ -935,45 +957,23 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 
 // Array of endpoints that are supported, the data inside
 // the array is the endpoint number.
-#define FIXED_ENDPOINT_ARRAY                                                                                                       \
-    {                                                                                                                              \
-        0x0001                                                                                                                     \
-    }
+#define FIXED_ENDPOINT_ARRAY { 0x0001 }
 
 // Array of profile ids
-#define FIXED_PROFILE_IDS                                                                                                          \
-    {                                                                                                                              \
-        0x0103                                                                                                                     \
-    }
+#define FIXED_PROFILE_IDS { 0x0103 }
 
 // Array of device types
-#define FIXED_DEVICE_TYPES                                                                                                         \
-    {                                                                                                                              \
-        {                                                                                                                          \
-            0x0016, 1                                                                                                              \
-        }                                                                                                                          \
-    }
+#define FIXED_DEVICE_TYPES {{0x0016,1}}
 
 // Array of device type offsets
-#define FIXED_DEVICE_TYPE_OFFSETS                                                                                                  \
-    {                                                                                                                              \
-        0                                                                                                                          \
-    }
+#define FIXED_DEVICE_TYPE_OFFSETS { 0}
 
 // Array of device type lengths
-#define FIXED_DEVICE_TYPE_LENGTHS                                                                                                  \
-    {                                                                                                                              \
-        1                                                                                                                          \
-    }
+#define FIXED_DEVICE_TYPE_LENGTHS { 1}
 
 // Array of endpoint types supported on each endpoint
-#define FIXED_ENDPOINT_TYPES                                                                                                       \
-    {                                                                                                                              \
-        0                                                                                                                          \
-    }
+#define FIXED_ENDPOINT_TYPES { 0 }
 
 // Array of networks supported on each endpoint
-#define FIXED_NETWORKS                                                                                                             \
-    {                                                                                                                              \
-        0                                                                                                                          \
-    }
+#define FIXED_NETWORKS { 0 }
+
