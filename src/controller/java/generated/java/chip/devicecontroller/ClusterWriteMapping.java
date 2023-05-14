@@ -625,6 +625,26 @@ public class ClusterWriteMapping {
     writeModeSelectInteractionInfo.put(
         "writeOnModeAttribute", writeModeSelectOnModeAttributeInteractionInfo);
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
+    Map<String, InteractionInfo> writeSmokeCoAlarmInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeSmokeCoAlarmSensitivityLevelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo smokeCoAlarmsensitivityLevelCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeSmokeCoAlarmSensitivityLevelCommandParams.put(
+        "value", smokeCoAlarmsensitivityLevelCommandParameterInfo);
+    InteractionInfo writeSmokeCoAlarmSensitivityLevelAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .writeSensitivityLevelAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeSmokeCoAlarmSensitivityLevelCommandParams);
+    writeSmokeCoAlarmInteractionInfo.put(
+        "writeSensitivityLevelAttribute",
+        writeSmokeCoAlarmSensitivityLevelAttributeInteractionInfo);
+    writeAttributeMap.put("smokeCoAlarm", writeSmokeCoAlarmInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
