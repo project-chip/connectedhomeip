@@ -156,6 +156,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 
 @property (nonatomic) BOOL expirationCheckScheduled;
 
+// When a server reports its events with system up time, and implements UpTime in the GeneralDiagnostics cluster, this attribute
+// would be reported in the priming reports, and can be used to help estimate the system start time. When subscription established
+// event happens, this should be consulted to update estimatedStartTime if it exists.
+@property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
+
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -260,6 +265,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     _state = state;
     if (lastState != state) {
         if (state != MTRDeviceStateReachable) {
+            MTR_LOG_INFO("%@ Set estimated start time to nil due to state change", self);
             _estimatedStartTime = nil;
         }
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
@@ -277,6 +283,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 
     // reset subscription attempt wait time when subscription succeeds
     _lastSubscriptionAttemptWait = 0;
+
+    // Check if estimated system start time can be made better
+    if (_estimatedStartTimeFromGeneralDiagnosticsUpTime) {
+        if (!_estimatedStartTime
+            || ([_estimatedStartTimeFromGeneralDiagnosticsUpTime compare:_estimatedStartTime] == NSOrderedAscending)) {
+            MTR_LOG_INFO("%@ SubscriptionEstablished: update estimated start time %@ => %@", self, _estimatedStartTime,
+                _estimatedStartTimeFromGeneralDiagnosticsUpTime);
+            _estimatedStartTime = _estimatedStartTimeFromGeneralDiagnosticsUpTime;
+        }
+        _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
+    }
 
     [self _changeState:MTRDeviceStateReachable];
 
@@ -413,6 +430,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
         BOOL isStartUpEvent = (eventPath.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID)
             && (eventPath.event.unsignedLongValue == MTREventIDTypeClusterBasicInformationEventStartUpID);
         if (isStartUpEvent) {
+            MTR_LOG_INFO("%@ Set estimated start time to nil due to startup event", self);
             _estimatedStartTime = nil;
         }
 
@@ -947,6 +965,26 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                     MTR_LOG_INFO("%@ report %@ value filtered - same as expected values", self, attributePath);
                 } else {
                     MTR_LOG_INFO("%@ report %@ value filtered - same values as cache", self, attributePath);
+                }
+            }
+
+            // If General Diagnostics UpTime attribute, save the likely better estimated start time. At OnSubscriptionEstablished
+            // time, this estimate will be used if it's more accurate. Note that this needs to be done because the current SDK
+            // implementation reports events after attributes, and the system startup event resets the estimated start time.
+            if ((attributePath.cluster.unsignedLongValue == MTRClusterGeneralDiagnosticsID)
+                && (attributePath.attribute.unsignedLongValue == MTRClusterGeneralDiagnosticsAttributeUpTimeID)) {
+                // verify that the uptime is indeed the data type we want
+                if ([attributeDataValue[MTRTypeKey] isEqual:MTRUnsignedIntegerValueType]) {
+                    NSNumber * upTimeNumber = attributeDataValue[MTRValueKey];
+                    NSTimeInterval upTime = upTimeNumber.unsignedLongLongValue; // UpTime unit is defined as seconds in the spec
+                    NSDate * oldSystemStartTime = _estimatedStartTimeFromGeneralDiagnosticsUpTime;
+                    NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-upTime];
+                    if (!_estimatedStartTimeFromGeneralDiagnosticsUpTime
+                        || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
+                        MTR_LOG_INFO("%@ General Diagnostics UpTime %.3lf: estimated start time %@ => %@", self, upTime,
+                            oldSystemStartTime, potentialSystemStartTime);
+                        _estimatedStartTimeFromGeneralDiagnosticsUpTime = potentialSystemStartTime;
+                    }
                 }
             }
         }
