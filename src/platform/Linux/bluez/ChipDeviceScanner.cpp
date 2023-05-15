@@ -105,8 +105,7 @@ ChipDeviceScanner::~ChipDeviceScanner()
     StopScan();
 
     // mTimerExpired should only be set to true in the TimerExpiredCallback, which means we are in that callback
-    // right now so there is no need to cancel the timer. Doing so would result in deadlock trying to aquire the
-    // chip stack lock which we already currently have.
+    // right now so there is no need to cancel the timer.
     if (!mTimerExpired)
     {
         chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
