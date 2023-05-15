@@ -264,7 +264,8 @@ tests:
               isUpperCase: true
               isLowerCase: true
 
-    - label: "Write attribute CHAR_STRING Value with uppercase letters and symbols"
+    - label:
+          "Write attribute CHAR_STRING Value with uppercase letters and symbols"
       command: "writeAttribute"
       attribute: "char_string"
       arguments:
@@ -279,7 +280,8 @@ tests:
               isUpperCase: true
               isLowerCase: false
 
-    - label: "Write attribute CHAR_STRING Value with lowercase letters and symbols"
+    - label:
+          "Write attribute CHAR_STRING Value with lowercase letters and symbols"
       command: "writeAttribute"
       attribute: "char_string"
       arguments:
