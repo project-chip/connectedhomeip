@@ -29,7 +29,8 @@ using namespace chip::app::Clusters::TemperatureControl::Attributes;
 using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
-static Status setTemperatureHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, int16_t targetTemperature, int16_t targetTemperatureLevel);
+static Status setTemperatureHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                    int16_t targetTemperature, uint8_t targetTemperatureLevel);
 
 namespace {
 
@@ -40,10 +41,9 @@ public:
     TemperatureControlAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TemperatureControl::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
 };
 
-}
+} // namespace
 TemperatureControlAttrAccess gAttrAccess;
 
 CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -59,7 +59,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
 
     switch (aPath.mAttributeId)
     {
-    case TemperatureSetpoint::Id : {
+    case TemperatureSetpoint::Id: {
         int16_t tempSetpoint = 0;
         TemperatureSetpoint::Get(endpoint, &tempSetpoint);
         if (status == CHIP_NO_ERROR)
@@ -69,7 +69,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
         break;
     }
 
-    case MinTemperature::Id : {
+    case MinTemperature::Id: {
         int16_t minTemperature = 0;
         MinTemperature::Get(endpoint, &minTemperature);
         if (status == CHIP_NO_ERROR)
@@ -79,7 +79,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
         break;
     }
 
-    case MaxTemperature::Id : {
+    case MaxTemperature::Id: {
         int16_t maxTemperature = 0;
         MaxTemperature::Get(endpoint, &maxTemperature);
         if (status == CHIP_NO_ERROR)
@@ -89,7 +89,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
         break;
     }
 
-    case Step::Id : {
+    case Step::Id: {
         int16_t step = 0;
         Step::Get(endpoint, &step);
         if (status == CHIP_NO_ERROR)
@@ -99,7 +99,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
         break;
     }
 
-    case CurrentTemperatureLevelIndex::Id : {
+    case CurrentTemperatureLevelIndex::Id: {
         uint8_t currentTemperatureLevelIndex = 0;
         CurrentTemperatureLevelIndex::Get(endpoint, &currentTemperatureLevelIndex);
         if (status == CHIP_NO_ERROR)
@@ -126,36 +126,40 @@ bool TemperatureControlHasFeature(EndpointId endpoint, TemperatureControlFeature
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }
 
-static Status setTemperatureHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, int16_t targetTemperature, int16_t targetTemperatureLevel)
+static Status setTemperatureHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                    int16_t targetTemperature, uint8_t targetTemperatureLevel)
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    if (TemperatureControlHasFeature(endpoint, TemperatureControlFeature::kTemperatureNumber)) {
+    if (TemperatureControlHasFeature(endpoint, TemperatureControlFeature::kTemperatureNumber))
+    {
         int16_t minTemperature = 0;
         int16_t maxTemperature = 0;
         MinTemperature::Get(endpoint, &minTemperature);
         MaxTemperature::Get(endpoint, &maxTemperature);
-        if(targetTemperature < minTemperature || targetTemperature > maxTemperature){
+        if (targetTemperature < minTemperature || targetTemperature > maxTemperature)
+        {
             return Status::ConstraintError;
         }
         TemperatureSetpoint::Set(endpoint, targetTemperature);
     }
-    if (TemperatureControlHasFeature(endpoint, TemperatureControlFeature::kTemperatureLevel)) {
+    if (TemperatureControlHasFeature(endpoint, TemperatureControlFeature::kTemperatureLevel))
+    {
         // TODO: Check is targetTemperatureLevel is one of the SupportedTemperatureLevels
         CurrentTemperatureLevelIndex::Set(endpoint, targetTemperatureLevel);
-        
     }
     return Status::Success;
-    
 }
 /**********************************************************
  * Callbacks Implementation
  *********************************************************/
 
-bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, const Commands::SetTemperature::DecodableType & commandData)
+bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler * commandObj,
+                                                            const app::ConcreteCommandPath & commandPath,
+                                                            const Commands::SetTemperature::DecodableType & commandData)
 {
-    auto & targetTemperature        = commandData.targetTemperature;
-    auto & targetTemperatureLevel   = commandData.targetTemperatureLevel;
+    auto & targetTemperature      = commandData.targetTemperature;
+    auto & targetTemperatureLevel = commandData.targetTemperatureLevel;
 
     Status status = setTemperatureHandler(commandObj, commandPath, targetTemperature, targetTemperatureLevel);
     commandObj->AddStatus(commandPath, status);
