@@ -282,6 +282,15 @@ public:
     ~EthernetNetworkDiagnosticsCluster() {}
 };
 
+class DLL_EXPORT TimeSynchronizationCluster : public ClusterBase
+{
+public:
+    TimeSynchronizationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~TimeSynchronizationCluster() {}
+};
+
 class DLL_EXPORT BridgedDeviceBasicInformationCluster : public ClusterBase
 {
 public:
@@ -621,6 +630,15 @@ public:
         ClusterBase(exchangeManager, session, endpoint)
     {}
     ~ElectricalMeasurementCluster() {}
+};
+
+class DLL_EXPORT ClientMonitoringCluster : public ClusterBase
+{
+public:
+    ClientMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~ClientMonitoringCluster() {}
 };
 
 class DLL_EXPORT UnitTestingCluster : public ClusterBase

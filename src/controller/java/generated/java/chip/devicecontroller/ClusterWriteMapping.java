@@ -553,6 +553,8 @@ public class ClusterWriteMapping {
         new LinkedHashMap<>();
     writeAttributeMap.put(
         "ethernetNetworkDiagnostics", writeEthernetNetworkDiagnosticsInteractionInfo);
+    Map<String, InteractionInfo> writeTimeSynchronizationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("timeSynchronization", writeTimeSynchronizationInteractionInfo);
     Map<String, InteractionInfo> writeBridgedDeviceBasicInformationInteractionInfo =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeBridgedDeviceBasicInformationNodeLabelCommandParams =
@@ -2593,6 +2595,8 @@ public class ClusterWriteMapping {
         "writeAcOverloadAlarmsMaskAttribute",
         writeElectricalMeasurementAcOverloadAlarmsMaskAttributeInteractionInfo);
     writeAttributeMap.put("electricalMeasurement", writeElectricalMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeClientMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("clientMonitoring", writeClientMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeUnitTestingInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeUnitTestingBooleanCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
