@@ -15592,6 +15592,17 @@ public class ClusterReadMapping {
     result.put(
         "readExpectedClientsAttribute",
         readClientMonitoringExpectedClientsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readClientMonitoringICDCounterCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readClientMonitoringICDCounterAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ClientMonitoringCluster) cluster)
+                  .readICDCounterAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readClientMonitoringICDCounterCommandParams);
+    result.put("readICDCounterAttribute", readClientMonitoringICDCounterAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readClientMonitoringGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readClientMonitoringGeneratedCommandListAttributeInteractionInfo =
