@@ -3,6 +3,7 @@
 #import "MTRCallbackBridge.h"
 #import "MTRStructsObjc.h"
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRCommandPayloads_Internal.h"
 
 #include <lib/support/TypeTraits.h>
 
