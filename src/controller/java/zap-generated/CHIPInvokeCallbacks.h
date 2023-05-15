@@ -687,22 +687,6 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPClientMonitoringClusterRegisterClientMonitoringResponseCallback
-    : public Callback::Callback<CHIPClientMonitoringClusterRegisterClientMonitoringResponseCallbackType>
-{
-public:
-    CHIPClientMonitoringClusterRegisterClientMonitoringResponseCallback(jobject javaCallback);
-
-    ~CHIPClientMonitoringClusterRegisterClientMonitoringResponseCallback();
-
-    static void
-    CallbackFn(void * context,
-               const chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoringResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
 class CHIPUnitTestingClusterTestSpecificResponseCallback
     : public Callback::Callback<CHIPUnitTestingClusterTestSpecificResponseCallbackType>
 {

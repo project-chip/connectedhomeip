@@ -12142,129 +12142,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedClientMonitoringClusterExpectedClientsAttributeCallback
-      implements ChipClusters.ClientMonitoringCluster.ExpectedClientsAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(
-        List<ChipStructs.ClientMonitoringClusterMonitoringRegistrationStruct> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo(
-              "valueList", "List<ChipStructs.ClientMonitoringClusterMonitoringRegistrationStruct>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedClientMonitoringClusterGeneratedCommandListAttributeCallback
-      implements ChipClusters.ClientMonitoringCluster.GeneratedCommandListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedClientMonitoringClusterAcceptedCommandListAttributeCallback
-      implements ChipClusters.ClientMonitoringCluster.AcceptedCommandListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedClientMonitoringClusterEventListAttributeCallback
-      implements ChipClusters.ClientMonitoringCluster.EventListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedClientMonitoringClusterAttributeListAttributeCallback
-      implements ChipClusters.ClientMonitoringCluster.AttributeListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Long> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedUnitTestingClusterTestSpecificResponseCallback
       implements ChipClusters.UnitTestingCluster.TestSpecificResponseCallback,
           DelegatedClusterCallback {
@@ -13833,11 +13710,6 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.ElectricalMeasurementCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("electricalMeasurement", electricalMeasurementClusterInfo);
-    ClusterInfo clientMonitoringClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.ClientMonitoringCluster(ptr, endpointId),
-            new HashMap<>());
-    clusterMap.put("clientMonitoring", clientMonitoringClusterInfo);
     ClusterInfo unitTestingClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.UnitTestingCluster(ptr, endpointId),
@@ -13937,7 +13809,6 @@ public class ClusterInfoMapping {
     destination.get("applicationBasic").combineCommands(source.get("applicationBasic"));
     destination.get("accountLogin").combineCommands(source.get("accountLogin"));
     destination.get("electricalMeasurement").combineCommands(source.get("electricalMeasurement"));
-    destination.get("clientMonitoring").combineCommands(source.get("clientMonitoring"));
     destination.get("unitTesting").combineCommands(source.get("unitTesting"));
   }
 
@@ -18170,35 +18041,6 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> electricalMeasurementClusterInteractionInfoMap =
         new LinkedHashMap<>();
     commandMap.put("electricalMeasurement", electricalMeasurementClusterInteractionInfoMap);
-    Map<String, InteractionInfo> clientMonitoringClusterInteractionInfoMap = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> clientMonitoringregisterClientMonitoringCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo clientMonitoringregisterClientMonitoringclientNodeIDCommandParameterInfo =
-        new CommandParameterInfo("clientNodeID", Long.class, Long.class);
-    clientMonitoringregisterClientMonitoringCommandParams.put(
-        "clientNodeID", clientMonitoringregisterClientMonitoringclientNodeIDCommandParameterInfo);
-
-    CommandParameterInfo clientMonitoringregisterClientMonitoringkeyCommandParameterInfo =
-        new CommandParameterInfo("key", byte[].class, byte[].class);
-    clientMonitoringregisterClientMonitoringCommandParams.put(
-        "key", clientMonitoringregisterClientMonitoringkeyCommandParameterInfo);
-
-    InteractionInfo clientMonitoringregisterClientMonitoringInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.ClientMonitoringCluster) cluster)
-                  .registerClientMonitoring(
-                      (ChipClusters.ClientMonitoringCluster
-                              .RegisterClientMonitoringResponseCallback)
-                          callback,
-                      (Long) commandArguments.get("clientNodeID"),
-                      (byte[]) commandArguments.get("key"));
-            },
-            () -> new DelegatedClientMonitoringClusterRegisterClientMonitoringResponseCallback(),
-            clientMonitoringregisterClientMonitoringCommandParams);
-    clientMonitoringClusterInteractionInfoMap.put(
-        "registerClientMonitoring", clientMonitoringregisterClientMonitoringInteractionInfo);
-    commandMap.put("clientMonitoring", clientMonitoringClusterInteractionInfoMap);
     Map<String, InteractionInfo> unitTestingClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> unitTestingtestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

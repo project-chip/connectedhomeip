@@ -1995,36 +1995,6 @@ public class ChipStructs {
     }
   }
 
-  public static class ClientMonitoringClusterMonitoringRegistrationStruct {
-    public Long clientNodeID;
-    public byte[] key;
-    public Integer fabricIndex;
-
-    public ClientMonitoringClusterMonitoringRegistrationStruct(
-        Long clientNodeID, byte[] key, Integer fabricIndex) {
-      this.clientNodeID = clientNodeID;
-      this.key = key;
-      this.fabricIndex = fabricIndex;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("ClientMonitoringClusterMonitoringRegistrationStruct {\n");
-      output.append("\tclientNodeID: ");
-      output.append(clientNodeID);
-      output.append("\n");
-      output.append("\tkey: ");
-      output.append(Arrays.toString(key));
-      output.append("\n");
-      output.append("\tfabricIndex: ");
-      output.append(fabricIndex);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
   public static class UnitTestingClusterSimpleStruct {
     public Integer a;
     public Boolean b;
