@@ -128,7 +128,6 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
         commandObj->AddStatus(commandPath, Status::Failure);
         return false;
     }
-
     if (TemperatureControlHasFeature(endpoint, TemperatureControl::Feature::kTemperatureNumber))
     {
         if (targetTemperature.HasValue())
