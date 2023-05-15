@@ -294,8 +294,8 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(uint16_t conn_id, uint16_t disc_c
     }
 
     ChipDeviceEvent event;
-    event.Type = DeviceEventType::kCHIPoBLEConnectionError;
-    event.CHIPoBLEConnectionError.ConId = conn_id;
+    event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
+    event.CHIPoBLEConnectionError.ConId  = conn_id;
     event.CHIPoBLEConnectionError.Reason = disconReason;
     PlatformMgr().PostEventOrDie(&event);
 
