@@ -1583,6 +1583,13 @@ enum class SensitivityEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
+
+// Bitmap for SmokeCOFeature
+enum class SmokeCOFeature : uint32_t
+{
+    kSmoke = 0x1,
+    kCo    = 0x2,
+};
 } // namespace SmokeCoAlarm
 
 namespace DoorLock {

@@ -20428,6 +20428,11 @@ typedef NS_ENUM(uint8_t, MTRSmokeCOAlarmSensitivity) {
     MTRSmokeCOAlarmSensitivityLow MTR_NEWLY_AVAILABLE = 0x02,
 } MTR_NEWLY_AVAILABLE;
 
+typedef NS_OPTIONS(uint32_t, MTRSmokeCOAlarmSmokeCOFeature) {
+    MTRSmokeCOAlarmSmokeCOFeatureSMOKE MTR_NEWLY_AVAILABLE = 0x1,
+    MTRSmokeCOAlarmSmokeCOFeatureCO MTR_NEWLY_AVAILABLE = 0x2,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDoorLockAlarmCode) {
     MTRDoorLockAlarmCodeLockJammed API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
     MTRDoorLockAlarmCodeLockFactoryReset API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x01,

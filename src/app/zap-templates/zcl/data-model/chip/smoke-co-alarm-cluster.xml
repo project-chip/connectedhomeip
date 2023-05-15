@@ -33,6 +33,8 @@ limitations under the License.
 
     <!-- Current cluster version -->
     <globalAttribute side="either" code="0xFFFD" value="1" />
+    <!-- Cluster feature map -->
+    <globalAttribute side="server" code="0xFFFC" type="SmokeCOFeature" value="1" />
 
     <!-- Attributes -->
     <attribute side="server" code="0x0000" define="EXPRESSED_STATE" type="ExpressedStateEnum" writable="false" optional="false">ExpressedState</attribute>
@@ -142,4 +144,10 @@ limitations under the License.
     <item value="3" name="Warning" />
     <item value="4" name="Critical" />
   </enum>
+
+  <bitmap name="SmokeCOFeature" type="BITMAP32">
+    <cluster code="0x005C" />
+    <field name="SMOKE" mask="0x01" />
+    <field name="CO" mask="0x02" />
+  </bitmap>
 </configurator>

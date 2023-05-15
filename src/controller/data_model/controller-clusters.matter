@@ -2583,6 +2583,11 @@ client cluster SmokeCoAlarm = 92 {
     kLow = 2;
   }
 
+  bitmap SmokeCOFeature : BITMAP32 {
+    kSmoke = 0x1;
+    kCo = 0x2;
+  }
+
   info event SmokeAlarm = 0 {
   }
 

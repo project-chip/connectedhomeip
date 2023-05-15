@@ -14897,6 +14897,11 @@ class SmokeCoAlarm(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
 
+    class Bitmaps:
+        class SmokeCOFeature(IntFlag):
+            kSmoke = 0x1
+            kCo = 0x2
+
     class Commands:
         @dataclass
         class SelfTestRequest(ClusterCommand):
