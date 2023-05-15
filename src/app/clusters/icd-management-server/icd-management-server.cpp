@@ -109,7 +109,7 @@ InteractionModel::Status IcdManagementServer::StayActiveRequest(const chip::app:
 //==============================================================================
 
 /**
- * @brief Client Monitoring Cluster RegisterClient Command callback (from client)
+ * @brief ICD Management Cluster RegisterClient Command callback (from client)
  *
  */
 bool emberAfIcdManagementClusterRegisterClientCallback(
@@ -124,7 +124,7 @@ bool emberAfIcdManagementClusterRegisterClientCallback(
 }
 
 /**
- * @brief Client Monitoring Cluster UregisterClient Command callback (from client)
+ * @brief ICD Management Cluster UnregisterClient Command callback (from client)
  *
  */
 bool emberAfIcdManagementClusterUnregisterClientCallback(
@@ -139,7 +139,7 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(
 }
 
 /**
- * @brief Client Monitoring Cluster StayActiveRequest Command callback (from client)
+ * @brief ICD Management Cluster StayActiveRequest Command callback (from client)
  */
 bool emberAfIcdManagementClusterStayActiveRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
