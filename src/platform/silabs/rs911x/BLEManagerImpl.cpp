@@ -673,17 +673,10 @@ int32_t BLEManagerImpl::SendBLEAdvertisementCommand(void)
     ble_adv.filter_type      = RSI_BLE_ADV_FILTER_TYPE;
     ble_adv.direct_addr_type = RSI_BLE_ADV_DIR_ADDR_TYPE;
     rsi_ascii_dev_address_to_6bytes_rev(ble_adv.direct_addr, (int8_t *) RSI_BLE_ADV_DIR_ADDR);
-    if (ble_adv.adv_int_min == 0)
-    {
-        ble_adv.adv_int_min = RSI_BLE_ADV_INT_MIN;
-    }
-    if (ble_adv.adv_int_max == 0)
-    {
-        ble_adv.adv_int_max = RSI_BLE_ADV_INT_MAX;
-    }
+    ble_adv.adv_int_min = RSI_BLE_ADV_INT_MIN;
+    ble_adv.adv_int_max = RSI_BLE_ADV_INT_MAX;
     ble_adv.own_addr_type   = LE_RANDOM_ADDRESS;
     ble_adv.adv_channel_map = RSI_BLE_ADV_CHANNEL_MAP;
-
     return rsi_ble_start_advertising_with_values(&ble_adv);
 }
 
