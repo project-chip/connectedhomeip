@@ -216,6 +216,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagem
 
 static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request,
                         Json::Value & value);
 
@@ -301,12 +307,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLaun
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistrationStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistrationStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,
                         Json::Value & value);

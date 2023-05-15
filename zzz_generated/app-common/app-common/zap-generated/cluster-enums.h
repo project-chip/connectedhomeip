@@ -1486,6 +1486,15 @@ namespace ProxyValid {} // namespace ProxyValid
 
 namespace BooleanState {} // namespace BooleanState
 
+namespace IcdManagement {
+
+// Bitmap for ICDManagementFeature
+enum class ICDManagementFeature : uint32_t
+{
+    kCheckInProtocolSupport = 0x1,
+};
+} // namespace IcdManagement
+
 namespace ModeSelect {
 
 // Bitmap for ModeSelectFeature
@@ -3341,8 +3350,6 @@ enum class ApplicationStatusEnum : uint8_t
 namespace AccountLogin {} // namespace AccountLogin
 
 namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
-
-namespace ClientMonitoring {} // namespace ClientMonitoring
 
 namespace UnitTesting {
 
