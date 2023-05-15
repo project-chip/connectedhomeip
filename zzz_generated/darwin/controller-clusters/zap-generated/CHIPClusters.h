@@ -357,6 +357,15 @@ public:
     ~BooleanStateCluster() {}
 };
 
+class DLL_EXPORT IcdManagementCluster : public ClusterBase
+{
+public:
+    IcdManagementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~IcdManagementCluster() {}
+};
+
 class DLL_EXPORT ModeSelectCluster : public ClusterBase
 {
 public:
