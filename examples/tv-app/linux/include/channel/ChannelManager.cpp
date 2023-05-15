@@ -178,7 +178,7 @@ bool ChannelManager::HandleSkipChannel(const int16_t & count)
         newChannelIndex = newChannelIndex % channelsSize;
     }
 
-    // handle smaller than 0 
+    // handle smaller than 0
     if (newChannelIndex < 0)
     {
         newChannelIndex = channelsSize + (newChannelIndex % channelsSize);
