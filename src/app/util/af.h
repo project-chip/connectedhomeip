@@ -217,9 +217,9 @@ uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::
  * emberAfGetClusterServerEndpointIndex(9, X) returns 2. (fixedClusterServerEndpointCount{2} + DynamicEndpointIndex {0}).
  * and emberAfGetClusterServerEndpointIndex(7, X) still returns 3
  *
- * @param endpoint: Endpoint number
- * @param cluster: Id the of the Cluster server you are interrested on
- * @param fixedClusterServerEndpointCount: The amount of Fixed endpoints containing this cluster server
+ * @param endpoint Endpoint number
+ * @param cluster Id the of the Cluster server you are interrested on
+ * @param fixedClusterServerEndpointCount The amount of Fixed endpoints containing this cluster server
  */
 uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                               uint16_t fixedClusterServerEndpointCount);
