@@ -117,3 +117,56 @@ tests:
           values:
               - name: "Count"
                 value: 1
+
+    - label: "Verify that Skip Channel Command set correct current channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 1,
+                  Name: "PBS",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    - label: "Skip Channel Command"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 108
+
+    - label: "Verify that Skip Channel Command set correct current channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 1,
+                  Name: "PBS",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }
+
+    - label: "Skip Channel Command"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: -18
+
+    - label: "Verify that Skip Channel Command set correct current channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 9,
+                  MinorNumber: 3,
+                  Name: "World Channel",
+                  CallSign: "KCTS-TV",
+                  AffiliateCallSign: "KCTS",
+              }

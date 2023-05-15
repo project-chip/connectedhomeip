@@ -169,9 +169,18 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
 
 bool ChannelManager::HandleSkipChannel(const int16_t & count)
 {
-    // TODO: Insert code here
-    uint16_t newChannelIndex = static_cast<uint16_t>((count + mCurrentChannelIndex) % mChannels.size());
-    mCurrentChannelIndex     = newChannelIndex;
+    int16_t newChannelIndex  = count + static_cast<int16_t>(mCurrentChannelIndex);
+    int16_t channelsSize = static_cast<int16_t>(mChannels.size());
+
+    if (newChannelIndex >= channelsSize) {
+        newChannelIndex = newChannelIndex % channelsSize;
+    }
+
+    if (newChannelIndex < 0) {
+        newChannelIndex = channelsSize + (newChannelIndex % channelsSize);
+    }
+
+    mCurrentChannelIndex     = static_cast<uint16_t>(newChannelIndex);
     mCurrentChannel          = mChannels[mCurrentChannelIndex];
     return true;
 }
