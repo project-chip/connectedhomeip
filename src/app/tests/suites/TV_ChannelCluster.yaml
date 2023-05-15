@@ -145,8 +145,8 @@ tests:
           value:
               {
                   MajorNumber: 9,
-                  MinorNumber: 2,
-                  Name: "PBS Kids",
+                  MinorNumber: 1,
+                  Name: "PBS",
                   CallSign: "KCTS-TV",
                   AffiliateCallSign: "KCTS",
               }
