@@ -125,8 +125,8 @@ tests:
           value:
               {
                   MajorNumber: 9,
-                  MinorNumber: 1,
-                  Name: "PBS",
+                  MinorNumber: 2,
+                  Name: "PBS Kids",
                   CallSign: "KCTS-TV",
                   AffiliateCallSign: "KCTS",
               }
@@ -136,7 +136,7 @@ tests:
       arguments:
           values:
               - name: "Count"
-                value: 108
+                value: 123
 
     - label: "Verify that Skip Channel Command set correct current channel"
       command: "readAttribute"
@@ -145,8 +145,8 @@ tests:
           value:
               {
                   MajorNumber: 9,
-                  MinorNumber: 1,
-                  Name: "PBS",
+                  MinorNumber: 2,
+                  Name: "PBS Kids",
                   CallSign: "KCTS-TV",
                   AffiliateCallSign: "KCTS",
               }
@@ -156,7 +156,7 @@ tests:
       arguments:
           values:
               - name: "Count"
-                value: -18
+                value: -123
 
     - label: "Verify that Skip Channel Command set correct current channel"
       command: "readAttribute"
@@ -165,8 +165,8 @@ tests:
           value:
               {
                   MajorNumber: 9,
-                  MinorNumber: 3,
-                  Name: "World Channel",
+                  MinorNumber: 2,
+                  Name: "PBS Kids",
                   CallSign: "KCTS-TV",
                   AffiliateCallSign: "KCTS",
               }
