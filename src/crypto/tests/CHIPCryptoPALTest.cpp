@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -2133,6 +2133,47 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestSerialNumber_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct SerialNumberTestCase
+    {
+        uint8_t Cert;
+        ByteSpan mExpectedResult;
+    };
+
+    const uint8_t serialNumberRoot01[]    = { 0x53, 0x4c, 0x45, 0x82, 0x73, 0x62, 0x35, 0x14 };
+    const uint8_t serialNumberICA01[]     = { 0x69, 0xd8, 0x6a, 0x8d, 0x80, 0xfc, 0x8f, 0x5d };
+    const uint8_t serialNumberNode02_08[] = { 0x3e, 0x67, 0x94, 0x70, 0x7a, 0xec, 0xb8, 0x15 };
+
+    // clang-format off
+    static SerialNumberTestCase sSerialNumberTestCases[] = {
+        // Cert                    Expected Output
+        // ====================================================
+        {  TestCert::kRoot01,      ByteSpan(serialNumberRoot01) },
+        {  TestCert::kICA01,       ByteSpan(serialNumberICA01) },
+        {  TestCert::kNode02_08,   ByteSpan(serialNumberNode02_08) },
+    };
+    // clang-format on
+
+    for (auto & testCase : sSerialNumberTestCases)
+    {
+        ByteSpan cert;
+        err = GetTestCert(testCase.Cert, TestCertLoadFlags::kDERForm, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
+        MutableByteSpan serialNumber(serialNumberBuf);
+        err = ExtractSerialNumberFromX509Cert(cert, serialNumber);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, serialNumber.data_equal(testCase.mExpectedResult));
+    }
+}
+
 static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
@@ -2560,6 +2601,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test x509 Certificate Timestamp Validation", TestX509_IssuingTimestampValidation),
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
+    NL_TEST_DEF("Test Serial Number Extraction from x509 Certificate", TestSerialNumber_x509Extraction),
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from Attribute String", TestVIDPID_StringExtraction),
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from x509 Attestation Certificate", TestVIDPID_x509Extraction),
     NL_TEST_DEF("Test Replace Resigned Certificate Version if Found", TestX509_ReplaceCertIfResignedCertFound),
