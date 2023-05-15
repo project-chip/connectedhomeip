@@ -1493,6 +1493,9 @@ server cluster IcdManagement = 70 {
   readonly attribute int32u idleModeInterval = 0;
   readonly attribute int32u activeModeInterval = 1;
   readonly attribute int16u activeModeThreshold = 2;
+  readonly attribute access(read: administer) MonitoringRegistrationStruct registeredClients[] = 3;
+  readonly attribute access(read: administer) int32u ICDCounter = 4;
+  readonly attribute int16u clientsSupportedPerFabric = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2024,11 +2027,14 @@ endpoint 0 {
     ram      attribute idleModeInterval default = 500;
     ram      attribute activeModeInterval default = 300;
     ram      attribute activeModeThreshold default = 300;
+    callback attribute registeredClients;
+    ram      attribute ICDCounter;
+    ram      attribute clientsSupportedPerFabric default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 }
