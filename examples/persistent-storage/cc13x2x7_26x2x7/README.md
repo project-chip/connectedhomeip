@@ -64,8 +64,7 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
         packaged with the TI SDK. Check the following section for a list of
         changes needed.
 
--   Download and install [SysConfig][sysconfig] ([recommended
-    version][sysconfig_recommended])
+-   Download and install [SysConfig][sysconfig].
 
     -   This may have already been installed with your SimpleLink SDK install.
 
@@ -252,7 +251,5 @@ Additionally, we welcome any feedback.
 [e2e]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
-[sysconfig_recommended]:
-    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.10.0_2163-setup.run
 [ti_cc13x2_26x2_r7_matter_request]: https://ti.com/chip_sdk
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH
