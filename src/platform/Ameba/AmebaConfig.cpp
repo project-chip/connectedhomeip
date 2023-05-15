@@ -22,6 +22,7 @@
 #include <core/CHIPEncoding.h>
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/AmebaUtils.h>
+#include <platform/Ameba/KeyValueStoreManagerImpl.h>
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
@@ -35,6 +36,8 @@ enum
     kPrefsTypeBuffer  = 4,
     kPrefsTypeBinary  = 5
 };
+
+using namespace chip::DeviceLayer::PersistedStorage;
 
 namespace chip {
 namespace DeviceLayer {
@@ -178,6 +181,16 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, bool val)
         value = 1;
     else
         value = 0;
+
+    if (checkExist(key.Name, key.Name))
+    {
+        err = ClearConfigValue(key);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old KVS value");
+        }
+    }
+    
     error = setPref_new(key.Namespace, key.Name, &value, 1);
     err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
     if (err != CHIP_NO_ERROR)
@@ -199,6 +212,15 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint32_t val)
     CHIP_ERROR err;
     int32_t error;
 
+    if (checkExist(key.Name, key.Name))
+    {
+        err = ClearConfigValue(key);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old KVS value");
+        }
+    }
+    
     error = setPref_new(key.Namespace, key.Name, (uint8_t *) &val, sizeof(uint32_t));
     err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
     if (err != CHIP_NO_ERROR)
@@ -220,6 +242,15 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint64_t val)
     CHIP_ERROR err;
     int32_t error;
 
+    if (checkExist(key.Name, key.Name))
+    {
+        err = ClearConfigValue(key);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old KVS value");
+        }
+    }
+    
     error = setPref_new(key.Namespace, key.Name, (uint8_t *) &val, sizeof(uint64_t));
     err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
     if (err != CHIP_NO_ERROR)
@@ -241,6 +272,15 @@ CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str)
     CHIP_ERROR err;
     int32_t error;
 
+    if (checkExist(key.Name, key.Name))
+    {
+        err = ClearConfigValue(key);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old KVS value");
+        }
+    }
+    
     error = setPref_new(key.Namespace, key.Name, (uint8_t *) str, strlen(str) + 1);
     err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
     if (err != CHIP_NO_ERROR)
@@ -278,6 +318,15 @@ CHIP_ERROR AmebaConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_
     CHIP_ERROR err;
     int32_t error;
 
+    if (checkExist(key.Name, key.Name))
+    {
+        err = ClearConfigValue(key);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old KVS value");
+        }
+    }
+    
     error = setPref_new(key.Namespace, key.Name, (uint8_t *) data, dataLen);
     err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
     if (err != CHIP_NO_ERROR)
