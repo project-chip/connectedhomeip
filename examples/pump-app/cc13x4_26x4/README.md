@@ -53,8 +53,8 @@ Some initial setup is necessary for preparing the build environment. This
 section will need to be done when migrating to new versions of the SDK. This
 guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
--   Download and install [SysConfig][sysconfig].
-    This can be done simply with the following commands.
+-   Download and install [SysConfig][sysconfig]. This can be done simply with
+    the following commands.
 
     ```
     $ cd ~
