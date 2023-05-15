@@ -146,7 +146,7 @@ limitations under the License.
       <description>
         The command is generated in response to a received unicast AddScene command,
       </description>
-      <arg name="Status" type="ENUM8"/>
+      <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="INT8U"/>
     </command>
@@ -155,7 +155,7 @@ limitations under the License.
       <description>
         The command is generated in response to a received unicast ViewScene command 
       </description>
-      <arg name="Status" type="ENUM8"/>
+      <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U" optional="true"/>
@@ -167,7 +167,7 @@ limitations under the License.
       <description>
         The command is generated in response to a received unicast RemoveScene command
       </description>
-      <arg name="Status" type="ENUM8"/>
+      <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="INT8U"/>
     </command>
@@ -176,7 +176,7 @@ limitations under the License.
       <description>
         The command is generated in response to a received unicast RemoveAllScenes command
       </description>
-      <arg name="Status" type="ENUM8"/>
+      <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
     </command>
     
@@ -184,7 +184,7 @@ limitations under the License.
       <description>
         The command is generated in response to a received unicast StoreScene command
       </description>
-      <arg name="Status" type="ENUM8"/>
+      <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="INT8U"/>
     </command>
@@ -193,7 +193,7 @@ limitations under the License.
       <description>
         The command is generated in response to a received unicast GetSceneMembership command
       </description>
-      <arg name="Status" type="ENUM8"/>
+      <arg name="Status" type="status"/>
       <arg name="Capacity" type="INT8U" isNullable="true"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneList" type="INT8U" array="true" optional="true"/>
@@ -203,7 +203,7 @@ limitations under the License.
       <description>
         The command is generated in response to a received unicast EnhancedAddScene command
       </description>
-      <arg name="Status" type="ENUM8"/>
+      <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="INT8U"/>
     </command>
@@ -212,7 +212,7 @@ limitations under the License.
       <description>
         The command is generated in response to a received unicast EnhancedViewScene command
       </description>
-      <arg name="Status" type="ENUM8"/>
+      <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_Id"/>
       <arg name="SceneID" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U"  optional="true"/>
@@ -224,7 +224,7 @@ limitations under the License.
       <description>
         The command is generated in response to a received unicast CopyScene command
       </description>
-      <arg name="Status" type="ENUM8"/>
+      <arg name="Status" type="status"/>
       <arg name="GroupIdentifierFrom" type="group_Id"/>
       <arg name="SceneIdentifierFrom" type="INT8U"/>
     </command>

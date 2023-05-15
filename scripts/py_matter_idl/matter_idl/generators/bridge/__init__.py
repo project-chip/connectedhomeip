@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 import re
+from typing import Tuple, Union
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
@@ -38,40 +38,39 @@ def create_lookup_context(idl: Idl, cluster: Cluster) -> TypeLookupContext:
     return TypeLookupContext(idl, cluster)
 
 
-def get_field_info(definition: Field, cluster: Cluster, idl: Idl):
+def get_field_info(definition: Field, cluster: Cluster, idl: Idl) -> Tuple[str, str, Union[str, int, None], str]:
     context = create_lookup_context(idl, cluster)
     actual = ParseDataType(definition.data_type, context)
 
-    if type(actual) == IdlEnumType or type(actual) == IdlBitmapType:
+    if isinstance(actual, (IdlEnumType, IdlBitmapType)):
         actual = actual.base_type
 
-    if type(actual) == BasicString:
+    if isinstance(actual, BasicString):
         return 'OctetString', 'char', actual.max_length, \
             'ZCL_%s_ATTRIBUTE_TYPE' % actual.idl_name.upper()
 
-    if type(actual) == BasicInteger:
+    if isinstance(actual, BasicInteger):
         name = actual.idl_name.upper()
         ty = "int%d_t" % actual.power_of_two_bits
         if not actual.is_signed:
             ty = "u" + ty
         return "", ty, actual.byte_count, "ZCL_%s_ATTRIBUTE_TYPE" % name
-    if type(actual) == FundamentalType:
+    if isinstance(actual, FundamentalType):
         if actual == FundamentalType.BOOL:
             return "", "bool", 1, "ZCL_BOOLEAN_ATTRIBUTE_TYPE"
-        if actual == FundamentalType.FLOAT:
+        elif actual == FundamentalType.FLOAT:
             return "", "float", 4, "ZCL_SINGLE_ATTRIBUTE_TYPE"
-        if actual == FundamentalType.DOUBLE:
+        elif actual == FundamentalType.DOUBLE:
             return "", "double", 8, "ZCL_DOUBLE_ATTRIBUTE_TYPE"
-        logging.warn('Unknown fundamental type: %r' % actual)
-        return None
-    if type(actual) == IdlType:
+        else:
+            raise Exception('Unknown fundamental type: %r' % actual)
+    if isinstance(actual, IdlType):
         return '', actual.idl_name, 'sizeof(%s)' % actual.idl_name, \
             'ZCL_STRUCT_ATTRIBUTE_TYPE'
-    logging.warn('Unknown type: %r' % actual)
-    return None
+    raise Exception('UNKNOWN TYPE: %s' % actual)
 
 
-def get_raw_size_and_type(attr: Attribute, cluster: Cluster, idl: Idl):
+def get_raw_size_and_type(attr: Attribute, cluster: Cluster, idl: Idl) -> str:
     container, cType, size, matterType = get_field_info(
         attr.definition, cluster, idl)
     if attr.definition.is_list:

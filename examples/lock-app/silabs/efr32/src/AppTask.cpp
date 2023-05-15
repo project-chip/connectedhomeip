@@ -143,7 +143,9 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Lock-App", true);
@@ -359,6 +361,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent button_event           = {};
@@ -376,6 +379,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         sAppTask.PostEvent(&button_event);
     }
 }
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
 {

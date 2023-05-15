@@ -29,7 +29,6 @@
 #include "AppEvent.h"
 #include "BaseApplication.h"
 #include "FreeRTOS.h"
-#include "sl_simple_button_instances.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>

@@ -25,6 +25,8 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
+    # XXX: Workaround for https://github.com/actions/cache/issues/1141
+    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
 
 jobs:
     tizen:
@@ -34,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-tizen:0.7.0
+            image: connectedhomeip/chip-build-tizen:0.7.3
             options: --user root
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
@@ -61,7 +63,7 @@ jobs:
                       .environment
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
 
             - name: Build Tizen examples
               run: |

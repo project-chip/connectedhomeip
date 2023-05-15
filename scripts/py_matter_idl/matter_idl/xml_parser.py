@@ -33,7 +33,6 @@ if __name__ == '__main__':
     import pprint
 
     import click
-    import coloredlogs
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -49,7 +48,7 @@ if __name__ == '__main__':
         '--log-level',
         default='INFO',
         show_default=True,
-        type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
         help='Determines the verbosity of script output.')
     @ click.option(
         '--no-print',
@@ -59,8 +58,10 @@ if __name__ == '__main__':
         help='Do not pring output data (parsed data)')
     @ click.argument('filenames', nargs=-1)
     def main(log_level, no_print, filenames):
-        coloredlogs.install(level=__LOG_LEVELS__[
-                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+        logging.basicConfig(
+            level=__LOG_LEVELS__[log_level],
+            format='%(asctime)s %(levelname)-7s %(message)s',
+        )
 
         logging.info("Starting to parse ...")
 

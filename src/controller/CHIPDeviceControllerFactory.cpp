@@ -58,11 +58,12 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
 
     // Save our initialization state that we can't recover later from a
     // created-but-shut-down system state.
-    mListenPort               = params.listenPort;
-    mFabricIndependentStorage = params.fabricIndependentStorage;
-    mOperationalKeystore      = params.operationalKeystore;
-    mOpCertStore              = params.opCertStore;
-    mEnableServerInteractions = params.enableServerInteractions;
+    mListenPort                = params.listenPort;
+    mFabricIndependentStorage  = params.fabricIndependentStorage;
+    mOperationalKeystore       = params.operationalKeystore;
+    mOpCertStore               = params.opCertStore;
+    mCertificateValidityPolicy = params.certificateValidityPolicy;
+    mEnableServerInteractions  = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -82,14 +83,15 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
-        params.listenPort               = mListenPort;
-        params.fabricIndependentStorage = mFabricIndependentStorage;
-        params.enableServerInteractions = mEnableServerInteractions;
-        params.groupDataProvider        = mSystemState->GetGroupDataProvider();
-        params.sessionKeystore          = mSystemState->GetSessionKeystore();
-        params.fabricTable              = mSystemState->Fabrics();
-        params.operationalKeystore      = mOperationalKeystore;
-        params.opCertStore              = mOpCertStore;
+        params.listenPort                = mListenPort;
+        params.fabricIndependentStorage  = mFabricIndependentStorage;
+        params.enableServerInteractions  = mEnableServerInteractions;
+        params.groupDataProvider         = mSystemState->GetGroupDataProvider();
+        params.sessionKeystore           = mSystemState->GetSessionKeystore();
+        params.fabricTable               = mSystemState->Fabrics();
+        params.operationalKeystore       = mOperationalKeystore;
+        params.opCertStore               = mOpCertStore;
+        params.certificateValidityPolicy = mCertificateValidityPolicy;
     }
 
     return InitSystemState(params);
@@ -249,12 +251,13 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseClientPool   = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
     CASEClientInitParams sessionInitParams = {
-        .sessionManager           = stateParams.sessionMgr,
-        .sessionResumptionStorage = stateParams.sessionResumptionStorage.get(),
-        .exchangeMgr              = stateParams.exchangeMgr,
-        .fabricTable              = stateParams.fabricTable,
-        .groupDataProvider        = stateParams.groupDataProvider,
-        .mrpLocalConfig           = GetLocalMRPConfig(),
+        .sessionManager            = stateParams.sessionMgr,
+        .sessionResumptionStorage  = stateParams.sessionResumptionStorage.get(),
+        .certificateValidityPolicy = stateParams.certificateValidityPolicy,
+        .exchangeMgr               = stateParams.exchangeMgr,
+        .fabricTable               = stateParams.fabricTable,
+        .groupDataProvider         = stateParams.groupDataProvider,
+        .mrpLocalConfig            = GetLocalMRPConfig(),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
@@ -272,7 +275,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));
-    mSystemState->SetTempFabricTable(tempFabricTable);
+    mSystemState->SetTempFabricTable(tempFabricTable, params.enableServerInteractions);
     ChipLogDetail(Controller, "System State Initialized...");
     return CHIP_NO_ERROR;
 }
@@ -348,11 +351,6 @@ void DeviceControllerFactory::RetainSystemState()
 void DeviceControllerFactory::ReleaseSystemState()
 {
     mSystemState->Release();
-
-    if (!mSystemState->IsInitialized() && mEnableServerInteractions)
-    {
-        app::DnssdServer::Instance().StopServer();
-    }
 }
 
 DeviceControllerFactory::~DeviceControllerFactory()
@@ -367,9 +365,10 @@ void DeviceControllerFactory::Shutdown()
         Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
-    mFabricIndependentStorage = nullptr;
-    mOperationalKeystore      = nullptr;
-    mOpCertStore              = nullptr;
+    mFabricIndependentStorage  = nullptr;
+    mOperationalKeystore       = nullptr;
+    mOpCertStore               = nullptr;
+    mCertificateValidityPolicy = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()
@@ -383,6 +382,14 @@ void DeviceControllerSystemState::Shutdown()
     mHaveShutDown = true;
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
+
+    if (mTempFabricTable && mEnableServerInteractions)
+    {
+        // The DnssdServer is holding a reference to our temp fabric table,
+        // which we are about to destroy.  Stop it, so that it will stop trying
+        // to use it.
+        app::DnssdServer::Instance().StopServer();
+    }
 
     if (mFabricTableDelegate != nullptr)
     {

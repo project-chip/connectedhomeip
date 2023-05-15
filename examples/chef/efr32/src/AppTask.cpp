@@ -169,6 +169,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent button_event           = {};
@@ -181,3 +182,4 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         sAppTask.PostEvent(&button_event);
     }
 }
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT

@@ -24,11 +24,15 @@ import os
 import pathlib
 import re
 import sys
+import typing
 import uuid
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import List, Optional, Tuple
+
+from chip.tlv import float32, uint
 
 # isort: off
 
@@ -115,6 +119,68 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
     else:
         # On not having found a PAA dir, just return current dir to avoid blow-ups
         return pathlib.Path.cwd()
+
+
+def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
+    pics = {}
+    for raw in lines:
+        line, _, _ = raw.partition("#")
+        line = line.strip()
+
+        if not line:
+            continue
+
+        key, _, val = line.partition("=")
+        val = val.strip()
+        if val not in ["1", "0"]:
+            raise ValueError('PICS {} must have a value of 0 or 1'.format(key))
+
+        pics[key.strip().upper()] = (val == "1")
+    return pics
+
+
+def read_pics_from_file(filename: str) -> dict[str, bool]:
+    """ Reads a dictionary of PICS from a file. """
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+        return parse_pics(lines)
+
+
+def type_matches(received_value, desired_type):
+    """ Checks if the value received matches the expected type.
+
+        Handles unpacking Nullable and Optional types and
+        compares list value types for non-empty lists.
+    """
+    if typing.get_origin(desired_type) == typing.Union:
+        return any(type_matches(received_value, t) for t in typing.get_args(desired_type))
+    elif typing.get_origin(desired_type) == list:
+        if isinstance(received_value, list):
+            # Assume an empty list is of the correct type
+            return True if received_value == [] else any(type_matches(received_value[0], t) for t in typing.get_args(desired_type))
+        else:
+            return False
+    elif desired_type == uint:
+        return isinstance(received_value, int) and received_value >= 0
+    elif desired_type == float32:
+        return isinstance(received_value, float)
+    else:
+        return isinstance(received_value, desired_type)
+
+
+def utc_time_in_matter_epoch(desired_datetime: datetime = None):
+    """ Returns the time in matter epoch in us.
+
+        If desired_datetime is None, it will return the current time.
+    """
+    if desired_datetime is None:
+        utc_native = datetime.now(tz=timezone.utc)
+    else:
+        utc_native = desired_datetime
+    # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
+    utc_th_delta = utc_native - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
+    utc_th_us = int(utc_th_delta.total_seconds() * 1000000)
+    return utc_th_us
 
 
 @dataclass
@@ -266,6 +332,11 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         return self.matter_test_config.dut_node_id[0]
 
+    def check_pics(self, pics_key: str) -> bool:
+        picsd = self.matter_test_config.pics
+        pics_key = pics_key.strip().upper()
+        return pics_key in picsd and picsd[pics_key]
+
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
@@ -273,7 +344,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_check_success(
-            self, cluster: object, attribute: object,
+            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
             dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -285,6 +356,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         err_msg = "Error reading {}:{}".format(str(cluster), str(attribute))
         asserts.assert_true(attr_ret is not None, err_msg)
         asserts.assert_false(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
+        desired_type = attribute.attribute_type.Type
+        asserts.assert_true(type_matches(attr_ret, desired_type),
+                            'Returned attribute {} is wrong type expected {}, got {}'.format(attribute, desired_type, type(attr_ret)))
         return attr_ret
 
     async def read_single_attribute_expect_error(
@@ -303,6 +377,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         asserts.assert_true(isinstance(attr_ret.Reason, InteractionModelError), err_msg)
         asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
         return attr_ret
+
+    async def send_single_cmd(
+            self, cmd: Clusters.ClusterObjects.ClusterCommand,
+            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0,
+            timedRequestTimeoutMs: typing.Union[None, int] = None) -> object:
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
+
+        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
+        return result
 
     def print_step(self, stepnum: int, title: str) -> None:
         logging.info('***** Test Step %d : %s', stepnum, title)
@@ -567,6 +653,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_interface_id = args.ble_interface_id
+    config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
 
     config.controller_node_id = args.controller_node_id
 
@@ -616,6 +703,7 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              metavar='NODE_ID', default=[_DEFAULT_DUT_NODE_ID],
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
+    basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 

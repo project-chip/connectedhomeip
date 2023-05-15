@@ -35,6 +35,13 @@ chip_test_suite("tests") {
     test_sources += [ "TestSystemScheduleWork.cpp" ]
   }
 
+  # SystemPacketBuffer on nrfconnect uses LwIP buffers, which ignore the
+  #  requested allocation size and always allocate at max-size.  So our test,
+  #  which tries to size-limit the buffers, does not work correctly there.
+  if (chip_device_platform != "nrfconnect") {
+    test_sources += [ "TestTLVPacketBufferBackingStore.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [

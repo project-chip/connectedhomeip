@@ -24,7 +24,6 @@
 #include <WindowApp.h>
 #include <queue.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <sl_simple_button_instances.h>
 #include <string>
 #include <task.h>
 #include <timers.h>

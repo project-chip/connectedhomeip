@@ -73,6 +73,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_FABRIC_IDX_ATTRIBUTE_TYPE: // Fabric Index
     case ZCL_BITMAP8_ATTRIBUTE_TYPE:    // 8-bit bitmap
     case ZCL_ENUM8_ATTRIBUTE_TYPE:      // 8-bit enumeration
+    case ZCL_STATUS_ATTRIBUTE_TYPE:     // Status Code
     case ZCL_PERCENT_ATTRIBUTE_TYPE:    // Percentage
         static_assert(std::is_same<chip::Percent, uint8_t>::value,
                       "chip::Percent is expected to be uint8_t, change this when necessary");
@@ -83,7 +84,6 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_VENDOR_ID_ATTRIBUTE_TYPE:     // Vendor Id
     case ZCL_ENUM16_ATTRIBUTE_TYPE:        // 16-bit enumeration
     case ZCL_BITMAP16_ATTRIBUTE_TYPE:      // 16-bit bitmap
-    case ZCL_STATUS_ATTRIBUTE_TYPE:        // Status Code
     case ZCL_PERCENT100THS_ATTRIBUTE_TYPE: // 100ths of a percent
         static_assert(std::is_same<chip::EndpointId, uint16_t>::value,
                       "chip::EndpointId is expected to be uint16_t, change this when necessary");

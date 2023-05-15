@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.7.0"
+    - name: "connectedhomeip/chip-build-vscode:0.7.3"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               git submodule update --init --recursive
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.7.0"
+    - name: "connectedhomeip/chip-build-vscode:0.7.3"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -22,13 +22,14 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.0"
+    - name: "connectedhomeip/chip-build-vscode:0.7.3"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle --target
+              esp32-devkitc-light-rpc --target
               esp32-m5stack-all-clusters-ipv6only --target
               esp32-m5stack-all-clusters-rpc --target
               esp32-m5stack-light --target
@@ -41,7 +42,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "connectedhomeip/chip-build-vscode:0.7.0"
+    - name: "connectedhomeip/chip-build-vscode:0.7.3"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -62,7 +63,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.0"
+    - name: "connectedhomeip/chip-build-vscode:0.7.3"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -84,7 +85,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.0"
+    - name: "connectedhomeip/chip-build-vscode:0.7.3"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -144,7 +145,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.0"
+    - name: "connectedhomeip/chip-build-vscode:0.7.3"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv

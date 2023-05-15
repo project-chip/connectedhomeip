@@ -62,7 +62,6 @@ qpg_executable("lock_app") {
   ]
 
   deps = [
-    ":factorydata_lib",
     ":sdk",
     "${chip_root}/examples/lock-app/qpg/zap/",
     "${chip_root}/examples/providers:device_info_provider",
@@ -70,6 +69,7 @@ qpg_executable("lock_app") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    "${chip_root}/third_party/qpg_sdk:qpg_lock_factorydata_lib",
   ]
 
   if (chip_openthread_ftd) {
@@ -152,16 +152,4 @@ group("qpg") {
 
 group("default") {
   deps = [ ":qpg" ]
-}
-
-static_library("factorydata_lib") {
-  libs = [ "${qpg_sdk_root}/Binaries/FactoryData/FactoryData_example/FactoryData_example.a" ]
-  public_configs = [ ":qpg_retain_factorydata" ]
-}
-
-config("qpg_retain_factorydata") {
-  ldflags = [
-    "-Wl,-u_binary_factory_data_bin_start",
-    "-Wl,-u_binary_factory_data_start",
-  ]
 }

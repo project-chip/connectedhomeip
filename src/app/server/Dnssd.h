@@ -60,8 +60,9 @@ public:
     Inet::InterfaceId GetInterfaceId() { return mInterfaceId; }
 
     //
-    // Override the referenced fabric table from the default that is present
-    // in Server::GetInstance().GetFabricTable() to something else.
+    // Set the fabric table the DnssdServer should use for operational
+    // advertising.  This must be set before StartServer() is called for the
+    // first time.
     //
     void SetFabricTable(FabricTable * table)
     {
@@ -94,7 +95,8 @@ public:
     /// (Re-)starts the Dnssd server, using the provided commissioning mode.
     void StartServer(Dnssd::CommissioningMode mode);
 
-    //// Stop the Dnssd server.
+    //// Stop the Dnssd server.  After this call, SetFabricTable must be called
+    //// again before calling StartServer().
     void StopServer();
 
     CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);

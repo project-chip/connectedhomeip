@@ -229,6 +229,7 @@ void AppTask::OnIdentifyStop(Identify * identify)
 #endif
 }
 
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
     VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button);
@@ -271,3 +272,4 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         sAppTask.PostEvent(&button_event);
     }
 }
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT

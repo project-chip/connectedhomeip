@@ -127,7 +127,7 @@ public:
 
     struct WiFiInfo
     {
-        ByteSpan mBssId{};
+        uint8_t mBssId[DeviceLayer::Internal::kWiFiBSSIDLength];
         app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum mSecurityType{};
         app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum mWiFiVersion{};
         uint16_t mChannel{};

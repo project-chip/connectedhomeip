@@ -330,7 +330,8 @@ CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, const Cryp
     bool isCA;
 
     VerifyOrReturnError(requestParams.SerialNumber >= 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(requestParams.ValidityEnd >= requestParams.ValidityStart, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(requestParams.ValidityEnd == kNullCertTime || requestParams.ValidityEnd >= requestParams.ValidityStart,
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(requestParams.SubjectDN.GetCertType(certType));
     isCA = (certType == kCertType_ICA || certType == kCertType_Root);

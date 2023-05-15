@@ -217,7 +217,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         return false;
     }
 
-    if (!mDiscoveredParameters.empty())
+    while (!mDiscoveredParameters.empty())
     {
         // Grab the first element from the queue and try connecting to it.
         // Remove it from the queue before we try to connect, in case the
@@ -258,7 +258,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
             return true;
         }
 
-        // Failed to start establishing PASE.
+        // Failed to start establishing PASE.  Move on to the next item.
         PASEEstablishmentComplete();
     }
 
