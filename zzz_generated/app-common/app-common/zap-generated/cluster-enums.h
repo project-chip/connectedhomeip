@@ -184,8 +184,7 @@ enum class OnOffFeature : uint32_t
 };
 } // namespace OnOff
 
-namespace OnOffSwitchConfiguration {
-} // namespace OnOffSwitchConfiguration
+namespace OnOffSwitchConfiguration {} // namespace OnOffSwitchConfiguration
 
 namespace LevelControl {
 
@@ -243,17 +242,13 @@ enum class LevelControlOptions : uint8_t
 };
 } // namespace LevelControl
 
-namespace BinaryInputBasic {
-} // namespace BinaryInputBasic
+namespace BinaryInputBasic {} // namespace BinaryInputBasic
 
-namespace PulseWidthModulation {
-} // namespace PulseWidthModulation
+namespace PulseWidthModulation {} // namespace PulseWidthModulation
 
-namespace Descriptor {
-} // namespace Descriptor
+namespace Descriptor {} // namespace Descriptor
 
-namespace Binding {
-} // namespace Binding
+namespace Binding {} // namespace Binding
 
 namespace AccessControl {
 
@@ -519,8 +514,7 @@ enum class OTAUpdateStateEnum : uint8_t
 };
 } // namespace OtaSoftwareUpdateRequestor
 
-namespace LocalizationConfiguration {
-} // namespace LocalizationConfiguration
+namespace LocalizationConfiguration {} // namespace LocalizationConfiguration
 
 namespace TimeFormatLocalization {
 
@@ -581,8 +575,7 @@ enum class UnitLocalizationFeature : uint32_t
 };
 } // namespace UnitLocalization
 
-namespace PowerSourceConfiguration {
-} // namespace PowerSourceConfiguration
+namespace PowerSourceConfiguration {} // namespace PowerSourceConfiguration
 
 namespace PowerSource {
 
@@ -1481,23 +1474,17 @@ enum class GroupKeySecurityPolicyEnum : uint8_t
 };
 } // namespace GroupKeyManagement
 
-namespace FixedLabel {
-} // namespace FixedLabel
+namespace FixedLabel {} // namespace FixedLabel
 
-namespace UserLabel {
-} // namespace UserLabel
+namespace UserLabel {} // namespace UserLabel
 
-namespace ProxyConfiguration {
-} // namespace ProxyConfiguration
+namespace ProxyConfiguration {} // namespace ProxyConfiguration
 
-namespace ProxyDiscovery {
-} // namespace ProxyDiscovery
+namespace ProxyDiscovery {} // namespace ProxyDiscovery
 
-namespace ProxyValid {
-} // namespace ProxyValid
+namespace ProxyValid {} // namespace ProxyValid
 
-namespace BooleanState {
-} // namespace BooleanState
+namespace BooleanState {} // namespace BooleanState
 
 namespace IcdManagement {
 
@@ -2696,8 +2683,7 @@ enum class WindowCoveringFeature : uint32_t
 };
 } // namespace WindowCovering
 
-namespace BarrierControl {
-} // namespace BarrierControl
+namespace BarrierControl {} // namespace BarrierControl
 
 namespace PumpConfigurationAndControl {
 
@@ -2920,8 +2906,7 @@ enum class WindSupportMask : uint8_t
 };
 } // namespace FanControl
 
-namespace ThermostatUserInterfaceConfiguration {
-} // namespace ThermostatUserInterfaceConfiguration
+namespace ThermostatUserInterfaceConfiguration {} // namespace ThermostatUserInterfaceConfiguration
 
 namespace ColorControl {
 
@@ -3064,8 +3049,7 @@ enum class ColorLoopUpdateFlags : uint8_t
 };
 } // namespace ColorControl
 
-namespace BallastConfiguration {
-} // namespace BallastConfiguration
+namespace BallastConfiguration {} // namespace BallastConfiguration
 
 namespace IlluminanceMeasurement {
 
@@ -3082,8 +3066,7 @@ enum class LightSensorType : uint8_t
 };
 } // namespace IlluminanceMeasurement
 
-namespace TemperatureMeasurement {
-} // namespace TemperatureMeasurement
+namespace TemperatureMeasurement {} // namespace TemperatureMeasurement
 
 namespace PressureMeasurement {
 
@@ -3094,11 +3077,9 @@ enum class PressureMeasurementFeature : uint32_t
 };
 } // namespace PressureMeasurement
 
-namespace FlowMeasurement {
-} // namespace FlowMeasurement
+namespace FlowMeasurement {} // namespace FlowMeasurement
 
-namespace RelativeHumidityMeasurement {
-} // namespace RelativeHumidityMeasurement
+namespace RelativeHumidityMeasurement {} // namespace RelativeHumidityMeasurement
 
 namespace OccupancySensing {
 
@@ -3131,8 +3112,7 @@ enum class OccupancySensorTypeBitmap : uint8_t
 };
 } // namespace OccupancySensing
 
-namespace WakeOnLan {
-} // namespace WakeOnLan
+namespace WakeOnLan {} // namespace WakeOnLan
 
 namespace Channel {
 
@@ -3255,8 +3235,7 @@ enum class MediaInputFeature : uint32_t
 };
 } // namespace MediaInput
 
-namespace LowPower {
-} // namespace LowPower
+namespace LowPower {} // namespace LowPower
 
 namespace KeypadInput {
 
@@ -3508,16 +3487,18 @@ enum class ApplicationStatusEnum : uint8_t
 };
 } // namespace ApplicationBasic
 
-namespace AccountLogin {
-} // namespace AccountLogin
+namespace AccountLogin {} // namespace AccountLogin
 
-namespace ElectricalMeasurement {
-} // namespace ElectricalMeasurement
+namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 namespace ClientMonitoring {
 } // namespace ClientMonitoring
+=======
+namespace ClientMonitoring {} // namespace ClientMonitoring
+>>>>>>> 527fe00c24 (Update the generated files)
 
 >>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 namespace UnitTesting {
