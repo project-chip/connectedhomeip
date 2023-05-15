@@ -23,15 +23,16 @@
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
-class ClientMonitoringServer
+using chip::Protocols::InteractionModel::Status;
+
+class IcdManagementServer
 {
 public:
-    chip::Protocols::InteractionModel::Status StayAwakeRequestCommand(const chip::app::ConcreteCommandPath & commandPath);
-    chip::Protocols::InteractionModel::Status RegisterClientMonitoringCommand(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoring::DecodableType & commandData);
+    Status RegisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                          const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData);
 
-    chip::Protocols::InteractionModel::Status UnregisterClientMonitoringCommand(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::DecodableType & commandData);
+    Status UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                            const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
+
+    Status StayActiveRequest(const chip::app::ConcreteCommandPath & commandPath);
 };

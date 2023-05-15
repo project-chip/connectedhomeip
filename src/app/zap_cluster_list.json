@@ -119,7 +119,6 @@
             "bridged-device-basic-information-server"
         ],
         "CHANNEL_CLUSTER": ["channel-server"],
-        "CLIENT_MONITORING_CLUSTER": ["client-monitoring-server"],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONING_CLUSTER": [],
         "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
@@ -140,6 +139,7 @@
         "GROUP_KEY_MANAGEMENT_CLUSTER": ["group-key-mgmt-server"],
         "GROUPS_CLUSTER": ["groups-server"],
         "IAS_ZONE_CLUSTER": [],
+        "ICD_MANAGEMENT_CLUSTER": ["icd-management-server"],
         "IDENTIFY_CLUSTER": ["identify-server"],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": ["keypad-input-server"],
