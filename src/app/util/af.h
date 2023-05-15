@@ -185,16 +185,17 @@ uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId end
 uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
- *  @brief Returns an index of the given endpoint the given cluster server
+ *  @brief Returns the index of the given endpoint in the list of all endpoints that might support the given cluster server.
  *
  * Returns kEmberInvalidEndpointIndex if the given endpoint does not support the
  * given cluster or if the given endpoint is disabled.
  *
  * Unlike emberAfFindClusterServerEndpointIndex, this function always returns the same index
- * for a given endpointId instance, static or dynamic.
+ * for a given endpointId instance, fixed or dynamic, if it does not return kEmberInvalidEndpointIndex.
  *
- * The return index is determined by the location of the endpoint in
- * emAfEndpoints database but is adjusted to the given Cluster server implementation scope
+ * The return index is identical to emberAfFindClusterServerEndpointIndex for fixed endpoints,
+ * but for dynamic endpoints the indexing assumes that any dynamic endpoint could start supporting
+ * the given server cluster.
  *
  * For example, if a device has 4 fixed endpoints (ids 0-3) and 2 dynamic
  * endpoints, and cluster X is supported on endpoints 1 and 3, then
@@ -205,7 +206,7 @@ uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::
  * 3) emberAfGetClusterServerEndpointIndex(2, X) returns kEmberInvalidEndpointIndex
  * 4) emberAfGetClusterServerEndpointIndex(3, X) returns 1
 
- * The Dynamic endpoints are placed after the fixed ones
+ * The Dynamic endpoints are placed after the fixed ones;
  * therefore their return index will always be >= to fixedClusterServerEndpointCount
  *
  * If a dynamic endpoint, supporting cluster X, is defined to dynamic index 1 with endpoint id 7,
@@ -219,7 +220,7 @@ uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::
  *
  * @param endpoint Endpoint number
  * @param cluster Id the of the Cluster server you are interrested on
- * @param fixedClusterServerEndpointCount The amount of Fixed endpoints containing this cluster server
+ * @param fixedClusterServerEndpointCount The number of fixed endpoints containing this cluster server.  Typically one of the  EMBER_AF_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
  */
 uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                               uint16_t fixedClusterServerEndpointCount);

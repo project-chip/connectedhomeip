@@ -887,7 +887,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
     {
         if (emberAfFindClusterInType(emAfEndpoints[epIndex].endpointType, cluster, CLUSTER_MASK_SERVER) == nullptr)
         {
-            // The provided endpoint do not contain the given cluster server.
+            // The provided endpoint does not contain the given cluster server.
             return kEmberInvalidEndpointIndex;
         }
 
@@ -914,8 +914,8 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
         }
         else
         {
-            // This is a Dynamic endpoint
-            // ajust index after the fixedClusterServerEndpointCount index
+            // This is a dynamic endpoint.
+            // It's index is just its index in the dynamic endpoint list, offset by fixedClusterServerEndpointCount.
             epIndex = static_cast<uint16_t>(fixedClusterServerEndpointCount + (epIndex - FIXED_ENDPOINT_COUNT));
         }
     }
