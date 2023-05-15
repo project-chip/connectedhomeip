@@ -3925,6 +3925,7 @@ private:
 | * SetCredential                                                     |   0x22 |
 | * GetCredentialStatus                                               |   0x24 |
 | * ClearCredential                                                   |   0x26 |
+| * UnboltDoor                                                        |   0x27 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LockState                                                         | 0x0000 |
@@ -4561,6 +4562,36 @@ private:
     chip::app::Clusters::DoorLock::Commands::ClearCredential::Type mRequest;
     TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type>>
         mComplex_Credential;
+};
+
+/*
+ * Command UnboltDoor
+ */
+class DoorLockUnboltDoor : public ClusterCommand
+{
+public:
+    DoorLockUnboltDoor(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("unbolt-door", credsIssuerConfig)
+    {
+        AddArgument("PINCode", &mRequest.PINCode);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000027) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000027, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000027) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000101, 0x00000027, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::UnboltDoor::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -12122,6 +12153,7 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<DoorLockSetCredential>(credsIssuerConfig),        //
         make_unique<DoorLockGetCredentialStatus>(credsIssuerConfig),  //
         make_unique<DoorLockClearCredential>(credsIssuerConfig),      //
+        make_unique<DoorLockUnboltDoor>(credsIssuerConfig),           //
         //
         // Attributes
         //

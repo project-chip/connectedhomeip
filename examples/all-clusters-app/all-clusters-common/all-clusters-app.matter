@@ -2314,6 +2314,7 @@ server cluster DoorLock = 257 {
     kNotFullyLocked = 0;
     kLocked = 1;
     kUnlocked = 2;
+    kUnlatched = 3;
   }
 
   enum DlLockType : ENUM8 {
@@ -2328,6 +2329,7 @@ server cluster DoorLock = 257 {
     kInterconnectedLock = 8;
     kDeadLatch = 9;
     kDoorFurniture = 10;
+    kEurocylinder = 11;
   }
 
   enum DlStatus : ENUM8 {
@@ -2419,6 +2421,7 @@ server cluster DoorLock = 257 {
     kUnlock = 1;
     kNonAccessUserEvent = 2;
     kForcedUserEvent = 3;
+    kUnlatch = 4;
   }
 
   enum OperatingModeEnum : ENUM8 {
@@ -2769,6 +2772,10 @@ server cluster DoorLock = 257 {
     nullable CredentialStruct credential = 0;
   }
 
+  request struct UnboltDoorRequest {
+    optional OCTET_STRING PINCode = 0;
+  }
+
   response struct GetUserResponse = 28 {
     INT16U userIndex = 0;
     nullable CHAR_STRING userName = 1;
@@ -2810,6 +2817,7 @@ server cluster DoorLock = 257 {
   timed command access(invoke: administer) SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
   command access(invoke: administer) GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
   timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
+  timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
@@ -5108,7 +5116,7 @@ endpoint 1 {
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation default = 0;
-    ram      attribute featureMap default = 0xD13;
+    ram      attribute featureMap default = 0x1D13;
     ram      attribute clusterRevision default = 6;
   }
 

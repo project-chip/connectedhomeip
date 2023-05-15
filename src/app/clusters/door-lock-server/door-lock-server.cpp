@@ -3552,6 +3552,28 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
     return true;
 }
 
+bool emberAfDoorLockClusterUnboltDoorCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::UnboltDoor::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("Received command: UnboltDoor");
+
+    if (DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, LockOperationTypeEnum::kUnlock,
+                                                             emberAfPluginDoorLockOnDoorUnlockCommand, commandData.PINCode))
+    {
+        // appclusters.pdf 5.3.3.25:
+        // The number of seconds to wait after unlocking a lock before it automatically locks again. 0=disabled. If set, unlock
+        // operations from any source will be timed. For one time unlock with timeout use the specific command.
+        uint32_t autoRelockTime = 0;
+
+        VerifyOrReturnError(DoorLockServer::Instance().GetAutoRelockTime(commandPath.mEndpointId, autoRelockTime), true);
+        VerifyOrReturnError(0 != autoRelockTime, true);
+        DoorLockServer::Instance().ScheduleAutoRelock(commandPath.mEndpointId, autoRelockTime);
+    }
+
+    return true;
+}
+
 bool emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)

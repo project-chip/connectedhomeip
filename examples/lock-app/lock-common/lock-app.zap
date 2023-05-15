@@ -7023,6 +7023,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 0
+            },
+            {
+              "name": "UnboltDoor",
+              "code": 39,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -7736,7 +7744,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0xDB3",
+              "defaultValue": "0x1DB3",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

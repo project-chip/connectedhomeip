@@ -6759,6 +6759,12 @@ bool emberAfDoorLockClusterClearCredentialCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
 /**
+ * @brief Door Lock Cluster UnboltDoor Command callback (from client)
+ */
+bool emberAfDoorLockClusterUnboltDoorCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::UnboltDoor::DecodableType & commandData);
+/**
  * @brief Window Covering Cluster UpOrOpen Command callback (from client)
  */
 bool emberAfWindowCoveringClusterUpOrOpenCallback(

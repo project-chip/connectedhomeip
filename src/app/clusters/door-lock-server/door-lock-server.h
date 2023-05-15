@@ -493,6 +493,10 @@ private:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData);
 
+    friend bool emberAfDoorLockClusterUnboltDoorCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::UnboltDoor::DecodableType & commandData);
+
     friend bool emberAfDoorLockClusterSetHolidayScheduleCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::DecodableType & commandData);
