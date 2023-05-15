@@ -27,6 +27,8 @@ class PairCodeThreadCommand(controller: ChipDeviceController, credsIssue: Creden
       .pairDeviceWithCode(
         getNodeId(),
         getOnboardingPayload(),
+        getDiscoverOnce(),
+        getUseOnlyOnNetworkDiscovery(),        
         null,
         getThreadNetworkCredentials(),
       )
