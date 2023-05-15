@@ -23,8 +23,8 @@
 /* this file behaves like a config.h, comes first */
 #include "FreeRTOS.h"
 #include "chip_porting.h"
-#include <platform/KeyValueStoreManager.h>
 #include <platform/Ameba/AmebaUtils.h>
+#include <platform/KeyValueStoreManager.h>
 #include <support/CodeUtils.h>
 
 using namespace chip::DeviceLayer::Internal;
@@ -58,7 +58,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     if (read_bytes_size)
     {
         error = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
-        err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+        err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
     }
     else
     {
@@ -69,7 +69,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
             goto exit;
         }
         error = getPref_bin_new(key, key, (uint8_t *) value, value_size, dummy_read_bytes_size);
-        err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+        err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
         vPortFree(dummy_read_bytes_size);
     }
 
@@ -91,7 +91,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     if (checkExist(key, key))
     {
         error = deleteKey(key, key);
-        err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+        err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old kvs value");
@@ -99,7 +99,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     }
 
     error = setPref_new(key, key, (uint8_t *) value, value_size);
-    err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
 
 exit:
     return err;
@@ -107,7 +107,7 @@ exit:
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    int32_t error = deleteKey(key, key);
+    int32_t error  = deleteKey(key, key);
     CHIP_ERROR err = AmebaUtils::MapError(error, AmebaErrorType::kDctError);
 
     return err;

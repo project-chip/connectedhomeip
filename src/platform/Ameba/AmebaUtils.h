@@ -47,7 +47,7 @@ public:
     static CHIP_ERROR WiFiConnect(const char * ssid, const char * password);
     static CHIP_ERROR SetCurrentProvisionedNetwork(void);
     static CHIP_ERROR WiFiConnect(void);
-    
+
     static CHIP_ERROR MapError(int32_t error, AmebaErrorType type);
 
 private:

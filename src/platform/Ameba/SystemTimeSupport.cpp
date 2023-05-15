@@ -29,8 +29,8 @@
 #include <support/logging/CHIPLogging.h>
 
 #include "task.h"
-#include <time.h>
 #include <chip_porting.h>
+#include <time.h>
 
 struct rtkTimeVal
 {

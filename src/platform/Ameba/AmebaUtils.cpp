@@ -41,7 +41,7 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 CHIP_ERROR AmebaUtils::StartWiFi(void)
 {
     // Ensure that the WiFi layer is started.
-    int32_t error = matter_wifi_on(RTW_MODE_STA);
+    int32_t error  = matter_wifi_on(RTW_MODE_STA);
     CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
     return CHIP_NO_ERROR; // will fail if wifi is already initialized, let it pass
 }
@@ -60,16 +60,16 @@ bool AmebaUtils::IsStationProvisioned(void)
 
 CHIP_ERROR AmebaUtils::IsStationConnected(bool & connected)
 {
-    int32_t error = matter_wifi_is_connected_to_ap();
+    int32_t error  = matter_wifi_is_connected_to_ap();
     CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
-    connected = (err == CHIP_NO_ERROR) ? true : false;
+    connected      = (err == CHIP_NO_ERROR) ? true : false;
     return err;
 }
 
 CHIP_ERROR AmebaUtils::EnableStationMode(void)
 {
     // Ensure that station mode is enabled in the WiFi layer.
-    int32_t error = matter_wifi_set_mode(RTW_MODE_STA);
+    int32_t error  = matter_wifi_set_mode(RTW_MODE_STA);
     CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
     return err;
 }
@@ -119,7 +119,7 @@ CHIP_ERROR AmebaUtils::ClearWiFiConfig()
 {
     /* Clear Wi-Fi Configurations in Storage */
     CHIP_ERROR err;
-    err            = PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
+    err = PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
     SuccessOrExit(err);
 
     err = PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
@@ -132,7 +132,7 @@ exit:
 CHIP_ERROR AmebaUtils::WiFiDisconnect(void)
 {
     ChipLogProgress(DeviceLayer, "Disconnecting WiFi");
-    int32_t error = matter_wifi_disconnect();
+    int32_t error  = matter_wifi_disconnect();
     CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
     if (err == CHIP_NO_ERROR)
     {
@@ -148,9 +148,9 @@ CHIP_ERROR AmebaUtils::WiFiConnectProvisionedNetwork(void)
     memset(config, 0, sizeof(rtw_wifi_config_t));
     GetWiFiConfig(config);
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) config->ssid);
-    int32_t error = matter_wifi_connect((char *) config->ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) config->password,
+    int32_t error  = matter_wifi_connect((char *) config->ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) config->password,
                                         strlen((const char *) config->ssid), strlen((const char *) config->password), 0, nullptr);
-    CHIP_ERROR err =  MapError(error, AmebaErrorType::kWiFiError);
+    CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
 
     vPortFree(config);
     return err;
@@ -159,17 +159,17 @@ CHIP_ERROR AmebaUtils::WiFiConnectProvisionedNetwork(void)
 CHIP_ERROR AmebaUtils::WiFiConnect(const char * ssid, const char * password)
 {
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) ssid);
-    int32_t error = matter_wifi_connect((char *) ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) password, strlen(ssid),
+    int32_t error  = matter_wifi_connect((char *) ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) password, strlen(ssid),
                                         strlen(password), 0, nullptr);
-    CHIP_ERROR err =  MapError(error, AmebaErrorType::kWiFiError);
+    CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
     return err;
 }
 
 CHIP_ERROR AmebaUtils::SetCurrentProvisionedNetwork()
 {
     rtw_wifi_setting_t pSetting;
-    int32_t error = matter_get_sta_wifi_info(&pSetting);
-    CHIP_ERROR err =  MapError(error, AmebaErrorType::kWiFiError);
+    int32_t error  = matter_get_sta_wifi_info(&pSetting);
+    CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "STA No Wi-Fi Info");
@@ -247,6 +247,6 @@ CHIP_ERROR AmebaUtils::MapWiFiError(int32_t error)
 {
     if (error == RTW_SUCCESS)
         return CHIP_NO_ERROR;
-    
+
     return CHIP_ERROR_INTERNAL;
 }

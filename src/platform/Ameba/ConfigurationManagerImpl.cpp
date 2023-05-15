@@ -158,10 +158,10 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     char temp[32];
     uint32_t mac[ETH_ALEN];
     char * token = strtok(temp, ":");
-    int i = 0;
+    int i        = 0;
 
     error = matter_wifi_get_mac_address(temp);
-    err = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to get mac address");

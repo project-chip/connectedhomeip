@@ -25,8 +25,8 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CHIPMemString.h>
-#include <platform/Ameba/DiagnosticDataProviderImpl.h>
 #include <platform/Ameba/AmebaUtils.h>
+#include <platform/Ameba/DiagnosticDataProviderImpl.h>
 
 #include <lwip_netconf.h>
 
@@ -258,7 +258,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
     VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     error = matter_wifi_get_ap_bssid(BssId.data());
-    err = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -292,7 +292,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
     rtw_wifi_setting_t setting;
 
     error = matter_wifi_get_security_type("wlan0", &security, &setting.key_idx, setting.password);
-    err = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
     if (err != CHIP_NO_ERROR)
     {
         securityType = SecurityTypeEnum::kUnspecified;
@@ -361,7 +361,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
     unsigned char channel;
 
     error = matter_wifi_get_wifi_channel_number("wlan0", &channel);
-    err = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
     if (err != CHIP_NO_ERROR)
         channelNumber = 0;
     else
@@ -375,8 +375,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
     CHIP_ERROR err;
     int32_t error;
 
-    error = matter_wifi_get_rssi((int *)&rssi);
-    err = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    error = matter_wifi_get_rssi((int *) &rssi);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
 
     if (err != CHIP_NO_ERROR)
     {
