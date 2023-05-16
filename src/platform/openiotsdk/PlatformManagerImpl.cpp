@@ -40,6 +40,18 @@ namespace DeviceLayer {
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
+    if (mInitialized)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
+    CHIP_ERROR err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
     // Members are initialized by the stack
     osMutexAttr_t mut_att = { .attr_bits = osMutexRecursive };
 
@@ -62,15 +74,12 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         return CHIP_ERROR_INTERNAL;
     }
 
+    mInitialized = true;
+
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
-    // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
-    CHIP_ERROR err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::_LockChipStack()
@@ -97,6 +106,9 @@ void PlatformManagerImpl::_UnlockChipStack()
 
 CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
 {
+    // The post event requires event queue from stack initialization
+    ReturnLogErrorOnFailure(_InitChipStack());
+
     osStatus_t status = osMessageQueuePut(mQueue, eventPtr, 0, 0);
     CHIP_ERROR ret    = (status == osOK) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
     osEventFlagsSet(mPlatformFlags, kPostEventFlag);
@@ -107,12 +119,18 @@ void PlatformManagerImpl::HandlePostEvent()
 {
     /* handle an event */
     ChipDeviceEvent event;
-    osStatus_t status = osMessageQueueGet(mQueue, &event, nullptr, 0);
-    if (status == osOK)
+    uint32_t count = osMessageQueueGetCount(mQueue);
+    while (count)
     {
+        if (osMessageQueueGet(mQueue, &event, nullptr, 0) != osOK)
+        {
+            break;
+        }
+
         LockChipStack();
         DispatchEvent(&event);
         UnlockChipStack();
+        count--;
     }
 }
 
@@ -154,12 +172,8 @@ void PlatformManagerImpl::RunEventLoopInternal()
 
         if (flags & kPostEventFlag)
         {
+            osEventFlagsClear(mPlatformFlags, kPostEventFlag);
             HandlePostEvent();
-
-            if (!osMessageQueueGetCount(mQueue))
-            {
-                osEventFlagsClear(mPlatformFlags, kPostEventFlag);
-            }
         }
 
         if ((flags & kTaskRunningEventFlag) == 0)
@@ -171,6 +185,12 @@ void PlatformManagerImpl::RunEventLoopInternal()
 
 void PlatformManagerImpl::_RunEventLoop()
 {
+    if (!mInitialized)
+    {
+        ChipLogError(DeviceLayer, "_RunEventLoop: stack not initialized");
+        return;
+    }
+
     osEventFlagsSet(mPlatformFlags, kTaskRunningEventFlag);
 
     RunEventLoopInternal();
@@ -185,6 +205,12 @@ void PlatformManagerImpl::EventLoopTask(void * arg)
 
 CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
 {
+    if (!mInitialized)
+    {
+        ChipLogError(DeviceLayer, "_StartEventLoopTask: stack not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     // this mutex only needed to guard against multiple launches
     {
         osMutexAcquire(mEventTaskMutex, osWaitForever);
@@ -221,6 +247,12 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
 
 CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 {
+    if (!mInitialized)
+    {
+        ChipLogError(DeviceLayer, "_StopEventLoopTask: stack not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     // this mutex only needed to guard against multiple calls to stop
     {
         osMutexAcquire(mEventTaskMutex, osWaitForever);
@@ -258,6 +290,9 @@ void PlatformManagerImpl::TimerCallback(void * arg)
 
 CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout duration)
 {
+    // The timer requires event queue from stack initialization
+    ReturnLogErrorOnFailure(_InitChipStack());
+
     if (duration.count() == 0)
     {
         TimerCallback(0);
@@ -276,6 +311,12 @@ CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout duration)
 
 void PlatformManagerImpl::_Shutdown()
 {
+    if (!mInitialized)
+    {
+        ChipLogError(DeviceLayer, "_Shutdown: stack not initialized");
+        return;
+    }
+
     //
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
@@ -304,6 +345,7 @@ void PlatformManagerImpl::_Shutdown()
     mEventTaskMutex = nullptr;
     mQueue          = nullptr;
     mTimer          = nullptr;
+    mInitialized    = false;
 
     GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }

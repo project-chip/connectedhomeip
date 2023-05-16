@@ -25,6 +25,8 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
+    # XXX: Workaround for https://github.com/actions/cache/issues/1141
+    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
 
 jobs:
     linux_standalone:

@@ -107,7 +107,7 @@ public final class AttributeWriteRequest {
 
   /** Create a new {@link AttributeWriteRequest} with only concrete ids. */
   public static AttributeWriteRequest newInstance(
-      long endpointId, long clusterId, long attributeId, byte[] tlv) {
+      int endpointId, long clusterId, long attributeId, byte[] tlv) {
     return new AttributeWriteRequest(
         ChipPathId.forId(endpointId),
         ChipPathId.forId(clusterId),
@@ -117,11 +117,7 @@ public final class AttributeWriteRequest {
   }
 
   public static AttributeWriteRequest newInstance(
-      long endpointId,
-      long clusterId,
-      long attributeId,
-      byte[] tlv,
-      Optional<Integer> dataVersion) {
+      int endpointId, long clusterId, long attributeId, byte[] tlv, Optional<Integer> dataVersion) {
     return new AttributeWriteRequest(
         ChipPathId.forId(endpointId),
         ChipPathId.forId(clusterId),

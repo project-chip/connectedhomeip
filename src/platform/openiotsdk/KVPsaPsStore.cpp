@@ -303,7 +303,7 @@ CHIP_ERROR KVPsaPsStore::WriteConfigValue(Key key, uint64_t val)
 
 CHIP_ERROR KVPsaPsStore::WriteConfigValueStr(Key key, const char * str)
 {
-    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t *>(str), (str != NULL) ? strlen(str) : 0);
+    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t *>(str), (str != nullptr) ? strlen(str) : 0);
 }
 
 CHIP_ERROR KVPsaPsStore::WriteConfigValueStr(Key key, const char * str, size_t strLen)

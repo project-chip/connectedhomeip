@@ -29,7 +29,7 @@ assert(current_os == "freertos")
 project_dir = "${chip_root}/examples/lock-app/cc13x2x7_26x2x7"
 
 ti_simplelink_sdk("sdk") {
-  include_dirs = [ "${project_dir}/main/include" ]
+  include_dirs = [ "${project_dir}/include" ]
   public_configs = [ ":lock_app_config" ]
 }
 
@@ -75,16 +75,17 @@ ti_simplelink_executable("lock_app") {
 
   sources = [
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
-    "${project_dir}/main/AppTask.cpp",
-    "${project_dir}/main/BoltLockManager.cpp",
-    "${project_dir}/main/ZclCallbacks.cpp",
-    "${project_dir}/main/main.cpp",
+    "${project_dir}/src/AppTask.cpp",
+    "${project_dir}/src/LockManager.cpp",
+    "${project_dir}/src/ZclCallbacks.cpp",
+    "${project_dir}/src/main.cpp",
   ]
 
   deps = [
     ":sdk",
     ":sysconfig",
     "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/examples/platform/cc13x2_26x2:cc13x2_26x2-attestation-credentials",
     "${chip_root}/src/lib",
   ]
 
@@ -96,7 +97,6 @@ ti_simplelink_executable("lock_app") {
 
   include_dirs = [
     "${project_dir}",
-    "${project_dir}/main",
     "${chip_root}/examples/providers/",
   ]
 

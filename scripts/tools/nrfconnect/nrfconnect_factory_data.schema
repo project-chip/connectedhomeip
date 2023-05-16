@@ -156,6 +156,16 @@
             "minLength": 36, 
             "maxLength": 36
         },
+        "product_finish": {
+            "description": "Product finish provides a description of the product's external case finish method (matte, satin, polished, rugged, fabric)",
+            "type": "integer",
+            "enum": [0, 1, 2, 3, 4, 5]
+        },
+        "primary_color": { 
+            "description": "Product finish provides a description of the product's primary color",
+            "type": "integer",
+            "enum": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        },
         "user": {
             "description": "A user-specific additional data which should be added to factory data. This should be a Json format.",
             "type": "object"

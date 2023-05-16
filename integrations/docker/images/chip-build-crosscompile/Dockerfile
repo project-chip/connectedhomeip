@@ -28,6 +28,6 @@ RUN set -x \
 
 FROM connectedhomeip/chip-build:${VERSION}
 
-COPY --from=build /opt/ubuntu-22.04.1-aarch64-sysroot/ /opt/ubuntu-22.04-aarch64-sysroot/
+COPY --from=build /opt/ubuntu-22.04.1-aarch64-sysroot/ /opt/ubuntu-22.04.1-aarch64-sysroot/
 
 ENV SYSROOT_AARCH64=/opt/ubuntu-22.04.1-aarch64-sysroot

@@ -142,9 +142,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Thermostat-App");
@@ -246,7 +244,6 @@ void AppTask::UpdateThermoStatUI()
 #endif // DISPLAY_ENABLED
 }
 
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent aEvent           = {};
@@ -259,4 +256,3 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         sAppTask.PostEvent(&aEvent);
     }
 }
-#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT

@@ -128,7 +128,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mOperationalKeystore           = initParams.operationalKeystore;
     mOpCertStore                   = initParams.opCertStore;
 
-    mCertificateValidityPolicy.Init(initParams.certificateValidityPolicy);
+    if (initParams.certificateValidityPolicy)
+    {
+        mCertificateValidityPolicy.Init(initParams.certificateValidityPolicy);
+    }
+    else
+    {
+        mCertificateValidityPolicy.Init(&sDefaultCertValidityPolicy);
+    }
 
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT)
     VerifyOrDie(chip::audit::ExecutePersistentStorageApiAudit(*mDeviceStorage));
@@ -531,11 +538,12 @@ void Server::ResumeSubscriptions()
 }
 #endif
 
+Credentials::IgnoreCertificateValidityPeriodPolicy Server::sDefaultCertValidityPolicy;
+
 KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
 PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
 Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
 Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
-Credentials::IgnoreCertificateValidityPeriodPolicy CommonCaseDeviceServerInitParams::sDefaultCertValidityPolicy;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
 SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
 #endif

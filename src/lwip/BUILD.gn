@@ -29,7 +29,7 @@ if (lwip_platform == "") {
 }
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
-           lwip_platform == "cc13x2_26x2" || lwip_platform == "cc32xx" ||
+           lwip_platform == "cc13xx_26xx" || lwip_platform == "cc32xx" ||
            lwip_platform == "silabs" || lwip_platform == "k32w0" ||
            lwip_platform == "qpg" || lwip_platform == "mbed" ||
            lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
@@ -44,7 +44,7 @@ if (lwip_platform != "external") {
   }
 }
 
-if (lwip_platform == "cc13x2_26x2") {
+if (lwip_platform == "cc13xx_26xx") {
   import("//build_overrides/ti_simplelink_sdk.gni")
 } else if (lwip_platform == "cc32xx") {
   import("//build_overrides/ti_simplelink_sdk.gni")
@@ -180,7 +180,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
     }
 
     public_deps = [ ":lwip_buildconfig" ]
-    if (lwip_platform == "cc13x2_26x2") {
+    if (lwip_platform == "cc13xx_26xx") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
     } else if (lwip_platform == "cc32xx") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]

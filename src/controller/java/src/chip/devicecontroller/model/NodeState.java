@@ -35,7 +35,7 @@ public final class NodeState {
   }
 
   // Called from native code only, which ignores access modifiers.
-  private void setDataVersion(int endpointId, long clusterId, int dataVersion) {
+  private void setDataVersion(int endpointId, long clusterId, long dataVersion) {
     EndpointState endpointState = getEndpointState(endpointId);
     ClusterState clusterState = endpointState.getClusterState(clusterId);
 
