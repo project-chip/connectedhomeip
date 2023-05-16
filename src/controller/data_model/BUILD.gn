@@ -240,6 +240,12 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/TotalVolatileOrganicCompoundsConcentrationMeasurementClient-ReadImpl.cpp",
       "jni/TurbidityConcentrationMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/TurbidityConcentrationMeasurementClient-ReadImpl.cpp",
+      "jni/Pm1ConcentrationMeasurementClient-ReadImpl.cpp",
+      "jni/Pm1ConcentrationMeasurementClient-InvokeSubscribeImpl.cpp",
+      "jni/Pm10ConcentrationMeasurementClient-ReadImpl.cpp",
+      "jni/Pm10ConcentrationMeasurementClient-InvokeSubscribeImpl.cpp",
+      "jni/Pm25ConcentrationMeasurementClient-ReadImpl.cpp",
+      "jni/Pm25ConcentrationMeasurementClient-InvokeSubscribeImpl.cpp",
 
       # Disable CM cluster table tests until update is done
       # https://github.com/project-chip/connectedhomeip/issues/24425
