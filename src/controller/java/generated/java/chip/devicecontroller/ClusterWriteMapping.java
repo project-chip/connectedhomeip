@@ -345,6 +345,8 @@ public class ClusterWriteMapping {
     writeBinaryInputBasicInteractionInfo.put(
         "writeReliabilityAttribute", writeBinaryInputBasicReliabilityAttributeInteractionInfo);
     writeAttributeMap.put("binaryInputBasic", writeBinaryInputBasicInteractionInfo);
+    Map<String, InteractionInfo> writePulseWidthModulationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("pulseWidthModulation", writePulseWidthModulationInteractionInfo);
     Map<String, InteractionInfo> writeDescriptorInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("descriptor", writeDescriptorInteractionInfo);
     Map<String, InteractionInfo> writeBindingInteractionInfo = new LinkedHashMap<>();
@@ -553,6 +555,8 @@ public class ClusterWriteMapping {
         new LinkedHashMap<>();
     writeAttributeMap.put(
         "ethernetNetworkDiagnostics", writeEthernetNetworkDiagnosticsInteractionInfo);
+    Map<String, InteractionInfo> writeTimeSynchronizationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("timeSynchronization", writeTimeSynchronizationInteractionInfo);
     Map<String, InteractionInfo> writeBridgedDeviceBasicInformationInteractionInfo =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeBridgedDeviceBasicInformationNodeLabelCommandParams =
@@ -589,6 +593,12 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("fixedLabel", writeFixedLabelInteractionInfo);
     Map<String, InteractionInfo> writeUserLabelInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("userLabel", writeUserLabelInteractionInfo);
+    Map<String, InteractionInfo> writeProxyConfigurationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("proxyConfiguration", writeProxyConfigurationInteractionInfo);
+    Map<String, InteractionInfo> writeProxyDiscoveryInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("proxyDiscovery", writeProxyDiscoveryInteractionInfo);
+    Map<String, InteractionInfo> writeProxyValidInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("proxyValid", writeProxyValidInteractionInfo);
     Map<String, InteractionInfo> writeBooleanStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("booleanState", writeBooleanStateInteractionInfo);
     Map<String, InteractionInfo> writeModeSelectInteractionInfo = new LinkedHashMap<>();
@@ -2593,6 +2603,8 @@ public class ClusterWriteMapping {
         "writeAcOverloadAlarmsMaskAttribute",
         writeElectricalMeasurementAcOverloadAlarmsMaskAttributeInteractionInfo);
     writeAttributeMap.put("electricalMeasurement", writeElectricalMeasurementInteractionInfo);
+    Map<String, InteractionInfo> writeClientMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("clientMonitoring", writeClientMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeUnitTestingInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeUnitTestingBooleanCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -3842,6 +3854,8 @@ public class ClusterWriteMapping {
     writeUnitTestingInteractionInfo.put(
         "writeWriteOnlyInt8uAttribute", writeUnitTestingWriteOnlyInt8uAttributeInteractionInfo);
     writeAttributeMap.put("unitTesting", writeUnitTestingInteractionInfo);
+    Map<String, InteractionInfo> writeFaultInjectionInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("faultInjection", writeFaultInjectionInteractionInfo);
     return writeAttributeMap;
   }
 }
