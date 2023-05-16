@@ -49,7 +49,7 @@ limitations under the License.
             <description>RegisteredClients</description>
             <access op="read" privilege="administer"/>
         </attribute>
-        <attribute side="server" code="0x04" define="ICD_COUNTER" type="INT32U" writable="false" default="0" ptional="true" isNullable="false">
+        <attribute side="server" code="0x04" define="ICD_COUNTER" type="INT32U" writable="false" default="0" optional="true" isNullable="false">
             <description>ICDCounter</description>
             <access op="read" privilege="administer"/>
         </attribute>
