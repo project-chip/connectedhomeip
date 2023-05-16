@@ -37,7 +37,7 @@
 #include "SilabsDeviceDataProvider.h"
 #include "rsi_board.h"
 #include "rsi_chip.h"
-#include "siwx917_utils.h"
+#include "silabs_utils.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>

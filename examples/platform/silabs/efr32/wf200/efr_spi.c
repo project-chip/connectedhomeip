@@ -417,7 +417,6 @@ static void sl_wfx_spi_wakeup_irq_callback(uint8_t irqNumber)
  *****************************************************************************/
 void sl_wfx_host_gpio_init(void)
 {
-    SILABS_LOG("WIFI: GPIO Init:IRQ=%d", wirq_irq_nb);
     // Enable GPIO clock.
     CMU_ClockEnable(cmuClock_GPIO, true);
 
