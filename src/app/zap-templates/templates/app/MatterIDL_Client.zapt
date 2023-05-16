@@ -8,7 +8,5 @@
 {{/if}}
 {{/zcl_structs}}
 {{#zcl_clusters~}}
-  {{#if (is_client side)~}}
-    {{>idl_cluster_definition}}
-  {{~/if}}
+{{>idl_cluster_definition generateClientCluster=1}}
 {{/zcl_clusters}}

@@ -1,5 +1,6 @@
 /** {{description}} */
-{{side}} cluster {{asUpperCamelCase name}} = {{code}} {
+{{#if generateClientCluster}}client {{else}}server {{/if~}}
+cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
@@ -36,7 +37,7 @@
   }
 
   {{/zcl_events}}
-  {{#if (is_client side)}}
+  {{#if generateClientCluster}}
     {{#zcl_attributes_server}}
       {{#if clusterRef}}
   {{! ensure indent }}{{>idl_attribute_definition}}
@@ -61,14 +62,14 @@
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 {{!--Open:Generating command request structs for all incoming commands into server side--~}}
-  {{#if (is_server side)}}
+  {{#unless generateClientCluster}}
     {{#all_incoming_commands_for_cluster name side}}
       {{~>idl_command_request_struct}}
     {{/all_incoming_commands_for_cluster}}
-  {{/if}}
+  {{/unless}}
   {{~!--Close:Generating command request structs for all incoming commands into server side--~}}
   {{~!--Open:Generating command request structs for all outgoing commands from client side--~}}
-  {{#if (is_client side)}}
+  {{#if generateClientCluster}}
     {{#zcl_commands}}
       {{#if (isStrEqual source "client")}}
       {{~>idl_command_request_struct}}
@@ -81,20 +82,21 @@
   {{~!--Open:Generating command response structs for all incoming commands into client side--~}}
   {{~!--Close:Generating command response structs for all incoming commands into client side--~}}
   {{~!--Open:Generating command response structs for all outgoing commands from server side--~}}
-  {{#if (is_server side)}}
+  {{#unless generateClientCluster}}
     {{#all_outgoing_commands_for_cluster name side}}
       {{~>idl_command_response_struct}}
     {{/all_outgoing_commands_for_cluster}}
-  {{/if}}
+  {{/unless}}
   {{~!--Close:Generating command response structs for all outgoing commands from server side--~}}
-  {{#if (is_server side)}}
+  {{#unless generateClientCluster}}
     {{#all_incoming_commands_for_cluster name side}}
       {{~>idl_command_request_response}}{{~new_line 1~}}
     {{/all_incoming_commands_for_cluster}}
-  {{/if}}
-  {{#if (is_client side)}}
+  {{/unless}}
+  {{#if generateClientCluster}}
     {{#zcl_commands_source_client}}
       {{~>idl_command_request_response}}{{~new_line 1~}}
     {{/zcl_commands_source_client}}
   {{/if}}
 }
+

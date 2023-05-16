@@ -8,7 +8,11 @@
 {{/if}}
 {{/zcl_structs}}
 {{#all_user_clusters~}}
-{{>idl_cluster_definition}}
+{{#if (is_client side)~}}
+{{>idl_cluster_definition generateClientCluster=1}}
+{{else~}}
+{{>idl_cluster_definition generateClientCluster=0}}
+{{/if}
 
 {{/all_user_clusters}}
 {{#user_endpoints}}
