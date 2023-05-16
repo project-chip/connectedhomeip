@@ -366,6 +366,121 @@ public:
     ~ModeSelectCluster() {}
 };
 
+class DLL_EXPORT HepaFilterMonitoringCluster : public ClusterBase
+{
+public:
+    HepaFilterMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~HepaFilterMonitoringCluster() {}
+};
+
+class DLL_EXPORT ActivatedCarbonFilterMonitoringCluster : public ClusterBase
+{
+public:
+    ActivatedCarbonFilterMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                           EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~ActivatedCarbonFilterMonitoringCluster() {}
+};
+
+class DLL_EXPORT CeramicFilterMonitoringCluster : public ClusterBase
+{
+public:
+    CeramicFilterMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                   EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~CeramicFilterMonitoringCluster() {}
+};
+
+class DLL_EXPORT ElectrostaticFilterMonitoringCluster : public ClusterBase
+{
+public:
+    ElectrostaticFilterMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                         EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~ElectrostaticFilterMonitoringCluster() {}
+};
+
+class DLL_EXPORT UvFilterMonitoringCluster : public ClusterBase
+{
+public:
+    UvFilterMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~UvFilterMonitoringCluster() {}
+};
+
+class DLL_EXPORT IonizingFilterMonitoringCluster : public ClusterBase
+{
+public:
+    IonizingFilterMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                    EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~IonizingFilterMonitoringCluster() {}
+};
+
+class DLL_EXPORT ZeoliteFilterMonitoringCluster : public ClusterBase
+{
+public:
+    ZeoliteFilterMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                   EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~ZeoliteFilterMonitoringCluster() {}
+};
+
+class DLL_EXPORT OzoneFilterMonitoringCluster : public ClusterBase
+{
+public:
+    OzoneFilterMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~OzoneFilterMonitoringCluster() {}
+};
+
+class DLL_EXPORT WaterTankMonitoringCluster : public ClusterBase
+{
+public:
+    WaterTankMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~WaterTankMonitoringCluster() {}
+};
+
+class DLL_EXPORT FuelTankMonitoringCluster : public ClusterBase
+{
+public:
+    FuelTankMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~FuelTankMonitoringCluster() {}
+};
+
+class DLL_EXPORT InkCartridgeMonitoringCluster : public ClusterBase
+{
+public:
+    InkCartridgeMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                  EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~InkCartridgeMonitoringCluster() {}
+};
+
+class DLL_EXPORT TonerCartridgeMonitoringCluster : public ClusterBase
+{
+public:
+    TonerCartridgeMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                    EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~TonerCartridgeMonitoringCluster() {}
+};
+
 class DLL_EXPORT DoorLockCluster : public ClusterBase
 {
 public:

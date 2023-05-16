@@ -276,6 +276,18 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeProxyValidID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000044,
     MTRClusterIDTypeBooleanStateID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
+    MTRClusterIDTypeHEPAFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000071,
+    MTRClusterIDTypeActivatedCarbonFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000072,
+    MTRClusterIDTypeCeramicFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000073,
+    MTRClusterIDTypeElectrostaticFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000074,
+    MTRClusterIDTypeUVFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000075,
+    MTRClusterIDTypeIonizingFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000076,
+    MTRClusterIDTypeZeoliteFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000077,
+    MTRClusterIDTypeOzoneFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000078,
+    MTRClusterIDTypeWaterTankMonitoringID MTR_NEWLY_AVAILABLE = 0x00000079,
+    MTRClusterIDTypeFuelTankMonitoringID MTR_NEWLY_AVAILABLE = 0x0000007A,
+    MTRClusterIDTypeInkCartridgeMonitoringID MTR_NEWLY_AVAILABLE = 0x0000007B,
+    MTRClusterIDTypeTonerCartridgeMonitoringID MTR_NEWLY_AVAILABLE = 0x0000007C,
     MTRClusterIDTypeDoorLockID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000101,
     MTRClusterIDTypeWindowCoveringID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000102,
     MTRClusterIDTypeBarrierControlID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000103,
@@ -3646,6 +3658,198 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterModeSelectAttributeFeatureMapID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster HEPAFilterMonitoring attributes
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ActivatedCarbonFilterMonitoring attributes
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster CeramicFilterMonitoring attributes
+    MTRAttributeIDTypeClusterCeramicFilterMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterCeramicFilterMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterCeramicFilterMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterCeramicFilterMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterCeramicFilterMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterCeramicFilterMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterCeramicFilterMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterCeramicFilterMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterCeramicFilterMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ElectrostaticFilterMonitoring attributes
+    MTRAttributeIDTypeClusterElectrostaticFilterMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterElectrostaticFilterMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterElectrostaticFilterMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterElectrostaticFilterMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterElectrostaticFilterMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterElectrostaticFilterMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterElectrostaticFilterMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterElectrostaticFilterMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterElectrostaticFilterMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster UVFilterMonitoring attributes
+    MTRAttributeIDTypeClusterUVFilterMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterUVFilterMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterUVFilterMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterUVFilterMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterUVFilterMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterUVFilterMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterUVFilterMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterUVFilterMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterUVFilterMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster IonizingFilterMonitoring attributes
+    MTRAttributeIDTypeClusterIonizingFilterMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterIonizingFilterMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterIonizingFilterMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterIonizingFilterMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterIonizingFilterMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterIonizingFilterMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterIonizingFilterMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterIonizingFilterMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterIonizingFilterMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ZeoliteFilterMonitoring attributes
+    MTRAttributeIDTypeClusterZeoliteFilterMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterZeoliteFilterMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterZeoliteFilterMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterZeoliteFilterMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterZeoliteFilterMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterZeoliteFilterMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterZeoliteFilterMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterZeoliteFilterMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterZeoliteFilterMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster OzoneFilterMonitoring attributes
+    MTRAttributeIDTypeClusterOzoneFilterMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterOzoneFilterMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterOzoneFilterMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterOzoneFilterMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterOzoneFilterMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterOzoneFilterMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterOzoneFilterMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterOzoneFilterMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterOzoneFilterMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster WaterTankMonitoring attributes
+    MTRAttributeIDTypeClusterWaterTankMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterWaterTankMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterWaterTankMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterWaterTankMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterWaterTankMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterWaterTankMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterWaterTankMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterWaterTankMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterWaterTankMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster FuelTankMonitoring attributes
+    MTRAttributeIDTypeClusterFuelTankMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterFuelTankMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterFuelTankMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterFuelTankMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterFuelTankMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterFuelTankMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterFuelTankMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterFuelTankMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterFuelTankMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster InkCartridgeMonitoring attributes
+    MTRAttributeIDTypeClusterInkCartridgeMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterInkCartridgeMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterInkCartridgeMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterInkCartridgeMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterInkCartridgeMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterInkCartridgeMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterInkCartridgeMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterInkCartridgeMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterInkCartridgeMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster TonerCartridgeMonitoring attributes
+    MTRAttributeIDTypeClusterTonerCartridgeMonitoringAttributeConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterTonerCartridgeMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterTonerCartridgeMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterTonerCartridgeMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterTonerCartridgeMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterTonerCartridgeMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterTonerCartridgeMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterTonerCartridgeMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterTonerCartridgeMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster DoorLock deprecated attribute names
@@ -8733,6 +8937,42 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster ModeSelect commands
     MTRCommandIDTypeClusterModeSelectCommandChangeToModeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000000,
+
+    // Cluster HEPAFilterMonitoring commands
+    MTRCommandIDTypeClusterHEPAFilterMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster ActivatedCarbonFilterMonitoring commands
+    MTRCommandIDTypeClusterActivatedCarbonFilterMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster CeramicFilterMonitoring commands
+    MTRCommandIDTypeClusterCeramicFilterMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster ElectrostaticFilterMonitoring commands
+    MTRCommandIDTypeClusterElectrostaticFilterMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster UVFilterMonitoring commands
+    MTRCommandIDTypeClusterUVFilterMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster IonizingFilterMonitoring commands
+    MTRCommandIDTypeClusterIonizingFilterMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster ZeoliteFilterMonitoring commands
+    MTRCommandIDTypeClusterZeoliteFilterMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster OzoneFilterMonitoring commands
+    MTRCommandIDTypeClusterOzoneFilterMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster WaterTankMonitoring commands
+    MTRCommandIDTypeClusterWaterTankMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster FuelTankMonitoring commands
+    MTRCommandIDTypeClusterFuelTankMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster InkCartridgeMonitoring commands
+    MTRCommandIDTypeClusterInkCartridgeMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster TonerCartridgeMonitoring commands
+    MTRCommandIDTypeClusterTonerCartridgeMonitoringCommandResetConditionID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster DoorLock deprecated command id names
     MTRClusterDoorLockCommandLockDoorID MTR_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandLockDoorID",

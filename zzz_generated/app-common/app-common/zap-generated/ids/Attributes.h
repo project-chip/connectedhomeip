@@ -2405,6 +2405,558 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ModeSelect
 
+namespace HepaFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace HepaFilterMonitoring
+
+namespace ActivatedCarbonFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ActivatedCarbonFilterMonitoring
+
+namespace CeramicFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CeramicFilterMonitoring
+
+namespace ElectrostaticFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ElectrostaticFilterMonitoring
+
+namespace UvFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace UvFilterMonitoring
+
+namespace IonizingFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace IonizingFilterMonitoring
+
+namespace ZeoliteFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ZeoliteFilterMonitoring
+
+namespace OzoneFilterMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace OzoneFilterMonitoring
+
+namespace WaterTankMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace WaterTankMonitoring
+
+namespace FuelTankMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace FuelTankMonitoring
+
+namespace InkCartridgeMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace InkCartridgeMonitoring
+
+namespace TonerCartridgeMonitoring {
+namespace Attributes {
+
+namespace Condition {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Condition
+
+namespace DegradationDirection {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace DegradationDirection
+
+namespace ChangeIndication {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ChangeIndication
+
+namespace InPlaceIndicator {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace InPlaceIndicator
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TonerCartridgeMonitoring
+
 namespace DoorLock {
 namespace Attributes {
 
