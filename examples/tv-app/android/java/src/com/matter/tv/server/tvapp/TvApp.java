@@ -28,7 +28,7 @@ public class TvApp {
     nativeInit();
   }
 
-  private void postClusterInit(int clusterId, int endpoint) {
+  private void postClusterInit(long clusterId, int endpoint) {
     Log.d(TAG, "postClusterInit for " + clusterId + " at " + endpoint);
     if (mCallback != null) {
       mCallback.onClusterInit(this, clusterId, endpoint);
