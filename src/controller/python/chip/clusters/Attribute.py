@@ -466,13 +466,14 @@ class AttributeCache:
 
 
 class SubscriptionTransaction:
-    def __init__(self, transaction: AsyncReadTransaction, subscriptionId, devCtrl):
+    def __init__(self, transaction: AsyncReadTransaction, subscriptionId, maxInterval, devCtrl):
         self._onResubscriptionAttemptedCb = DefaultResubscriptionAttemptedCallback
         self._onAttributeChangeCb = DefaultAttributeChangeCallback
         self._onEventChangeCb = DefaultEventChangeCallback
         self._onErrorCb = DefaultErrorCallback
         self._readTransaction = transaction
         self._subscriptionId = subscriptionId
+        self._maxInterval = maxInterval
         self._devCtrl = devCtrl
         self._isDone = False
         self._onResubscriptionSucceededCb = None
@@ -556,6 +557,14 @@ class SubscriptionTransaction:
     @property
     def OnErrorCb(self) -> Callable[[int, SubscriptionTransaction], None]:
         return self._onErrorCb
+
+    @property
+    def subscriptionId(self) -> int:
+        return self._subscriptionId
+
+    @property
+    def maxInterval(self) -> int:
+        return self._maxInterval
 
     def Shutdown(self):
         if (self._isDone):
@@ -711,10 +720,10 @@ class AsyncReadTransaction:
     def handleError(self, chipError: PyChipError):
         self._resultError = chipError.code
 
-    def _handleSubscriptionEstablished(self, subscriptionId):
+    def _handleSubscriptionEstablished(self, subscriptionId, maxInterval):
         if not self._future.done():
             self._subscription_handler = SubscriptionTransaction(
-                self, subscriptionId, self._devCtrl)
+                self, subscriptionId, maxInterval, self._devCtrl)
             self._future.set_result(self._subscription_handler)
         else:
             logging.info("Re-subscription succeeded!")
@@ -725,9 +734,9 @@ class AsyncReadTransaction:
                 else:
                     self._subscription_handler._onResubscriptionSucceededCb(self._subscription_handler)
 
-    def handleSubscriptionEstablished(self, subscriptionId):
+    def handleSubscriptionEstablished(self, subscriptionId, maxInterval):
         self._event_loop.call_soon_threadsafe(
-            self._handleSubscriptionEstablished, subscriptionId)
+            self._handleSubscriptionEstablished, subscriptionId, maxInterval)
 
     def handleResubscriptionAttempted(self, terminationCause: PyChipError, nextResubscribeIntervalMsec: int):
         if (self._subscription_handler._onResubscriptionAttemptedCb_isAsync):
@@ -837,7 +846,7 @@ class AsyncWriteTransaction:
 
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32, c_uint16, c_uint32, c_uint32, c_uint8, c_void_p, c_size_t)
-_OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint32)
+_OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint32, c_uint16)
 _OnResubscriptionAttemptedCallbackFunct = CFUNCTYPE(None, py_object, PyChipError, c_uint32)
 _OnReadEventDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_uint64, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t, c_uint8)
@@ -867,8 +876,8 @@ def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: c_uint
 
 
 @_OnSubscriptionEstablishedCallbackFunct
-def _OnSubscriptionEstablishedCallback(closure, subscriptionId):
-    closure.handleSubscriptionEstablished(subscriptionId)
+def _OnSubscriptionEstablishedCallback(closure, subscriptionId, maxInterval):
+    closure.handleSubscriptionEstablished(subscriptionId, maxInterval)
 
 
 @_OnResubscriptionAttemptedCallbackFunct

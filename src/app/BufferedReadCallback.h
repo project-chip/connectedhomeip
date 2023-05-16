@@ -81,9 +81,9 @@ private:
     }
 
     void OnDone(ReadClient * apReadClient) override { return mCallback.OnDone(apReadClient); }
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval) override
     {
-        mCallback.OnSubscriptionEstablished(aSubscriptionId);
+        mCallback.OnSubscriptionEstablished(aSubscriptionId, aMaxInterval);
     }
 
     CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override

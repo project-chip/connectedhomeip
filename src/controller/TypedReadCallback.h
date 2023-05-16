@@ -53,7 +53,7 @@ public:
     using OnErrorCallbackType = std::function<void(const app::ConcreteDataAttributePath * aPath, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(TypedReadAttributeCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType =
-        std::function<void(const app::ReadClient & readClient, SubscriptionId aSubscriptionId)>;
+        std::function<void(const app::ReadClient & readClient, SubscriptionId aSubscriptionId, uint16_t aMaxInterval)>;
     using OnResubscriptionAttemptCallbackType =
         std::function<void(const app::ReadClient & readClient, CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec)>;
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
@@ -124,11 +124,11 @@ private:
 
     void OnDone(app::ReadClient *) override { mOnDone(this); }
 
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval) override
     {
         if (mOnSubscriptionEstablished)
         {
-            mOnSubscriptionEstablished(*mReadClient.get(), aSubscriptionId);
+            mOnSubscriptionEstablished(*mReadClient.get(), aSubscriptionId, aMaxInterval);
         }
     }
 
@@ -177,7 +177,7 @@ public:
     using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader, CHIP_ERROR aError)>;
     using OnDoneCallbackType    = std::function<void(app::ReadClient * apReadClient)>;
     using OnSubscriptionEstablishedCallbackType =
-        std::function<void(const app::ReadClient & aReadClient, SubscriptionId aSubscriptionId)>;
+        std::function<void(const app::ReadClient & aReadClient, SubscriptionId aSubscriptionId, uint16_t aMaxInterval)>;
     using OnResubscriptionAttemptCallbackType =
         std::function<void(const app::ReadClient & aReadClient, CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec)>;
 
@@ -258,11 +258,11 @@ private:
         chip::Platform::Delete<app::EventPathParams>(aReadPrepareParams.mpEventPathParamsList);
     }
 
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval) override
     {
         if (mOnSubscriptionEstablished)
         {
-            mOnSubscriptionEstablished(*mReadClient.get(), aSubscriptionId);
+            mOnSubscriptionEstablished(*mReadClient.get(), aSubscriptionId, aMaxInterval);
         }
     }
 

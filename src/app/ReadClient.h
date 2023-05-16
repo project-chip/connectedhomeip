@@ -134,8 +134,9 @@ public:
          * receives an OnDone call to destroy the object.
          *
          * @param[in] aSubscriptionId The identifier of the subscription that was established.
+         * @param[in] aMaxInterval The reporting max interval of the subscription that was established
          */
-        virtual void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) {}
+        virtual void OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval) {}
 
         /**
          * OnResubscriptionNeeded will be called when a subscription that was started with SendAutoResubscribeRequest has terminated

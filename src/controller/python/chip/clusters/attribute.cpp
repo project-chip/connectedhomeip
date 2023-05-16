@@ -75,7 +75,7 @@ using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::
                                          chip::EventId eventId, chip::EventNumber eventNumber, uint8_t priority, uint64_t timestamp,
                                          uint8_t timestampType, uint8_t * data, uint32_t dataLen,
                                          std::underlying_type_t<Protocols::InteractionModel::Status> imstatus);
-using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, SubscriptionId subscriptionId);
+using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, SubscriptionId subscriptionId, uint16_t maxInterval);
 using OnResubscriptionAttemptedCallback = void (*)(PyObject * appContext, PyChipError aTerminationCause,
                                                    uint32_t aNextResubscribeIntervalMsec);
 using OnReadErrorCallback               = void (*)(PyObject * appContext, PyChipError chiperror);
@@ -142,9 +142,9 @@ public:
                                      to_underlying(aStatus.mStatus), buffer.get(), size);
     }
 
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval) override
     {
-        gOnSubscriptionEstablishedCallback(mAppContext, aSubscriptionId);
+        gOnSubscriptionEstablishedCallback(mAppContext, aSubscriptionId, aMaxInterval);
     }
 
     CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override

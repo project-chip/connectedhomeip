@@ -158,7 +158,10 @@ public:
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval) override
+    {
+        mOnSubscriptionEstablished = true;
+    }
 
     uint32_t mAttributeCount        = 0;
     uint32_t mEventCount            = 0;

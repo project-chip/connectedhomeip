@@ -163,7 +163,7 @@ void InteractionModel::OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPr
     InteractionModelReports::OnDeallocatePaths(std::move(aReadPrepareParams));
 }
 
-void InteractionModel::OnSubscriptionEstablished(SubscriptionId subscriptionId)
+void InteractionModel::OnSubscriptionEstablished(SubscriptionId subscriptionId, uint16_t maxInterval)
 {
     ContinueOnChipMainThread(CHIP_NO_ERROR);
 }

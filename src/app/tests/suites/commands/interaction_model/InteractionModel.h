@@ -672,7 +672,7 @@ public:
                      const chip::app::StatusIB * status) override;
     void OnError(CHIP_ERROR error) override;
     void OnDone(chip::app::ReadClient * aReadClient) override;
-    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override;
+    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId, uint16_t maxInterval) override;
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override;
     /////////// WriteClient Callback Interface /////////
     void OnResponse(const chip::app::WriteClient * client, const chip::app::ConcreteDataAttributePath & path,

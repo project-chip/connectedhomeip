@@ -149,7 +149,7 @@ protected:
         ReportCommand(commandName, credsIssuerConfig)
     {}
 
-    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override
+    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId, uint16_t maxInterval) override
     {
         mSubscriptionEstablished = true;
         SetCommandExitStatus(CHIP_NO_ERROR);

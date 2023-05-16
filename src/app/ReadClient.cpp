@@ -919,7 +919,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 
     MoveToState(ClientState::SubscriptionActive);
 
-    mpCallback.OnSubscriptionEstablished(subscriptionId);
+    mpCallback.OnSubscriptionEstablished(subscriptionId, mMaxInterval);
 
     mNumRetries = 0;
 
