@@ -898,28 +898,27 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
     if (epIndex < FIXED_ENDPOINT_COUNT)
     {
         // This endpoint is a fixed one.
-        // ajust the return index to be in the scope of the ClusterServer[0 to fixedClusterServerEndpointCount]
-        // in chronological order of appearance of the cluster server in the endpoint database
-        uint16_t ajustedEndpointIndex = 0;
+        // Return the index of this endpoint in the list of fixed endpoints that support the given cluster.
+        uint16_t adjustedEndpointIndex = 0;
         for (uint16_t i = 0; i < epIndex; i++)
         {
-            // increase ajustedEndpointIndex for every endpoint containing the cluster server
+            // Increase adjustedEndpointIndex for every endpoint containing the cluster server
             // before our endpoint of interest
             if (emAfEndpoints[i].endpoint != kInvalidEndpointId &&
                 (emberAfFindClusterInType(emAfEndpoints[i].endpointType, cluster, CLUSTER_MASK_SERVER) != nullptr))
             {
-                ajustedEndpointIndex++;
+                adjustedEndpointIndex++;
             }
         }
 
-        // If this asserts, The provided fixedClusterServerEndpointCount doesn't match the app data model"
-        VerifyOrDie(ajustedEndpointIndex < fixedClusterServerEndpointCount);
-        epIndex = ajustedEndpointIndex;
+        // If this asserts, the provided fixedClusterServerEndpointCount doesn't match the app data model.
+        VerifyOrDie(adjustedEndpointIndex < fixedClusterServerEndpointCount);
+        epIndex = adjustedEndpointIndex;
     }
     else
     {
         // This is a dynamic endpoint.
-        // It's index is just its index in the dynamic endpoint list, offset by fixedClusterServerEndpointCount.
+        // Its index is just its index in the dynamic endpoint list, offset by fixedClusterServerEndpointCount.
         epIndex = static_cast<uint16_t>(fixedClusterServerEndpointCount + (epIndex - FIXED_ENDPOINT_COUNT));
     }
 
