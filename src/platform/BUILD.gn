@@ -294,6 +294,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK=1",
         "CHIP_DEVICE_LAYER_TARGET=openiotsdk",
       ]
+    } else if (chip_device_platform == "asr") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_ASR=1",
+        "CHIP_DEVICE_LAYER_TARGET=ASR",
+      ]
     }
 
     if (chip_device_config_device_software_version_string != "") {
@@ -476,6 +481,8 @@ if (chip_device_platform != "none") {
       _platform_target = "mt793x"
     } else if (chip_device_platform == "openiotsdk") {
       _platform_target = "openiotsdk"
+    } else if (chip_device_platform == "asr") {
+      _platform_target = "ASR"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }
