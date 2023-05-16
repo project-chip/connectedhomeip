@@ -13,7 +13,6 @@
 {{else~}}
 {{>idl_cluster_definition generateClientCluster=0}}
 {{/if}}
-
 {{/all_user_clusters}}
 {{#user_endpoints}}
 endpoint {{endpointId}} {
