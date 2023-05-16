@@ -2498,6 +2498,56 @@ client cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Allows servers to ensure that listed clients are notified when a server is available for communication. */
+client cluster IcdManagement = 70 {
+  bitmap ICDManagementFeature : BITMAP32 {
+    kCheckInProtocolSupport = 0x1;
+  }
+
+  fabric_scoped struct MonitoringRegistrationStruct {
+    fabric_sensitive node_id checkInNodeID = 1;
+    fabric_sensitive int64u monitoredSubject = 2;
+    fabric_sensitive octet_string<16> key = 3;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute int32u idleModeInterval = 0;
+  readonly attribute int32u activeModeInterval = 1;
+  readonly attribute int16u activeModeThreshold = 2;
+  readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
+  readonly attribute access(read: administer) optional int32u ICDCounter = 4;
+  readonly attribute optional int16u clientsSupportedPerFabric = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RegisterClientRequest {
+    node_id checkInNodeID = 0;
+    INT64U monitoredSubject = 1;
+    OCTET_STRING<16> key = 2;
+    optional OCTET_STRING<16> verificationKey = 3;
+  }
+
+  response struct RegisterClientResponse = 1 {
+    INT32U ICDCounter = 0;
+  }
+
+  request struct UnregisterClientRequest {
+    node_id checkInNodeID = 0;
+    optional OCTET_STRING<16> key = 1;
+  }
+
+  /** Register a client to the end device */
+  fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
+  /** Unregister a client from an end device */
+  fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
+  /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
+  command access(invoke: manage) StayActiveRequest(): DefaultSuccess = 3;
+}
+
 /** Attributes and commands for selecting a mode from a list of supported options. */
 client cluster ModeSelect = 80 {
   bitmap ModeSelectFeature : BITMAP32 {
@@ -5877,6 +5927,7 @@ endpoint 1 {
   binding cluster FixedLabel;
   binding cluster UserLabel;
   binding cluster BooleanState;
+  binding cluster IcdManagement;
   binding cluster ModeSelect;
   binding cluster AirQuality;
   binding cluster HepaFilterMonitoring;

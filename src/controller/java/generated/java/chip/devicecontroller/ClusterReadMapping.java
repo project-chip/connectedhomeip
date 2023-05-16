@@ -6813,6 +6813,177 @@ public class ClusterReadMapping {
     return result;
   }
 
+  private static Map<String, InteractionInfo> readIcdManagementInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readIcdManagementIdleModeIntervalCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementIdleModeIntervalAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readIdleModeIntervalAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readIcdManagementIdleModeIntervalCommandParams);
+    result.put(
+        "readIdleModeIntervalAttribute", readIcdManagementIdleModeIntervalAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementActiveModeIntervalCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementActiveModeIntervalAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readActiveModeIntervalAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readIcdManagementActiveModeIntervalCommandParams);
+    result.put(
+        "readActiveModeIntervalAttribute",
+        readIcdManagementActiveModeIntervalAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementActiveModeThresholdCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementActiveModeThresholdAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readActiveModeThresholdAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readIcdManagementActiveModeThresholdCommandParams);
+    result.put(
+        "readActiveModeThresholdAttribute",
+        readIcdManagementActiveModeThresholdAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementRegisteredClientsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementRegisteredClientsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readRegisteredClientsAttribute(
+                      (ChipClusters.IcdManagementCluster.RegisteredClientsAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedIcdManagementClusterRegisteredClientsAttributeCallback(),
+            readIcdManagementRegisteredClientsCommandParams);
+    result.put(
+        "readRegisteredClientsAttribute",
+        readIcdManagementRegisteredClientsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementICDCounterCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementICDCounterAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readICDCounterAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readIcdManagementICDCounterCommandParams);
+    result.put("readICDCounterAttribute", readIcdManagementICDCounterAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementClientsSupportedPerFabricCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementClientsSupportedPerFabricAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readClientsSupportedPerFabricAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readIcdManagementClientsSupportedPerFabricCommandParams);
+    result.put(
+        "readClientsSupportedPerFabricAttribute",
+        readIcdManagementClientsSupportedPerFabricAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.IcdManagementCluster.GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedIcdManagementClusterGeneratedCommandListAttributeCallback(),
+            readIcdManagementGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readIcdManagementGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.IcdManagementCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedIcdManagementClusterAcceptedCommandListAttributeCallback(),
+            readIcdManagementAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readIcdManagementAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.IcdManagementCluster.EventListAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIcdManagementClusterEventListAttributeCallback(),
+            readIcdManagementEventListCommandParams);
+    result.put("readEventListAttribute", readIcdManagementEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.IcdManagementCluster.AttributeListAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedIcdManagementClusterAttributeListAttributeCallback(),
+            readIcdManagementAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute", readIcdManagementAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readIcdManagementFeatureMapCommandParams);
+    result.put("readFeatureMapAttribute", readIcdManagementFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIcdManagementClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIcdManagementClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readIcdManagementClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute", readIcdManagementClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
   private static Map<String, InteractionInfo> readModeSelectInteractionInfo() {
     Map<String, InteractionInfo> result = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readModeSelectDescriptionCommandParams =
@@ -18385,6 +18556,7 @@ public class ClusterReadMapping {
         put("fixedLabel", readFixedLabelInteractionInfo());
         put("userLabel", readUserLabelInteractionInfo());
         put("booleanState", readBooleanStateInteractionInfo());
+        put("icdManagement", readIcdManagementInteractionInfo());
         put("modeSelect", readModeSelectInteractionInfo());
         put("airQuality", readAirQualityInteractionInfo());
         put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());

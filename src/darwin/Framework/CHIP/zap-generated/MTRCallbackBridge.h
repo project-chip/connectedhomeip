@@ -85,6 +85,8 @@ typedef void (*GroupKeyManagementClusterKeySetReadResponseCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
 typedef void (*GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
+typedef void (*ICDManagementClusterRegisterClientResponseCallbackType)(
+    void *, const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType &);
 typedef void (*DoorLockClusterGetWeekDayScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
 typedef void (*DoorLockClusterGetYearDayScheduleResponseCallbackType)(
@@ -984,6 +986,18 @@ typedef void (*BooleanStateAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BooleanStateAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ICDManagementRegisteredClientsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType> & data);
+typedef void (*ICDManagementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ICDManagementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ICDManagementEventListListAttributeCallback)(void * context,
+                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ICDManagementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ModeSelectSupportedModesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & data);
@@ -6963,6 +6977,170 @@ public:
     void OnSubscriptionEstablished();
     using MTRBooleanStateAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBooleanStateAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRICDManagementRegisteredClientsListAttributeCallbackBridge
+    : public MTRCallbackBridge<ICDManagementRegisteredClientsListAttributeCallback>
+{
+public:
+    MTRICDManagementRegisteredClientsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ICDManagementRegisteredClientsListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRICDManagementRegisteredClientsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<ICDManagementRegisteredClientsListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType> & value);
+};
+
+class MTRICDManagementRegisteredClientsListAttributeCallbackSubscriptionBridge
+    : public MTRICDManagementRegisteredClientsListAttributeCallbackBridge
+{
+public:
+    MTRICDManagementRegisteredClientsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRICDManagementRegisteredClientsListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRICDManagementRegisteredClientsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRICDManagementRegisteredClientsListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRICDManagementGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ICDManagementGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRICDManagementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ICDManagementGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRICDManagementGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<ICDManagementGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRICDManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRICDManagementGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRICDManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRICDManagementGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRICDManagementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRICDManagementGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRICDManagementAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ICDManagementAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRICDManagementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ICDManagementAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRICDManagementAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<ICDManagementAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRICDManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRICDManagementAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRICDManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRICDManagementAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRICDManagementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRICDManagementAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRICDManagementEventListListAttributeCallbackBridge : public MTRCallbackBridge<ICDManagementEventListListAttributeCallback>
+{
+public:
+    MTRICDManagementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ICDManagementEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRICDManagementEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<ICDManagementEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRICDManagementEventListListAttributeCallbackSubscriptionBridge : public MTRICDManagementEventListListAttributeCallbackBridge
+{
+public:
+    MTRICDManagementEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action,
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRICDManagementEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRICDManagementEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRICDManagementEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRICDManagementAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ICDManagementAttributeListListAttributeCallback>
+{
+public:
+    MTRICDManagementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ICDManagementAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRICDManagementAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRActionBlock action) :
+        MTRCallbackBridge<ICDManagementAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRICDManagementAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRICDManagementAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRICDManagementAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action,
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRICDManagementAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRICDManagementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRICDManagementAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -13359,6 +13537,21 @@ public:
     static void
     OnSuccessFn(void * context,
                 const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
+};
+
+class MTRICDManagementClusterRegisterClientResponseCallbackBridge
+    : public MTRCallbackBridge<ICDManagementClusterRegisterClientResponseCallbackType>
+{
+public:
+    MTRICDManagementClusterRegisterClientResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ICDManagementClusterRegisterClientResponseCallbackType>(queue, handler, OnSuccessFn){};
+
+    MTRICDManagementClusterRegisterClientResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<ICDManagementClusterRegisterClientResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
 };
 
 class MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge

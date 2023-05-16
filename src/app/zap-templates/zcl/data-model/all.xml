@@ -15,7 +15,6 @@
    <xi:include href="chip/bridged-device-basic-information.xml" />
    <xi:include href="chip/chip-ota.xml" />
    <xi:include href="chip/chip-types.xml" />
-   <xi:include href="chip/client-monitoring-cluster.xml" />
    <xi:include href="chip/clusters-extensions.xml" />
    <xi:include href="chip/color-control-cluster.xml" />
    <xi:include href="chip/content-launch-cluster.xml" />
@@ -32,6 +31,7 @@
    <xi:include href="chip/global-attributes.xml" />
    <xi:include href="chip/groups-cluster.xml" />
    <xi:include href="chip/group-key-mgmt-cluster.xml" />
+   <xi:include href="chip/icd-management-cluster.xml" />
    <xi:include href="chip/identify-cluster.xml" />
    <xi:include href="chip/illuminance-measurement-cluster.xml" />
    <xi:include href="chip/level-control-cluster.xml" />
