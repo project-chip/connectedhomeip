@@ -42,8 +42,6 @@ declare_args() {
   # Use default handler to negotiate subscription max interval
   chip_config_use_icd_subscription_callbacks = enable_sleepy_device
 
-  #use nvm for DIC
-  enable_nvm_DIC = false
 }
 
 # Use persitent subscriptions for IC devices
