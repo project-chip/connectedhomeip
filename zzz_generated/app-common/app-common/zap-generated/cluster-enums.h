@@ -1514,8 +1514,8 @@ enum class AirQualityEnum : uint8_t
     kUnknownEnumValue = 7,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kFair          = 0x1,
     kModerate      = 0x2,

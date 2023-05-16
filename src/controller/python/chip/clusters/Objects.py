@@ -14821,7 +14821,7 @@ class AirQuality(Cluster):
             kUnknownEnumValue = 7,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kFair = 0x1
             kModerate = 0x2
             kVeryPoor = 0x4
