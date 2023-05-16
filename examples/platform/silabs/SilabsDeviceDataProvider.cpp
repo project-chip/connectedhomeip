@@ -113,7 +113,7 @@ CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
-     if (strlen(spake2Verifier) != 0)
+    if (strlen(spake2Verifier) != 0)
     {
         err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_Spake2pVerifier, spake2Verifier);
         if (err != CHIP_NO_ERROR)
@@ -170,7 +170,7 @@ CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
-#endif //DIC_ENABLE
+#endif // DIC_ENABLE
     if (strlen(vendorName) != 0)
     {
         err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_VendorName, vendorName);
