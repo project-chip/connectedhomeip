@@ -787,7 +787,7 @@ tests:
           values:
               - name: "Status"
                 saveAs: StoreStatus
-                constraints: 
+                constraints:
                     anyOf: [0x00, 0x89]
               - name: "GroupID"
                 value: 0x0001
@@ -939,7 +939,7 @@ tests:
           values:
               - name: "Status"
                 saveAs: StoreStatus
-                constraints: 
+                constraints:
                     anyOf: [0x00, 0x89]
               - name: "GroupID"
                 value: 0x0002
