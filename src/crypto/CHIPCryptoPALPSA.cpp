@@ -1673,7 +1673,7 @@ CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, Mutable
     serialNumber.reduce_size(len);
 
 exit:
-    _log_mbedTLS_error(result);
+    logMbedTLSError(result);
     mbedtls_x509_crt_free(&mbed_cert);
 
 #else
