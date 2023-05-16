@@ -180,6 +180,9 @@ public class ChipDeviceController {
    *
    * @param deviceId the node ID to assign to the device
    * @param setupCode the scanned QR code or manual entry code
+   * @param discoverOnce the flag to enable/disable PASE auto retry mechanism
+   * @param useOnlyOnNetworkDiscovery the flag to indicate the commissionable device is available on
+   *     the network
    * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
    *     generated CSR nonce.
    * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
@@ -187,9 +190,18 @@ public class ChipDeviceController {
   public void pairDeviceWithCode(
       long deviceId,
       String setupCode,
+      boolean discoverOnce,
+      boolean useOnlyOnNetworkDiscovery,
       @Nullable byte[] csrNonce,
       @Nullable NetworkCredentials networkCredentials) {
-    pairDeviceWithCode(deviceControllerPtr, deviceId, setupCode, csrNonce, networkCredentials);
+    pairDeviceWithCode(
+        deviceControllerPtr,
+        deviceId,
+        setupCode,
+        discoverOnce,
+        useOnlyOnNetworkDiscovery,
+        csrNonce,
+        networkCredentials);
   }
 
   public void establishPaseConnection(long deviceId, int connId, long setupPincode) {
@@ -1017,6 +1029,8 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long deviceId,
       String setupCode,
+      boolean discoverOnce,
+      boolean useOnlyOnNetworkDiscovery,
       @Nullable byte[] csrNonce,
       @Nullable NetworkCredentials networkCredentials);
 

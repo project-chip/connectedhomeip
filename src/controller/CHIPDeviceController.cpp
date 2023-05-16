@@ -590,6 +590,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
                                           DiscoveryType discoveryType)
 {
     MATTER_TRACE_EVENT_SCOPE("PairDevice", "DeviceCommissioner");
+
     if (mDefaultCommissioner == nullptr)
     {
         ChipLogError(Controller, "No default commissioner is specified");
