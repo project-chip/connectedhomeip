@@ -11,4 +11,4 @@
   {{#if (is_client side)~}}
     {{>idl_cluster_definition}}
   {{~/if}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
