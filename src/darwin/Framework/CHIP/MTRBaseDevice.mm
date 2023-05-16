@@ -1819,7 +1819,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
                                                 error:(NSError * __autoreleasing *)error
 {
     if (!CheckMemberOfType(responseValue, MTRCommandPathKey, [MTRCommandPath class],
-            @"response-valie command path is not an MTRCommandPath.", error)) {
+            @"response-value command path is not an MTRCommandPath.", error)) {
         return System::PacketBufferHandle();
     }
 
