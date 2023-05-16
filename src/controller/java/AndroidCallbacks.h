@@ -65,7 +65,7 @@ struct ReportCallback : public app::ClusterStateCache::Callback
 
     void OnDone(app::ReadClient *) override;
 
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval) override;
 
     CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
@@ -109,7 +109,7 @@ struct ReportEventCallback : public app::ReadClient::Callback
 
     void OnDone(app::ReadClient *) override;
 
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval) override;
 
     CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 

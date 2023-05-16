@@ -116,7 +116,7 @@ private:
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override;
 
-    void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override;
+    void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId, uint16_t aMaxInterval) override;
 
     CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 

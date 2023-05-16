@@ -139,7 +139,10 @@ private:
         }
     }
 
-    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override { this->mBridge->OnSubscriptionEstablished(); }
+    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId, uint16_t maxInterval) override
+    {
+        this->mBridge->OnSubscriptionEstablished();
+    }
 
     void OnDone(chip::app::ReadClient * readClient) override
     {

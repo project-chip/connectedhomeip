@@ -542,10 +542,10 @@ void ReportCallback::OnDone(app::ReadClient *)
     JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
 }
 
-void ReportCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
+void ReportCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval)
 {
     DeviceLayer::StackUnlock unlock;
-    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef, aSubscriptionId);
+    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef, aSubscriptionId, aMaxInterval);
 }
 
 CHIP_ERROR ReportCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
@@ -797,10 +797,10 @@ void ReportEventCallback::OnDone(app::ReadClient *)
     JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
 }
 
-void ReportEventCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
+void ReportEventCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef, aSubscriptionId);
+    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef, aSubscriptionId, aMaxInterval);
 }
 
 CHIP_ERROR ReportEventCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)

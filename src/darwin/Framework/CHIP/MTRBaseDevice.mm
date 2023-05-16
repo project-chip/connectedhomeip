@@ -863,7 +863,7 @@ private:
 
     void OnDone(ReadClient *) override { mOnDone(this); }
 
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval) override
     {
         if (mOnSubscriptionEstablished) {
             mOnSubscriptionEstablished();

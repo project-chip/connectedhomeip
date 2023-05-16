@@ -90,7 +90,7 @@ void MTRBaseSubscriptionCallback::OnDeallocatePaths(ReadPrepareParams && aReadPr
     }
 }
 
-void MTRBaseSubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
+void MTRBaseSubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId, uint16_t aMaxInterval)
 {
     if (mSubscriptionEstablishedHandler) {
         auto subscriptionEstablishedHandler = mSubscriptionEstablishedHandler;
