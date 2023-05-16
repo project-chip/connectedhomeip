@@ -4,11 +4,12 @@
             "path": "fuchsia/third_party/zap/${platform}",
             "platforms": [
                 "linux-amd64",
+                "linux-arm64",
                 "mac-amd64",
                 "mac-arm64",
                 "windows-amd64"
             ],
-            "tags": ["version:2@v2023.04.27-nightly.1"]
+            "tags": ["version:2@v2023.05.16-nightly.1"]
         }
     ]
 }

@@ -513,6 +513,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterStartUpEvent")
 @interface MTRBridgedDeviceBasicClusterStartUpEvent : MTRBridgedDeviceBasicInformationClusterStartUpEvent
 @end
 
@@ -521,6 +522,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterShutDownEvent")
 @interface MTRBridgedDeviceBasicClusterShutDownEvent : MTRBridgedDeviceBasicInformationClusterShutDownEvent
 @end
 
@@ -529,6 +531,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterLeaveEvent")
 @interface MTRBridgedDeviceBasicClusterLeaveEvent : MTRBridgedDeviceBasicInformationClusterLeaveEvent
 @end
 
@@ -538,6 +541,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterReachableChangedEvent")
 @interface MTRBridgedDeviceBasicClusterReachableChangedEvent : MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
 @end
 
