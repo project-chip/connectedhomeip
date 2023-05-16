@@ -139,6 +139,12 @@ declare -a args=(
     )
 }
 
+[[ $CHIP_IS_TSAN == YES ]] && {
+    args+=(
+        'is_tsan=true'
+    )
+}
+
 [[ $CHIP_IS_CLANG == YES ]] && {
     args+=(
         'is_clang=true'
