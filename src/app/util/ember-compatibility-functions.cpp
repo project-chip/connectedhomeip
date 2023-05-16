@@ -103,6 +103,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_DATA_VER_ATTRIBUTE_TYPE:   // Data Version
     case ZCL_BITMAP32_ATTRIBUTE_TYPE:   // 32-bit bitmap
     case ZCL_EPOCH_S_ATTRIBUTE_TYPE:    // Epoch Seconds
+    case ZCL_ELAPSED_S_ATTRIBUTE_TYPE:  // Elapsed Seconds
         static_assert(std::is_same<chip::ClusterId, uint32_t>::value,
                       "chip::Cluster is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::AttributeId, uint32_t>::value,
@@ -121,11 +122,14 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::DataVersion is expected to be uint32_t, change this when necessary");
         return ZCL_INT32U_ATTRIBUTE_TYPE;
 
-    case ZCL_EVENT_NO_ATTRIBUTE_TYPE:  // Event Number
-    case ZCL_FABRIC_ID_ATTRIBUTE_TYPE: // Fabric Id
-    case ZCL_NODE_ID_ATTRIBUTE_TYPE:   // Node Id
-    case ZCL_BITMAP64_ATTRIBUTE_TYPE:  // 64-bit bitmap
-    case ZCL_EPOCH_US_ATTRIBUTE_TYPE:  // Epoch Microseconds
+    case ZCL_EVENT_NO_ATTRIBUTE_TYPE:   // Event Number
+    case ZCL_FABRIC_ID_ATTRIBUTE_TYPE:  // Fabric Id
+    case ZCL_NODE_ID_ATTRIBUTE_TYPE:    // Node Id
+    case ZCL_BITMAP64_ATTRIBUTE_TYPE:   // 64-bit bitmap
+    case ZCL_EPOCH_US_ATTRIBUTE_TYPE:   // Epoch Microseconds
+    case ZCL_POSIX_MS_ATTRIBUTE_TYPE:   // POSIX Milliseconds
+    case ZCL_SYSTIME_MS_ATTRIBUTE_TYPE: // System time Milliseconds
+    case ZCL_SYSTIME_US_ATTRIBUTE_TYPE: // System time Microseconds
         static_assert(std::is_same<chip::EventNumber, uint64_t>::value,
                       "chip::EventNumber is expected to be uint64_t, change this when necessary");
         static_assert(std::is_same<chip::FabricId, uint64_t>::value,

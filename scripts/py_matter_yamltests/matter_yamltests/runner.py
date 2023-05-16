@@ -155,7 +155,7 @@ class TestRunner(TestRunnerBase):
             duration = round((time.time() - start) * 1000)
             runner_config.hooks.stop(duration)
 
-        return True
+        return parser_builder.done
 
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
         status = True

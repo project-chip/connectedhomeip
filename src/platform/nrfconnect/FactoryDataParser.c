@@ -22,7 +22,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#define MAX_FACTORY_DATA_NESTING_LEVEL 3
+#define MAX_FACTORY_DATA_NESTING_LEVEL 4
 
 static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
 {
@@ -31,6 +31,19 @@ static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
     if (zcbor_uint32_decode(states, &u32))
     {
         *value = (uint16_t) u32;
+        return true;
+    }
+
+    return false;
+}
+
+static inline bool uint8_decode(zcbor_state_t * states, uint8_t * value)
+{
+    uint32_t u32;
+
+    if (zcbor_uint32_decode(states, &u32))
+    {
+        *value = (uint8_t) u32;
         return true;
     }
 
@@ -232,6 +245,16 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         else if (strncmp("enable_key", (const char *) currentString.value, currentString.len) == 0)
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->enable_key);
+        }
+        else if (strncmp("product_finish", (const char *) currentString.value, currentString.len) == 0)
+        {
+            res                               = res && uint8_decode(states, &factoryData->product_finish);
+            factoryData->productFinishPresent = res;
+        }
+        else if (strncmp("primary_color", (const char *) currentString.value, currentString.len) == 0)
+        {
+            res                              = res && uint8_decode(states, &factoryData->primary_color);
+            factoryData->primaryColorPresent = res;
         }
         else if (strncmp("user", (const char *) currentString.value, currentString.len) == 0)
         {

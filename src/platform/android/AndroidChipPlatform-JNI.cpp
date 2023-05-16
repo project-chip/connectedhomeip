@@ -37,6 +37,7 @@
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
+#include "BleConnectCallback-JNI.h"
 #include "CommissionableDataProviderImpl.h"
 #include "DiagnosticDataProviderImpl.h"
 #include "DnssdImpl.h"
@@ -84,6 +85,9 @@ CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
     SuccessOrExit(err);
     ChipLogProgress(DeviceLayer, "Java class references loaded.");
 
+    err = BleConnectCallbackJNI_OnLoad(jvm, reserved);
+    SuccessOrExit(err);
+
     chip::InitializeTracing();
 
 exit:
@@ -99,6 +103,7 @@ exit:
 void AndroidChipPlatformJNI_OnUnload(JavaVM * jvm, void * reserved)
 {
     ChipLogProgress(DeviceLayer, "AndroidChipPlatform JNI_OnUnload() called");
+    BleConnectCallbackJNI_OnUnload(jvm, reserved);
     chip::Platform::MemoryShutdown();
 }
 

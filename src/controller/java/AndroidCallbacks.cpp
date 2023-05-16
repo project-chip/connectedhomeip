@@ -334,10 +334,10 @@ void ReportCallback::UpdateClusterDataVersion()
 
     // SetDataVersion to NodeState
     jmethodID setDataVersionMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "setDataVersion", "(IJI)V", &setDataVersionMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "setDataVersion", "(IJJ)V", &setDataVersionMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find setDataVersion method"));
     env->CallVoidMethod(mNodeStateObj, setDataVersionMethod, static_cast<jint>(lastConcreteClusterPath.mEndpointId),
-                        static_cast<jlong>(lastConcreteClusterPath.mClusterId), static_cast<jint>(committedDataVersion.Value()));
+                        static_cast<jlong>(lastConcreteClusterPath.mClusterId), static_cast<jlong>(committedDataVersion.Value()));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
@@ -428,11 +428,11 @@ CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath,
     JniClass attributePathJniCls(attributePathCls);
 
     jmethodID attributePathCtor =
-        env->GetStaticMethodID(attributePathCls, "newInstance", "(JJJ)Lchip/devicecontroller/model/ChipAttributePath;");
+        env->GetStaticMethodID(attributePathCls, "newInstance", "(IJJ)Lchip/devicecontroller/model/ChipAttributePath;");
     VerifyOrReturnError(attributePathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outObj =
-        env->CallStaticObjectMethod(attributePathCls, attributePathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    outObj = env->CallStaticObjectMethod(attributePathCls, attributePathCtor, static_cast<jint>(aPath.mEndpointId),
+                                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId));
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     return err;
@@ -449,7 +449,7 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & 
     JniClass invokeElementJniCls(invokeElementCls);
 
     jmethodID invokeElementCtor = env->GetStaticMethodID(invokeElementCls, "newInstance",
-                                                         "(JJJ[BLjava/lang/String;)Lchip/devicecontroller/model/InvokeElement;");
+                                                         "(IJJ[BLjava/lang/String;)Lchip/devicecontroller/model/InvokeElement;");
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
     VerifyOrReturnError(invokeElementCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
@@ -480,13 +480,15 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & 
         ReturnErrorOnFailure(err);
 
         UtfString jsonString(env, JsonToString(json).c_str());
-        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, aPath.mEndpointId, aPath.mClusterId,
-                                             aPath.mCommandId, jniByteArray.jniValue(), jsonString.jniValue());
+        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, static_cast<jint>(aPath.mEndpointId),
+                                             static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mCommandId),
+                                             jniByteArray.jniValue(), jsonString.jniValue());
     }
     else
     {
-        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, aPath.mEndpointId, aPath.mClusterId,
-                                             aPath.mCommandId, nullptr, nullptr);
+        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, static_cast<jint>(aPath.mEndpointId),
+                                             static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mCommandId), nullptr,
+                                             nullptr);
     }
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
@@ -504,10 +506,11 @@ CHIP_ERROR ReportCallback::CreateChipEventPath(const app::ConcreteEventPath & aP
     JniClass eventPathJniCls(eventPathCls);
 
     jmethodID eventPathCtor =
-        env->GetStaticMethodID(eventPathCls, "newInstance", "(JJJ)Lchip/devicecontroller/model/ChipEventPath;");
+        env->GetStaticMethodID(eventPathCls, "newInstance", "(IJJ)Lchip/devicecontroller/model/ChipEventPath;");
     VerifyOrReturnError(eventPathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mEventId);
+    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, static_cast<jint>(aPath.mEndpointId),
+                                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mEventId));
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     return err;
@@ -558,8 +561,9 @@ CHIP_ERROR ReportCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient
         env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(II)V", &onResubscriptionAttemptMethod));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod, aTerminationCause.AsInteger(),
-                        apReadClient->ComputeTimeTillNextSubscription());
+    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod,
+                        static_cast<jint>(aTerminationCause.AsInteger()),
+                        static_cast<jint>(apReadClient->ComputeTimeTillNextSubscription()));
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
     return CHIP_NO_ERROR;
 }
@@ -763,10 +767,11 @@ CHIP_ERROR ReportEventCallback::CreateChipEventPath(const app::ConcreteEventPath
     JniClass eventPathJniCls(eventPathCls);
 
     jmethodID eventPathCtor =
-        env->GetStaticMethodID(eventPathCls, "newInstance", "(JJJ)Lchip/devicecontroller/model/ChipEventPath;");
+        env->GetStaticMethodID(eventPathCls, "newInstance", "(IJJ)Lchip/devicecontroller/model/ChipEventPath;");
     VerifyOrReturnError(eventPathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mEventId);
+    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, static_cast<jint>(aPath.mEndpointId),
+                                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mEventId));
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     return err;
@@ -811,8 +816,9 @@ CHIP_ERROR ReportEventCallback::OnResubscriptionNeeded(app::ReadClient * apReadC
         env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(II)V", &onResubscriptionAttemptMethod));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod, aTerminationCause.AsInteger(),
-                        apReadClient->ComputeTimeTillNextSubscription());
+    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod,
+                        static_cast<jint>(aTerminationCause.AsInteger()),
+                        static_cast<jint>(apReadClient->ComputeTimeTillNextSubscription()));
 
     return CHIP_NO_ERROR;
 }
@@ -996,8 +1002,7 @@ void InvokeCallback::OnResponse(app::CommandSender * apCommandSender, const app:
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj,
-                        static_cast<std::underlying_type_t<Protocols::InteractionModel::Status>>(aStatusIB.mStatus));
+    env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj, static_cast<jlong>(aStatusIB.mStatus));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 

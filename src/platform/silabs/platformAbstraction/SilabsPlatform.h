@@ -29,6 +29,14 @@ class SilabsPlatform : virtual public SilabsPlatformAbstractionBase
 {
 
 public:
+    enum class ButtonAction : uint8_t
+    {
+        ButtonReleased = 0,
+        ButtonPressed,
+        ButtonDisabled,
+        InvalidAction
+    };
+
     // Generic Peripherical methods
     CHIP_ERROR Init(void) override;
 

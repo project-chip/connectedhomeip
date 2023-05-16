@@ -42,8 +42,8 @@
 #include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/SecureSessionTable.h>
+#include <transport/Session.h>
 #include <transport/SessionDelegate.h>
-#include <transport/SessionHandle.h>
 #include <transport/SessionHolder.h>
 #include <transport/SessionMessageDelegate.h>
 #include <transport/TransportMgr.h>
