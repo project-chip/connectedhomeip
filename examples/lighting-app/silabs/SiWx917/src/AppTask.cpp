@@ -43,6 +43,7 @@
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 
@@ -240,12 +241,12 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
-    if (button == SIWx917_BTN1 && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    if (button == SIWx917_BTN1 && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         button_event.Handler = LightActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (button == SIWx917_BTN0 && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    else if (button == SIWx917_BTN0 && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);

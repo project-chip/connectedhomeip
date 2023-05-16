@@ -27,6 +27,8 @@ class PairCodeCommand(controller: ChipDeviceController, credsIssue: CredentialsI
       .pairDeviceWithCode(
         getNodeId(),
         getOnboardingPayload(),
+        getDiscoverOnce(),
+        getUseOnlyOnNetworkDiscovery(),
         null,
         getWifiNetworkCredentials(),
       )

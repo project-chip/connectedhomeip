@@ -125,9 +125,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-#endif
 
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
@@ -169,7 +167,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent button_event           = {};
@@ -182,4 +179,3 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         sAppTask.PostEvent(&button_event);
     }
 }
-#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT

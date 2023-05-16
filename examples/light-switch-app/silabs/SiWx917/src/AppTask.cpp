@@ -69,6 +69,7 @@ constexpr chip::EndpointId kGenericSwitchEndpoint = 2;
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 
@@ -239,7 +240,7 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 
     static bool mCurrentButtonState = false;
 
-    if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
+    if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         mCurrentButtonState = !mCurrentButtonState;
         LightSwitchMgr::LightSwitchAction action =
@@ -252,7 +253,7 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
         sAppTask.GetLCD().WriteDemoUI(mCurrentButtonState);
 #endif
     }
-    else if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_RELEASED)
+    else if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased))
     {
         LightSwitchMgr::GetInstance().GenericSwitchOnShortRelease();
     }
@@ -268,7 +269,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         button_event.Handler = SwitchActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (button == SIWx917_BTN0 && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    else if (button == SIWx917_BTN0 && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);

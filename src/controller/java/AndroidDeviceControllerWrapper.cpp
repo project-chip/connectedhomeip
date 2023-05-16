@@ -528,7 +528,8 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningComplete", "(JI)V",
                                                              &onCommissioningCompleteMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
-    env->CallVoidMethod(mJavaObjectRef, onCommissioningCompleteMethod, static_cast<jlong>(deviceId), error.AsInteger());
+    env->CallVoidMethod(mJavaObjectRef, onCommissioningCompleteMethod, static_cast<jlong>(deviceId),
+                        static_cast<jint>(error.AsInteger()));
 
     if (ssidStr != nullptr)
     {
@@ -560,7 +561,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
 
     UtfString jStageCompleted(env, StageToString(stageCompleted));
     env->CallVoidMethod(mJavaObjectRef, onCommissioningStatusUpdateMethod, static_cast<jlong>(peerId.GetNodeId()),
-                        jStageCompleted.jniValue(), error.AsInteger());
+                        jStageCompleted.jniValue(), static_cast<jint>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
