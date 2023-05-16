@@ -2667,7 +2667,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRLaundryWasherClusterSemanticTagStruct
+@implementation MTRLaundryWasherModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2681,7 +2681,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRLaundryWasherClusterSemanticTagStruct alloc] init];
+    auto other = [[MTRLaundryWasherModeSelectClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
@@ -2698,7 +2698,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRLaundryWasherClusterModeOptionStruct
+@implementation MTRLaundryWasherModeSelectClusterModeOptionStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2714,7 +2714,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRLaundryWasherClusterModeOptionStruct alloc] init];
+    auto other = [[MTRLaundryWasherModeSelectClusterModeOptionStruct alloc] init];
 
     other.label = self.label;
     other.mode = self.mode;

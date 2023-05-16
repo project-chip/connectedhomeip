@@ -4174,7 +4174,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const LaundryWasher::Commands::ChangeToModeResponse::DecodableType & value)
+                                     const LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -7136,11 +7136,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Description", 1, value);
         }
-        case ModeSelect::Attributes::StandardNamespace::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StandardNamespace", 1, value);
-        }
         case ModeSelect::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -7194,65 +7189,62 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case LaundryWasher::Id: {
+    case LaundryWasherModeSelect::Id: {
         switch (path.mAttributeId)
         {
-        case LaundryWasher::Attributes::Description::Id: {
+        case LaundryWasherModeSelect::Attributes::Description::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Description", 1, value);
         }
-        case LaundryWasher::Attributes::StandardNamespace::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StandardNamespace", 1, value);
-        }
-        case LaundryWasher::Attributes::SupportedModes::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasher::Structs::ModeOptionStruct::DecodableType> value;
+        case LaundryWasherModeSelect::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case LaundryWasher::Attributes::CurrentMode::Id: {
+        case LaundryWasherModeSelect::Attributes::CurrentMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case LaundryWasher::Attributes::StartUpMode::Id: {
+        case LaundryWasherModeSelect::Attributes::StartUpMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpMode", 1, value);
         }
-        case LaundryWasher::Attributes::OnMode::Id: {
+        case LaundryWasherModeSelect::Attributes::OnMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OnMode", 1, value);
         }
-        case LaundryWasher::Attributes::GeneratedCommandList::Id: {
+        case LaundryWasherModeSelect::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case LaundryWasher::Attributes::AcceptedCommandList::Id: {
+        case LaundryWasherModeSelect::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case LaundryWasher::Attributes::EventList::Id: {
+        case LaundryWasherModeSelect::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case LaundryWasher::Attributes::AttributeList::Id: {
+        case LaundryWasherModeSelect::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case LaundryWasher::Attributes::FeatureMap::Id: {
+        case LaundryWasherModeSelect::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case LaundryWasher::Attributes::ClusterRevision::Id: {
+        case LaundryWasherModeSelect::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -7267,11 +7259,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Description", 1, value);
-        }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::StandardNamespace::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StandardNamespace", 1, value);
         }
         case RefrigeratorAndTemperatureControlledCabinet::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<
@@ -7336,11 +7323,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Description", 1, value);
         }
-        case RvcRun::Attributes::StandardNamespace::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StandardNamespace", 1, value);
-        }
         case RvcRun::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -7402,11 +7384,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Description", 1, value);
         }
-        case RvcClean::Attributes::StandardNamespace::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StandardNamespace", 1, value);
-        }
         case RvcClean::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -7467,11 +7444,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Description", 1, value);
-        }
-        case DishwasherModeSelect::Attributes::StandardNamespace::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StandardNamespace", 1, value);
         }
         case DishwasherModeSelect::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::DecodableType>
@@ -11275,11 +11247,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
-    case LaundryWasher::Id: {
+    case LaundryWasherModeSelect::Id: {
         switch (path.mCommandId)
         {
-        case LaundryWasher::Commands::ChangeToModeResponse::Id: {
-            LaundryWasher::Commands::ChangeToModeResponse::DecodableType value;
+        case LaundryWasherModeSelect::Commands::ChangeToModeResponse::Id: {
+            LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }

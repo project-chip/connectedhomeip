@@ -415,16 +415,17 @@ typedef void (*ModeSelectEventListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*LaundryWasherSupportedModesListAttributeCallback)(
+typedef void (*LaundryWasherModeSelectSupportedModesListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasher::Structs::ModeOptionStruct::DecodableType> & data);
-typedef void (*LaundryWasherGeneratedCommandListListAttributeCallback)(
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType> & data);
+typedef void (*LaundryWasherModeSelectGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LaundryWasherAcceptedCommandListListAttributeCallback)(
+typedef void (*LaundryWasherModeSelectAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LaundryWasherEventListListAttributeCallback)(void * context,
-                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*LaundryWasherAttributeListListAttributeCallback)(
+typedef void (*LaundryWasherModeSelectEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*LaundryWasherModeSelectAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*RefrigeratorAndTemperatureControlledCabinetSupportedModesListAttributeCallback)(
     void * context,

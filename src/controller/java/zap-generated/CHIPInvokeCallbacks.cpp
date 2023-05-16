@@ -2775,8 +2775,9 @@ void CHIPModeSelectClusterChangeToModeResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, StatusText);
 }
-CHIPLaundryWasherClusterChangeToModeResponseCallback::CHIPLaundryWasherClusterChangeToModeResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPLaundryWasherClusterChangeToModeResponseCallbackType>(CallbackFn, this)
+CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback::CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback(
+    jobject javaCallback) :
+    Callback::Callback<CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2792,7 +2793,7 @@ CHIPLaundryWasherClusterChangeToModeResponseCallback::CHIPLaundryWasherClusterCh
     }
 }
 
-CHIPLaundryWasherClusterChangeToModeResponseCallback::~CHIPLaundryWasherClusterChangeToModeResponseCallback()
+CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback::~CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2803,8 +2804,9 @@ CHIPLaundryWasherClusterChangeToModeResponseCallback::~CHIPLaundryWasherClusterC
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPLaundryWasherClusterChangeToModeResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::LaundryWasher::Commands::ChangeToModeResponse::DecodableType & dataResponse)
+void CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback::CallbackFn(
+    void * context,
+    const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2814,10 +2816,10 @@ void CHIPLaundryWasherClusterChangeToModeResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPLaundryWasherClusterChangeToModeResponseCallback,
-                    void (*)(CHIPLaundryWasherClusterChangeToModeResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPLaundryWasherClusterChangeToModeResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPLaundryWasherClusterChangeToModeResponseCallback>);
+    std::unique_ptr<CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback,
+                    void (*)(CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;

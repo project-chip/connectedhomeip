@@ -531,7 +531,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Laundry Washer (client) */ \
+      /* Endpoint: 1, Cluster: Laundry Washer Mode Select (client) */ \
       .clusterId = 0x00000051, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \

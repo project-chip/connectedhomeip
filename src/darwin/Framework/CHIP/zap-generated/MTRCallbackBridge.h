@@ -87,8 +87,8 @@ typedef void (*GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType
     void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
 typedef void (*ModeSelectClusterChangeToModeResponseCallbackType)(
     void *, const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType &);
-typedef void (*LaundryWasherClusterChangeToModeResponseCallbackType)(
-    void *, const chip::app::Clusters::LaundryWasher::Commands::ChangeToModeResponse::DecodableType &);
+typedef void (*LaundryWasherModeSelectClusterChangeToModeResponseCallbackType)(
+    void *, const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType &);
 typedef void (*RefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseCallbackType)(
     void *,
     const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeResponse::DecodableType &);
@@ -401,9 +401,10 @@ typedef void (*NullableModeSelectClusterChangeToModeResponseStatusAttributeCallb
 typedef void (*ModeSelectClusterSemanticTagsAttributeCallback)(void *, chip::app::Clusters::ModeSelect::SemanticTags);
 typedef void (*NullableModeSelectClusterSemanticTagsAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::SemanticTags> &);
-typedef void (*LaundryWasherClusterSemanticTagsAttributeCallback)(void *, chip::app::Clusters::LaundryWasher::SemanticTags);
-typedef void (*NullableLaundryWasherClusterSemanticTagsAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasher::SemanticTags> &);
+typedef void (*LaundryWasherModeSelectClusterSemanticTagsAttributeCallback)(
+    void *, chip::app::Clusters::LaundryWasherModeSelect::SemanticTags);
+typedef void (*NullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherModeSelect::SemanticTags> &);
 typedef void (*RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagsAttributeCallback)(
     void *, chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::SemanticTags);
 typedef void (*NullableRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagsAttributeCallback)(
@@ -939,16 +940,17 @@ typedef void (*ModeSelectAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*LaundryWasherSupportedModesListAttributeCallback)(
+typedef void (*LaundryWasherModeSelectSupportedModesListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasher::Structs::ModeOptionStruct::DecodableType> & data);
-typedef void (*LaundryWasherGeneratedCommandListListAttributeCallback)(
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType> & data);
+typedef void (*LaundryWasherModeSelectGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LaundryWasherAcceptedCommandListListAttributeCallback)(
+typedef void (*LaundryWasherModeSelectAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LaundryWasherEventListListAttributeCallback)(void * context,
-                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*LaundryWasherAttributeListListAttributeCallback)(
+typedef void (*LaundryWasherModeSelectEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*LaundryWasherModeSelectAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*RefrigeratorAndTemperatureControlledCabinetSupportedModesListAttributeCallback)(
     void * context,
@@ -6999,166 +7001,168 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRLaundryWasherSupportedModesListAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherSupportedModesListAttributeCallback>
+class MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge
+    : public MTRCallbackBridge<LaundryWasherModeSelectSupportedModesListAttributeCallback>
 {
 public:
-    MTRLaundryWasherSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherSupportedModesListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LaundryWasherModeSelectSupportedModesListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRLaundryWasherSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<LaundryWasherModeSelectSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasher::Structs::ModeOptionStruct::DecodableType> &
-            value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType> & value);
 };
 
-class MTRLaundryWasherSupportedModesListAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherSupportedModesListAttributeCallbackBridge
+class MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackSubscriptionBridge
+    : public MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge
 {
 public:
-    MTRLaundryWasherSupportedModesListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action,
-                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherSupportedModesListAttributeCallbackBridge(queue, handler, action),
+    MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRLaundryWasherSupportedModesListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherSupportedModesListAttributeCallbackBridge::OnDone;
+    using MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRLaundryWasherGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherGeneratedCommandListListAttributeCallback>
+class MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<LaundryWasherModeSelectGeneratedCommandListListAttributeCallback>
 {
 public:
-    MTRLaundryWasherGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LaundryWasherModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRLaundryWasherGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<LaundryWasherModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRLaundryWasherGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherGeneratedCommandListListAttributeCallbackBridge
+class MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRLaundryWasherGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+    MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRLaundryWasherGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherGeneratedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRLaundryWasherAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherAcceptedCommandListListAttributeCallback>
+class MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<LaundryWasherModeSelectAcceptedCommandListListAttributeCallback>
 {
 public:
-    MTRLaundryWasherAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LaundryWasherModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRLaundryWasherAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<LaundryWasherModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<LaundryWasherModeSelectEventListListAttributeCallback>
+{
+public:
+    MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LaundryWasherModeSelectEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRLaundryWasherAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRLaundryWasherAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRLaundryWasherAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherAcceptedCommandListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRLaundryWasherEventListListAttributeCallbackBridge : public MTRCallbackBridge<LaundryWasherEventListListAttributeCallback>
-{
-public:
-    MTRLaundryWasherEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRLaundryWasherEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<LaundryWasherModeSelectEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
 };
 
-class MTRLaundryWasherEventListListAttributeCallbackSubscriptionBridge : public MTRLaundryWasherEventListListAttributeCallbackBridge
+class MTRLaundryWasherModeSelectEventListListAttributeCallbackSubscriptionBridge
+    : public MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge
 {
 public:
-    MTRLaundryWasherEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action,
-                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherEventListListAttributeCallbackBridge(queue, handler, action),
+    MTRLaundryWasherModeSelectEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRLaundryWasherEventListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherEventListListAttributeCallbackBridge::OnDone;
+    using MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRLaundryWasherAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherAttributeListListAttributeCallback>
+class MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<LaundryWasherModeSelectAttributeListListAttributeCallback>
 {
 public:
-    MTRLaundryWasherAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LaundryWasherModeSelectAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRLaundryWasherAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<LaundryWasherModeSelectAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class MTRLaundryWasherAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherAttributeListListAttributeCallbackBridge
+class MTRLaundryWasherModeSelectAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRLaundryWasherAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action,
-                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherAttributeListListAttributeCallbackBridge(queue, handler, action),
+    MTRLaundryWasherModeSelectAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRLaundryWasherAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherAttributeListListAttributeCallbackBridge::OnDone;
+    using MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12388,19 +12392,20 @@ public:
                             const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
 };
 
-class MTRLaundryWasherClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherClusterChangeToModeResponseCallbackType>
+class MTRLaundryWasherModeSelectClusterChangeToModeResponseCallbackBridge
+    : public MTRCallbackBridge<LaundryWasherModeSelectClusterChangeToModeResponseCallbackType>
 {
 public:
-    MTRLaundryWasherClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRLaundryWasherModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LaundryWasherModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRLaundryWasherClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+    MTRLaundryWasherModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<LaundryWasherModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::LaundryWasher::Commands::ChangeToModeResponse::DecodableType & data);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
 };
 
 class MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseCallbackBridge
@@ -17566,68 +17571,70 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRLaundryWasherClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherClusterSemanticTagsAttributeCallback>
+class MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge
+    : public MTRCallbackBridge<LaundryWasherModeSelectClusterSemanticTagsAttributeCallback>
 {
 public:
-    MTRLaundryWasherClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LaundryWasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRLaundryWasherClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<LaundryWasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::LaundryWasher::SemanticTags value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::LaundryWasherModeSelect::SemanticTags value);
 };
 
-class MTRLaundryWasherClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherClusterSemanticTagsAttributeCallbackBridge
+class MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
+    : public MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge
 {
 public:
-    MTRLaundryWasherClusterSemanticTagsAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action,
-                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
+    MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRLaundryWasherClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherClusterSemanticTagsAttributeCallbackBridge::OnDone;
+    using MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableLaundryWasherClusterSemanticTagsAttributeCallback>
+class MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallback>
 {
 public:
-    MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableLaundryWasherClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action) :
-        MTRCallbackBridge<NullableLaundryWasherClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasher::SemanticTags> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherModeSelect::SemanticTags> & value);
 };
 
-class MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackBridge
+class MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
+    : public MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge
 {
 public:
-    MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackSubscriptionBridge(
+    MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
+        MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackBridge::OnDone;
+    using MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

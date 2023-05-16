@@ -13808,18 +13808,6 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 64; }
 };
 } // namespace Description
-namespace StandardNamespace {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StandardNamespace::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StandardNamespace
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -13916,7 +13904,6 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::StandardNamespace::TypeInfo::DecodableType standardNamespace;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
@@ -13931,7 +13918,7 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ModeSelect
-namespace LaundryWasher {
+namespace LaundryWasherModeSelect {
 namespace Structs {
 namespace SemanticTagStruct = Clusters::detail::Structs::SemanticTagStruct;
 namespace ModeOptionStruct  = Clusters::detail::Structs::ModeOptionStruct;
@@ -13969,7 +13956,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
@@ -13984,7 +13971,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 
     uint8_t newMode = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -14001,13 +13988,13 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 
     uint8_t newMode = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::LaundryWasher::Commands::ChangeToModeResponse::DecodableType;
+    using ResponseType = Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14016,7 +14003,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 
     uint8_t newMode = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -14034,7 +14021,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 
     uint8_t status = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> statusText;
@@ -14050,7 +14037,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 
     uint8_t status = static_cast<uint8_t>(0);
     Optional<chip::CharSpan> statusText;
@@ -14068,34 +14055,22 @@ struct TypeInfo
     using DecodableType    = chip::CharSpan;
     using DecodableArgType = chip::CharSpan;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
     static constexpr size_t MaxLength() { return 64; }
 };
 } // namespace Description
-namespace StandardNamespace {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StandardNamespace::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StandardNamespace
 namespace SupportedModes {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::LaundryWasher::Structs::ModeOptionStruct::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasher::Structs::ModeOptionStruct::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasher::Structs::ModeOptionStruct::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14107,7 +14082,7 @@ struct TypeInfo
     using DecodableType    = uint8_t;
     using DecodableArgType = uint8_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14119,7 +14094,7 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
     using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14131,7 +14106,7 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
     using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14139,37 +14114,37 @@ struct TypeInfo
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 };
 } // namespace AcceptedCommandList
 namespace EventList {
 struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 };
 } // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 };
 } // namespace ClusterRevision
 
@@ -14177,12 +14152,11 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasher::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::StandardNamespace::TypeInfo::DecodableType standardNamespace;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
@@ -14196,7 +14170,7 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-} // namespace LaundryWasher
+} // namespace LaundryWasherModeSelect
 namespace RefrigeratorAndTemperatureControlledCabinet {
 namespace Structs {
 namespace SemanticTagStruct = Clusters::detail::Structs::SemanticTagStruct;
@@ -14340,18 +14314,6 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 64; }
 };
 } // namespace Description
-namespace StandardNamespace {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinet::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StandardNamespace::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StandardNamespace
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -14449,7 +14411,6 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::StandardNamespace::TypeInfo::DecodableType standardNamespace;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
@@ -14607,18 +14568,6 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 64; }
 };
 } // namespace Description
-namespace StandardNamespace {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRun::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StandardNamespace::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StandardNamespace
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -14715,7 +14664,6 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::StandardNamespace::TypeInfo::DecodableType standardNamespace;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
@@ -14873,18 +14821,6 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 64; }
 };
 } // namespace Description
-namespace StandardNamespace {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcClean::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StandardNamespace::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StandardNamespace
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -14981,7 +14917,6 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::StandardNamespace::TypeInfo::DecodableType standardNamespace;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
@@ -15139,18 +15074,6 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 64; }
 };
 } // namespace Description
-namespace StandardNamespace {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StandardNamespace::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StandardNamespace
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -15247,7 +15170,6 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::StandardNamespace::TypeInfo::DecodableType standardNamespace;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;

@@ -3752,7 +3752,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRLaundryWasherClusterChangeToModeParams : NSObject <NSCopying>
+@interface MTRLaundryWasherModeSelectClusterChangeToModeParams : NSObject <NSCopying>
 
 @property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
 /**
@@ -3782,7 +3782,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRLaundryWasherClusterChangeToModeWithStatusParams : NSObject <NSCopying>
+@interface MTRLaundryWasherModeSelectClusterChangeToModeWithStatusParams : NSObject <NSCopying>
 
 @property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
 /**
@@ -3812,7 +3812,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRLaundryWasherClusterChangeToModeResponseParams : NSObject <NSCopying>
+@interface MTRLaundryWasherModeSelectClusterChangeToModeResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_NEWLY_AVAILABLE;
 

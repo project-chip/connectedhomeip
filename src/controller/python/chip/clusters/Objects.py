@@ -14510,7 +14510,6 @@ class ModeSelect(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="description", Tag=0x00000000, Type=str),
-                ClusterObjectFieldDescriptor(Label="standardNamespace", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000002, Type=typing.List[ModeSelect.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
@@ -14524,7 +14523,6 @@ class ModeSelect(Cluster):
             ])
 
     description: 'str' = None
-    standardNamespace: 'typing.Union[Nullable, uint]' = None
     supportedModes: 'typing.List[ModeSelect.Structs.ModeOptionStruct]' = None
     currentMode: 'uint' = None
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
@@ -14665,22 +14663,6 @@ class ModeSelect(Cluster):
                 return ClusterObjectFieldDescriptor(Type=str)
 
             value: 'str' = ""
-
-        @dataclass
-        class StandardNamespace(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0050
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
-
-            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -14844,7 +14826,7 @@ class ModeSelect(Cluster):
 
 
 @dataclass
-class LaundryWasher(Cluster):
+class LaundryWasherModeSelect(Cluster):
     id: typing.ClassVar[int] = 0x0051
 
     @ChipUtility.classproperty
@@ -14852,8 +14834,7 @@ class LaundryWasher(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="description", Tag=0x00000000, Type=str),
-                ClusterObjectFieldDescriptor(Label="standardNamespace", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000002, Type=typing.List[LaundryWasher.Structs.ModeOptionStruct]),
+                ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000002, Type=typing.List[LaundryWasherModeSelect.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="onMode", Tag=0x00000005, Type=typing.Union[None, Nullable, uint]),
@@ -14866,8 +14847,7 @@ class LaundryWasher(Cluster):
             ])
 
     description: 'str' = None
-    standardNamespace: 'typing.Union[Nullable, uint]' = None
-    supportedModes: 'typing.List[LaundryWasher.Structs.ModeOptionStruct]' = None
+    supportedModes: 'typing.List[LaundryWasherModeSelect.Structs.ModeOptionStruct]' = None
     currentMode: 'uint' = None
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
     onMode: 'typing.Union[None, Nullable, uint]' = None
@@ -14917,12 +14897,12 @@ class LaundryWasher(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="label", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="mode", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="semanticTags", Tag=2, Type=typing.List[LaundryWasher.Structs.SemanticTagStruct]),
+                        ClusterObjectFieldDescriptor(Label="semanticTags", Tag=2, Type=typing.List[LaundryWasherModeSelect.Structs.SemanticTagStruct]),
                     ])
 
             label: 'str' = ""
             mode: 'uint' = 0
-            semanticTags: 'typing.List[LaundryWasher.Structs.SemanticTagStruct]' = field(default_factory=lambda: [])
+            semanticTags: 'typing.List[LaundryWasherModeSelect.Structs.SemanticTagStruct]' = field(default_factory=lambda: [])
 
     class Commands:
         @dataclass
@@ -14993,22 +14973,6 @@ class LaundryWasher(Cluster):
             value: 'str' = ""
 
         @dataclass
-        class StandardNamespace(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0051
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
-
-            value: 'typing.Union[Nullable, uint]' = NullValue
-
-        @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -15020,9 +14984,9 @@ class LaundryWasher(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[LaundryWasher.Structs.ModeOptionStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[LaundryWasherModeSelect.Structs.ModeOptionStruct])
 
-            value: 'typing.List[LaundryWasher.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
+            value: 'typing.List[LaundryWasherModeSelect.Structs.ModeOptionStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class CurrentMode(ClusterAttributeDescriptor):
@@ -15178,7 +15142,6 @@ class RefrigeratorAndTemperatureControlledCabinet(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="description", Tag=0x00000000, Type=str),
-                ClusterObjectFieldDescriptor(Label="standardNamespace", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000002, Type=typing.List[RefrigeratorAndTemperatureControlledCabinet.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
@@ -15192,7 +15155,6 @@ class RefrigeratorAndTemperatureControlledCabinet(Cluster):
             ])
 
     description: 'str' = None
-    standardNamespace: 'typing.Union[Nullable, uint]' = None
     supportedModes: 'typing.List[RefrigeratorAndTemperatureControlledCabinet.Structs.ModeOptionStruct]' = None
     currentMode: 'uint' = None
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
@@ -15315,22 +15277,6 @@ class RefrigeratorAndTemperatureControlledCabinet(Cluster):
                 return ClusterObjectFieldDescriptor(Type=str)
 
             value: 'str' = ""
-
-        @dataclass
-        class StandardNamespace(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0052
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
-
-            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -15502,7 +15448,6 @@ class RvcRun(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="description", Tag=0x00000000, Type=str),
-                ClusterObjectFieldDescriptor(Label="standardNamespace", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000002, Type=typing.List[RvcRun.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
@@ -15516,7 +15461,6 @@ class RvcRun(Cluster):
             ])
 
     description: 'str' = None
-    standardNamespace: 'typing.Union[Nullable, uint]' = None
     supportedModes: 'typing.List[RvcRun.Structs.ModeOptionStruct]' = None
     currentMode: 'uint' = None
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
@@ -15653,22 +15597,6 @@ class RvcRun(Cluster):
                 return ClusterObjectFieldDescriptor(Type=str)
 
             value: 'str' = ""
-
-        @dataclass
-        class StandardNamespace(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0054
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
-
-            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -15840,7 +15768,6 @@ class RvcClean(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="description", Tag=0x00000000, Type=str),
-                ClusterObjectFieldDescriptor(Label="standardNamespace", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000002, Type=typing.List[RvcClean.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
@@ -15854,7 +15781,6 @@ class RvcClean(Cluster):
             ])
 
     description: 'str' = None
-    standardNamespace: 'typing.Union[Nullable, uint]' = None
     supportedModes: 'typing.List[RvcClean.Structs.ModeOptionStruct]' = None
     currentMode: 'uint' = None
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
@@ -15986,22 +15912,6 @@ class RvcClean(Cluster):
                 return ClusterObjectFieldDescriptor(Type=str)
 
             value: 'str' = ""
-
-        @dataclass
-        class StandardNamespace(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0055
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
-
-            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -16173,7 +16083,6 @@ class DishwasherModeSelect(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="description", Tag=0x00000000, Type=str),
-                ClusterObjectFieldDescriptor(Label="standardNamespace", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000002, Type=typing.List[DishwasherModeSelect.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
@@ -16187,7 +16096,6 @@ class DishwasherModeSelect(Cluster):
             ])
 
     description: 'str' = None
-    standardNamespace: 'typing.Union[Nullable, uint]' = None
     supportedModes: 'typing.List[DishwasherModeSelect.Structs.ModeOptionStruct]' = None
     currentMode: 'uint' = None
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
@@ -16311,22 +16219,6 @@ class DishwasherModeSelect(Cluster):
                 return ClusterObjectFieldDescriptor(Type=str)
 
             value: 'str' = ""
-
-        @dataclass
-        class StandardNamespace(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0059
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
-
-            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):

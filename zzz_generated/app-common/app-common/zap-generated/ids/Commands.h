@@ -627,7 +627,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace Commands
 } // namespace ModeSelect
 
-namespace LaundryWasher {
+namespace LaundryWasherModeSelect {
 namespace Commands {
 
 namespace ChangeToMode {
@@ -643,7 +643,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace ChangeToModeResponse
 
 } // namespace Commands
-} // namespace LaundryWasher
+} // namespace LaundryWasherModeSelect
 
 namespace RefrigeratorAndTemperatureControlledCabinet {
 namespace Commands {

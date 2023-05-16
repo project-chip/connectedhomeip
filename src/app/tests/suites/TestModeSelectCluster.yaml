@@ -33,12 +33,6 @@ tests:
       response:
           value: "Coffee"
 
-    - label: "Read StandardNamespace"
-      command: "readAttribute"
-      attribute: "StandardNamespace"
-      response:
-          value: 0
-
     - label: "Read SupportedModes"
       command: "readAttribute"
       attribute: "SupportedModes"

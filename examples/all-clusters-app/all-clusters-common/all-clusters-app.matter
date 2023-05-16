@@ -2287,7 +2287,6 @@ server cluster ModeSelect = 80 {
   }
 
   readonly attribute char_string<64> description = 0;
-  readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute nullable int8u startUpMode = 4;
@@ -5090,7 +5089,6 @@ endpoint 1 {
 
   server cluster ModeSelect {
     ram      attribute description default = "Coffee";
-    ram      attribute standardNamespace default = 0;
     callback attribute supportedModes default = 0;
     persist  attribute currentMode default = 0;
     persist  attribute startUpMode default = 0;

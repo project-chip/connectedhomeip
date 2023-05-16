@@ -10566,28 +10566,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
             return value;
         }
-        case Attributes::StandardNamespace::Id: {
-            using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                std::string valueClassName     = "java/lang/Integer";
-                std::string valueCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value(), value);
-            }
-            return value;
-        }
         case Attributes::SupportedModes::Id: {
             using TypeInfo = Attributes::SupportedModes::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -10867,8 +10845,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::LaundryWasher::Id: {
-        using namespace app::Clusters::LaundryWasher;
+    case app::Clusters::LaundryWasherModeSelect::Id: {
+        using namespace app::Clusters::LaundryWasherModeSelect;
         switch (aPath.mAttributeId)
         {
         case Attributes::Description::Id: {
@@ -10881,28 +10859,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             jobject value;
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
-            return value;
-        }
-        case Attributes::StandardNamespace::Id: {
-            using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                std::string valueClassName     = "java/lang/Integer";
-                std::string valueCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value(), value);
-            }
             return value;
         }
         case Attributes::SupportedModes::Id: {
@@ -10951,18 +10907,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     jclass semanticTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
-                        env, "chip/devicecontroller/ChipStructs$LaundryWasherClusterSemanticTagStruct",
+                        env, "chip/devicecontroller/ChipStructs$LaundryWasherModeSelectClusterSemanticTagStruct",
                         semanticTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$LaundryWasherClusterSemanticTagStruct");
+                        ChipLogError(Zcl, "Could not find class ChipStructs$LaundryWasherModeSelectClusterSemanticTagStruct");
                         return nullptr;
                     }
                     jmethodID semanticTagStructStructCtor_3 =
                         env->GetMethodID(semanticTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
                     if (semanticTagStructStructCtor_3 == nullptr)
                     {
-                        ChipLogError(Zcl, "Could not find ChipStructs$LaundryWasherClusterSemanticTagStruct constructor");
+                        ChipLogError(Zcl, "Could not find ChipStructs$LaundryWasherModeSelectClusterSemanticTagStruct constructor");
                         return nullptr;
                     }
 
@@ -10973,17 +10929,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass modeOptionStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$LaundryWasherClusterModeOptionStruct", modeOptionStructStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$LaundryWasherModeSelectClusterModeOptionStruct",
+                    modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$LaundryWasherClusterModeOptionStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$LaundryWasherModeSelectClusterModeOptionStruct");
                     return nullptr;
                 }
                 jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(
                     modeOptionStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
                 if (modeOptionStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$LaundryWasherClusterModeOptionStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$LaundryWasherModeSelectClusterModeOptionStruct constructor");
                     return nullptr;
                 }
 
@@ -11198,28 +11155,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             jobject value;
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
-            return value;
-        }
-        case Attributes::StandardNamespace::Id: {
-            using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                std::string valueClassName     = "java/lang/Integer";
-                std::string valueCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value(), value);
-            }
             return value;
         }
         case Attributes::SupportedModes::Id: {
@@ -11526,28 +11461,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
             return value;
         }
-        case Attributes::StandardNamespace::Id: {
-            using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                std::string valueClassName     = "java/lang/Integer";
-                std::string valueCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value(), value);
-            }
-            return value;
-        }
         case Attributes::SupportedModes::Id: {
             using TypeInfo = Attributes::SupportedModes::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -11842,28 +11755,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
             return value;
         }
-        case Attributes::StandardNamespace::Id: {
-            using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                std::string valueClassName     = "java/lang/Integer";
-                std::string valueCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value(), value);
-            }
-            return value;
-        }
         case Attributes::SupportedModes::Id: {
             using TypeInfo = Attributes::SupportedModes::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -12156,28 +12047,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             jobject value;
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
-            return value;
-        }
-        case Attributes::StandardNamespace::Id: {
-            using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                std::string valueClassName     = "java/lang/Integer";
-                std::string valueCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value(), value);
-            }
             return value;
         }
         case Attributes::SupportedModes::Id: {

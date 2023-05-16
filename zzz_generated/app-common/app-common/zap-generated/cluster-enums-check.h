@@ -1318,9 +1318,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::SemanticTag
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasher::SemanticTags val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherModeSelect::SemanticTags val)
 {
-    using EnumType = LaundryWasher::SemanticTags;
+    using EnumType = LaundryWasherModeSelect::SemanticTags;
     switch (val)
     {
     case EnumType::kNormal:

@@ -1368,11 +1368,11 @@ public class ChipStructs {
     }
   }
 
-  public static class LaundryWasherClusterSemanticTagStruct {
+  public static class LaundryWasherModeSelectClusterSemanticTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public LaundryWasherClusterSemanticTagStruct(Integer mfgCode, Integer value) {
+    public LaundryWasherModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1380,7 +1380,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("LaundryWasherClusterSemanticTagStruct {\n");
+      output.append("LaundryWasherModeSelectClusterSemanticTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1392,15 +1392,15 @@ public class ChipStructs {
     }
   }
 
-  public static class LaundryWasherClusterModeOptionStruct {
+  public static class LaundryWasherModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.LaundryWasherClusterSemanticTagStruct> semanticTags;
+    public ArrayList<ChipStructs.LaundryWasherModeSelectClusterSemanticTagStruct> semanticTags;
 
-    public LaundryWasherClusterModeOptionStruct(
+    public LaundryWasherModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.LaundryWasherClusterSemanticTagStruct> semanticTags) {
+        ArrayList<ChipStructs.LaundryWasherModeSelectClusterSemanticTagStruct> semanticTags) {
       this.label = label;
       this.mode = mode;
       this.semanticTags = semanticTags;
@@ -1409,7 +1409,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("LaundryWasherClusterModeOptionStruct {\n");
+      output.append("LaundryWasherModeSelectClusterModeOptionStruct {\n");
       output.append("\tlabel: ");
       output.append(label);
       output.append("\n");

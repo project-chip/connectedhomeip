@@ -203,7 +203,7 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterLaundryWasher ()
+@interface MTRClusterLaundryWasherModeSelect ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end

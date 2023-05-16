@@ -134,7 +134,7 @@ public final class ChipIdLookup {
       return "ModeSelect";
     }
     if (clusterId == 81L) {
-      return "LaundryWasher";
+      return "LaundryWasherModeSelect";
     }
     if (clusterId == 82L) {
       return "RefrigeratorAndTemperatureControlledCabinet";
@@ -1765,9 +1765,6 @@ public final class ChipIdLookup {
       if (attributeId == 0L) {
         return "Description";
       }
-      if (attributeId == 1L) {
-        return "StandardNamespace";
-      }
       if (attributeId == 2L) {
         return "SupportedModes";
       }
@@ -1803,9 +1800,6 @@ public final class ChipIdLookup {
     if (clusterId == 81L) {
       if (attributeId == 0L) {
         return "Description";
-      }
-      if (attributeId == 1L) {
-        return "StandardNamespace";
       }
       if (attributeId == 2L) {
         return "SupportedModes";
@@ -1843,9 +1837,6 @@ public final class ChipIdLookup {
       if (attributeId == 0L) {
         return "Description";
       }
-      if (attributeId == 1L) {
-        return "StandardNamespace";
-      }
       if (attributeId == 2L) {
         return "SupportedModes";
       }
@@ -1881,9 +1872,6 @@ public final class ChipIdLookup {
     if (clusterId == 84L) {
       if (attributeId == 0L) {
         return "Description";
-      }
-      if (attributeId == 1L) {
-        return "StandardNamespace";
       }
       if (attributeId == 2L) {
         return "SupportedModes";
@@ -1921,9 +1909,6 @@ public final class ChipIdLookup {
       if (attributeId == 0L) {
         return "Description";
       }
-      if (attributeId == 1L) {
-        return "StandardNamespace";
-      }
       if (attributeId == 2L) {
         return "SupportedModes";
       }
@@ -1959,9 +1944,6 @@ public final class ChipIdLookup {
     if (clusterId == 89L) {
       if (attributeId == 0L) {
         return "Description";
-      }
-      if (attributeId == 1L) {
-        return "StandardNamespace";
       }
       if (attributeId == 2L) {
         return "SupportedModes";

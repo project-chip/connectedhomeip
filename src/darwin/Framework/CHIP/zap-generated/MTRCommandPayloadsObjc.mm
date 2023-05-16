@@ -4530,7 +4530,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRLaundryWasherClusterChangeToModeParams
+@implementation MTRLaundryWasherModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4544,7 +4544,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRLaundryWasherClusterChangeToModeParams alloc] init];
+    auto other = [[MTRLaundryWasherModeSelectClusterChangeToModeParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -4560,7 +4560,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRLaundryWasherClusterChangeToModeWithStatusParams
+@implementation MTRLaundryWasherModeSelectClusterChangeToModeWithStatusParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4574,7 +4574,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRLaundryWasherClusterChangeToModeWithStatusParams alloc] init];
+    auto other = [[MTRLaundryWasherModeSelectClusterChangeToModeWithStatusParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -4590,7 +4590,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRLaundryWasherClusterChangeToModeResponseParams
+@implementation MTRLaundryWasherModeSelectClusterChangeToModeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4604,7 +4604,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRLaundryWasherClusterChangeToModeResponseParams alloc] init];
+    auto other = [[MTRLaundryWasherModeSelectClusterChangeToModeResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;

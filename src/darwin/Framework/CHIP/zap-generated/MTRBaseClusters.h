@@ -7306,19 +7306,6 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                            completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
-- (void)readAttributeStandardNamespaceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-- (void)subscribeAttributeStandardNamespaceWithParams:(MTRSubscribeParams *)params
-                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-+ (void)readAttributeStandardNamespaceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                                 completion:
-                                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-
 - (void)readAttributeSupportedModesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeSupportedModesWithParams:(MTRSubscribeParams *)params
@@ -7452,13 +7439,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
- * Cluster Laundry Washer
+ * Cluster Laundry Washer Mode Select
  *
  * This cluster is an alias of the Mode Select cluster, defining additional semantics and
       namespaced enumerated values for laundry washer devices.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRBaseClusterLaundryWasher : MTRCluster
+@interface MTRBaseClusterLaundryWasherModeSelect : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -7473,7 +7460,7 @@ MTR_NEWLY_AVAILABLE
  Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the
  CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response.
  */
-- (void)changeToModeWithParams:(MTRLaundryWasherClusterChangeToModeParams *)params
+- (void)changeToModeWithParams:(MTRLaundryWasherModeSelectClusterChangeToModeParams *)params
                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 /**
  * Command ChangeToModeWithStatus
@@ -7482,8 +7469,8 @@ MTR_NEWLY_AVAILABLE
  response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on
  NewMode field, see ChangeToMode command. On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
  */
-- (void)changeToModeWithStatusWithParams:(MTRLaundryWasherClusterChangeToModeWithStatusParams *)params
-                              completion:(void (^)(MTRLaundryWasherClusterChangeToModeResponseParams * _Nullable data,
+- (void)changeToModeWithStatusWithParams:(MTRLaundryWasherModeSelectClusterChangeToModeWithStatusParams *)params
+                              completion:(void (^)(MTRLaundryWasherModeSelectClusterChangeToModeResponseParams * _Nullable data,
                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeDescriptionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
@@ -7497,18 +7484,6 @@ MTR_NEWLY_AVAILABLE
                                                 queue:(dispatch_queue_t)queue
                                            completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-
-- (void)readAttributeStandardNamespaceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-    MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeStandardNamespaceWithParams:(MTRSubscribeParams *)params
-                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-    MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeStandardNamespaceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                                 completion:(void (^)(NSNumber * _Nullable value,
-                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeSupportedModesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
@@ -7694,18 +7669,6 @@ MTR_NEWLY_AVAILABLE
                                            completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeStandardNamespaceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-    MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeStandardNamespaceWithParams:(MTRSubscribeParams *)params
-                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-    MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeStandardNamespaceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                                 completion:(void (^)(NSNumber * _Nullable value,
-                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-
 - (void)readAttributeSupportedModesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeSupportedModesWithParams:(MTRSubscribeParams *)params
@@ -7886,18 +7849,6 @@ MTR_NEWLY_AVAILABLE
                                                 queue:(dispatch_queue_t)queue
                                            completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-
-- (void)readAttributeStandardNamespaceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-    MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeStandardNamespaceWithParams:(MTRSubscribeParams *)params
-                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-    MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeStandardNamespaceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                                 completion:(void (^)(NSNumber * _Nullable value,
-                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeSupportedModesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
@@ -8080,18 +8031,6 @@ MTR_NEWLY_AVAILABLE
                                            completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeStandardNamespaceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-    MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeStandardNamespaceWithParams:(MTRSubscribeParams *)params
-                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-    MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeStandardNamespaceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                                 completion:(void (^)(NSNumber * _Nullable value,
-                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-
 - (void)readAttributeSupportedModesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeSupportedModesWithParams:(MTRSubscribeParams *)params
@@ -8272,18 +8211,6 @@ MTR_NEWLY_AVAILABLE
                                                 queue:(dispatch_queue_t)queue
                                            completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-
-- (void)readAttributeStandardNamespaceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
-    MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeStandardNamespaceWithParams:(MTRSubscribeParams *)params
-                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-    MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeStandardNamespaceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                                 completion:(void (^)(NSNumber * _Nullable value,
-                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeSupportedModesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
@@ -21137,16 +21064,16 @@ typedef NS_OPTIONS(uint32_t, MTRModeSelectFeature) {
     MTRModeSelectFeatureExtendedStatus MTR_NEWLY_AVAILABLE = 0x2,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_ENUM(uint16_t, MTRLaundryWasherSemanticTags) {
-    MTRLaundryWasherSemanticTagsNormal MTR_NEWLY_AVAILABLE = 0x4000,
-    MTRLaundryWasherSemanticTagsDelicate MTR_NEWLY_AVAILABLE = 0x4001,
-    MTRLaundryWasherSemanticTagsHeavy MTR_NEWLY_AVAILABLE = 0x4002,
-    MTRLaundryWasherSemanticTagsWhites MTR_NEWLY_AVAILABLE = 0x4003,
+typedef NS_ENUM(uint16_t, MTRLaundryWasherModeSelectSemanticTags) {
+    MTRLaundryWasherModeSelectSemanticTagsNormal MTR_NEWLY_AVAILABLE = 0x4000,
+    MTRLaundryWasherModeSelectSemanticTagsDelicate MTR_NEWLY_AVAILABLE = 0x4001,
+    MTRLaundryWasherModeSelectSemanticTagsHeavy MTR_NEWLY_AVAILABLE = 0x4002,
+    MTRLaundryWasherModeSelectSemanticTagsWhites MTR_NEWLY_AVAILABLE = 0x4003,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRLaundryWasherModeSelectFeature) {
-    MTRLaundryWasherModeSelectFeatureOnOff MTR_NEWLY_AVAILABLE = 0x1,
-    MTRLaundryWasherModeSelectFeatureExtendedStatus MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRLaundryWasherModeSelectModeSelectFeature) {
+    MTRLaundryWasherModeSelectModeSelectFeatureOnOff MTR_NEWLY_AVAILABLE = 0x1,
+    MTRLaundryWasherModeSelectModeSelectFeatureExtendedStatus MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRRefrigeratorAndTemperatureControlledCabinetSemanticTags) {
@@ -32416,27 +32343,6 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                  completionHandler:
                                      (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler
     MTR_DEPRECATED("Please use readAttributeDescriptionWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4),
-        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-
-- (void)readAttributeStandardNamespaceWithCompletionHandler:
-    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_DEPRECATED("Please use readAttributeStandardNamespaceWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4));
-- (void)subscribeAttributeStandardNamespaceWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                               maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                    params:(MTRSubscribeParams * _Nullable)params
-                                   subscriptionEstablished:
-                                       (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                             reportHandler:
-                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-    MTR_DEPRECATED("Please use subscribeAttributeStandardNamespaceWithParams:subscriptionEstablished:", ios(16.1, 16.4),
-        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-+ (void)readAttributeStandardNamespaceWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                endpoint:(NSNumber *)endpoint
-                                                   queue:(dispatch_queue_t)queue
-                                       completionHandler:
-                                           (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_DEPRECATED("Please use readAttributeStandardNamespaceWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeSupportedModesWithCompletionHandler:

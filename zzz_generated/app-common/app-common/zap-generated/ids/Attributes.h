@@ -2358,10 +2358,6 @@ namespace Description {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Description
 
-namespace StandardNamespace {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace StandardNamespace
-
 namespace SupportedModes {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace SupportedModes
@@ -2405,16 +2401,12 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ModeSelect
 
-namespace LaundryWasher {
+namespace LaundryWasherModeSelect {
 namespace Attributes {
 
 namespace Description {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Description
-
-namespace StandardNamespace {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace StandardNamespace
 
 namespace SupportedModes {
 static constexpr AttributeId Id = 0x00000002;
@@ -2457,7 +2449,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace LaundryWasher
+} // namespace LaundryWasherModeSelect
 
 namespace RefrigeratorAndTemperatureControlledCabinet {
 namespace Attributes {
@@ -2465,10 +2457,6 @@ namespace Attributes {
 namespace Description {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Description
-
-namespace StandardNamespace {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace StandardNamespace
 
 namespace SupportedModes {
 static constexpr AttributeId Id = 0x00000002;
@@ -2520,10 +2508,6 @@ namespace Description {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Description
 
-namespace StandardNamespace {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace StandardNamespace
-
 namespace SupportedModes {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace SupportedModes
@@ -2574,10 +2558,6 @@ namespace Description {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Description
 
-namespace StandardNamespace {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace StandardNamespace
-
 namespace SupportedModes {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace SupportedModes
@@ -2627,10 +2607,6 @@ namespace Attributes {
 namespace Description {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Description
-
-namespace StandardNamespace {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace StandardNamespace
 
 namespace SupportedModes {
 static constexpr AttributeId Id = 0x00000002;

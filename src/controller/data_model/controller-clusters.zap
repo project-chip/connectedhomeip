@@ -10018,7 +10018,7 @@
           "name": "Laundry Washer",
           "code": 81,
           "mfgCode": null,
-          "define": "LAUNDRY_WASHER_CLUSTER",
+          "define": "LAUNDRY_WASHER_MODE_SELECT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -10078,7 +10078,7 @@
           "name": "Laundry Washer",
           "code": 81,
           "mfgCode": null,
-          "define": "LAUNDRY_WASHER_CLUSTER",
+          "define": "LAUNDRY_WASHER_MODE_SELECT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [

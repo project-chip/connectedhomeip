@@ -6574,8 +6574,9 @@ void MTRModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRLaundryWasherSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasher::Structs::ModeOptionStruct::DecodableType> & value)
+void MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6583,8 +6584,8 @@ void MTRLaundryWasherSupportedModesListAttributeCallbackBridge::OnSuccessFn(void
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRLaundryWasherClusterModeOptionStruct * newElement_0;
-            newElement_0 = [MTRLaundryWasherClusterModeOptionStruct new];
+            MTRLaundryWasherModeSelectClusterModeOptionStruct * newElement_0;
+            newElement_0 = [MTRLaundryWasherModeSelectClusterModeOptionStruct new];
             newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                           length:entry_0.label.size()
                                                         encoding:NSUTF8StringEncoding];
@@ -6594,8 +6595,8 @@ void MTRLaundryWasherSupportedModesListAttributeCallbackBridge::OnSuccessFn(void
                 auto iter_2 = entry_0.semanticTags.begin();
                 while (iter_2.Next()) {
                     auto & entry_2 = iter_2.GetValue();
-                    MTRLaundryWasherClusterSemanticTagStruct * newElement_2;
-                    newElement_2 = [MTRLaundryWasherClusterSemanticTagStruct new];
+                    MTRLaundryWasherModeSelectClusterSemanticTagStruct * newElement_2;
+                    newElement_2 = [MTRLaundryWasherModeSelectClusterSemanticTagStruct new];
                     newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                     [array_2 addObject:newElement_2];
@@ -6619,7 +6620,7 @@ void MTRLaundryWasherSupportedModesListAttributeCallbackBridge::OnSuccessFn(void
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLaundryWasherSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -6634,7 +6635,7 @@ void MTRLaundryWasherSupportedModesListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRLaundryWasherGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -6657,7 +6658,7 @@ void MTRLaundryWasherGeneratedCommandListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLaundryWasherGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -6672,7 +6673,7 @@ void MTRLaundryWasherGeneratedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRLaundryWasherAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -6695,7 +6696,7 @@ void MTRLaundryWasherAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLaundryWasherAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -6710,7 +6711,7 @@ void MTRLaundryWasherAcceptedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRLaundryWasherEventListListAttributeCallbackBridge::OnSuccessFn(
+void MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -6733,7 +6734,7 @@ void MTRLaundryWasherEventListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLaundryWasherEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRLaundryWasherModeSelectEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -6748,7 +6749,7 @@ void MTRLaundryWasherEventListListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRLaundryWasherAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -6771,7 +6772,7 @@ void MTRLaundryWasherAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLaundryWasherAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRLaundryWasherModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -13258,10 +13259,10 @@ void MTRModeSelectClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void MTRLaundryWasherClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::LaundryWasher::Commands::ChangeToModeResponse::DecodableType & data)
+void MTRLaundryWasherModeSelectClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType & data)
 {
-    auto * response = [MTRLaundryWasherClusterChangeToModeResponseParams new];
+    auto * response = [MTRLaundryWasherModeSelectClusterChangeToModeResponseParams new];
     {
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
@@ -17764,15 +17765,15 @@ void MTRNullableModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRLaundryWasherClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LaundryWasher::SemanticTags value)
+void MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LaundryWasherModeSelect::SemanticTags value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRLaundryWasherClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17787,8 +17788,8 @@ void MTRLaundryWasherClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasher::SemanticTags> & value)
+void MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherModeSelect::SemanticTags> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17799,7 +17800,7 @@ void MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableLaundryWasherClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

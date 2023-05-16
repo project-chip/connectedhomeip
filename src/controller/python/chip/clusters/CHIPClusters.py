@@ -3809,12 +3809,6 @@ class ChipClusters:
                 "type": "str",
                 "reportable": True,
             },
-            0x00000001: {
-                "attributeName": "StandardNamespace",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
             0x00000002: {
                 "attributeName": "SupportedModes",
                 "attributeId": 0x00000002,
@@ -3879,8 +3873,8 @@ class ChipClusters:
             },
         },
     }
-    _LAUNDRY_WASHER_CLUSTER_INFO = {
-        "clusterName": "LaundryWasher",
+    _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO = {
+        "clusterName": "LaundryWasherModeSelect",
         "clusterId": 0x00000051,
         "commands": {
             0x00000000: {
@@ -3903,12 +3897,6 @@ class ChipClusters:
                 "attributeName": "Description",
                 "attributeId": 0x00000000,
                 "type": "str",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "StandardNamespace",
-                "attributeId": 0x00000001,
-                "type": "int",
                 "reportable": True,
             },
             0x00000002: {
@@ -4001,12 +3989,6 @@ class ChipClusters:
                 "type": "str",
                 "reportable": True,
             },
-            0x00000001: {
-                "attributeName": "StandardNamespace",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
             0x00000002: {
                 "attributeName": "SupportedModes",
                 "attributeId": 0x00000002,
@@ -4095,12 +4077,6 @@ class ChipClusters:
                 "attributeName": "Description",
                 "attributeId": 0x00000000,
                 "type": "str",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "StandardNamespace",
-                "attributeId": 0x00000001,
-                "type": "int",
                 "reportable": True,
             },
             0x00000002: {
@@ -4193,12 +4169,6 @@ class ChipClusters:
                 "type": "str",
                 "reportable": True,
             },
-            0x00000001: {
-                "attributeName": "StandardNamespace",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
             0x00000002: {
                 "attributeName": "SupportedModes",
                 "attributeId": 0x00000002,
@@ -4287,12 +4257,6 @@ class ChipClusters:
                 "attributeName": "Description",
                 "attributeId": 0x00000000,
                 "type": "str",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "StandardNamespace",
-                "attributeId": 0x00000001,
-                "type": "int",
                 "reportable": True,
             },
             0x00000002: {
@@ -9593,7 +9557,7 @@ class ChipClusters:
         0x00000041: _USER_LABEL_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
-        0x00000051: _LAUNDRY_WASHER_CLUSTER_INFO,
+        0x00000051: _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO,
         0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER_INFO,
         0x00000054: _RVC_RUN_CLUSTER_INFO,
         0x00000055: _RVC_CLEAN_CLUSTER_INFO,
@@ -9666,7 +9630,7 @@ class ChipClusters:
         "UserLabel": _USER_LABEL_CLUSTER_INFO,
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
-        "LaundryWasher": _LAUNDRY_WASHER_CLUSTER_INFO,
+        "LaundryWasherModeSelect": _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO,
         "RefrigeratorAndTemperatureControlledCabinet": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER_INFO,
         "RvcRun": _RVC_RUN_CLUSTER_INFO,
         "RvcClean": _RVC_CLEAN_CLUSTER_INFO,

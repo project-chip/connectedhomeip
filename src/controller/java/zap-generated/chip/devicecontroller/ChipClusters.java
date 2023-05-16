@@ -12356,14 +12356,6 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface StandardNamespaceAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished(long subscriptionId) {}
-    }
-
     public interface SupportedModesAttributeCallback {
       void onSuccess(List<ChipStructs.ModeSelectClusterModeOptionStruct> valueList);
 
@@ -12427,15 +12419,6 @@ public class ChipClusters {
     public void subscribeDescriptionAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readStandardNamespaceAttribute(StandardNamespaceAttributeCallback callback) {
-      readStandardNamespaceAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeStandardNamespaceAttribute(
-        StandardNamespaceAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeStandardNamespaceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedModesAttribute(SupportedModesAttributeCallback callback) {
@@ -12552,15 +12535,6 @@ public class ChipClusters {
     private native void subscribeDescriptionAttribute(
         long chipClusterPtr,
         CharStringAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
-
-    private native void readStandardNamespaceAttribute(
-        long chipClusterPtr, StandardNamespaceAttributeCallback callback);
-
-    private native void subscribeStandardNamespaceAttribute(
-        long chipClusterPtr,
-        StandardNamespaceAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -12651,10 +12625,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class LaundryWasherCluster extends BaseChipCluster {
+  public static class LaundryWasherModeSelectCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 81L;
 
-    public LaundryWasherCluster(long devicePtr, int endpointId) {
+    public LaundryWasherModeSelectCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -12697,16 +12671,8 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface StandardNamespaceAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished(long subscriptionId) {}
-    }
-
     public interface SupportedModesAttributeCallback {
-      void onSuccess(List<ChipStructs.LaundryWasherClusterModeOptionStruct> valueList);
+      void onSuccess(List<ChipStructs.LaundryWasherModeSelectClusterModeOptionStruct> valueList);
 
       void onError(Exception ex);
 
@@ -12768,15 +12734,6 @@ public class ChipClusters {
     public void subscribeDescriptionAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readStandardNamespaceAttribute(StandardNamespaceAttributeCallback callback) {
-      readStandardNamespaceAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeStandardNamespaceAttribute(
-        StandardNamespaceAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeStandardNamespaceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedModesAttribute(SupportedModesAttributeCallback callback) {
@@ -12893,15 +12850,6 @@ public class ChipClusters {
     private native void subscribeDescriptionAttribute(
         long chipClusterPtr,
         CharStringAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
-
-    private native void readStandardNamespaceAttribute(
-        long chipClusterPtr, StandardNamespaceAttributeCallback callback);
-
-    private native void subscribeStandardNamespaceAttribute(
-        long chipClusterPtr,
-        StandardNamespaceAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -13038,14 +12986,6 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface StandardNamespaceAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished(long subscriptionId) {}
-    }
-
     public interface SupportedModesAttributeCallback {
       void onSuccess(
           List<ChipStructs.RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct>
@@ -13111,15 +13051,6 @@ public class ChipClusters {
     public void subscribeDescriptionAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readStandardNamespaceAttribute(StandardNamespaceAttributeCallback callback) {
-      readStandardNamespaceAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeStandardNamespaceAttribute(
-        StandardNamespaceAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeStandardNamespaceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedModesAttribute(SupportedModesAttributeCallback callback) {
@@ -13236,15 +13167,6 @@ public class ChipClusters {
     private native void subscribeDescriptionAttribute(
         long chipClusterPtr,
         CharStringAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
-
-    private native void readStandardNamespaceAttribute(
-        long chipClusterPtr, StandardNamespaceAttributeCallback callback);
-
-    private native void subscribeStandardNamespaceAttribute(
-        long chipClusterPtr,
-        StandardNamespaceAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -13381,14 +13303,6 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface StandardNamespaceAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished(long subscriptionId) {}
-    }
-
     public interface SupportedModesAttributeCallback {
       void onSuccess(List<ChipStructs.RvcRunClusterModeOptionStruct> valueList);
 
@@ -13452,15 +13366,6 @@ public class ChipClusters {
     public void subscribeDescriptionAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readStandardNamespaceAttribute(StandardNamespaceAttributeCallback callback) {
-      readStandardNamespaceAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeStandardNamespaceAttribute(
-        StandardNamespaceAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeStandardNamespaceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedModesAttribute(SupportedModesAttributeCallback callback) {
@@ -13577,15 +13482,6 @@ public class ChipClusters {
     private native void subscribeDescriptionAttribute(
         long chipClusterPtr,
         CharStringAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
-
-    private native void readStandardNamespaceAttribute(
-        long chipClusterPtr, StandardNamespaceAttributeCallback callback);
-
-    private native void subscribeStandardNamespaceAttribute(
-        long chipClusterPtr,
-        StandardNamespaceAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -13722,14 +13618,6 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface StandardNamespaceAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished(long subscriptionId) {}
-    }
-
     public interface SupportedModesAttributeCallback {
       void onSuccess(List<ChipStructs.RvcCleanClusterModeOptionStruct> valueList);
 
@@ -13793,15 +13681,6 @@ public class ChipClusters {
     public void subscribeDescriptionAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readStandardNamespaceAttribute(StandardNamespaceAttributeCallback callback) {
-      readStandardNamespaceAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeStandardNamespaceAttribute(
-        StandardNamespaceAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeStandardNamespaceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedModesAttribute(SupportedModesAttributeCallback callback) {
@@ -13918,15 +13797,6 @@ public class ChipClusters {
     private native void subscribeDescriptionAttribute(
         long chipClusterPtr,
         CharStringAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
-
-    private native void readStandardNamespaceAttribute(
-        long chipClusterPtr, StandardNamespaceAttributeCallback callback);
-
-    private native void subscribeStandardNamespaceAttribute(
-        long chipClusterPtr,
-        StandardNamespaceAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -14063,14 +13933,6 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface StandardNamespaceAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished(long subscriptionId) {}
-    }
-
     public interface SupportedModesAttributeCallback {
       void onSuccess(List<ChipStructs.DishwasherModeSelectClusterModeOptionStruct> valueList);
 
@@ -14134,15 +13996,6 @@ public class ChipClusters {
     public void subscribeDescriptionAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readStandardNamespaceAttribute(StandardNamespaceAttributeCallback callback) {
-      readStandardNamespaceAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeStandardNamespaceAttribute(
-        StandardNamespaceAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeStandardNamespaceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedModesAttribute(SupportedModesAttributeCallback callback) {
@@ -14259,15 +14112,6 @@ public class ChipClusters {
     private native void subscribeDescriptionAttribute(
         long chipClusterPtr,
         CharStringAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
-
-    private native void readStandardNamespaceAttribute(
-        long chipClusterPtr, StandardNamespaceAttributeCallback callback);
-
-    private native void subscribeStandardNamespaceAttribute(
-        long chipClusterPtr,
-        StandardNamespaceAttributeCallback callback,
         int minInterval,
         int maxInterval);
 

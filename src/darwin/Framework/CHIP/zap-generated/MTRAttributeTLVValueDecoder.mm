@@ -7874,21 +7874,6 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(
         value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
         return value;
     }
-    case Attributes::StandardNamespace::Id: {
-        using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
-        }
-        return value;
-    }
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -8086,10 +8071,10 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForLaundryWasherCluster(
+static id _Nullable DecodeAttributeValueForLaundryWasherModeSelectCluster(
     AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::LaundryWasher;
+    using namespace Clusters::LaundryWasherModeSelect;
     switch (aAttributeId) {
     case Attributes::Description::Id: {
         using TypeInfo = Attributes::Description::TypeInfo;
@@ -8100,21 +8085,6 @@ static id _Nullable DecodeAttributeValueForLaundryWasherCluster(
         }
         NSString * _Nonnull value;
         value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
-        return value;
-    }
-    case Attributes::StandardNamespace::Id: {
-        using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
-        }
         return value;
     }
     case Attributes::SupportedModes::Id: {
@@ -8130,8 +8100,8 @@ static id _Nullable DecodeAttributeValueForLaundryWasherCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRLaundryWasherClusterModeOptionStruct * newElement_0;
-                newElement_0 = [MTRLaundryWasherClusterModeOptionStruct new];
+                MTRLaundryWasherModeSelectClusterModeOptionStruct * newElement_0;
+                newElement_0 = [MTRLaundryWasherModeSelectClusterModeOptionStruct new];
                 newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                               length:entry_0.label.size()
                                                             encoding:NSUTF8StringEncoding];
@@ -8141,8 +8111,8 @@ static id _Nullable DecodeAttributeValueForLaundryWasherCluster(
                     auto iter_2 = entry_0.semanticTags.begin();
                     while (iter_2.Next()) {
                         auto & entry_2 = iter_2.GetValue();
-                        MTRLaundryWasherClusterSemanticTagStruct * newElement_2;
-                        newElement_2 = [MTRLaundryWasherClusterSemanticTagStruct new];
+                        MTRLaundryWasherModeSelectClusterSemanticTagStruct * newElement_2;
+                        newElement_2 = [MTRLaundryWasherModeSelectClusterSemanticTagStruct new];
                         newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                         [array_2 addObject:newElement_2];
@@ -8354,21 +8324,6 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
         }
         NSString * _Nonnull value;
         value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
-        return value;
-    }
-    case Attributes::StandardNamespace::Id: {
-        using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
-        }
         return value;
     }
     case Attributes::SupportedModes::Id: {
@@ -8609,21 +8564,6 @@ static id _Nullable DecodeAttributeValueForRVCRunCluster(AttributeId aAttributeI
         value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
         return value;
     }
-    case Attributes::StandardNamespace::Id: {
-        using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
-        }
-        return value;
-    }
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -8860,21 +8800,6 @@ static id _Nullable DecodeAttributeValueForRVCCleanCluster(AttributeId aAttribut
         }
         NSString * _Nonnull value;
         value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
-        return value;
-    }
-    case Attributes::StandardNamespace::Id: {
-        using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
-        }
         return value;
     }
     case Attributes::SupportedModes::Id: {
@@ -9114,21 +9039,6 @@ static id _Nullable DecodeAttributeValueForDishwasherModeSelectCluster(
         }
         NSString * _Nonnull value;
         value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
-        return value;
-    }
-    case Attributes::StandardNamespace::Id: {
-        using TypeInfo = Attributes::StandardNamespace::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
-        }
         return value;
     }
     case Attributes::SupportedModes::Id: {
@@ -19220,8 +19130,8 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::ModeSelect::Id: {
         return DecodeAttributeValueForModeSelectCluster(aPath.mAttributeId, aReader, aError);
     }
-    case Clusters::LaundryWasher::Id: {
-        return DecodeAttributeValueForLaundryWasherCluster(aPath.mAttributeId, aReader, aError);
+    case Clusters::LaundryWasherModeSelect::Id: {
+        return DecodeAttributeValueForLaundryWasherModeSelectCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::RefrigeratorAndTemperatureControlledCabinet::Id: {
         return DecodeAttributeValueForRefrigeratorAndTemperatureControlledCabinetCluster(aPath.mAttributeId, aReader, aError);

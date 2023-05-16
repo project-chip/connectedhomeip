@@ -11163,9 +11163,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Description::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, description));
         break;
-    case Attributes::StandardNamespace::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, standardNamespace));
-        break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
@@ -11207,7 +11204,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace ModeSelect
-namespace LaundryWasher {
+namespace LaundryWasherModeSelect {
 namespace Structs {} // namespace Structs
 
 namespace Commands {
@@ -11336,9 +11333,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Description::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, description));
         break;
-    case Attributes::StandardNamespace::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, standardNamespace));
-        break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
@@ -11379,7 +11373,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace LaundryWasher
+} // namespace LaundryWasherModeSelect
 namespace RefrigeratorAndTemperatureControlledCabinet {
 namespace Structs {} // namespace Structs
 
@@ -11508,9 +11502,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::Description::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, description));
-        break;
-    case Attributes::StandardNamespace::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, standardNamespace));
         break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
@@ -11682,9 +11673,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Description::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, description));
         break;
-    case Attributes::StandardNamespace::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, standardNamespace));
-        break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
@@ -11855,9 +11843,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Description::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, description));
         break;
-    case Attributes::StandardNamespace::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, standardNamespace));
-        break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
@@ -12027,9 +12012,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::Description::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, description));
-        break;
-    case Attributes::StandardNamespace::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, standardNamespace));
         break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
@@ -23195,7 +23177,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::LaundryWasher::Id: {
+    case Clusters::LaundryWasherModeSelect::Id: {
         switch (aCommand)
         {
         default:

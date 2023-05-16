@@ -276,7 +276,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeProxyValidID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000044,
     MTRClusterIDTypeBooleanStateID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
-    MTRClusterIDTypeLaundryWasherID MTR_NEWLY_AVAILABLE = 0x00000051,
+    MTRClusterIDTypeLaundryWasherModeSelectID MTR_NEWLY_AVAILABLE = 0x00000051,
     MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetID MTR_NEWLY_AVAILABLE = 0x00000052,
     MTRClusterIDTypeRVCRunID MTR_NEWLY_AVAILABLE = 0x00000054,
     MTRClusterIDTypeRVCCleanID MTR_NEWLY_AVAILABLE = 0x00000055,
@@ -3588,10 +3588,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         "Please use MTRAttributeIDTypeClusterModeSelectAttributeDescriptionID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000000,
-    MTRClusterModeSelectAttributeStandardNamespaceID MTR_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeStandardNamespaceID", ios(16.1, 16.4), macos(13.0, 13.3),
-        watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000001,
     MTRClusterModeSelectAttributeSupportedModesID MTR_DEPRECATED(
         "Please use MTRAttributeIDTypeClusterModeSelectAttributeSupportedModesID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -3630,8 +3626,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster ModeSelect attributes
     MTRAttributeIDTypeClusterModeSelectAttributeDescriptionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000000,
-    MTRAttributeIDTypeClusterModeSelectAttributeStandardNamespaceID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000001,
     MTRAttributeIDTypeClusterModeSelectAttributeSupportedModesID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000002,
     MTRAttributeIDTypeClusterModeSelectAttributeCurrentModeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -3653,27 +3647,25 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster LaundryWasher attributes
-    MTRAttributeIDTypeClusterLaundryWasherAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterLaundryWasherAttributeStandardNamespaceID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterLaundryWasherAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterLaundryWasherAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterLaundryWasherAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterLaundryWasherAttributeOnModeID MTR_NEWLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterLaundryWasherAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    // Cluster LaundryWasherModeSelect attributes
+    MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeOnModeID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterLaundryWasherAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterLaundryWasherAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeAttributeListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterLaundryWasherAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterLaundryWasherAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster RefrigeratorAndTemperatureControlledCabinet attributes
     MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeStandardNamespaceID MTR_NEWLY_AVAILABLE
-    = 0x00000001,
     MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
@@ -3691,7 +3683,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster RVCRun attributes
     MTRAttributeIDTypeClusterRVCRunAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRVCRunAttributeStandardNamespaceID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterRVCRunAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterRVCRunAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterRVCRunAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
@@ -3707,7 +3698,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster RVCClean attributes
     MTRAttributeIDTypeClusterRVCCleanAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRVCCleanAttributeStandardNamespaceID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterRVCCleanAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterRVCCleanAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterRVCCleanAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
@@ -3724,7 +3714,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster DishwasherModeSelect attributes
     MTRAttributeIDTypeClusterDishwasherModeSelectAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterDishwasherModeSelectAttributeStandardNamespaceID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterDishwasherModeSelectAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterDishwasherModeSelectAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterDishwasherModeSelectAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
@@ -8828,10 +8817,10 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterModeSelectCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterModeSelectCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
 
-    // Cluster LaundryWasher commands
-    MTRCommandIDTypeClusterLaundryWasherCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterLaundryWasherCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterLaundryWasherCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
+    // Cluster LaundryWasherModeSelect commands
+    MTRCommandIDTypeClusterLaundryWasherModeSelectCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterLaundryWasherModeSelectCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterLaundryWasherModeSelectCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster RefrigeratorAndTemperatureControlledCabinet commands
     MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,

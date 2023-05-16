@@ -12580,14 +12580,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeModeSelectID)
-                                        attributeID:@(MTRAttributeIDTypeClusterModeSelectAttributeStandardNamespaceID)
-                                             params:params];
-}
-
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
@@ -12734,7 +12726,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 @end
 
-@implementation MTRClusterLaundryWasher
+@implementation MTRClusterLaundryWasherModeSelect
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
@@ -12749,14 +12741,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return self;
 }
 
-- (void)changeToModeWithParams:(MTRLaundryWasherClusterChangeToModeParams *)params
+- (void)changeToModeWithParams:(MTRLaundryWasherModeSelectClusterChangeToModeParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
-                                     _endpoint, (unsigned int) MTRClusterIDTypeLaundryWasherID,
-                                     (unsigned int) MTRCommandIDTypeClusterLaundryWasherCommandChangeToModeID];
+                                     _endpoint, (unsigned int) MTRClusterIDTypeLaundryWasherModeSelectID,
+                                     (unsigned int) MTRCommandIDTypeClusterLaundryWasherModeSelectCommandChangeToModeID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -12783,7 +12775,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 Optional<uint16_t> timedInvokeTimeoutMs;
                 Optional<Timeout> invokeTimeout;
                 ListFreer listFreer;
-                LaundryWasher::Commands::ChangeToMode::Type request;
+                LaundryWasherModeSelect::Commands::ChangeToMode::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -12817,15 +12809,15 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (void)changeToModeWithStatusWithParams:(MTRLaundryWasherClusterChangeToModeWithStatusParams *)params
+- (void)changeToModeWithStatusWithParams:(MTRLaundryWasherModeSelectClusterChangeToModeWithStatusParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                              completion:(void (^)(MTRLaundryWasherClusterChangeToModeResponseParams * _Nullable data,
+                              completion:(void (^)(MTRLaundryWasherModeSelectClusterChangeToModeResponseParams * _Nullable data,
                                              NSError * _Nullable error))completion
 {
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
-                                     _endpoint, (unsigned int) MTRClusterIDTypeLaundryWasherID,
-                                     (unsigned int) MTRCommandIDTypeClusterLaundryWasherCommandChangeToModeWithStatusID];
+                                     _endpoint, (unsigned int) MTRClusterIDTypeLaundryWasherModeSelectID,
+                                     (unsigned int) MTRCommandIDTypeClusterLaundryWasherModeSelectCommandChangeToModeWithStatusID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -12837,7 +12829,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRLaundryWasherClusterChangeToModeResponseCallbackBridge(
+        auto * bridge = new MTRLaundryWasherModeSelectClusterChangeToModeResponseCallbackBridge(
             self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 MTRClustersLogCompletion(logPrefix, value, error);
@@ -12847,13 +12839,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
-                LaundryWasherClusterChangeToModeResponseCallbackType successCb, MTRErrorCallback failureCb,
+                LaundryWasherModeSelectClusterChangeToModeResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
-                auto * typedBridge = static_cast<MTRLaundryWasherClusterChangeToModeResponseCallbackBridge *>(bridge);
+                auto * typedBridge = static_cast<MTRLaundryWasherModeSelectClusterChangeToModeResponseCallbackBridge *>(bridge);
                 Optional<uint16_t> timedInvokeTimeoutMs;
                 Optional<Timeout> invokeTimeout;
                 ListFreer listFreer;
-                LaundryWasher::Commands::ChangeToModeWithStatus::Type request;
+                LaundryWasherModeSelect::Commands::ChangeToModeWithStatus::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -12890,40 +12882,32 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeDescriptionID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeStandardNamespaceID)
+                                          clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeDescriptionID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeSupportedModesID)
+                                          clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeSupportedModesID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeCurrentModeID)
+                                          clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeCurrentModeID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeStartUpModeID)
+                                          clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeStartUpModeID)
                                              params:params];
 }
 
@@ -12939,8 +12923,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                  attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeStartUpModeID)
+                                    clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                  attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeStartUpModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -12949,8 +12933,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 - (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeOnModeID)
+                                          clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeOnModeID)
                                              params:params];
 }
 
@@ -12966,8 +12950,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                  attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeOnModeID)
+                                    clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                  attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeOnModeID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -12975,41 +12959,43 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeGeneratedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                     attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeGeneratedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeAcceptedCommandListID)
-                                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                     attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeAcceptedCommandListID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeLaundryWasherID)
-                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeLaundryWasherModeSelectID)
+                                        attributeID:@(MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeClusterRevisionID)
                                              params:params];
 }
 
@@ -13181,16 +13167,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         readAttributeWithEndpointID:@(_endpoint)
                           clusterID:@(MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetID)
                         attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeDescriptionID)
-                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetID)
-                        attributeID:
-                            @(MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeStandardNamespaceID)
                              params:params];
 }
 
@@ -13481,14 +13457,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRVCRunID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRVCRunAttributeStandardNamespaceID)
-                                             params:params];
-}
-
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
@@ -13762,14 +13730,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRVCCleanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRVCCleanAttributeStandardNamespaceID)
-                                             params:params];
-}
-
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
@@ -14040,14 +14000,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeDishwasherModeSelectID)
                                         attributeID:@(MTRAttributeIDTypeClusterDishwasherModeSelectAttributeDescriptionID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeDishwasherModeSelectID)
-                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherModeSelectAttributeStandardNamespaceID)
                                              params:params];
 }
 

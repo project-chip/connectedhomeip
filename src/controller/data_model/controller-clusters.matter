@@ -2547,7 +2547,6 @@ client cluster ModeSelect = 80 {
   }
 
   readonly attribute char_string<64> description = 0;
-  readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
@@ -2583,7 +2582,7 @@ client cluster ModeSelect = 80 {
 
 /** This cluster is an alias of the Mode Select cluster, defining additional semantics and
       namespaced enumerated values for laundry washer devices. */
-client cluster LaundryWasher = 81 {
+client cluster LaundryWasherModeSelect = 81 {
   enum SemanticTags : ENUM16 {
     kNormal = 16384;
     kDelicate = 16385;
@@ -2608,7 +2607,6 @@ client cluster LaundryWasher = 81 {
   }
 
   readonly attribute char_string<64> description = 0;
-  readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
@@ -2667,7 +2665,6 @@ client cluster RefrigeratorAndTemperatureControlledCabinet = 82 {
   }
 
   readonly attribute char_string<64> description = 0;
-  readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
@@ -2735,7 +2732,6 @@ client cluster RvcRun = 84 {
   }
 
   readonly attribute char_string<64> description = 0;
-  readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
@@ -2799,7 +2795,6 @@ client cluster RvcClean = 85 {
   }
 
   readonly attribute char_string<64> description = 0;
-  readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
@@ -2859,7 +2854,6 @@ client cluster DishwasherModeSelect = 89 {
   }
 
   readonly attribute char_string<64> description = 0;
-  readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
@@ -5811,7 +5805,7 @@ endpoint 1 {
   binding cluster UserLabel;
   binding cluster BooleanState;
   binding cluster ModeSelect;
-  binding cluster LaundryWasher;
+  binding cluster LaundryWasherModeSelect;
   binding cluster RefrigeratorAndTemperatureControlledCabinet;
   binding cluster RvcRun;
   binding cluster RvcClean;

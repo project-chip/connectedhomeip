@@ -1529,7 +1529,7 @@ enum class ModeSelectFeature : uint32_t
 };
 } // namespace ModeSelect
 
-namespace LaundryWasher {
+namespace LaundryWasherModeSelect {
 
 // Enum for SemanticTags
 enum class SemanticTags : uint16_t
@@ -1551,7 +1551,7 @@ enum class ModeSelectFeature : uint32_t
     kOnOff          = 0x1,
     kExtendedStatus = 0x2,
 };
-} // namespace LaundryWasher
+} // namespace LaundryWasherModeSelect
 
 namespace RefrigeratorAndTemperatureControlledCabinet {
 

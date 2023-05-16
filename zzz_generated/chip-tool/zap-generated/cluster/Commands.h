@@ -73,7 +73,7 @@
 | ProxyValid                                                          | 0x0044 |
 | BooleanState                                                        | 0x0045 |
 | ModeSelect                                                          | 0x0050 |
-| LaundryWasher                                                       | 0x0051 |
+| LaundryWasherModeSelect                                             | 0x0051 |
 | RefrigeratorAndTemperatureControlledCabinet                         | 0x0052 |
 | RvcRun                                                              | 0x0054 |
 | RvcClean                                                            | 0x0055 |
@@ -3864,7 +3864,6 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Description                                                       | 0x0000 |
-| * StandardNamespace                                                 | 0x0001 |
 | * SupportedModes                                                    | 0x0002 |
 | * CurrentMode                                                       | 0x0003 |
 | * StartUpMode                                                       | 0x0004 |
@@ -3941,7 +3940,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster LaundryWasher                                               | 0x0051 |
+| Cluster LaundryWasherModeSelect                                     | 0x0051 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
@@ -3949,7 +3948,6 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Description                                                       | 0x0000 |
-| * StandardNamespace                                                 | 0x0001 |
 | * SupportedModes                                                    | 0x0002 |
 | * CurrentMode                                                       | 0x0003 |
 | * StartUpMode                                                       | 0x0004 |
@@ -3967,10 +3965,11 @@ private:
 /*
  * Command ChangeToMode
  */
-class LaundryWasherChangeToMode : public ClusterCommand
+class LaundryWasherModeSelectChangeToMode : public ClusterCommand
 {
 public:
-    LaundryWasherChangeToMode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("change-to-mode", credsIssuerConfig)
+    LaundryWasherModeSelectChangeToMode(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode", credsIssuerConfig)
     {
         AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
         ClusterCommand::AddArguments();
@@ -3991,16 +3990,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::LaundryWasher::Commands::ChangeToMode::Type mRequest;
+    chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToMode::Type mRequest;
 };
 
 /*
  * Command ChangeToModeWithStatus
  */
-class LaundryWasherChangeToModeWithStatus : public ClusterCommand
+class LaundryWasherModeSelectChangeToModeWithStatus : public ClusterCommand
 {
 public:
-    LaundryWasherChangeToModeWithStatus(CredentialIssuerCommands * credsIssuerConfig) :
+    LaundryWasherModeSelectChangeToModeWithStatus(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("change-to-mode-with-status", credsIssuerConfig)
     {
         AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
@@ -4022,7 +4021,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::LaundryWasher::Commands::ChangeToModeWithStatus::Type mRequest;
+    chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeWithStatus::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -4034,7 +4033,6 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Description                                                       | 0x0000 |
-| * StandardNamespace                                                 | 0x0001 |
 | * SupportedModes                                                    | 0x0002 |
 | * CurrentMode                                                       | 0x0003 |
 | * StartUpMode                                                       | 0x0004 |
@@ -4120,7 +4118,6 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Description                                                       | 0x0000 |
-| * StandardNamespace                                                 | 0x0001 |
 | * SupportedModes                                                    | 0x0002 |
 | * CurrentMode                                                       | 0x0003 |
 | * StartUpMode                                                       | 0x0004 |
@@ -4205,7 +4202,6 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Description                                                       | 0x0000 |
-| * StandardNamespace                                                 | 0x0001 |
 | * SupportedModes                                                    | 0x0002 |
 | * CurrentMode                                                       | 0x0003 |
 | * StartUpMode                                                       | 0x0004 |
@@ -4290,7 +4286,6 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Description                                                       | 0x0000 |
-| * StandardNamespace                                                 | 0x0001 |
 | * SupportedModes                                                    | 0x0002 |
 | * CurrentMode                                                       | 0x0003 |
 | * StartUpMode                                                       | 0x0004 |
@@ -12497,7 +12492,6 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12511,9 +12505,6 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "standard-namespace", 0, UINT16_MAX,
-                                                                              Attributes::StandardNamespace::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -12538,7 +12529,6 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12558,25 +12548,24 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterLaundryWasher(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterLaundryWasherModeSelect(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::LaundryWasher;
+    using namespace chip::app::Clusters::LaundryWasherModeSelect;
 
-    const char * clusterName = "LaundryWasher";
+    const char * clusterName = "LaundryWasherModeSelect";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                  //
-        make_unique<LaundryWasherChangeToMode>(credsIssuerConfig),           //
-        make_unique<LaundryWasherChangeToModeWithStatus>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                            //
+        make_unique<LaundryWasherModeSelectChangeToMode>(credsIssuerConfig),           //
+        make_unique<LaundryWasherModeSelectChangeToModeWithStatus>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12590,11 +12579,8 @@ void registerClusterLaundryWasher(Commands & commands, CredentialIssuerCommands 
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "standard-namespace", 0, UINT16_MAX,
-                                                                              Attributes::StandardNamespace::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::LaundryWasher::Structs::ModeOptionStruct::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -12617,7 +12603,6 @@ void registerClusterLaundryWasher(Commands & commands, CredentialIssuerCommands 
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12655,7 +12640,6 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinet(Commands & comma
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12669,9 +12653,6 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinet(Commands & comma
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "standard-namespace", 0, UINT16_MAX,
-                                                                              Attributes::StandardNamespace::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -12696,7 +12677,6 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinet(Commands & comma
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12734,7 +12714,6 @@ void registerClusterRvcRun(Commands & commands, CredentialIssuerCommands * creds
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12748,9 +12727,6 @@ void registerClusterRvcRun(Commands & commands, CredentialIssuerCommands * creds
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "standard-namespace", 0, UINT16_MAX,
-                                                                              Attributes::StandardNamespace::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -12775,7 +12751,6 @@ void registerClusterRvcRun(Commands & commands, CredentialIssuerCommands * creds
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12813,7 +12788,6 @@ void registerClusterRvcClean(Commands & commands, CredentialIssuerCommands * cre
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12827,9 +12801,6 @@ void registerClusterRvcClean(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "standard-namespace", 0, UINT16_MAX,
-                                                                              Attributes::StandardNamespace::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -12854,7 +12825,6 @@ void registerClusterRvcClean(Commands & commands, CredentialIssuerCommands * cre
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12892,7 +12862,6 @@ void registerClusterDishwasherModeSelect(Commands & commands, CredentialIssuerCo
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -12906,9 +12875,6 @@ void registerClusterDishwasherModeSelect(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "standard-namespace", 0, UINT16_MAX,
-                                                                              Attributes::StandardNamespace::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -12933,7 +12899,6 @@ void registerClusterDishwasherModeSelect(Commands & commands, CredentialIssuerCo
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
-        make_unique<SubscribeAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -17196,7 +17161,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterProxyValid(commands, credsIssuerConfig);
     registerClusterBooleanState(commands, credsIssuerConfig);
     registerClusterModeSelect(commands, credsIssuerConfig);
-    registerClusterLaundryWasher(commands, credsIssuerConfig);
+    registerClusterLaundryWasherModeSelect(commands, credsIssuerConfig);
     registerClusterRefrigeratorAndTemperatureControlledCabinet(commands, credsIssuerConfig);
     registerClusterRvcRun(commands, credsIssuerConfig);
     registerClusterRvcClean(commands, credsIssuerConfig);

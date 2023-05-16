@@ -39,7 +39,7 @@
         "IDENTIFY_CLUSTER": [],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": [],
-        "LAUNDRY_WASHER_CLUSTER": [],
+        "LAUNDRY_WASHER_MODE_SELECT_CLUSTER": [],
         "LEVEL_CONTROL_CLUSTER": [],
         "LOCALIZATION_CONFIGURATION_CLUSTER": [],
         "LOW_POWER_CLUSTER": [],
@@ -137,7 +137,7 @@
         "IDENTIFY_CLUSTER": ["identify-server"],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": ["keypad-input-server"],
-        "LAUNDRY_WASHER_CLUSTER": ["mode-select-server"],
+        "LAUNDRY_WASHER_MODE_SELECT_CLUSTER": ["mode-select-server"],
         "LEVEL_CONTROL_CLUSTER": ["level-control"],
         "LOCALIZATION_CONFIGURATION_CLUSTER": [
             "localization-configuration-server"

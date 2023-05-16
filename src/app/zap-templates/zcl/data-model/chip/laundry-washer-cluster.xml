@@ -27,9 +27,9 @@ limitations under the License.
 
   <cluster>
     <domain>General</domain>
-    <name>Laundry Washer</name>
+    <name>Laundry Washer Mode Select</name>
     <code>0x0051</code>
-    <define>LAUNDRY_WASHER_CLUSTER</define>
+    <define>LAUNDRY_WASHER_MODE_SELECT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster is an alias of the Mode Select cluster, defining additional semantics and

@@ -366,13 +366,14 @@ public:
     ~ModeSelectCluster() {}
 };
 
-class DLL_EXPORT LaundryWasherCluster : public ClusterBase
+class DLL_EXPORT LaundryWasherModeSelectCluster : public ClusterBase
 {
 public:
-    LaundryWasherCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    LaundryWasherModeSelectCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                   EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~LaundryWasherCluster() {}
+    ~LaundryWasherModeSelectCluster() {}
 };
 
 class DLL_EXPORT RefrigeratorAndTemperatureControlledCabinetCluster : public ClusterBase
