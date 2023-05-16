@@ -108,6 +108,9 @@
  * @def kNvmId_KvsValues
  *
  * PDM ID used for KVS values RAM storage.
+ * KVS buffer can become quite big, so this PDM
+ * id is used as base id for subsequent PDM ids
+ * used to store data in chunks of PDM page size.
  */
 #ifndef kNvmId_KvsValues
 #define kNvmId_KvsValues (uint16_t) 0x6001

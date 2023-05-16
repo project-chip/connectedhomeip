@@ -61,7 +61,7 @@ public:
 
     RamStorage(uint16_t aPdmId) : mPdmId(aPdmId), mBuffer(nullptr) {}
 
-    CHIP_ERROR Init(uint16_t aInitialSize);
+    CHIP_ERROR Init(uint16_t aInitialSize, bool extendedSearch = false);
     void FreeBuffer();
     Buffer * GetBuffer() const { return mBuffer; }
     CHIP_ERROR Read(uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength) const;

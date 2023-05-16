@@ -68,11 +68,11 @@ CHIP_ERROR RamStorageKey::Delete()
     return mStorage->Delete(mId, -1);
 }
 
-CHIP_ERROR RamStorage::Init(uint16_t aInitialSize)
+CHIP_ERROR RamStorage::Init(uint16_t aInitialSize, bool extendedSearch)
 {
     CHIP_ERROR err;
 
-    mBuffer = getRamBuffer(mPdmId, aInitialSize);
+    mBuffer = getRamBuffer(mPdmId, aInitialSize, extendedSearch);
 
     return mBuffer ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
@@ -152,7 +152,18 @@ exit:
 void RamStorage::OnFactoryReset()
 {
     mutex_lock(mBuffer, osaWaitForever_c);
-    PDM_vDeleteDataRecord(mPdmId);
+#if PDM_SAVE_IDLE
+    // Have to cover the extended search case, in which a large RAM
+    // buffer is saved at multiple PDM ids.
+    uint8_t segments = (mBuffer->header.length / PDM_SEGMENT_SIZE) + 1;
+#else
+    uint8_t segments = 1;
+#endif
+    for (auto i = 0; i < segments; i++)
+    {
+        ChipLogProgress(DeviceLayer, "Ram Storage: delete PDM id: %d", mPdmId + i);
+        PDM_vDeleteDataRecord(mPdmId + i);
+    }
     mutex_unlock(mBuffer);
     FreeBuffer();
 }

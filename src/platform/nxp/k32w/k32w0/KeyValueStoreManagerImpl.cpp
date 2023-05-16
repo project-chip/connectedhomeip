@@ -34,7 +34,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
-constexpr size_t kMaxNumberOfKeys  = 150;
+constexpr size_t kMaxNumberOfKeys  = 200;
 constexpr size_t kMaxKeyValueBytes = 255;
 
 Internal::RamStorage KeyValueStoreManagerImpl::sKeysStorage   = { kNvmId_KvsKeys };
@@ -81,7 +81,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init()
     {
         ChipLogProgress(DeviceLayer, "Cannot init KVS keys storage with id: %d. Error: %s", kNvmId_KvsKeys, ErrorStr(err));
     }
-    err = sValuesStorage.Init(Internal::RamStorage::kRamBufferInitialSize);
+    // Set values storage to max RAM buffer size as a temporary fix for TC-RR-1.1.
+    err = sValuesStorage.Init(kRamBufferMaxAllocSize, true);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Cannot init KVS values storage with id: %d. Error: %s", kNvmId_KvsValues, ErrorStr(err));
