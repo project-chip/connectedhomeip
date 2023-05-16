@@ -59,6 +59,7 @@ enum
     ZCL_POSIX_MS_ATTRIBUTE_TYPE          = 0xD0, // Posix Time Milliseconds
     ZCL_SYSTIME_MS_ATTRIBUTE_TYPE        = 0xD1, // System Time Milliseconds
     ZCL_ELAPSED_S_ATTRIBUTE_TYPE         = 0xD2, // Elapsed Time Seconds
+    ZCL_TEMPERATURE_ATTRIBUTE_TYPE       = 0xDB, // Temperature
     ZCL_TOD_ATTRIBUTE_TYPE               = 0xE0, // Time of day
     ZCL_DATE_ATTRIBUTE_TYPE              = 0xE1, // Date
     ZCL_EPOCH_US_ATTRIBUTE_TYPE          = 0xE3, // Epoch Microseconds

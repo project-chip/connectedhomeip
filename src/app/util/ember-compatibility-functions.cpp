@@ -138,6 +138,9 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::NodeId is expected to be uint64_t, change this when necessary");
         return ZCL_INT64U_ATTRIBUTE_TYPE;
 
+    case ZCL_TEMPERATURE_ATTRIBUTE_TYPE: // Temperature
+        return ZCL_INT16S_ATTRIBUTE_TYPE;
+
     default:
         return type;
     }
