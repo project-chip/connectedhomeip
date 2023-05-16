@@ -6974,6 +6974,1838 @@ public class ClusterReadMapping {
     return result;
   }
 
+  private static Map<String, InteractionInfo> readHepaFilterMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readHepaFilterMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readHepaFilterMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.HepaFilterMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readHepaFilterMonitoringConditionCommandParams);
+    result.put("readConditionAttribute", readHepaFilterMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readHepaFilterMonitoringDegradationDirectionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readHepaFilterMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.HepaFilterMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readHepaFilterMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readHepaFilterMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readHepaFilterMonitoringChangeIndicationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readHepaFilterMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.HepaFilterMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readHepaFilterMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readHepaFilterMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readHepaFilterMonitoringInPlaceIndicatorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readHepaFilterMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.HepaFilterMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readHepaFilterMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readHepaFilterMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readHepaFilterMonitoringGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readHepaFilterMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.HepaFilterMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.HepaFilterMonitoringCluster
+                              .GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedHepaFilterMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readHepaFilterMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readHepaFilterMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readHepaFilterMonitoringAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readHepaFilterMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.HepaFilterMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.HepaFilterMonitoringCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedHepaFilterMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readHepaFilterMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readHepaFilterMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readHepaFilterMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readHepaFilterMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.HepaFilterMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.HepaFilterMonitoringCluster.EventListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedHepaFilterMonitoringClusterEventListAttributeCallback(),
+            readHepaFilterMonitoringEventListCommandParams);
+    result.put("readEventListAttribute", readHepaFilterMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readHepaFilterMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readHepaFilterMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.HepaFilterMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.HepaFilterMonitoringCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedHepaFilterMonitoringClusterAttributeListAttributeCallback(),
+            readHepaFilterMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute",
+        readHepaFilterMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readHepaFilterMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readHepaFilterMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.HepaFilterMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readHepaFilterMonitoringFeatureMapCommandParams);
+    result.put(
+        "readFeatureMapAttribute", readHepaFilterMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readHepaFilterMonitoringClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readHepaFilterMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.HepaFilterMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readHepaFilterMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readHepaFilterMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readActivatedCarbonFilterMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readActivatedCarbonFilterMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readActivatedCarbonFilterMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readActivatedCarbonFilterMonitoringConditionCommandParams);
+    result.put(
+        "readConditionAttribute",
+        readActivatedCarbonFilterMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readActivatedCarbonFilterMonitoringDegradationDirectionCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo
+        readActivatedCarbonFilterMonitoringDegradationDirectionAttributeInteractionInfo =
+            new InteractionInfo(
+                (cluster, callback, commandArguments) -> {
+                  ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster)
+                      .readDegradationDirectionAttribute(
+                          (ChipClusters.IntegerAttributeCallback) callback);
+                },
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+                readActivatedCarbonFilterMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readActivatedCarbonFilterMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readActivatedCarbonFilterMonitoringChangeIndicationCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readActivatedCarbonFilterMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readActivatedCarbonFilterMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readActivatedCarbonFilterMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readActivatedCarbonFilterMonitoringInPlaceIndicatorCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readActivatedCarbonFilterMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readActivatedCarbonFilterMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readActivatedCarbonFilterMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readActivatedCarbonFilterMonitoringGeneratedCommandListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo
+        readActivatedCarbonFilterMonitoringGeneratedCommandListAttributeInteractionInfo =
+            new InteractionInfo(
+                (cluster, callback, commandArguments) -> {
+                  ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster)
+                      .readGeneratedCommandListAttribute(
+                          (ChipClusters.ActivatedCarbonFilterMonitoringCluster
+                                  .GeneratedCommandListAttributeCallback)
+                              callback);
+                },
+                () ->
+                    new ClusterInfoMapping
+                        .DelegatedActivatedCarbonFilterMonitoringClusterGeneratedCommandListAttributeCallback(),
+                readActivatedCarbonFilterMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readActivatedCarbonFilterMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readActivatedCarbonFilterMonitoringAcceptedCommandListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readActivatedCarbonFilterMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.ActivatedCarbonFilterMonitoringCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedActivatedCarbonFilterMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readActivatedCarbonFilterMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readActivatedCarbonFilterMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readActivatedCarbonFilterMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readActivatedCarbonFilterMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.ActivatedCarbonFilterMonitoringCluster
+                              .EventListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedActivatedCarbonFilterMonitoringClusterEventListAttributeCallback(),
+            readActivatedCarbonFilterMonitoringEventListCommandParams);
+    result.put(
+        "readEventListAttribute",
+        readActivatedCarbonFilterMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readActivatedCarbonFilterMonitoringAttributeListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readActivatedCarbonFilterMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.ActivatedCarbonFilterMonitoringCluster
+                              .AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedActivatedCarbonFilterMonitoringClusterAttributeListAttributeCallback(),
+            readActivatedCarbonFilterMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute",
+        readActivatedCarbonFilterMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readActivatedCarbonFilterMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readActivatedCarbonFilterMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readActivatedCarbonFilterMonitoringFeatureMapCommandParams);
+    result.put(
+        "readFeatureMapAttribute",
+        readActivatedCarbonFilterMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readActivatedCarbonFilterMonitoringClusterRevisionCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readActivatedCarbonFilterMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ActivatedCarbonFilterMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readActivatedCarbonFilterMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readActivatedCarbonFilterMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readCeramicFilterMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readCeramicFilterMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readCeramicFilterMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.CeramicFilterMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readCeramicFilterMonitoringConditionCommandParams);
+    result.put(
+        "readConditionAttribute", readCeramicFilterMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readCeramicFilterMonitoringDegradationDirectionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readCeramicFilterMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.CeramicFilterMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readCeramicFilterMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readCeramicFilterMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readCeramicFilterMonitoringChangeIndicationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readCeramicFilterMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.CeramicFilterMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readCeramicFilterMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readCeramicFilterMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readCeramicFilterMonitoringInPlaceIndicatorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readCeramicFilterMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.CeramicFilterMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readCeramicFilterMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readCeramicFilterMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readCeramicFilterMonitoringGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readCeramicFilterMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.CeramicFilterMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.CeramicFilterMonitoringCluster
+                              .GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedCeramicFilterMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readCeramicFilterMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readCeramicFilterMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readCeramicFilterMonitoringAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readCeramicFilterMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.CeramicFilterMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.CeramicFilterMonitoringCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedCeramicFilterMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readCeramicFilterMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readCeramicFilterMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readCeramicFilterMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readCeramicFilterMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.CeramicFilterMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.CeramicFilterMonitoringCluster.EventListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedCeramicFilterMonitoringClusterEventListAttributeCallback(),
+            readCeramicFilterMonitoringEventListCommandParams);
+    result.put(
+        "readEventListAttribute", readCeramicFilterMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readCeramicFilterMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readCeramicFilterMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.CeramicFilterMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.CeramicFilterMonitoringCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedCeramicFilterMonitoringClusterAttributeListAttributeCallback(),
+            readCeramicFilterMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute",
+        readCeramicFilterMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readCeramicFilterMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readCeramicFilterMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.CeramicFilterMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readCeramicFilterMonitoringFeatureMapCommandParams);
+    result.put(
+        "readFeatureMapAttribute", readCeramicFilterMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readCeramicFilterMonitoringClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readCeramicFilterMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.CeramicFilterMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readCeramicFilterMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readCeramicFilterMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readElectrostaticFilterMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readElectrostaticFilterMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readElectrostaticFilterMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readElectrostaticFilterMonitoringConditionCommandParams);
+    result.put(
+        "readConditionAttribute",
+        readElectrostaticFilterMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readElectrostaticFilterMonitoringDegradationDirectionCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readElectrostaticFilterMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readElectrostaticFilterMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readElectrostaticFilterMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readElectrostaticFilterMonitoringChangeIndicationCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readElectrostaticFilterMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readElectrostaticFilterMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readElectrostaticFilterMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readElectrostaticFilterMonitoringInPlaceIndicatorCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readElectrostaticFilterMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readElectrostaticFilterMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readElectrostaticFilterMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readElectrostaticFilterMonitoringGeneratedCommandListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readElectrostaticFilterMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.ElectrostaticFilterMonitoringCluster
+                              .GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedElectrostaticFilterMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readElectrostaticFilterMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readElectrostaticFilterMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readElectrostaticFilterMonitoringAcceptedCommandListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readElectrostaticFilterMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.ElectrostaticFilterMonitoringCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedElectrostaticFilterMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readElectrostaticFilterMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readElectrostaticFilterMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readElectrostaticFilterMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readElectrostaticFilterMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.ElectrostaticFilterMonitoringCluster.EventListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedElectrostaticFilterMonitoringClusterEventListAttributeCallback(),
+            readElectrostaticFilterMonitoringEventListCommandParams);
+    result.put(
+        "readEventListAttribute",
+        readElectrostaticFilterMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readElectrostaticFilterMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readElectrostaticFilterMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.ElectrostaticFilterMonitoringCluster
+                              .AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedElectrostaticFilterMonitoringClusterAttributeListAttributeCallback(),
+            readElectrostaticFilterMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute",
+        readElectrostaticFilterMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readElectrostaticFilterMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readElectrostaticFilterMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readElectrostaticFilterMonitoringFeatureMapCommandParams);
+    result.put(
+        "readFeatureMapAttribute",
+        readElectrostaticFilterMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readElectrostaticFilterMonitoringClusterRevisionCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readElectrostaticFilterMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectrostaticFilterMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readElectrostaticFilterMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readElectrostaticFilterMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readUvFilterMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readUvFilterMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUvFilterMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UvFilterMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readUvFilterMonitoringConditionCommandParams);
+    result.put("readConditionAttribute", readUvFilterMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUvFilterMonitoringDegradationDirectionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUvFilterMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UvFilterMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readUvFilterMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readUvFilterMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUvFilterMonitoringChangeIndicationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUvFilterMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UvFilterMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readUvFilterMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readUvFilterMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUvFilterMonitoringInPlaceIndicatorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUvFilterMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UvFilterMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readUvFilterMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readUvFilterMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUvFilterMonitoringGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUvFilterMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UvFilterMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.UvFilterMonitoringCluster.GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedUvFilterMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readUvFilterMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readUvFilterMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUvFilterMonitoringAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUvFilterMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UvFilterMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.UvFilterMonitoringCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedUvFilterMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readUvFilterMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readUvFilterMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUvFilterMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUvFilterMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UvFilterMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.UvFilterMonitoringCluster.EventListAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedUvFilterMonitoringClusterEventListAttributeCallback(),
+            readUvFilterMonitoringEventListCommandParams);
+    result.put("readEventListAttribute", readUvFilterMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUvFilterMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUvFilterMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UvFilterMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.UvFilterMonitoringCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedUvFilterMonitoringClusterAttributeListAttributeCallback(),
+            readUvFilterMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute", readUvFilterMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUvFilterMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUvFilterMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UvFilterMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readUvFilterMonitoringFeatureMapCommandParams);
+    result.put("readFeatureMapAttribute", readUvFilterMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUvFilterMonitoringClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUvFilterMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UvFilterMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readUvFilterMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readUvFilterMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readIonizingFilterMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readIonizingFilterMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIonizingFilterMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IonizingFilterMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readIonizingFilterMonitoringConditionCommandParams);
+    result.put(
+        "readConditionAttribute", readIonizingFilterMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readIonizingFilterMonitoringDegradationDirectionCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIonizingFilterMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IonizingFilterMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readIonizingFilterMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readIonizingFilterMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIonizingFilterMonitoringChangeIndicationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIonizingFilterMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IonizingFilterMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readIonizingFilterMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readIonizingFilterMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIonizingFilterMonitoringInPlaceIndicatorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIonizingFilterMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IonizingFilterMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readIonizingFilterMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readIonizingFilterMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readIonizingFilterMonitoringGeneratedCommandListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIonizingFilterMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IonizingFilterMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.IonizingFilterMonitoringCluster
+                              .GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedIonizingFilterMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readIonizingFilterMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readIonizingFilterMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIonizingFilterMonitoringAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIonizingFilterMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IonizingFilterMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.IonizingFilterMonitoringCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedIonizingFilterMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readIonizingFilterMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readIonizingFilterMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIonizingFilterMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIonizingFilterMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IonizingFilterMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.IonizingFilterMonitoringCluster.EventListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedIonizingFilterMonitoringClusterEventListAttributeCallback(),
+            readIonizingFilterMonitoringEventListCommandParams);
+    result.put(
+        "readEventListAttribute", readIonizingFilterMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIonizingFilterMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIonizingFilterMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IonizingFilterMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.IonizingFilterMonitoringCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedIonizingFilterMonitoringClusterAttributeListAttributeCallback(),
+            readIonizingFilterMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute",
+        readIonizingFilterMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIonizingFilterMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIonizingFilterMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IonizingFilterMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readIonizingFilterMonitoringFeatureMapCommandParams);
+    result.put(
+        "readFeatureMapAttribute", readIonizingFilterMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readIonizingFilterMonitoringClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readIonizingFilterMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IonizingFilterMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readIonizingFilterMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readIonizingFilterMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readZeoliteFilterMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readZeoliteFilterMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readZeoliteFilterMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readZeoliteFilterMonitoringConditionCommandParams);
+    result.put(
+        "readConditionAttribute", readZeoliteFilterMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readZeoliteFilterMonitoringDegradationDirectionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readZeoliteFilterMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readZeoliteFilterMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readZeoliteFilterMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readZeoliteFilterMonitoringChangeIndicationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readZeoliteFilterMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readZeoliteFilterMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readZeoliteFilterMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readZeoliteFilterMonitoringInPlaceIndicatorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readZeoliteFilterMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readZeoliteFilterMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readZeoliteFilterMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readZeoliteFilterMonitoringGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readZeoliteFilterMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.ZeoliteFilterMonitoringCluster
+                              .GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedZeoliteFilterMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readZeoliteFilterMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readZeoliteFilterMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readZeoliteFilterMonitoringAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readZeoliteFilterMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.ZeoliteFilterMonitoringCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedZeoliteFilterMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readZeoliteFilterMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readZeoliteFilterMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readZeoliteFilterMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readZeoliteFilterMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.ZeoliteFilterMonitoringCluster.EventListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedZeoliteFilterMonitoringClusterEventListAttributeCallback(),
+            readZeoliteFilterMonitoringEventListCommandParams);
+    result.put(
+        "readEventListAttribute", readZeoliteFilterMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readZeoliteFilterMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readZeoliteFilterMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.ZeoliteFilterMonitoringCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedZeoliteFilterMonitoringClusterAttributeListAttributeCallback(),
+            readZeoliteFilterMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute",
+        readZeoliteFilterMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readZeoliteFilterMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readZeoliteFilterMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readZeoliteFilterMonitoringFeatureMapCommandParams);
+    result.put(
+        "readFeatureMapAttribute", readZeoliteFilterMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readZeoliteFilterMonitoringClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readZeoliteFilterMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ZeoliteFilterMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readZeoliteFilterMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readZeoliteFilterMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readOzoneFilterMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readOzoneFilterMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOzoneFilterMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OzoneFilterMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readOzoneFilterMonitoringConditionCommandParams);
+    result.put(
+        "readConditionAttribute", readOzoneFilterMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOzoneFilterMonitoringDegradationDirectionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOzoneFilterMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OzoneFilterMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readOzoneFilterMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readOzoneFilterMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOzoneFilterMonitoringChangeIndicationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOzoneFilterMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OzoneFilterMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readOzoneFilterMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readOzoneFilterMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOzoneFilterMonitoringInPlaceIndicatorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOzoneFilterMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OzoneFilterMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readOzoneFilterMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readOzoneFilterMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOzoneFilterMonitoringGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOzoneFilterMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OzoneFilterMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.OzoneFilterMonitoringCluster
+                              .GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOzoneFilterMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readOzoneFilterMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readOzoneFilterMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOzoneFilterMonitoringAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOzoneFilterMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OzoneFilterMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.OzoneFilterMonitoringCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOzoneFilterMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readOzoneFilterMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readOzoneFilterMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOzoneFilterMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOzoneFilterMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OzoneFilterMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.OzoneFilterMonitoringCluster.EventListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOzoneFilterMonitoringClusterEventListAttributeCallback(),
+            readOzoneFilterMonitoringEventListCommandParams);
+    result.put(
+        "readEventListAttribute", readOzoneFilterMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOzoneFilterMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOzoneFilterMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OzoneFilterMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.OzoneFilterMonitoringCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOzoneFilterMonitoringClusterAttributeListAttributeCallback(),
+            readOzoneFilterMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute",
+        readOzoneFilterMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOzoneFilterMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOzoneFilterMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OzoneFilterMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readOzoneFilterMonitoringFeatureMapCommandParams);
+    result.put(
+        "readFeatureMapAttribute", readOzoneFilterMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOzoneFilterMonitoringClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOzoneFilterMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OzoneFilterMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readOzoneFilterMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readOzoneFilterMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readWaterTankMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readWaterTankMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWaterTankMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WaterTankMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readWaterTankMonitoringConditionCommandParams);
+    result.put("readConditionAttribute", readWaterTankMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWaterTankMonitoringDegradationDirectionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWaterTankMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WaterTankMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readWaterTankMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readWaterTankMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWaterTankMonitoringChangeIndicationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWaterTankMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WaterTankMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readWaterTankMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readWaterTankMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWaterTankMonitoringInPlaceIndicatorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWaterTankMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WaterTankMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readWaterTankMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readWaterTankMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWaterTankMonitoringGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWaterTankMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WaterTankMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.WaterTankMonitoringCluster
+                              .GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedWaterTankMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readWaterTankMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readWaterTankMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWaterTankMonitoringAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWaterTankMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WaterTankMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.WaterTankMonitoringCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedWaterTankMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readWaterTankMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readWaterTankMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWaterTankMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWaterTankMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WaterTankMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.WaterTankMonitoringCluster.EventListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedWaterTankMonitoringClusterEventListAttributeCallback(),
+            readWaterTankMonitoringEventListCommandParams);
+    result.put("readEventListAttribute", readWaterTankMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWaterTankMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWaterTankMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WaterTankMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.WaterTankMonitoringCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedWaterTankMonitoringClusterAttributeListAttributeCallback(),
+            readWaterTankMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute", readWaterTankMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWaterTankMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWaterTankMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WaterTankMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readWaterTankMonitoringFeatureMapCommandParams);
+    result.put(
+        "readFeatureMapAttribute", readWaterTankMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWaterTankMonitoringClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWaterTankMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WaterTankMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readWaterTankMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readWaterTankMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readFuelTankMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readFuelTankMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFuelTankMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FuelTankMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFuelTankMonitoringConditionCommandParams);
+    result.put("readConditionAttribute", readFuelTankMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFuelTankMonitoringDegradationDirectionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFuelTankMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FuelTankMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFuelTankMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readFuelTankMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFuelTankMonitoringChangeIndicationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFuelTankMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FuelTankMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFuelTankMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readFuelTankMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFuelTankMonitoringInPlaceIndicatorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFuelTankMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FuelTankMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readFuelTankMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readFuelTankMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFuelTankMonitoringGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFuelTankMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FuelTankMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.FuelTankMonitoringCluster.GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedFuelTankMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readFuelTankMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readFuelTankMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFuelTankMonitoringAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFuelTankMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FuelTankMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.FuelTankMonitoringCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedFuelTankMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readFuelTankMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readFuelTankMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFuelTankMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFuelTankMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FuelTankMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.FuelTankMonitoringCluster.EventListAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedFuelTankMonitoringClusterEventListAttributeCallback(),
+            readFuelTankMonitoringEventListCommandParams);
+    result.put("readEventListAttribute", readFuelTankMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFuelTankMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFuelTankMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FuelTankMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.FuelTankMonitoringCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedFuelTankMonitoringClusterAttributeListAttributeCallback(),
+            readFuelTankMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute", readFuelTankMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFuelTankMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFuelTankMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FuelTankMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readFuelTankMonitoringFeatureMapCommandParams);
+    result.put("readFeatureMapAttribute", readFuelTankMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readFuelTankMonitoringClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readFuelTankMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.FuelTankMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readFuelTankMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readFuelTankMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readInkCartridgeMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readInkCartridgeMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readInkCartridgeMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.InkCartridgeMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readInkCartridgeMonitoringConditionCommandParams);
+    result.put(
+        "readConditionAttribute", readInkCartridgeMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readInkCartridgeMonitoringDegradationDirectionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readInkCartridgeMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.InkCartridgeMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readInkCartridgeMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readInkCartridgeMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readInkCartridgeMonitoringChangeIndicationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readInkCartridgeMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.InkCartridgeMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readInkCartridgeMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readInkCartridgeMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readInkCartridgeMonitoringInPlaceIndicatorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readInkCartridgeMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.InkCartridgeMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readInkCartridgeMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readInkCartridgeMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readInkCartridgeMonitoringGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readInkCartridgeMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.InkCartridgeMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.InkCartridgeMonitoringCluster
+                              .GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedInkCartridgeMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readInkCartridgeMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readInkCartridgeMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readInkCartridgeMonitoringAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readInkCartridgeMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.InkCartridgeMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.InkCartridgeMonitoringCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedInkCartridgeMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readInkCartridgeMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readInkCartridgeMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readInkCartridgeMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readInkCartridgeMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.InkCartridgeMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.InkCartridgeMonitoringCluster.EventListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedInkCartridgeMonitoringClusterEventListAttributeCallback(),
+            readInkCartridgeMonitoringEventListCommandParams);
+    result.put(
+        "readEventListAttribute", readInkCartridgeMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readInkCartridgeMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readInkCartridgeMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.InkCartridgeMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.InkCartridgeMonitoringCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedInkCartridgeMonitoringClusterAttributeListAttributeCallback(),
+            readInkCartridgeMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute",
+        readInkCartridgeMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readInkCartridgeMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readInkCartridgeMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.InkCartridgeMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readInkCartridgeMonitoringFeatureMapCommandParams);
+    result.put(
+        "readFeatureMapAttribute", readInkCartridgeMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readInkCartridgeMonitoringClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readInkCartridgeMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.InkCartridgeMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readInkCartridgeMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readInkCartridgeMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readTonerCartridgeMonitoringInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readTonerCartridgeMonitoringConditionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTonerCartridgeMonitoringConditionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TonerCartridgeMonitoringCluster) cluster)
+                  .readConditionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTonerCartridgeMonitoringConditionCommandParams);
+    result.put(
+        "readConditionAttribute", readTonerCartridgeMonitoringConditionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readTonerCartridgeMonitoringDegradationDirectionCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTonerCartridgeMonitoringDegradationDirectionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TonerCartridgeMonitoringCluster) cluster)
+                  .readDegradationDirectionAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTonerCartridgeMonitoringDegradationDirectionCommandParams);
+    result.put(
+        "readDegradationDirectionAttribute",
+        readTonerCartridgeMonitoringDegradationDirectionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTonerCartridgeMonitoringChangeIndicationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTonerCartridgeMonitoringChangeIndicationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TonerCartridgeMonitoringCluster) cluster)
+                  .readChangeIndicationAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTonerCartridgeMonitoringChangeIndicationCommandParams);
+    result.put(
+        "readChangeIndicationAttribute",
+        readTonerCartridgeMonitoringChangeIndicationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTonerCartridgeMonitoringInPlaceIndicatorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTonerCartridgeMonitoringInPlaceIndicatorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TonerCartridgeMonitoringCluster) cluster)
+                  .readInPlaceIndicatorAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readTonerCartridgeMonitoringInPlaceIndicatorCommandParams);
+    result.put(
+        "readInPlaceIndicatorAttribute",
+        readTonerCartridgeMonitoringInPlaceIndicatorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readTonerCartridgeMonitoringGeneratedCommandListCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTonerCartridgeMonitoringGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TonerCartridgeMonitoringCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.TonerCartridgeMonitoringCluster
+                              .GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTonerCartridgeMonitoringClusterGeneratedCommandListAttributeCallback(),
+            readTonerCartridgeMonitoringGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readTonerCartridgeMonitoringGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTonerCartridgeMonitoringAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTonerCartridgeMonitoringAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TonerCartridgeMonitoringCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.TonerCartridgeMonitoringCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTonerCartridgeMonitoringClusterAcceptedCommandListAttributeCallback(),
+            readTonerCartridgeMonitoringAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readTonerCartridgeMonitoringAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTonerCartridgeMonitoringEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTonerCartridgeMonitoringEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TonerCartridgeMonitoringCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.TonerCartridgeMonitoringCluster.EventListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTonerCartridgeMonitoringClusterEventListAttributeCallback(),
+            readTonerCartridgeMonitoringEventListCommandParams);
+    result.put(
+        "readEventListAttribute", readTonerCartridgeMonitoringEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTonerCartridgeMonitoringAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTonerCartridgeMonitoringAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TonerCartridgeMonitoringCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.TonerCartridgeMonitoringCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTonerCartridgeMonitoringClusterAttributeListAttributeCallback(),
+            readTonerCartridgeMonitoringAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute",
+        readTonerCartridgeMonitoringAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTonerCartridgeMonitoringFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTonerCartridgeMonitoringFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TonerCartridgeMonitoringCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTonerCartridgeMonitoringFeatureMapCommandParams);
+    result.put(
+        "readFeatureMapAttribute", readTonerCartridgeMonitoringFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTonerCartridgeMonitoringClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTonerCartridgeMonitoringClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TonerCartridgeMonitoringCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTonerCartridgeMonitoringClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readTonerCartridgeMonitoringClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
   private static Map<String, InteractionInfo> readDoorLockInteractionInfo() {
     Map<String, InteractionInfo> result = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readDoorLockLockStateCommandParams =
@@ -16456,6 +18288,20 @@ public class ClusterReadMapping {
         put("userLabel", readUserLabelInteractionInfo());
         put("booleanState", readBooleanStateInteractionInfo());
         put("modeSelect", readModeSelectInteractionInfo());
+        put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());
+        put(
+            "activatedCarbonFilterMonitoring",
+            readActivatedCarbonFilterMonitoringInteractionInfo());
+        put("ceramicFilterMonitoring", readCeramicFilterMonitoringInteractionInfo());
+        put("electrostaticFilterMonitoring", readElectrostaticFilterMonitoringInteractionInfo());
+        put("uvFilterMonitoring", readUvFilterMonitoringInteractionInfo());
+        put("ionizingFilterMonitoring", readIonizingFilterMonitoringInteractionInfo());
+        put("zeoliteFilterMonitoring", readZeoliteFilterMonitoringInteractionInfo());
+        put("ozoneFilterMonitoring", readOzoneFilterMonitoringInteractionInfo());
+        put("waterTankMonitoring", readWaterTankMonitoringInteractionInfo());
+        put("fuelTankMonitoring", readFuelTankMonitoringInteractionInfo());
+        put("inkCartridgeMonitoring", readInkCartridgeMonitoringInteractionInfo());
+        put("tonerCartridgeMonitoring", readTonerCartridgeMonitoringInteractionInfo());
         put("doorLock", readDoorLockInteractionInfo());
         put("windowCovering", readWindowCoveringInteractionInfo());
         put("barrierControl", readBarrierControlInteractionInfo());

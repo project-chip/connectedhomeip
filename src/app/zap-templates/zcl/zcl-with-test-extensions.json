@@ -71,6 +71,7 @@
         "pump-configuration-and-control-cluster.xml",
         "pwm-cluster.xml",
         "relative-humidity-measurement-cluster.xml",
+        "replacable-monitoring-cluster.xml",
         "scene.xml",
         "software-diagnostics-cluster.xml",
         "switch-cluster.xml",

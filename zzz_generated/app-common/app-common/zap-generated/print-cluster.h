@@ -286,6 +286,88 @@
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                           \
+    { chip::app::Clusters::HepaFilterMonitoring::Id, "HEPA Filter Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_SERVER) ||                                                        \
+    defined(ZCL_USING_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                               \
+    { chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id, "Activated Carbon Filter Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CERAMIC_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_CERAMIC_FILTER_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CERAMIC_FILTER_MONITORING_CLUSTER                                                                        \
+    { chip::app::Clusters::CeramicFilterMonitoring::Id, "Ceramic Filter Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_CERAMIC_FILTER_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ELECTROSTATIC_FILTER_MONITORING_SERVER) || defined(ZCL_USING_ELECTROSTATIC_FILTER_MONITORING_CLIENT)
+#define CHIP_PRINTCLUSTER_ELECTROSTATIC_FILTER_MONITORING                                                                          \
+    { chip::app::Clusters::ElectrostaticFilterMonitoring::Id, "Electrostatic Filter Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_ELECTROSTATIC_FILTER_MONITORING
+#endif
+
+#if defined(ZCL_USING_UV_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_UV_FILTER_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_UV_FILTER_MONITORING_CLUSTER { chip::app::Clusters::UvFilterMonitoring::Id, "UV Filter Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_UV_FILTER_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_IONIZING_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_IONIZING_FILTER_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_IONIZING_FILTER_MONITORING_CLUSTER                                                                       \
+    { chip::app::Clusters::IonizingFilterMonitoring::Id, "Ionizing Filter Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_IONIZING_FILTER_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ZEOLITE_FILTER_MONITORING_SERVER) || defined(ZCL_USING_ZEOLITE_FILTER_MONITORING_CLIENT)
+#define CHIP_PRINTCLUSTER_ZEOLITE_FILTER_MONITORING                                                                                \
+    { chip::app::Clusters::ZeoliteFilterMonitoring::Id, "Zeolite Filter Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_ZEOLITE_FILTER_MONITORING
+#endif
+
+#if defined(ZCL_USING_OZONE_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_OZONE_FILTER_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OZONE_FILTER_MONITORING_CLUSTER                                                                          \
+    { chip::app::Clusters::OzoneFilterMonitoring::Id, "Ozone Filter Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_OZONE_FILTER_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_WATER_TANK_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_WATER_TANK_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_WATER_TANK_MONITORING_CLUSTER { chip::app::Clusters::WaterTankMonitoring::Id, "Water Tank Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_WATER_TANK_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_FUEL_TANK_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_FUEL_TANK_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_FUEL_TANK_MONITORING_CLUSTER { chip::app::Clusters::FuelTankMonitoring::Id, "Fuel Tank Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_FUEL_TANK_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_INK_CARTRIDGE_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_INK_CARTRIDGE_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_INK_CARTRIDGE_MONITORING_CLUSTER                                                                         \
+    { chip::app::Clusters::InkCartridgeMonitoring::Id, "Ink Cartridge Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_INK_CARTRIDGE_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_TONER_CARTRIDGE_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_TONER_CARTRIDGE_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TONER_CARTRIDGE_MONITORING_CLUSTER                                                                       \
+    { chip::app::Clusters::TonerCartridgeMonitoring::Id, "Toner Cartridge Monitoring" },
+#else
+#define CHIP_PRINTCLUSTER_TONER_CARTRIDGE_MONITORING_CLUSTER
+#endif
+
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER { chip::app::Clusters::DoorLock::Id, "Door Lock" },
 #else
@@ -523,6 +605,18 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
+    CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
+    CHIP_PRINTCLUSTER_CERAMIC_FILTER_MONITORING_CLUSTER                                                                            \
+    CHIP_PRINTCLUSTER_ELECTROSTATIC_FILTER_MONITORING                                                                              \
+    CHIP_PRINTCLUSTER_UV_FILTER_MONITORING_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_IONIZING_FILTER_MONITORING_CLUSTER                                                                           \
+    CHIP_PRINTCLUSTER_ZEOLITE_FILTER_MONITORING                                                                                    \
+    CHIP_PRINTCLUSTER_OZONE_FILTER_MONITORING_CLUSTER                                                                              \
+    CHIP_PRINTCLUSTER_WATER_TANK_MONITORING_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_FUEL_TANK_MONITORING_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_INK_CARTRIDGE_MONITORING_CLUSTER                                                                             \
+    CHIP_PRINTCLUSTER_TONER_CARTRIDGE_MONITORING_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \

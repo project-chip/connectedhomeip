@@ -57,6 +57,18 @@
 #define EMBER_AF_USER_LABEL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_BOOLEAN_STATE_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_MODE_SELECT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_HEPA_FILTER_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_CERAMIC_FILTER_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_ELECTROSTATIC_FILTER_MONITORING_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_UV_FILTER_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_IONIZING_FILTER_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_ZEOLITE_FILTER_MONITORING_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_OZONE_FILTER_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_WATER_TANK_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_FUEL_TANK_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_INK_CARTRIDGE_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_TONER_CARTRIDGE_MONITORING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_DOOR_LOCK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WINDOW_COVERING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_BARRIER_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -232,6 +244,54 @@
 // Use this macro to check if the client side of the Mode Select cluster is included
 #define ZCL_USING_MODE_SELECT_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_MODE_SELECT_CLIENT
+
+// Use this macro to check if the client side of the HEPA Filter Monitoring cluster is included
+#define ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_HEPA_FILTER_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the Activated Carbon Filter Monitoring cluster is included
+#define ZCL_USING_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_ACTIVATED_CARBON_FILTER_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the Ceramic Filter Monitoring cluster is included
+#define ZCL_USING_CERAMIC_FILTER_MONITORING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_CERAMIC_FILTER_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the Electrostatic Filter Monitoring cluster is included
+#define ZCL_USING_ELECTROSTATIC_FILTER_MONITORING_CLIENT
+#define EMBER_AF_PLUGIN_ELECTROSTATIC_FILTER_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the UV Filter Monitoring cluster is included
+#define ZCL_USING_UV_FILTER_MONITORING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_UV_FILTER_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the Ionizing Filter Monitoring cluster is included
+#define ZCL_USING_IONIZING_FILTER_MONITORING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_IONIZING_FILTER_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the Zeolite Filter Monitoring cluster is included
+#define ZCL_USING_ZEOLITE_FILTER_MONITORING_CLIENT
+#define EMBER_AF_PLUGIN_ZEOLITE_FILTER_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the Ozone Filter Monitoring cluster is included
+#define ZCL_USING_OZONE_FILTER_MONITORING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_OZONE_FILTER_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the Water Tank Monitoring cluster is included
+#define ZCL_USING_WATER_TANK_MONITORING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_WATER_TANK_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the Fuel Tank Monitoring cluster is included
+#define ZCL_USING_FUEL_TANK_MONITORING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_FUEL_TANK_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the Ink Cartridge Monitoring cluster is included
+#define ZCL_USING_INK_CARTRIDGE_MONITORING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_INK_CARTRIDGE_MONITORING_CLIENT
+
+// Use this macro to check if the client side of the Toner Cartridge Monitoring cluster is included
+#define ZCL_USING_TONER_CARTRIDGE_MONITORING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TONER_CARTRIDGE_MONITORING_CLIENT
 
 // Use this macro to check if the client side of the Door Lock cluster is included
 #define ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT
