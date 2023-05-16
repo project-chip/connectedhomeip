@@ -38,6 +38,7 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster is an alias of the Mode Select cluster which also defines a namespace for the
       cleaning type of the Robotic Vacuum Cleaner devices.</description>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false" isNullable="false" length="64">Description</attribute>
     <attribute side="server" code="0x0001" define="STANDARD_NAMESPACE" type="ENUM16"                                        writable="false" optional="false"  isNullable="true">StandardNamespace</attribute>
