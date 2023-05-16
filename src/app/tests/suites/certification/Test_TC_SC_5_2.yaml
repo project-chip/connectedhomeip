@@ -220,7 +220,7 @@ tests:
 
     - label: "TH binds GroupId to GroupKeySet"
       verification: |
-          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": "0x0103", "groupKeySetID": "0x01a3", "fabricIndex": 1}]' 1 0
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": "0x0103", "groupKeySetID": "0x01a3", "fabricIndex": 1},{"groupId": "0x0101", "groupKeySetID": "0x01a3", "fabricIndex": 1}]' 1 0
 
           Verify DUT sends SUCCESS(0x00) response on  TH(chip-tool)  Logs:
 
@@ -359,6 +359,7 @@ tests:
 
     - label: "TH removes the GroupKeySet"
       cluster: "Group Key Management"
+      PICS: PICS_SDK_CI_ONLY
       endpoint: 0
       command: "KeySetRemove"
       arguments:
