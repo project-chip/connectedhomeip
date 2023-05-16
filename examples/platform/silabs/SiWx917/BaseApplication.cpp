@@ -47,6 +47,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -70,6 +72,7 @@
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 
@@ -355,7 +358,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
     // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
+    if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         if ((!mFunctionTimerActive) && (mFunction == kFunction_NoneSelected))
         {

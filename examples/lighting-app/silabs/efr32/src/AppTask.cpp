@@ -46,14 +46,12 @@
 #define LIGHT_LED 0
 #endif
 
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-
 #define APP_FUNCTION_BUTTON 0
 #define APP_LIGHT_SWITCH 1
-#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 
@@ -132,9 +130,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-#endif
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Lighting-App");
@@ -241,13 +237,11 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
         action = static_cast<LightingManager::Action_t>(aEvent->LightEvent.Action);
         actor  = aEvent->LightEvent.Actor;
     }
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
         action = (LightMgr().IsLightOn()) ? LightingManager::OFF_ACTION : LightingManager::ON_ACTION;
         actor  = AppEvent::kEventType_Button;
     }
-#endif
     else
     {
         err = APP_ERROR_UNHANDLED_EVENT;
@@ -263,14 +257,14 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
         }
     }
 }
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (button == APP_LIGHT_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    if (button == APP_LIGHT_SWITCH && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         button_event.Handler = LightActionEventHandler;
         AppTask::GetAppTask().PostEvent(&button_event);
@@ -281,7 +275,6 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         AppTask::GetAppTask().PostEvent(&button_event);
     }
 }
-#endif
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
@@ -294,12 +287,11 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 #ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(lightOn);
 #endif
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
     if (aActor == AppEvent::kEventType_Button)
     {
         sAppTask.mSyncClusterToButtonAction = true;
     }
-#endif
 }
 
 void AppTask::ActionCompleted(LightingManager::Action_t aAction)
@@ -313,13 +305,12 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     {
         SILABS_LOG("Light OFF")
     }
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
     if (sAppTask.mSyncClusterToButtonAction)
     {
         chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
-#endif
 }
 
 void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)
