@@ -75,19 +75,10 @@ using namespace ::chip;
 using namespace ::chip::Ble;
 using namespace ::chip::DeviceLayer::Internal;
 
-void sl_get_bluethooth_addr(uint8_t * addr, uint8_t length)
-{
-    while (length > 0)
-    {
-        *(addr + length) = chip::Crypto::GetRandU8();
-        length--;
-    }
-}
-
 void sl_ble_init()
 {
-		constexpr int BLE_ADDR_LENGTH = 6;
-    uint8_t addr[BLE_ADDR_LENGTH] = { 0 };
+    uint8_t randomAddrRSI[6] = { 0 };
+	  uint64_t randomAddr = chip::Crypto::GetRandU64();
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
@@ -104,8 +95,8 @@ void sl_ble_init()
 
     //  initializing the application events map
     rsi_ble_app_init_events();
-    sl_get_bluethooth_addr(addr, BLE_ADDR_LENGTH);
-    rsi_ble_set_random_address_with_value(addr);
+		memcpy(randomAddrRSI, &randomAddr, 6);
+    rsi_ble_set_random_address_with_value(randomAddrRSI);
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
 
