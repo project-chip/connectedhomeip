@@ -170,7 +170,7 @@ template("siwx917_sdk") {
     if (enable_dic) {
       defines += [ "DIC_ENABLE=1" ]
     }
-    if(enable_nvm_DIC){
+    if (enable_nvm_DIC) {
       defines += [ "DIC_ENABLE_NVM_SUPPORT" ]
     }
 
