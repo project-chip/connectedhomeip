@@ -980,7 +980,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                     NSDate * oldSystemStartTime = _estimatedStartTimeFromGeneralDiagnosticsUpTime;
                     NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-upTime];
                     if (!_estimatedStartTimeFromGeneralDiagnosticsUpTime
-                        || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
+                        || ([potentialSystemStartTime compare:_estimatedStartTimeFromGeneralDiagnosticsUpTime]
+                            == NSOrderedAscending)) {
                         MTR_LOG_INFO("%@ General Diagnostics UpTime %.3lf: estimated start time %@ => %@", self, upTime,
                             oldSystemStartTime, potentialSystemStartTime);
                         _estimatedStartTimeFromGeneralDiagnosticsUpTime = potentialSystemStartTime;
