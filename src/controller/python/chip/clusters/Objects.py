@@ -23755,7 +23755,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -24121,7 +24121,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -24487,7 +24487,7 @@ class EthyleneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -24853,7 +24853,7 @@ class EthyleneOxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -25219,7 +25219,7 @@ class HydrogenConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -25585,7 +25585,7 @@ class HydrogenSulfideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -25951,7 +25951,7 @@ class NitricOxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -26317,7 +26317,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -26683,7 +26683,7 @@ class OxygenConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -27049,7 +27049,7 @@ class OzoneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -27415,7 +27415,7 @@ class SulfurDioxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -27781,7 +27781,7 @@ class DissolvedOxygenConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -28147,7 +28147,7 @@ class BromateConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -28513,7 +28513,7 @@ class ChloraminesConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -28879,7 +28879,7 @@ class ChlorineConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -29245,7 +29245,7 @@ class FecalColiformEColiConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -29611,7 +29611,7 @@ class FluorideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -29977,7 +29977,7 @@ class HaloaceticAcidsConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -30343,7 +30343,7 @@ class TotalTrihalomethanesConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -30709,7 +30709,7 @@ class TotalColiformBacteriaConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -31075,7 +31075,7 @@ class TurbidityConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -31441,7 +31441,7 @@ class CopperConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -31807,7 +31807,7 @@ class LeadConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -32173,7 +32173,7 @@ class ManganeseConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -32539,7 +32539,7 @@ class SulfateConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -32905,7 +32905,7 @@ class BromodichloromethaneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -33271,7 +33271,7 @@ class BromoformConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -33637,7 +33637,7 @@ class ChlorodibromomethaneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -34003,7 +34003,7 @@ class ChloroformConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -34369,7 +34369,7 @@ class SodiumConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -34735,7 +34735,7 @@ class Pm25ConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -35101,7 +35101,7 @@ class FormaldehydeConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -35467,7 +35467,7 @@ class Pm1ConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -35833,7 +35833,7 @@ class Pm10ConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -36199,7 +36199,7 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4
@@ -36565,7 +36565,7 @@ class RadonConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 8,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kNumericMeasurement = 0x1
             kLevelIndication = 0x2
             kMediumLevel = 0x4

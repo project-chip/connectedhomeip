@@ -4173,7 +4173,7 @@ client cluster CarbonMonoxideConcentrationMeasurement = 1036 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4228,7 +4228,7 @@ client cluster CarbonDioxideConcentrationMeasurement = 1037 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4283,7 +4283,7 @@ client cluster EthyleneConcentrationMeasurement = 1038 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4338,7 +4338,7 @@ client cluster EthyleneOxideConcentrationMeasurement = 1039 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4393,7 +4393,7 @@ client cluster HydrogenConcentrationMeasurement = 1040 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4448,7 +4448,7 @@ client cluster HydrogenSulfideConcentrationMeasurement = 1041 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4503,7 +4503,7 @@ client cluster NitricOxideConcentrationMeasurement = 1042 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4558,7 +4558,7 @@ client cluster NitrogenDioxideConcentrationMeasurement = 1043 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4613,7 +4613,7 @@ client cluster OxygenConcentrationMeasurement = 1044 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4668,7 +4668,7 @@ client cluster OzoneConcentrationMeasurement = 1045 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4723,7 +4723,7 @@ client cluster SulfurDioxideConcentrationMeasurement = 1046 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4778,7 +4778,7 @@ client cluster DissolvedOxygenConcentrationMeasurement = 1047 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4833,7 +4833,7 @@ client cluster BromateConcentrationMeasurement = 1048 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4888,7 +4888,7 @@ client cluster ChloraminesConcentrationMeasurement = 1049 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4943,7 +4943,7 @@ client cluster ChlorineConcentrationMeasurement = 1050 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -4998,7 +4998,7 @@ client cluster FecalColiformEColiConcentrationMeasurement = 1051 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5053,7 +5053,7 @@ client cluster FluorideConcentrationMeasurement = 1052 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5108,7 +5108,7 @@ client cluster HaloaceticAcidsConcentrationMeasurement = 1053 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5163,7 +5163,7 @@ client cluster TotalTrihalomethanesConcentrationMeasurement = 1054 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5218,7 +5218,7 @@ client cluster TotalColiformBacteriaConcentrationMeasurement = 1055 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5273,7 +5273,7 @@ client cluster TurbidityConcentrationMeasurement = 1056 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5328,7 +5328,7 @@ client cluster CopperConcentrationMeasurement = 1057 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5383,7 +5383,7 @@ client cluster LeadConcentrationMeasurement = 1058 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5438,7 +5438,7 @@ client cluster ManganeseConcentrationMeasurement = 1059 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5493,7 +5493,7 @@ client cluster SulfateConcentrationMeasurement = 1060 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5548,7 +5548,7 @@ client cluster BromodichloromethaneConcentrationMeasurement = 1061 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5603,7 +5603,7 @@ client cluster BromoformConcentrationMeasurement = 1062 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5658,7 +5658,7 @@ client cluster ChlorodibromomethaneConcentrationMeasurement = 1063 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5713,7 +5713,7 @@ client cluster ChloroformConcentrationMeasurement = 1064 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5768,7 +5768,7 @@ client cluster SodiumConcentrationMeasurement = 1065 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5823,7 +5823,7 @@ client cluster Pm25ConcentrationMeasurement = 1066 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5878,7 +5878,7 @@ client cluster FormaldehydeConcentrationMeasurement = 1067 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5933,7 +5933,7 @@ client cluster Pm1ConcentrationMeasurement = 1068 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -5988,7 +5988,7 @@ client cluster Pm10ConcentrationMeasurement = 1069 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -6043,7 +6043,7 @@ client cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -6098,7 +6098,7 @@ client cluster RadonConcentrationMeasurement = 1071 {
     kBqm3 = 7;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;

@@ -2591,8 +2591,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -2651,8 +2651,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -2711,8 +2711,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -2771,8 +2771,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -2831,8 +2831,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -2891,8 +2891,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -2951,8 +2951,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3011,8 +3011,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3071,8 +3071,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3131,8 +3131,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3191,8 +3191,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3251,8 +3251,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3311,8 +3311,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3371,8 +3371,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3431,8 +3431,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3491,8 +3491,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3551,8 +3551,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3611,8 +3611,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3671,8 +3671,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3731,8 +3731,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3791,8 +3791,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3851,8 +3851,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3911,8 +3911,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -3971,8 +3971,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4031,8 +4031,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4091,8 +4091,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4151,8 +4151,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4211,8 +4211,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4271,8 +4271,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4331,8 +4331,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4391,8 +4391,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4451,8 +4451,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4511,8 +4511,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4571,8 +4571,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4631,8 +4631,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
@@ -4691,8 +4691,8 @@ enum class MeasurementUnitEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNumericMeasurement = 0x1,
     kLevelIndication    = 0x2,
