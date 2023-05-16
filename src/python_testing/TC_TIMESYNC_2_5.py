@@ -16,6 +16,7 @@
 #
 
 import typing
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status

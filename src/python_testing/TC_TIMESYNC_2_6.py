@@ -16,8 +16,9 @@
 #
 
 import typing
+
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue, Nullable
+from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
