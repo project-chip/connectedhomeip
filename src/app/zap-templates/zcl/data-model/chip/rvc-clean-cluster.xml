@@ -19,7 +19,7 @@ limitations under the License.
 
   <enum name="ChangeToModeResponseStatus" type="ENUM8">
     <cluster code="0x0055"/>
-    <item value="0x40" name="Cleaning In Progress"/>
+    <item value="0x40" name="CleaningInProgress"/>
   </enum>
 
   <enum name="SemanticTags" type="ENUM16">
