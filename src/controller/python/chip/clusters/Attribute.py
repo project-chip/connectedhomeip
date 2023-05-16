@@ -47,9 +47,9 @@ class EventTimestampType(Enum):
 
 @unique
 class EventPriority(Enum):
-    DEBUG = 1
-    INFO = 2
-    CRITICAL = 3
+    DEBUG = 0
+    INFO = 1
+    CRITICAL = 2
 
 
 @dataclass
