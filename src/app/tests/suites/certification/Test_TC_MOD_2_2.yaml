@@ -161,7 +161,7 @@ tests:
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
 
-          Verify TH responds with a successful (value 0x00) status responseon the TH (all-cluster-app) log:
+          Verify TH responds with a successful (value 0x00) status response on the TH (all-cluster-app) log:
 
           [1666941165.052169][9718:9718] CHIP:DMG: InvokeResponseMessage =
           [1666941165.052172][9718:9718] CHIP:DMG: {

@@ -61,6 +61,8 @@ public:
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
 
+    bool kReadFromFlash = false;
+
 private:
     static constexpr uint8_t kDACPrivateKeyLength = 32;
     static constexpr uint8_t kDACPublicKeyLength  = 65;

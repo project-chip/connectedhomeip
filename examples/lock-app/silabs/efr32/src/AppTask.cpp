@@ -64,6 +64,7 @@ using chip::app::Clusters::DoorLock::OperationSourceEnum;
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace EFR32DoorLock::LockInitParams;
 
@@ -143,9 +144,7 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Lock-App", true);
@@ -361,14 +360,13 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (button == APP_LOCK_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    if (button == APP_LOCK_SWITCH && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         button_event.Handler = LockActionEventHandler;
         sAppTask.PostEvent(&button_event);
@@ -379,7 +377,6 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         sAppTask.PostEvent(&button_event);
     }
 }
-#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
 {

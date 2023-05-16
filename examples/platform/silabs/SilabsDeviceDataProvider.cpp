@@ -24,7 +24,7 @@
 
 #ifdef SIWX917_USE_COMISSIONABLE_DATA
 #include "DeviceConfig.h"
-#include "siwx917_utils.h"
+#include "silabs_utils.h"
 #include <setup_payload/Base38Decode.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #endif // SIWX917_USE_COMISSIONABLE_DATA

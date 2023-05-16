@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 public final class ClusterState {
   private Map<Long, AttributeState> attributes;
   private Map<Long, ArrayList<EventState>> events;
-  private Optional<Integer> dataVersion;
+  private Optional<Long> dataVersion;
 
   public ClusterState(
       Map<Long, AttributeState> attributes, Map<Long, ArrayList<EventState>> events) {
@@ -43,11 +43,11 @@ public final class ClusterState {
     return events;
   }
 
-  public void setDataVersion(int version) {
+  public void setDataVersion(long version) {
     dataVersion = Optional.of(version);
   }
 
-  public Optional<Integer> getDataVersion() {
+  public Optional<Long> getDataVersion() {
     return dataVersion;
   }
 

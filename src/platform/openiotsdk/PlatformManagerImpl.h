@@ -100,6 +100,7 @@ private:
     osMutexId_t mEventTaskMutex     = nullptr;
     osMessageQueueId_t mQueue       = nullptr;
     osTimerId_t mTimer              = nullptr;
+    bool mInitialized               = false;
 };
 
 /**

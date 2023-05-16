@@ -878,6 +878,53 @@ static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEn
     return kEmberInvalidEndpointIndex;
 }
 
+uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
+{
+    VerifyOrDie(fixedClusterServerEndpointCount <= FIXED_ENDPOINT_COUNT);
+    uint16_t epIndex = findIndexFromEndpoint(endpoint, true /*ignoreDisabledEndpoints*/);
+
+    // Endpoint must be configured and enabled
+    if (epIndex == kEmberInvalidEndpointIndex)
+    {
+        return kEmberInvalidEndpointIndex;
+    }
+
+    if (emberAfFindClusterInType(emAfEndpoints[epIndex].endpointType, cluster, CLUSTER_MASK_SERVER) == nullptr)
+    {
+        // The provided endpoint does not contain the given cluster server.
+        return kEmberInvalidEndpointIndex;
+    }
+
+    if (epIndex < FIXED_ENDPOINT_COUNT)
+    {
+        // This endpoint is a fixed one.
+        // Return the index of this endpoint in the list of fixed endpoints that support the given cluster.
+        uint16_t adjustedEndpointIndex = 0;
+        for (uint16_t i = 0; i < epIndex; i++)
+        {
+            // Increase adjustedEndpointIndex for every endpoint containing the cluster server
+            // before our endpoint of interest
+            if (emAfEndpoints[i].endpoint != kInvalidEndpointId &&
+                (emberAfFindClusterInType(emAfEndpoints[i].endpointType, cluster, CLUSTER_MASK_SERVER) != nullptr))
+            {
+                adjustedEndpointIndex++;
+            }
+        }
+
+        // If this asserts, the provided fixedClusterServerEndpointCount doesn't match the app data model.
+        VerifyOrDie(adjustedEndpointIndex < fixedClusterServerEndpointCount);
+        epIndex = adjustedEndpointIndex;
+    }
+    else
+    {
+        // This is a dynamic endpoint.
+        // Its index is just its index in the dynamic endpoint list, offset by fixedClusterServerEndpointCount.
+        epIndex = static_cast<uint16_t>(fixedClusterServerEndpointCount + (epIndex - FIXED_ENDPOINT_COUNT));
+    }
+
+    return epIndex;
+}
+
 bool emberAfEndpointIsEnabled(EndpointId endpoint)
 {
     uint16_t index = findIndexFromEndpoint(endpoint,

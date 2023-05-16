@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "siwx917_utils.h"
+#include "silabs_utils.h"
 
 // ---- Lighting Example App Config ----
 

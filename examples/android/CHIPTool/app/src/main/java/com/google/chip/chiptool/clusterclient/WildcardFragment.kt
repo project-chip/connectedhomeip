@@ -450,7 +450,7 @@ class WildcardFragment : Fragment() {
 
   private suspend fun readCurrentFabricIndex() : UInt {
     val context = requireContext()
-    val endpointId = 0L
+    val endpointId = 0
     val clusterId = 62L // OperationalCredentials
     val attributeId = 5L // CurrentFabricIndex
     val deviceId = addressUpdateFragment.deviceId

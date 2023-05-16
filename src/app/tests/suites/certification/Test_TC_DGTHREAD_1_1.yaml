@@ -224,6 +224,16 @@ tests:
               contains: [58]
 
     - label: "TH reads AcceptedCommandList from DUT"
+      PICS: " !DGTHREAD.S.F01 "
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "TH reads AcceptedCommandList from DUT"
+      PICS: DGTHREAD.S.F01
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:

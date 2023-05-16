@@ -124,7 +124,7 @@ tests:
 
 
 
-          After 30 Seconds, Verify response contains an CurrentSaturation value in  TH(all-clusters-app)  Logs:
+          After 30 Seconds, Verify response contains  CurrentSaturation value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666948964.837074][53014:53014] CHIP:DMG: {
           [1666948964.837078][53014:53014] CHIP:DMG:         AttributeReportIBs =
@@ -200,7 +200,7 @@ tests:
           ./chip-tool colorcontrol read current-saturation 1 1
 
 
-          After 10 seconds, Verify response contains an CurrentSaturation value in  TH(all-clusters-app)  Logs:
+          After 10 seconds, Verify response contains CurrentSaturation value in  TH(all-clusters-app)  Logs:
 
           ReportDataMessage =
           [1666949021.698047][53014:53014] CHIP:DMG: {
@@ -275,7 +275,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
-          After 20 Seconds, Verify response contains an CurrentSaturation value in  TH(all-clusters-app)  Logs:
+          After 20 Seconds, Verify response contains CurrentSaturation value in  TH(all-clusters-app)  Logs:
            ReportDataMessage =
           [1666949085.456270][53014:53014] CHIP:DMG: {
           [1666949085.456272][53014:53014] CHIP:DMG:         AttributeReportIBs =
@@ -350,7 +350,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-hue 1 1
 
-          After 20 Seconds, Verify response contains an CurrentHue value in  TH(all-clusters-app)  Logs:
+          After 20 Seconds, Verify response contains CurrentHue value in  TH(all-clusters-app)  Logs:
 
           ReportDataMessage =
           [1666949242.902165][53014:53014] CHIP:DMG: {
@@ -455,7 +455,8 @@ tests:
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
 
-          Verify response contains an CurrentSaturation value in  TH(all-clusters-app)  Logs:
+
+          Verify response contains  CurrentSaturation value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1667371661.960880][9339:9339] CHIP:DMG: {
           [1667371661.960882][9339:9339] CHIP:DMG:         AttributeReportIBs =
