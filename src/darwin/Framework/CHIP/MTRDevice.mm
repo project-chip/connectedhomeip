@@ -912,7 +912,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
         NSError * attributeError = attributeReponseValue[MTRErrorKey];
 
         // sanity check either data value or error must exist
-        if (!attributeDataValue && attributeError) {
+        if (!attributeDataValue && !attributeError) {
+            MTR_LOG_INFO("%@ report %@ no data value or error: %@", self, attributePath, attributeReponseValue);
             continue;
         }
 
