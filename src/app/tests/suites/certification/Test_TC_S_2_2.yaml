@@ -235,8 +235,6 @@ tests:
                 value: 0x0001
               - name: "SceneID"
                 value: 0x01
-      response:
-          error: 0x00
 
     - label: "TH reads the SceneCount attribute from DUT."
       PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003
@@ -338,8 +336,6 @@ tests:
                 value: 0x0001
               - name: "SceneID"
                 value: 0x01
-      response:
-          error: 0x00
 
     - label:
           "TH sends a ViewScene command to DUT with the GroupID field set to
@@ -686,7 +682,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
       response:
-          error: 0x8b
+          error: NOT_FOUND
 
     - label:
           "TH configures AC1 on DUT for all implemented application clusters
@@ -790,15 +786,34 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 0x00 || 0x89
+                saveAs: StoreStatus
+                constraints: 
+                    anyOf: [0x00, 0x89]
               - name: "GroupID"
                 value: 0x0001
               - name: "SceneID"
                 value: 0x02
 
     - label:
+          "Verify that the status of previous command was either 0x00 (SUCCESS) or 0x89 (INSUFFICIENT_SPACE)"
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: 0x00
+              - name: "Value2"
+                value: StoreStatus
+      response:
+          - values:
+                - name: "Equals"
+                  value: true
+                  saveAs: ContinueTest
+
+    - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0001."
+      runIf: ContinueTest
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
@@ -819,6 +834,7 @@ tests:
     - label:
           "If capacity allows, TH sends a AddGroup command to DUT with the
           GroupID field set to 0x0002."
+      runIf: ContinueTest
       PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
@@ -838,6 +854,7 @@ tests:
     - label:
           "TH sends a RemoveAllScenes command to DUT with the GroupID field set
           to 0x0002."
+      runIf: ContinueTest
       PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
       arguments:
@@ -854,6 +871,7 @@ tests:
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0002."
+      runIf: ContinueTest
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
@@ -872,6 +890,7 @@ tests:
     - label:
           "TH configures AC3 on DUT for all implemented application clusters
           supporting scenes."
+      runIf: ContinueTest
       cluster: "Level Control"
       PICS: PICS_SDK_CI_ONLY
       command: "MoveToLevelWithOnOff"
@@ -889,6 +908,7 @@ tests:
     - label:
           "TH configures AC3 on DUT for all implemented application clusters
           supporting scenes."
+      runIf: ContinueTest
       verification: |
           Is DUT configured with AC3?
       cluster: "LogCommands"
@@ -906,6 +926,7 @@ tests:
     - label:
           "TH sends a StoreScene command to DUT with the GroupID field set to
           0x0002 and the SceneID field set to 0x03."
+      runIf: ContinueTest
       PICS: S.S.C04.Rsp
       command: "StoreScene"
       arguments:
@@ -917,15 +938,35 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 0x00
+                saveAs: StoreStatus
+                constraints: 
+                    anyOf: [0x00, 0x89]
               - name: "GroupID"
                 value: 0x0002
               - name: "SceneID"
                 value: 0x03
 
     - label:
+          "Verify that the status of previous command was either 0x00 (SUCCESS) or 0x89 (INSUFFICIENT_SPACE)"
+      runIf: ContinueTest
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: 0x00
+              - name: "Value2"
+                value: StoreStatus
+      response:
+          - values:
+                - name: "Equals"
+                  value: true
+                  saveAs: ContinueTest
+
+    - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0002."
+      runIf: ContinueTest
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
