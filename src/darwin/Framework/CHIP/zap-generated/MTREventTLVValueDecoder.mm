@@ -1551,6 +1551,18 @@ static id _Nullable DecodeEventPayloadForModeSelectCluster(EventId aEventId, TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForAirQualityCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::AirQuality;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(
     EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -2728,6 +2740,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ModeSelect::Id: {
         return DecodeEventPayloadForModeSelectCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::AirQuality::Id: {
+        return DecodeEventPayloadForAirQualityCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);

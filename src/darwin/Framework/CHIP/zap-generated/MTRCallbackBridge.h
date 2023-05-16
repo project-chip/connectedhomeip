@@ -381,6 +381,9 @@ typedef void (*GroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallb
     void *, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum);
 typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum> &);
+typedef void (*AirQualityClusterAirQualityEnumAttributeCallback)(void *, chip::app::Clusters::AirQuality::AirQualityEnum);
+typedef void (*NullableAirQualityClusterAirQualityEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AirQuality::AirQualityEnum> &);
 typedef void (*HEPAFilterMonitoringClusterChangeIndicationEnumAttributeCallback)(
     void *, chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum);
 typedef void (*NullableHEPAFilterMonitoringClusterChangeIndicationEnumAttributeCallback)(
@@ -989,6 +992,14 @@ typedef void (*ModeSelectGeneratedCommandListListAttributeCallback)(
 typedef void (*ModeSelectAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
+                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*AirQualityGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*AirQualityAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*AirQualityEventListListAttributeCallback)(void * context,
+                                                         const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*AirQualityAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*HEPAFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -7084,6 +7095,133 @@ public:
     void OnSubscriptionEstablished();
     using MTRModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRModeSelectAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRAirQualityGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<AirQualityGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRAirQualityGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<AirQualityGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRAirQualityGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<AirQualityGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRAirQualityGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRAirQualityGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRAirQualityGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRAirQualityGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRAirQualityGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAirQualityGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRAirQualityAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<AirQualityAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRAirQualityAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<AirQualityAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRAirQualityAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<AirQualityAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRAirQualityAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRAirQualityAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRAirQualityAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRAirQualityAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRAirQualityAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAirQualityAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRAirQualityEventListListAttributeCallbackBridge : public MTRCallbackBridge<AirQualityEventListListAttributeCallback>
+{
+public:
+    MTRAirQualityEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<AirQualityEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRAirQualityEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<AirQualityEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRAirQualityEventListListAttributeCallbackSubscriptionBridge : public MTRAirQualityEventListListAttributeCallbackBridge
+{
+public:
+    MTRAirQualityEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action,
+                                                                  MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRAirQualityEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRAirQualityEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAirQualityEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRAirQualityAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<AirQualityAttributeListListAttributeCallback>
+{
+public:
+    MTRAirQualityAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<AirQualityAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRAirQualityAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<AirQualityAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRAirQualityAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRAirQualityAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRAirQualityAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action,
+                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRAirQualityAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRAirQualityAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAirQualityAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -18182,6 +18320,73 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRAirQualityClusterAirQualityEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<AirQualityClusterAirQualityEnumAttributeCallback>
+{
+public:
+    MTRAirQualityClusterAirQualityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<AirQualityClusterAirQualityEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRAirQualityClusterAirQualityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRActionBlock action) :
+        MTRCallbackBridge<AirQualityClusterAirQualityEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::AirQuality::AirQualityEnum value);
+};
+
+class MTRAirQualityClusterAirQualityEnumAttributeCallbackSubscriptionBridge
+    : public MTRAirQualityClusterAirQualityEnumAttributeCallbackBridge
+{
+public:
+    MTRAirQualityClusterAirQualityEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRAirQualityClusterAirQualityEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRAirQualityClusterAirQualityEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAirQualityClusterAirQualityEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableAirQualityClusterAirQualityEnumAttributeCallback>
+{
+public:
+    MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableAirQualityClusterAirQualityEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableAirQualityClusterAirQualityEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::AirQuality::AirQualityEnum> & value);
+};
+
+class MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

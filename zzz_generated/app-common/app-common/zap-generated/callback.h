@@ -361,6 +361,14 @@ void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Air Quality Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAirQualityClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief HEPA Filter Monitoring Cluster Init
  *
  * Cluster Init
@@ -3865,6 +3873,84 @@ void emberAfModeSelectClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Air Quality Cluster
+//
+
+/** @brief Air Quality Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAirQualityClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Air Quality Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterAirQualityClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Air Quality Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAirQualityClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Air Quality Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterAirQualityClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Air Quality Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterAirQualityClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Air Quality Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterAirQualityClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Air Quality Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfAirQualityClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Air Quality Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfAirQualityClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // HEPA Filter Monitoring Cluster

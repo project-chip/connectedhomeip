@@ -286,6 +286,12 @@
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_AIR_QUALITY_CLUSTER_SERVER) || defined(ZCL_USING_AIR_QUALITY_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER { chip::app::Clusters::AirQuality::Id, "Air Quality" },
+#else
+#define CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER
+#endif
+
 #if defined(ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                           \
     { chip::app::Clusters::HepaFilterMonitoring::Id, "HEPA Filter Monitoring" },
@@ -605,6 +611,7 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
     CHIP_PRINTCLUSTER_CERAMIC_FILTER_MONITORING_CLUSTER                                                                            \
