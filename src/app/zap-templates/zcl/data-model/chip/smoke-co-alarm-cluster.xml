@@ -147,7 +147,7 @@ limitations under the License.
 
   <bitmap name="SmokeCOAlarmFeature" type="BITMAP32">
     <cluster code="0x005C" />
-    <field name="SMOKE" mask="0x01" />
-    <field name="CO" mask="0x02" />
+    <field name="Smoke Alarm" mask="0x01" />
+    <field name="CO alarm" mask="0x02" />
   </bitmap>
 </configurator>
