@@ -36,6 +36,7 @@ tests:
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
+      PICS: ILL.C.AM-READ
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -112,6 +113,7 @@ tests:
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
+      PICS: ILL.C.AO-READ
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -162,6 +164,7 @@ tests:
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
+      PICS: ILL.C.AM-WRITE
       verification: |
           No writable attrbute for this cluster
       disabled: true
@@ -169,6 +172,7 @@ tests:
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
+      PICS: ILL.C.AO-WRITE
       verification: |
           No writable attrbute for this cluster
       disabled: true
@@ -184,6 +188,7 @@ tests:
           ./chip-tool illuminancemeasurement read attribute-list 1 1
 
           Verify DUT receives  AttributeList response on the TH(all-clusters-minimal-app) Log:
+
           Received Read request
           [1663070306.262953][4422:4422] CHIP:DMG: ReadRequestMessage =
           [1663070281.411639][4422:4422] CHIP:DMG: {
@@ -211,6 +216,7 @@ tests:
           ./chip-tool illuminancemeasurement read feature-map 1 1
 
           Verify DUT receives  FeatureMap attribute response on the TH(all-clusters-minimal-app) Log:
+
           Received Read request
           [1663070306.262953][4422:4422] CHIP:DMG: ReadRequestMessage =
           [1663070306.262953][4422:4422] CHIP:DMG: ReadRequestMessage =
@@ -238,7 +244,8 @@ tests:
 
 
 
-          sudo ./chip-tool illuminancemeasurement read min-measured-value 1 1
+           ./chip-tool illuminancemeasurement read min-measured-value 1 1
+
           Verify DUT receives  min-measured-value attribute response on the TH(all-clusters-minimal-app) Log:
 
           [1658142106.966504][13946:13946] CHIP:IM: Received Read request
@@ -262,8 +269,8 @@ tests:
           [1658142106.967676][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
 
+           ./chip-tool illuminancemeasurement read max-measured-value 1 1
 
-          sudo ./chip-tool illuminancemeasurement read max-measured-value 1 1
           Verify DUT receives  max-measured-value attribute response on the TH(all-clusters-minimal-app) Log:
           [1658142397.298817][13946:13946] CHIP:IM: Received Read request
           [1658142397.298895][13946:13946] CHIP:DMG: ReadRequestMessage =
@@ -286,8 +293,10 @@ tests:
           [1658142397.299556][13946:13946] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
 
-          sudo ./chip-tool illuminancemeasurement read measured-value 1 1
+           ./chip-tool illuminancemeasurement read measured-value 1 1
+
           Verify DUT receives  measured-value attribute response on the TH(all-clusters-minimal-app) Log:
+
           [1658142471.266188][13946:13946] CHIP:IM: Received Read request
           [1658142471.266273][13946:13946] CHIP:DMG: ReadRequestMessage =
           [1658142471.266303][13946:13946] CHIP:DMG: {
@@ -312,6 +321,7 @@ tests:
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
+      PICS: ILL.C.AO-READ
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -328,6 +338,7 @@ tests:
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
+      PICS: ILL.C.AO-WRITE
       verification: |
           No writable attrbute for this cluster
       disabled: true

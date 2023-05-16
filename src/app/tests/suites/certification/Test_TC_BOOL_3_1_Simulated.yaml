@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 68.3.1. [TC-BOOL-3.1] Attributes with Client as DUT
 
@@ -24,131 +23,18 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Boolean State"
     endpoint: 0
 
 tests:
-    - label: "Note"
-      verification: |
-          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
-      disabled: true
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
-    - label: "Preconditions"
-      verification: |
-          Validate these PICS items of attributes which are not allowed in this server cluster implementation - these PICS items should all be FALSE, if any of them is TRUE then FAIL the test
-
-          BRBINFO.S.A0000(DataModelRevision)
-
-          BRBINFO.S.A0004(ProductID)
-
-          BRBINFO.S.A0006(Location)
-
-          BRBINFO.S.A0010(LocalConfigDisabled)
-
-          BRBINFO.S.A0013(CapabilityMinima)
-      disabled: true
-    - label:
-          "DUT reads all supported mandatory attributes from TH one at a time in
-          a manufacturer specific order"
+    - label: "Read attribute: StateValue"
       PICS: BOOL.C.AM-READ
-      verification: |
-          ./chip-tool booleanstate read state-value 1 1
-
-          Verify read command is received on TH(all-clusters-app) Log successfully
-
-          [1666174663.263846][21481:21481] CHIP:EM: Handling via exchange: 63626r, Delegate: 0xaaaadc070288
-          [1666174663.264067][21481:21481] CHIP:IM: Received Read request
-          [1666174663.264274][21481:21481] CHIP:DMG: ReadRequestMessage =
-          [1666174663.264361][21481:21481] CHIP:DMG: {
-          [1666174663.264417][21481:21481] CHIP:DMG:         AttributePathIBs =
-          [1666174663.264482][21481:21481] CHIP:DMG:         [
-          [1666174663.264565][21481:21481] CHIP:DMG:                 AttributePathIB =
-          [1666174663.264645][21481:21481] CHIP:DMG:                 {
-          [1666174663.264748][21481:21481] CHIP:DMG:                         Endpoint = 0x1,
-          [1666174663.264841][21481:21481] CHIP:DMG:                         Cluster = 0x45,
-          [1666174663.264949][21481:21481] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1666174663.265057][21481:21481] CHIP:DMG:                 }
-          [1666174663.265138][21481:21481] CHIP:DMG:
-          [1666174663.265204][21481:21481] CHIP:DMG:         ],
-          [1666174663.265298][21481:21481] CHIP:DMG:
-          [1666174663.265369][21481:21481] CHIP:DMG:         isFabricFiltered = true,
-          [1666174663.265459][21481:21481] CHIP:DMG:         InteractionModelRevision = 1
-          [1666174663.265520][21481:21481] CHIP:DMG: },
-          [1666174663.265714][21481:21481] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1666174663.265995][21481:21481] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1666174663.266093][21481:21481] CHIP:DMG: <RE:Run> Cluster 45, Attribute 0 is dirty
-          [1666174663.266147][21481:21481] CHIP:DMG: Reading attribute: Cluster=0x0000_0045 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
-          [1666174663.266215][21481:21481] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0045 e=1 p=v
-          [1666174663.266319][21481:21481] CHIP:DMG: AccessControl: allowed
-          [1666174663.266439][21481:21481] CHIP:DMG: <RE> Sending report (payload has 35 bytes)...
-          [1666174663.267067][21481:21481] CHIP:EM: <<< [E:63626r M:36969602 (Ack:764247)] (S) Msg TX to 1:000000000001B669 [A7EF] --- Type 0001:05 (IM:ReportData)
-          [1666174663.267172][21481:21481] CHIP:IN: (S) Sending msg 36969602 on secure session with LSID: 53667
-          [1666174663.267928][21481:21481] CHIP:DMG: >> to UDP:[fe80::e65f:1ff:fe0e:be37%wlan0]:42580 | 36969602 | [Interaction Model  (1) / Report Data (0x05) / Session = 58403 / Exchange = 63626]
-          [1666174663.268026][21481:21481] CHIP:DMG: Header Flags =
-          [1666174663.268086][21481:21481] CHIP:DMG: {
-          [1666174663.268175][21481:21481] CHIP:DMG:     Exchange (0x06) =
-          [1666174663.268236][21481:21481] CHIP:DMG:     {
-          [1666174663.268297][21481:21481] CHIP:DMG:         AckMsg = 764247
-          [1666174663.268352][21481:21481] CHIP:DMG:         NeedsAck = true
-          [1666174663.268408][21481:21481] CHIP:DMG:     }
-          [1666174663.268480][21481:21481] CHIP:DMG: }
-          [1666174663.268563][21481:21481] CHIP:DMG:
-          [1666174663.268634][21481:21481] CHIP:DMG: Encrypted Payload (69 bytes) =
-          [1666174663.268713][21481:21481] CHIP:DMG: {
-          [1666174663.268770][21481:21481] CHIP:DMG:     data = 0023e400821c3402f21cc23126fb0db5a6a36a83d08fcf829d2e297fe7b97436aef3fcc3ebd2ceeeb3a2f101565fadaba18478940bba170ec79c8b64086d7e667b3eedd06c
-          [1666174663.268828][21481:21481] CHIP:DMG:     buffer_ptr = 187651145559328
-          [1666174663.268900][21481:21481] CHIP:DMG: }
-          [1666174663.268954][21481:21481] CHIP:DMG:
-          [1666174663.269143][21481:21481] CHIP:DMG: ReportDataMessage =
-          [1666174663.269211][21481:21481] CHIP:DMG: {
-          [1666174663.269294][21481:21481] CHIP:DMG:         AttributeReportIBs =
-          [1666174663.269375][21481:21481] CHIP:DMG:         [
-          [1666174663.269437][21481:21481] CHIP:DMG:                 AttributeReportIB =
-          [1666174663.269512][21481:21481] CHIP:DMG:                 {
-          [1666174663.269584][21481:21481] CHIP:DMG:                         AttributeDataIB =
-          [1666174663.269697][21481:21481] CHIP:DMG:                         {
-          [1666174663.269794][21481:21481] CHIP:DMG:                                 DataVersion = 0x88a29de9,
-          [1666174663.269947][21481:21481] CHIP:DMG:                                 AttributePathIB =
-          [1666174663.270041][21481:21481] CHIP:DMG:                                 {
-          [1666174663.270148][21481:21481] CHIP:DMG:                                         Endpoint = 0x1,
-          [1666174663.270244][21481:21481] CHIP:DMG:                                         Cluster = 0x45,
-          [1666174663.270341][21481:21481] CHIP:DMG:                                         Attribute = 0x0000_0000,
-          [1666174663.270454][21481:21481] CHIP:DMG:                                 }
-          [1666174663.270559][21481:21481] CHIP:DMG:
-          [1666174663.270656][21481:21481] CHIP:DMG:                                 Data = false,
-          [1666174663.270762][21481:21481] CHIP:DMG:                         },
-          [1666174663.270860][21481:21481] CHIP:DMG:
-          [1666174663.270968][21481:21481] CHIP:DMG:                 },
-          [1666174663.271054][21481:21481] CHIP:DMG:
-          [1666174663.271140][21481:21481] CHIP:DMG:         ],
-          [1666174663.271219][21481:21481] CHIP:DMG:
-          [1666174663.271310][21481:21481] CHIP:DMG:         SuppressResponse = true,
-          [1666174663.271375][21481:21481] CHIP:DMG:         InteractionModelRevision = 1
-      disabled: true
-
-    - label:
-          "DUT reads all supported optional attributes from TH one at a time in
-          a manufacturer specific order"
-      PICS: BOOL.C.AM-READ
-      verification: |
-          This cluster doesn"t have any  optional attribute
-      disabled: true
-
-    - label:
-          "DUT writes a suitable value to all supported mandatory attributes on
-          the TH one at a time in a manufacturer specific order"
-      PICS: BOOL.C.AM-WRITE
-      verification: |
-          This cluster doesn"t have any writable attributes
-      disabled: true
-
-    - label:
-          "DUT writes a suitable value to all supported optional attributes on
-          the TH one at a time in a manufacturer specific order"
-      PICS: BOOL.C.AO-WRITE
-      verification: |
-          This cluster doesn"t have any writable attributes
-      disabled: true
+      wait: "readAttribute"
+      attribute: "StateValue"
 
     - label:
           "Configure TH such that it implements mandatory and none of the
@@ -429,20 +315,42 @@ tests:
           [1666174757.467505][21506:21506] CHIP:DMG:                 },
           [1666174757.467582][21506:21506] CHIP:DMG:
           [1666174757.467643][21506:21506] CHIP:DMG:         ],
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
-      PICS: BOOL.C.AO-READ
       verification: |
-          This cluster doesn"t have any  optional attribute
-      disabled: true
+          This cluster doesn't have any  optional attribute
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
-      PICS: BOOL.C.AO-WRITE
       verification: |
-          This cluster doesn"t have any  optional attribute
-      disabled: true
+          This cluster doesn't have any writable attributes
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

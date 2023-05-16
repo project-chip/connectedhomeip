@@ -31,7 +31,7 @@ tests:
       verification: |
           Verify that the OTA Requestor App receives the write command and does not reject the value as invalid.
 
-          ./chip-tool otasoftwareupdaterequestor write default-otaproviders "[{"fabricIndex": 1, "providerNodeID": 123, "endpoint": 0}]" 321 0
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 123, "endpoint": 0}]' 321 0
 
 
           Verify write request for the DefaultOTAProviders attribute on TH [OTA-REQ] Logs:
@@ -193,7 +193,7 @@ tests:
       verification: |
           Write the acl entry to allow the software update:
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [321], "targets": null}]" 123 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [321], "targets": null}]' 123 0
 
           Run the announce ota provider command to start the software update and check the UpdateStateProgress
 
