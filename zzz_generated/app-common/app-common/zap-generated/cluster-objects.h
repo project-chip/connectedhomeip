@@ -13852,6 +13852,79 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ModeSelect
+namespace AirQuality {
+
+namespace Attributes {
+
+namespace AirQuality {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::AirQuality::AirQualityEnum;
+    using DecodableType    = chip::app::Clusters::AirQuality::AirQualityEnum;
+    using DecodableArgType = chip::app::Clusters::AirQuality::AirQualityEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AirQuality::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AirQuality
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::AirQuality::TypeInfo::DecodableType airQuality =
+            static_cast<chip::app::Clusters::AirQuality::AirQualityEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace AirQuality
 namespace HepaFilterMonitoring {
 
 namespace Commands {

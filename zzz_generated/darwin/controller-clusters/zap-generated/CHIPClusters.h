@@ -366,6 +366,15 @@ public:
     ~ModeSelectCluster() {}
 };
 
+class DLL_EXPORT AirQualityCluster : public ClusterBase
+{
+public:
+    AirQualityCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~AirQualityCluster() {}
+};
+
 class DLL_EXPORT HepaFilterMonitoringCluster : public ClusterBase
 {
 public:

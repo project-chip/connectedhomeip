@@ -6987,6 +6987,105 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace ModeSelect
 
+namespace AirQuality {
+namespace Attributes {
+
+namespace AirQuality {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum * value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::AirQuality::AirQualityEnum>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AirQuality::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::AirQuality::AirQualityEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AirQuality::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
+} // namespace AirQuality
+
+namespace FeatureMap {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AirQuality::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AirQuality::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::AirQuality::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::AirQuality::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace AirQuality
+
 namespace HepaFilterMonitoring {
 namespace Attributes {
 

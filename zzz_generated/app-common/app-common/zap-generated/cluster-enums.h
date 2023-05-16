@@ -1495,6 +1495,35 @@ enum class ModeSelectFeature : uint32_t
 };
 } // namespace ModeSelect
 
+namespace AirQuality {
+
+// Enum for AirQualityEnum
+enum class AirQualityEnum : uint8_t
+{
+    kUnknown       = 0x00,
+    kGood          = 0x01,
+    kFair          = 0x02,
+    kModerate      = 0x03,
+    kPoor          = 0x04,
+    kVeryPoor      = 0x05,
+    kExtremelyPoor = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kFair          = 0x1,
+    kModerate      = 0x2,
+    kVeryPoor      = 0x4,
+    kExtremelyPoor = 0x8,
+};
+} // namespace AirQuality
+
 namespace HepaFilterMonitoring {
 
 // Enum for ChangeIndicationEnum

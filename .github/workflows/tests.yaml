@@ -121,6 +121,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/access-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/account-login-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/administrator-commissioning-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/air-quality-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/application-basic-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/application-launcher-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/audio-output-cluster.xml \

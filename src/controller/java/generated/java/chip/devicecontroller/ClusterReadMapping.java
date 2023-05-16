@@ -6974,6 +6974,104 @@ public class ClusterReadMapping {
     return result;
   }
 
+  private static Map<String, InteractionInfo> readAirQualityInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readAirQualityAirQualityCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAirQualityAirQualityAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AirQualityCluster) cluster)
+                  .readAirQualityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAirQualityAirQualityCommandParams);
+    result.put("readAirQualityAttribute", readAirQualityAirQualityAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAirQualityGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAirQualityGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AirQualityCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.AirQualityCluster.GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedAirQualityClusterGeneratedCommandListAttributeCallback(),
+            readAirQualityGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readAirQualityGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAirQualityAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAirQualityAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AirQualityCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.AirQualityCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedAirQualityClusterAcceptedCommandListAttributeCallback(),
+            readAirQualityAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readAirQualityAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAirQualityEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAirQualityEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AirQualityCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.AirQualityCluster.EventListAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedAirQualityClusterEventListAttributeCallback(),
+            readAirQualityEventListCommandParams);
+    result.put("readEventListAttribute", readAirQualityEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAirQualityAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAirQualityAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AirQualityCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.AirQualityCluster.AttributeListAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedAirQualityClusterAttributeListAttributeCallback(),
+            readAirQualityAttributeListCommandParams);
+    result.put("readAttributeListAttribute", readAirQualityAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAirQualityFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAirQualityFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AirQualityCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readAirQualityFeatureMapCommandParams);
+    result.put("readFeatureMapAttribute", readAirQualityFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAirQualityClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAirQualityClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AirQualityCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAirQualityClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute", readAirQualityClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
   private static Map<String, InteractionInfo> readHepaFilterMonitoringInteractionInfo() {
     Map<String, InteractionInfo> result = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readHepaFilterMonitoringConditionCommandParams =
@@ -18288,6 +18386,7 @@ public class ClusterReadMapping {
         put("userLabel", readUserLabelInteractionInfo());
         put("booleanState", readBooleanStateInteractionInfo());
         put("modeSelect", readModeSelectInteractionInfo());
+        put("airQuality", readAirQualityInteractionInfo());
         put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());
         put(
             "activatedCarbonFilterMonitoring",
