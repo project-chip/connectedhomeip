@@ -1560,8 +1560,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1595,8 +1595,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1630,8 +1630,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1665,8 +1665,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1700,8 +1700,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1735,8 +1735,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1770,8 +1770,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1805,8 +1805,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1840,8 +1840,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1875,8 +1875,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1910,8 +1910,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
@@ -1945,8 +1945,8 @@ enum class DegradationDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for Features
-enum class Features : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCondition = 0x1,
     kWarning   = 0x2,
