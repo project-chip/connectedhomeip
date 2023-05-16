@@ -113,7 +113,7 @@ limitations under the License.
     <cluster code="0x0054"/>
     <cluster code="0x0055"/>
     <cluster code="0x0059"/>
-    <field name="On/Off" mask="0x1"/>
-    <field name="Extended Status" mask="0x2"/>
+    <field name="OnOff" mask="0x1"/>
+    <field name="ExtendedStatus" mask="0x2"/>
   </bitmap>
 </configurator>
