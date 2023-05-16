@@ -68,6 +68,7 @@ static_library("openiotsdk") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
+    "Logging.h",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
     "OpenIoTSDKArchUtils.c",

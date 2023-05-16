@@ -1,17 +1,19 @@
-# Copyright (c) 2009-2021 Arm Limited
-# SPDX-License-Identifier: Apache-2.0
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+#    Copyright (c) 2022 Project CHIP Authors
+#    All rights reserved.
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
 
 import logging
 import os
@@ -91,6 +93,10 @@ def test_command_check(device):
     ret = device.wait_for_output("Open IoT SDK shell example application run")
     assert ret is not None and len(ret) > 0
 
+    # Wait for printing prompt
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
+
     # Help
     ret = device.send(command="help", expected_output="Done")
     assert ret is not None and len(ret) > 1
@@ -98,32 +104,44 @@ def test_command_check(device):
     assert set(SHELL_COMMAND_NAME) == set(shell_commands)
 
     # Echo
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     ret = device.send(command="echo Hello", expected_output="Done")
     assert ret is not None and len(ret) > 1
     assert "Hello" in ret[-2]
 
     # Log
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     ret = device.send(command="log Hello", expected_output="Done")
     assert ret is not None and len(ret) > 1
     assert "[INF] [TOO] Hello" in ret[-2]
 
     # Rand
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     ret = device.send(command="rand", expected_output="Done")
     assert ret is not None and len(ret) > 1
     assert ret[-2].rstrip().isdigit()
 
     # Base64
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     hex_string = "1234"
     ret = device.send(command="base64 encode {}".format(
         hex_string), expected_output="Done")
     assert ret is not None and len(ret) > 1
     base64code = ret[-2]
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     ret = device.send(command="base64 decode {}".format(
         base64code), expected_output="Done")
     assert ret is not None and len(ret) > 1
     assert ret[-2].rstrip() == hex_string
 
     # Version
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     ret = device.send(command="version", expected_output="Done")
     assert ret is not None and len(ret) > 1
     assert "CHIP" in ret[-2].split()[0]
@@ -131,12 +149,16 @@ def test_command_check(device):
     assert isinstance(version.parse(app_version), version.Version)
 
     # Config
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     ret = device.send(command="config", expected_output="Done")
     assert ret is not None and len(ret) > 2
 
     config = parse_config_response(ret[1:-1])
 
     for param_name, value in config.items():
+        ret = device.wait_for_output("Enter command")
+        assert ret is not None and len(ret) > 0
         ret = device.send(command="config {}".format(
             param_name), expected_output="Done")
         assert ret is not None and len(ret) > 1
@@ -145,23 +167,31 @@ def test_command_check(device):
         else:
             assert int(ret[-2].split()[0]) == value
 
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     new_value = int(config['discriminator']) + 1
     ret = device.send(command="config discriminator {}".format(
         new_value), expected_output="Done")
     assert ret is not None and len(ret) > 1
     assert "Setup discriminator set to: {}".format(new_value) in ret[-2]
 
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     ret = device.send(command="config discriminator", expected_output="Done")
     assert ret is not None and len(ret) > 1
     assert int(ret[-2].split()[0], 16) == new_value
 
     # Onboardingcodes
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     ret = device.send(command="onboardingcodes none", expected_output="Done")
     assert ret is not None and len(ret) > 2
 
     boarding_codes = parse_boarding_codes_response(ret[1:-1])
 
     for param, value in boarding_codes.items():
+        ret = device.wait_for_output("Enter command")
+        assert ret is not None and len(ret) > 0
         ret = device.send(command="onboardingcodes none {}".format(
             param), expected_output="Done")
         assert ret is not None and len(ret) > 1
@@ -184,5 +214,7 @@ def test_command_check(device):
     assert device_details is not None and len(device_details) != 0
 
     # Exit - should be the last check
+    ret = device.wait_for_output("Enter command")
+    assert ret is not None and len(ret) > 0
     ret = device.send(command="exit", expected_output="Goodbye")
     assert ret is not None and len(ret) > 0

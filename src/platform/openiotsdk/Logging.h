@@ -16,10 +16,22 @@
  *    limitations under the License.
  */
 
-#ifndef USER_LWIPOPTS_H
-#define USER_LWIPOPTS_H
+/**
+ *    @file
+ *          Provides an implementation of logging support
+ *          for Open IOT SDK platform.
+ */
 
-#define LWIP_STATS (0)
-#define PBUF_POOL_SIZE (1001)
+#pragma once
 
-#endif /* USER_LWIPOPTS_H */
+#include <lib/support/logging/Constants.h>
+
+namespace chip {
+namespace Logging {
+namespace Platform {
+
+void ois_logging_init(void);
+
+} // namespace Platform
+} // namespace Logging
+} // namespace chip
