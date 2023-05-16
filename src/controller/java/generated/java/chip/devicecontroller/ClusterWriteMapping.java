@@ -637,6 +637,8 @@ public class ClusterWriteMapping {
     writeModeSelectInteractionInfo.put(
         "writeOnModeAttribute", writeModeSelectOnModeAttributeInteractionInfo);
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
+    Map<String, InteractionInfo> writeTemperatureControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("temperatureControl", writeTemperatureControlInteractionInfo);
     Map<String, InteractionInfo> writeAirQualityInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("airQuality", writeAirQualityInteractionInfo);
     Map<String, InteractionInfo> writeSmokeCoAlarmInteractionInfo = new LinkedHashMap<>();

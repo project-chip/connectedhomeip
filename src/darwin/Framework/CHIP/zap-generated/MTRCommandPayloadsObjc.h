@@ -4078,7 +4078,11 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRSmokeCOAlarmClusterSelfTestRequestParams : NSObject <NSCopying>
+@interface MTRTemperatureControlClusterSetTemperatureParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nullable targetTemperature MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable targetTemperatureLevel MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4106,11 +4110,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRTemperatureControlClusterSetTemperatureParams : NSObject <NSCopying>
-
-@property (nonatomic, copy) NSNumber * _Nonnull targetTemperature MTR_NEWLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nonnull targetTemperatureLevel MTR_NEWLY_AVAILABLE;
+@interface MTRSmokeCOAlarmClusterSelfTestRequestParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

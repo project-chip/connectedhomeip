@@ -7779,6 +7779,185 @@ public class ClusterReadMapping {
     return result;
   }
 
+  private static Map<String, InteractionInfo> readTemperatureControlInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readTemperatureControlTemperatureSetpointCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlTemperatureSetpointAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readTemperatureSetpointAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTemperatureControlTemperatureSetpointCommandParams);
+    result.put(
+        "readTemperatureSetpointAttribute",
+        readTemperatureControlTemperatureSetpointAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTemperatureControlMinTemperatureCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlMinTemperatureAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readMinTemperatureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTemperatureControlMinTemperatureCommandParams);
+    result.put(
+        "readMinTemperatureAttribute",
+        readTemperatureControlMinTemperatureAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTemperatureControlMaxTemperatureCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlMaxTemperatureAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readMaxTemperatureAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTemperatureControlMaxTemperatureCommandParams);
+    result.put(
+        "readMaxTemperatureAttribute",
+        readTemperatureControlMaxTemperatureAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTemperatureControlStepCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlStepAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readStepAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTemperatureControlStepCommandParams);
+    result.put("readStepAttribute", readTemperatureControlStepAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readTemperatureControlCurrentTemperatureLevelIndexCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlCurrentTemperatureLevelIndexAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readCurrentTemperatureLevelIndexAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTemperatureControlCurrentTemperatureLevelIndexCommandParams);
+    result.put(
+        "readCurrentTemperatureLevelIndexAttribute",
+        readTemperatureControlCurrentTemperatureLevelIndexAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readTemperatureControlSupportedTemperatureLevelsCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlSupportedTemperatureLevelsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readSupportedTemperatureLevelsAttribute(
+                      (ChipClusters.TemperatureControlCluster
+                              .SupportedTemperatureLevelsAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTemperatureControlClusterSupportedTemperatureLevelsAttributeCallback(),
+            readTemperatureControlSupportedTemperatureLevelsCommandParams);
+    result.put(
+        "readSupportedTemperatureLevelsAttribute",
+        readTemperatureControlSupportedTemperatureLevelsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTemperatureControlGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.TemperatureControlCluster.GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTemperatureControlClusterGeneratedCommandListAttributeCallback(),
+            readTemperatureControlGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readTemperatureControlGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTemperatureControlAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.TemperatureControlCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTemperatureControlClusterAcceptedCommandListAttributeCallback(),
+            readTemperatureControlAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readTemperatureControlAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTemperatureControlEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.TemperatureControlCluster.EventListAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTemperatureControlClusterEventListAttributeCallback(),
+            readTemperatureControlEventListCommandParams);
+    result.put("readEventListAttribute", readTemperatureControlEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTemperatureControlAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.TemperatureControlCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedTemperatureControlClusterAttributeListAttributeCallback(),
+            readTemperatureControlAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute", readTemperatureControlAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTemperatureControlFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTemperatureControlFeatureMapCommandParams);
+    result.put("readFeatureMapAttribute", readTemperatureControlFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTemperatureControlClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTemperatureControlClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TemperatureControlCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTemperatureControlClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readTemperatureControlClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
   private static Map<String, InteractionInfo> readAirQualityInteractionInfo() {
     Map<String, InteractionInfo> result = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readAirQualityAirQualityCommandParams =
@@ -19524,6 +19703,7 @@ public class ClusterReadMapping {
         put("booleanState", readBooleanStateInteractionInfo());
         put("icdManagement", readIcdManagementInteractionInfo());
         put("modeSelect", readModeSelectInteractionInfo());
+        put("temperatureControl", readTemperatureControlInteractionInfo());
         put("airQuality", readAirQualityInteractionInfo());
         put("smokeCoAlarm", readSmokeCoAlarmInteractionInfo());
         put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());

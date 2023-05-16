@@ -23985,8 +23985,14 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::SmokeCoAlarm::Id: {
     case Clusters::TemperatureControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::SmokeCoAlarm::Id: {
         switch (aCommand)
         {
         default:

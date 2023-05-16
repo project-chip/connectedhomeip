@@ -31,17 +31,17 @@ limitations under the License.
     <define>TEMPERATURE_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="TEMP_SETPOINT" type="INT16S" min="0x8000" max="0x7fff" writable="false"  optional="true">TemperatureSetpoint</attribute>
-    <attribute side="server" code="0x0001" define="MIN_TEMP" type="INT16S" min="0x8000" max="0x7ffe" writable="false" optional="true">MinTemperature</attribute>
-    <attribute side="server" code="0x0002" define="MAX_TEMP" type="INT16S" min="0x8001" max="0x7fff" writable="false" optional="true">MaxTemperature</attribute>
+    <attribute side="server" code="0x0000" define="TEMP_SETPOINT" type="INT16S" writable="false" optional="true">TemperatureSetpoint</attribute>
+    <attribute side="server" code="0x0001" define="MIN_TEMP" type="INT16S" writable="false" optional="true">MinTemperature</attribute>
+    <attribute side="server" code="0x0002" define="MAX_TEMP" type="INT16S" writable="false" optional="true">MaxTemperature</attribute>
     <attribute side="server" code="0x0003" define="STEP" type="INT16S" writable="false" optional="true">Step</attribute>
-    <attribute side="server" code="0x0004" define="CURRENT_TEMP_LEVEL_IND" type="INT8U" min="0x00" max="0x1f" writable="false" optional="true">CurrentTemperatureLevelIndex</attribute>
+    <attribute side="server" code="0x0004" define="CURRENT_TEMP_LEVEL_IND" type="INT8U" writable="false" optional="true">CurrentTemperatureLevelIndex</attribute>
     <attribute side="server" code="0x0005" define="SUPPORTED_TEMP_LEVELS" type="ARRAY" entryType="TemperatureLevelStruct" writable="false" optional="true">SupportedTemperatureLevels</attribute>
 
-    <command source="client" code="00" name="SetTemperature" optional="false">
+    <command source="client" code="0x00" name="SetTemperature" optional="false">
         <description>Set Temperature</description>
-        <arg name="TargetTemperature" type="INT16S" min="MIN_TEMP" max="MAX_TEMP"/>
-        <arg name="TargetTemperatureLevel" type="INT8U" />
+        <arg name="TargetTemperature" type="INT16S" min="MIN_TEMP" max="MAX_TEMP" optional="true"/>
+        <arg name="TargetTemperatureLevel" type="INT8U" optional="true"/>
     </command>
   </cluster>
   <bitmap name="TemperatureControlFeature" type="BITMAP32">

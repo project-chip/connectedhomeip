@@ -7887,7 +7887,7 @@ MTR_NEWLY_AVAILABLE
  *
  * Set Temperature
  */
-- (void)setTemperatureWithParams:(MTRTemperatureControlClusterSetTemperatureParams *)params
+- (void)setTemperatureWithParams:(MTRTemperatureControlClusterSetTemperatureParams * _Nullable)params
                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeTemperatureSetpointWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion

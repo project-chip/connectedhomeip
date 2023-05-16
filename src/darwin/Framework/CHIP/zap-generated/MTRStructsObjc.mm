@@ -2667,6 +2667,37 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRTemperatureControlClusterTemperatureLevelStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _tempLevel = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
+
+    other.label = self.label;
+    other.tempLevel = self.tempLevel;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: label:%@; tempLevel:%@; >", NSStringFromClass([self class]), _label, _tempLevel];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRSmokeCOAlarmClusterSmokeAlarmEvent
 - (instancetype)init
 {
@@ -2915,37 +2946,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRTemperatureControlClusterTemperatureLevelStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _label = @"";
-
-        _tempLevel = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
-
-    other.label = self.label;
-    other.tempLevel = self.tempLevel;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: label:%@; tempLevel:%@; >", NSStringFromClass([self class]), _label, _tempLevel];
     return descriptionString;
 }
 

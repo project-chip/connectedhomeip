@@ -14266,8 +14266,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
 
-    int16_t targetTemperature      = static_cast<int16_t>(0);
-    uint8_t targetTemperatureLevel = static_cast<uint8_t>(0);
+    Optional<int16_t> targetTemperature;
+    Optional<uint8_t> targetTemperatureLevel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14282,8 +14282,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetTemperature::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
 
-    int16_t targetTemperature      = static_cast<int16_t>(0);
-    uint8_t targetTemperatureLevel = static_cast<uint8_t>(0);
+    Optional<int16_t> targetTemperature;
+    Optional<uint8_t> targetTemperatureLevel;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetTemperature

@@ -15167,12 +15167,12 @@ class TemperatureControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="targetTemperature", Tag=0, Type=int),
-                        ClusterObjectFieldDescriptor(Label="targetTemperatureLevel", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="targetTemperature", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="targetTemperatureLevel", Tag=1, Type=typing.Optional[uint]),
                     ])
 
-            targetTemperature: 'int' = 0
-            targetTemperatureLevel: 'uint' = 0
+            targetTemperature: 'typing.Optional[int]' = None
+            targetTemperatureLevel: 'typing.Optional[uint]' = None
 
     class Attributes:
         @dataclass
