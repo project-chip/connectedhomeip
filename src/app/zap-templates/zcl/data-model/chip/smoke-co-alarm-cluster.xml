@@ -145,7 +145,7 @@ limitations under the License.
     <item value="4" name="Critical" />
   </enum>
 
-  <bitmap name="SmokeCOFeature" type="BITMAP32">
+  <bitmap name="SmokeCOAlarmFeature" type="BITMAP32">
     <cluster code="0x005C" />
     <field name="SMOKE" mask="0x01" />
     <field name="CO" mask="0x02" />
