@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
 static Status setTemperatureHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                    int16_t targetTemperature, uint8_t targetTemperatureLevel);
+                                    chip::Optional<int16_t> targetTemperature, chip::Optional<uint8_t> targetTemperatureLevel);
 
 namespace {
 
@@ -55,56 +55,57 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    CHIP_ERROR status = CHIP_NO_ERROR;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    EmberAfStatus status;
 
     switch (aPath.mAttributeId)
     {
     case TemperatureSetpoint::Id: {
         int16_t tempSetpoint = 0;
-        TemperatureSetpoint::Get(endpoint, &tempSetpoint);
-        if (status == CHIP_NO_ERROR)
+        status = TemperatureSetpoint::Get(endpoint, &tempSetpoint);
+        if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
-            status = aEncoder.Encode(tempSetpoint);
+            error = aEncoder.Encode(tempSetpoint);
         }
         break;
     }
 
     case MinTemperature::Id: {
         int16_t minTemperature = 0;
-        MinTemperature::Get(endpoint, &minTemperature);
-        if (status == CHIP_NO_ERROR)
+        status = MinTemperature::Get(endpoint, &minTemperature);
+        if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
-            status = aEncoder.Encode(minTemperature);
+            error = aEncoder.Encode(minTemperature);
         }
         break;
     }
 
     case MaxTemperature::Id: {
         int16_t maxTemperature = 0;
-        MaxTemperature::Get(endpoint, &maxTemperature);
-        if (status == CHIP_NO_ERROR)
+        status = MaxTemperature::Get(endpoint, &maxTemperature);
+        if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
-            status = aEncoder.Encode(maxTemperature);
+            error = aEncoder.Encode(maxTemperature);
         }
         break;
     }
 
     case Step::Id: {
         int16_t step = 0;
-        Step::Get(endpoint, &step);
-        if (status == CHIP_NO_ERROR)
+        status = Step::Get(endpoint, &step);
+        if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
-            status = aEncoder.Encode(step);
+            error = aEncoder.Encode(step);
         }
         break;
     }
 
     case CurrentTemperatureLevelIndex::Id: {
         uint8_t currentTemperatureLevelIndex = 0;
-        CurrentTemperatureLevelIndex::Get(endpoint, &currentTemperatureLevelIndex);
-        if (status == CHIP_NO_ERROR)
+        status = CurrentTemperatureLevelIndex::Get(endpoint, &currentTemperatureLevelIndex);
+        if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
-            status = aEncoder.Encode(currentTemperatureLevelIndex);
+            error = aEncoder.Encode(currentTemperatureLevelIndex);
         }
         break;
     }
@@ -114,7 +115,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
         break;
     }
 
-    return status;
+    return error;
 }
 
 bool TemperatureControlHasFeature(EndpointId endpoint, TemperatureControlFeature feature)
@@ -127,26 +128,56 @@ bool TemperatureControlHasFeature(EndpointId endpoint, TemperatureControlFeature
 }
 
 static Status setTemperatureHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                    int16_t targetTemperature, uint8_t targetTemperatureLevel)
+                                    chip::Optional<int16_t> targetTemperature, chip::Optional<uint8_t> targetTemperatureLevel)
 {
     EndpointId endpoint = commandPath.mEndpointId;
+    EmberAfStatus status;
 
     if (TemperatureControlHasFeature(endpoint, TemperatureControlFeature::kTemperatureNumber))
     {
+        if (!targetTemperature.HasValue())
+        {
+            return Status::Failure;
+        }
+
         int16_t minTemperature = 0;
         int16_t maxTemperature = 0;
-        MinTemperature::Get(endpoint, &minTemperature);
-        MaxTemperature::Get(endpoint, &maxTemperature);
-        if (targetTemperature < minTemperature || targetTemperature > maxTemperature)
+        status = MinTemperature::Get(endpoint, &minTemperature);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            return Status::Failure;
+        }
+        status = MaxTemperature::Get(endpoint, &maxTemperature);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            return Status::Failure;
+        }
+
+        if (targetTemperature.Value() < minTemperature || targetTemperature.Value() > maxTemperature)
         {
             return Status::ConstraintError;
         }
-        TemperatureSetpoint::Set(endpoint, targetTemperature);
+        status = TemperatureSetpoint::Set(endpoint, targetTemperature.Value());
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            return Status::Failure;
+        }
     }
     if (TemperatureControlHasFeature(endpoint, TemperatureControlFeature::kTemperatureLevel))
     {
+        if (!targetTemperatureLevel.HasValue())
+        {
+            return Status::Failure;
+        }
         // TODO: Check is targetTemperatureLevel is one of the SupportedTemperatureLevels
-        CurrentTemperatureLevelIndex::Set(endpoint, targetTemperatureLevel);
+        // And ser CurrentTemperatureLevelIndex to Index from SupportedTemperatureLevels whose level
+        // is mattching to targetTemperatureLevel
+
+        //status = CurrentTemperatureLevelIndex::Set(endpoint, targetTemperatureLevel.Value());
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            return Status::Failure;
+        }
     }
     return Status::Success;
 }
