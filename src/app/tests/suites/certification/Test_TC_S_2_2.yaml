@@ -795,7 +795,8 @@ tests:
                 value: 0x02
 
     - label:
-          "Verify that the status of previous command was either 0x00 (SUCCESS) or 0x89 (INSUFFICIENT_SPACE)"
+          "Verify that the status of previous command was either 0x00 (SUCCESS)
+          or 0x89 (INSUFFICIENT_SPACE)"
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
       arguments:
@@ -947,7 +948,8 @@ tests:
                 value: 0x03
 
     - label:
-          "Verify that the status of previous command was either 0x00 (SUCCESS) or 0x89 (INSUFFICIENT_SPACE)"
+          "Verify that the status of previous command was either 0x00 (SUCCESS)
+          or 0x89 (INSUFFICIENT_SPACE)"
       runIf: ContinueTest
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
