@@ -69,7 +69,7 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return encoder.EncodeEmptyList();
 }
 
 IcdManagementAttributeAccess gAttribute;
