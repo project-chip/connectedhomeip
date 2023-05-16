@@ -88,6 +88,7 @@ class YamlLoader:
             'label': str,
             'identity': str,
             'nodeId': int,
+            'runIf': str,  # Should be a variable.
             'groupId': int,
             'endpoint': int,
             'cluster': str,
@@ -194,7 +195,8 @@ class YamlLoader:
             'excludes': list,
             'hasMasksSet': list,
             'hasMasksClear': list,
-            'notValue': (type(None), bool, str, int, float, list, dict)
+            'notValue': (type(None), bool, str, int, float, list, dict),
+            'anyOf': list
         }
 
         self.__check(content, schema)
