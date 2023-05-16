@@ -27,6 +27,7 @@ CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 ALL_PLATFORMS = set([
     'ameba',
     'android',
+    'asr',
     'bl602',
     'bouffalolab',
     'cc13xx_26xx',

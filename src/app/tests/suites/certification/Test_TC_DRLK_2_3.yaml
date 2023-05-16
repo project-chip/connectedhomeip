@@ -325,6 +325,15 @@ tests:
       response:
           error: FAILURE
 
+    - label: "Wait for UserCodeTemporaryDisableTime expires"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0031
+      arguments:
+          values:
+              - name: "ms"
+                value: 15000
+
     - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
       PICS: DRLK.S.A0023 && PICS_SDK_CI_ONLY
       command: "writeAttribute"
@@ -374,58 +383,38 @@ tests:
     - label:
           "TH sends the unlock Door command to the DUT with valid PINCode and
           Verify that DUT sends SUCCESS response to the TH"
-      verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
-
-
-          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
-
-          [1657868999.441424][2857:2862] CHIP:DMG:                                StatusIB =
-          [1657868999.441478][2857:2862] CHIP:DMG:                                {
-          [1657868999.441531][2857:2862] CHIP:DMG:                                        status = 0x00 (SUCCESS),
-          [1657868999.441581][2857:2862] CHIP:DMG:                                },
-          [1657868999.441630][2857:2862] CHIP:DMG:
-          [1657868999.441673][2857:2862] CHIP:DMG:                        },
-          [1657868999.441716][2857:2862] CHIP:DMG:
-          [1657868999.441747][2857:2862] CHIP:DMG:                },
-          [1657868999.441784][2857:2862] CHIP:DMG:
-          [1657868999.441813][2857:2862] CHIP:DMG:        ],
-          [1657868999.441847][2857:2862] CHIP:DMG:
-          [1657868999.441874][2857:2862] CHIP:DMG:        InteractionModelRevision = 1
-          [1657868999.441900][2857:2862] CHIP:DMG: },
-          [1657868999.441965][2857:2862] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0001 Status=0x0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DRLK.S.C01.Rsp
+      PICS: DRLK.S.C01.Rsp
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "PINCode"
+                value: "123456"
 
-    - label:
-          "TH reads LockState attribute after AutoRelockTime Expires and Verify
-          that the DUT is locked."
-      verification: |
-          ./chip-tool doorlock read lock-state 1 1
-
-          Verify " DUT is locked" on the TH(Chip-tool) Log:
-
-          [1657869083.649102][2871:2876] CHIP:DMG:        SuppressResponse = true,
-          [1657869083.649136][2871:2876] CHIP:DMG:        InteractionModelRevision = 1
-          [1657869083.649169][2871:2876] CHIP:DMG: }
-          [1657869083.649336][2871:2876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0000 DataVersion: 2082875966
-          [1657869083.649446][2871:2876] CHIP:TOO:   LockState: 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DRLK.S.A0000
+    - label: "Wait for AutoRelockTime Expires"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: DRLK.S.A0023 && PICS_SDK_CI_ONLY
       arguments:
           values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "ms"
+                value: 10000
+
+    - label: "Wait for AutoRelockTime Expires"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: DRLK.S.A0023 && PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "ms"
+                value: 60000
+
+    - label: "TH reads LockState attribute"
+      PICS: DRLK.S.A0000 && DRLK.S.C01.Rsp
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
 
     - label: "Cleanup the created user"
       command: "ClearUser"

@@ -86,7 +86,7 @@ tests:
           transfer before it completely transfers the image. Wait for the Idle
           timeout. Initiate another QueryImage Command from OTA-R/TH to the DUT."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 

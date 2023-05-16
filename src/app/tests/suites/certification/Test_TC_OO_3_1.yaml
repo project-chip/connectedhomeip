@@ -36,6 +36,7 @@ tests:
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
+      PICS: OO.C.AM-READ
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -75,6 +76,7 @@ tests:
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
+      PICS: OO.C.AM-READ
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -219,6 +221,7 @@ tests:
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
+      PICS: OO.C.AO-WRITE
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -530,6 +533,7 @@ tests:
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
+      PICS: OO.C.AO-READ
       verification: |
           ./chip-tool onoff read global-scene-control 1 1
 
@@ -555,6 +559,7 @@ tests:
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
+      PICS: OO.C.AO-WRITE
       verification: |
           ./chip-tool onoff write on-time 1 1 1
 

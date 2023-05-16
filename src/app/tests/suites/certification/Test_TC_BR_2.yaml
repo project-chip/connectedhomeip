@@ -509,7 +509,7 @@ tests:
           "Read the PartsList and DeviceTypeList attributes of the Descriptor
           cluster on endpoint 0"
       verification: |
-          Verify DeviceTypeList has not changed compared to step 1a and PartsList contains exactly one endpoint which previously was not present which is higher than the previously used highest endpoint and also make sure the previously listed endpoint doesn"t change
+          Verify DeviceTypeList has not changed compared to step 1a and PartsList contains exactly one endpoint which previously was not present which is higher than the previously used highest endpoint and also make sure the previously listed endpoint doesn't change
 
 
           ./chip-tool descriptor read parts-list 1 0
@@ -959,7 +959,7 @@ tests:
           [1659351487.005831][12201:12207] CHIP:TOO:   MeasuredValue: 100
           [1659351487.005924][12201:12207] CHIP:EM: Sending Standalone Ack for MessageCounter:236763897 on exchange 8128i
 
-          3) Press a key "tbd" on bridge-app to change the simulated temperature
+          3) Press a key 't' on bridge-app to change the simulated temperature
 
           Verify on bridge-app
 
@@ -1687,7 +1687,7 @@ tests:
 
 
 
-          /chip-tool  descriptor read device-type-list 1 14
+          ./chip-tool  descriptor read device-type-list 1 14
 
           Verify the DeviceTypeList entries with endpoint 14 On TH(chip-tool) Log
 

@@ -30,7 +30,7 @@ tests:
       PICS: LTIME.S.A0000
       verification: |
           ./chip-tool timeformatlocalization read hour-format 1 0
-          Verify that  HourFormat attribute value is of Enum8 datatype on TH(chip-tool) log:
+          Verify that  HourFormat attribute value is of Enum8(0, 1)  datatype on TH(chip-tool) log:
 
           [1651191944157] [13649:182326] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530441
           [1651191944158] [13649:182326] CHIP: [TOO]   HourFormat: 0

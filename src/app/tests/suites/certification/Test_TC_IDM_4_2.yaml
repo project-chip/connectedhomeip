@@ -165,8 +165,9 @@ tests:
           AttributePath = [[Attribute = Attribute, Cluster = ClusterID, Endpoint
           = EndpointID ]]."
       verification: |
-          Out of scope for V1.0
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1984
+          As per Spec, there is no access control to specifically enable/disable access to an attribute, so the wording of the test plan need to be modified
+
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/2366
       disabled: true
 
     - label:
@@ -175,8 +176,93 @@ tests:
           subscribe to all attributes for which it does not have access.
           AttributePath = [[Cluster = ClusterID, Endpoint = EndpointID ]]."
       verification: |
-          Out of scope for V1.0
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1984
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
+          #1:- Please  run this test in chip tool interactive mode
+
+          #1:-  ./chip-tool interactive start
+
+          #2:- To Setup the TH2(chip-tool) such that it should not have access to all attributes on a specific cluster and endpoint, 1st we need to send below mentioned ACL command and Here by sending below mentioned ACL command giving access for access to all attributes on a specific cluster and endpoint.
+
+          accesscontrol write acl '[{ "fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}  , {"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[4], "targets": [{ "cluster":31, "endpoint":0, "deviceType":null }]}]' 1 0
+
+          [1683772555.196371][5065:5067] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1683772555.196398][5065:5067] CHIP:DMG: WriteResponseMessage =
+          [1683772555.196406][5065:5067] CHIP:DMG: {
+          [1683772555.196412][5065:5067] CHIP:DMG:         AttributeStatusIBs =
+          [1683772555.196425][5065:5067] CHIP:DMG:         [
+          [1683772555.196431][5065:5067] CHIP:DMG:                 AttributeStatusIB =
+          [1683772555.196439][5065:5067] CHIP:DMG:                 {
+          [1683772555.196445][5065:5067] CHIP:DMG:                         AttributePathIB =
+          [1683772555.196454][5065:5067] CHIP:DMG:                         {
+          [1683772555.196462][5065:5067] CHIP:DMG:                                 Endpoint = 0x0,
+          [1683772555.196470][5065:5067] CHIP:DMG:                                 Cluster = 0x1f,
+          [1683772555.196478][5065:5067] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1683772555.196484][5065:5067] CHIP:DMG:                         }
+          [1683772555.196495][5065:5067] CHIP:DMG:
+          [1683772555.196501][5065:5067] CHIP:DMG:                         StatusIB =
+          [1683772555.196509][5065:5067] CHIP:DMG:                         {
+          [1683772555.196517][5065:5067] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1683772555.196523][5065:5067] CHIP:DMG:                         },
+          [1683772555.196531][5065:5067] CHIP:DMG:
+          [1683772555.196537][5065:5067] CHIP:DMG:                 },
+          [1683772555.196550][5065:5067] CHIP:DMG:
+          [1683772555.196556][5065:5067] CHIP:DMG:                 AttributeStatusIB =
+          [1683772555.196563][5065:5067] CHIP:DMG:                 {
+          [1683772555.196569][5065:5067] CHIP:DMG:                         AttributePathIB =
+          [1683772555.196575][5065:5067] CHIP:DMG:                         {
+          [1683772555.196583][5065:5067] CHIP:DMG:                                 Endpoint = 0x0,
+          [1683772555.196590][5065:5067] CHIP:DMG:                                 Cluster = 0x1f,
+          [1683772555.196598][5065:5067] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1683772555.196605][5065:5067] CHIP:DMG:                                 ListIndex = Null,
+          [1683772555.196611][5065:5067] CHIP:DMG:                         }
+          [1683772555.196620][5065:5067] CHIP:DMG:
+          [1683772555.196627][5065:5067] CHIP:DMG:                         StatusIB =
+          [1683772555.196634][5065:5067] CHIP:DMG:                         {
+          [1683772555.196640][5065:5067] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1683772555.196647][5065:5067] CHIP:DMG:                         },
+          [1683772555.196654][5065:5067] CHIP:DMG:
+          [1683772555.196660][5065:5067] CHIP:DMG:                 },
+          [1683772555.196672][5065:5067] CHIP:DMG:
+          [1683772555.196678][5065:5067] CHIP:DMG:                 AttributeStatusIB =
+          [1683772555.196685][5065:5067] CHIP:DMG:                 {
+          [1683772555.196691][5065:5067] CHIP:DMG:                         AttributePathIB =
+          [1683772555.196696][5065:5067] CHIP:DMG:                         {
+          [1683772555.196703][5065:5067] CHIP:DMG:                                 Endpoint = 0x0,
+          [1683772555.196705][5065:5067] CHIP:DMG:                                 Cluster = 0x1f,
+          [1683772555.196707][5065:5067] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1683772555.196709][5065:5067] CHIP:DMG:                                 ListIndex = Null,
+          [1683772555.196711][5065:5067] CHIP:DMG:                         }
+          [1683772555.196714][5065:5067] CHIP:DMG:
+          [1683772555.196715][5065:5067] CHIP:DMG:                         StatusIB =
+          [1683772555.196717][5065:5067] CHIP:DMG:                         {
+          [1683772555.196719][5065:5067] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1683772555.196721][5065:5067] CHIP:DMG:                         },
+          [1683772555.196723][5065:5067] CHIP:DMG:
+          [1683772555.196725][5065:5067] CHIP:DMG:                 },
+          [1683772555.196728][5065:5067] CHIP:DMG:
+          [1683772555.196729][5065:5067] CHIP:DMG:         ],
+          [1683772555.196734][5065:5067] CHIP:DMG:
+          [1683772555.196736][5065:5067] CHIP:DMG:         InteractionModelRevision = 1
+          [1683772555.196737][5065:5067] CHIP:DMG: }
+          [1683772555.196761][5065:5067] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1683772555.196784][5065:5067] CHIP:EM: <<< [E:5727i S:25604 M:4589604 (Ack:173939662)] (S) Msg TX to 1:0000000000000001 [4847] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1683772555.196788][5065:5067] CHIP:IN: (S) Sending msg 4589604 on secure session with LSID: 25604
+
+          #3 TH2(Chip-Tool) sends a subscription request to subscribe to all attributes for which it does not have access.
+          AttributePath = [[Cluster = ClusterID, Endpoint = EndpointID ]].
+          levelcontrol subscribe current-frequency 2 10 1 1 --commissioner-nodeid 4
+          [1683772664.847709][5084:5086] CHIP:DMG: StatusResponseMessage =
+          [1683772664.847717][5084:5086] CHIP:DMG: {
+          [1683772664.847724][5084:5086] CHIP:DMG:         Status = 0x80 (INVALID_ACTION),
+          [1683772664.847731][5084:5086] CHIP:DMG:         InteractionModelRevision = 1
+          [1683772664.847737][5084:5086] CHIP:DMG: }
+          [1683772664.847744][5084:5086] CHIP:IM: Received status response, status is 0x80 (INVALID_ACTION)
+          [1683772664.847780][5084:5086] CHIP:EM: <<< [E:13809i S:6932 M:220785589 (Ack:32119470)] (S) Msg TX to 2:0000000000000001 [4847] --- Type 0001:01 (IM:StatusResponse)
+          [1683772664.847791][5084:5086] CHIP:IN: (S) Sending msg 220785589 on secure session with LSID: 6932
+
+
+          With the ACL command in step-2, we are overwriting the default privilege that chip-tool has an admin. After this step-3 you need to send below mentioned command to Grant access to all clusters again.
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233,4], "targets":null}]' 1 0
       disabled: true
 
     - label:
@@ -185,8 +271,89 @@ tests:
           on a specific Endpoint for which it does not have access.
           AttributePath = [[ Endpoint = EndpointID ]]."
       verification: |
-          Out of scope for V1.0
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1984
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
+          #1:- Please  run this test in chip tool interactive mode
+
+          #1:-  ./chip-tool interactive start
+
+          #2:- To Setup the TH2(chip-tool) such that it should not have access to an Endpoint, 1st we need to send below mentioned ACL command and Here by sending below mentioned ACL command giving only access to an Endpoint.
+
+          accesscontrol write acl '[{ "fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}  , {"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[4], "targets": [{ "cluster":null, "endpoint":0, "deviceType":null }]}]' 1 0
+          [1683775112.601728][5932:5934] CHIP:DMG: WriteResponseMessage =
+          [1683775112.601731][5932:5934] CHIP:DMG: {
+          [1683775112.601733][5932:5934] CHIP:DMG:         AttributeStatusIBs =
+          [1683775112.601737][5932:5934] CHIP:DMG:         [
+          [1683775112.601740][5932:5934] CHIP:DMG:                 AttributeStatusIB =
+          [1683775112.601742][5932:5934] CHIP:DMG:                 {
+          [1683775112.601744][5932:5934] CHIP:DMG:                         AttributePathIB =
+          [1683775112.601749][5932:5934] CHIP:DMG:                         {
+          [1683775112.601753][5932:5934] CHIP:DMG:                                 Endpoint = 0x0,
+          [1683775112.601756][5932:5934] CHIP:DMG:                                 Cluster = 0x1f,
+          [1683775112.601760][5932:5934] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1683775112.601763][5932:5934] CHIP:DMG:                         }
+          [1683775112.601768][5932:5934] CHIP:DMG:
+          [1683775112.601771][5932:5934] CHIP:DMG:                         StatusIB =
+          [1683775112.601775][5932:5934] CHIP:DMG:                         {
+          [1683775112.601779][5932:5934] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1683775112.601782][5932:5934] CHIP:DMG:                         },
+          [1683775112.601785][5932:5934] CHIP:DMG:
+          [1683775112.601788][5932:5934] CHIP:DMG:                 },
+          [1683775112.601794][5932:5934] CHIP:DMG:
+          [1683775112.601796][5932:5934] CHIP:DMG:                 AttributeStatusIB =
+          [1683775112.601799][5932:5934] CHIP:DMG:                 {
+          [1683775112.601801][5932:5934] CHIP:DMG:                         AttributePathIB =
+          [1683775112.601804][5932:5934] CHIP:DMG:                         {
+          [1683775112.601807][5932:5934] CHIP:DMG:                                 Endpoint = 0x0,
+          [1683775112.601810][5932:5934] CHIP:DMG:                                 Cluster = 0x1f,
+          [1683775112.601814][5932:5934] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1683775112.601816][5932:5934] CHIP:DMG:                                 ListIndex = Null,
+          [1683775112.601819][5932:5934] CHIP:DMG:                         }
+          [1683775112.601823][5932:5934] CHIP:DMG:
+          [1683775112.601826][5932:5934] CHIP:DMG:                         StatusIB =
+          [1683775112.601828][5932:5934] CHIP:DMG:                         {
+          [1683775112.601832][5932:5934] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1683775112.601834][5932:5934] CHIP:DMG:                         },
+          [1683775112.601837][5932:5934] CHIP:DMG:
+          [1683775112.601839][5932:5934] CHIP:DMG:                 },
+          [1683775112.601845][5932:5934] CHIP:DMG:
+          [1683775112.601847][5932:5934] CHIP:DMG:                 AttributeStatusIB =
+          [1683775112.601850][5932:5934] CHIP:DMG:                 {
+          [1683775112.601853][5932:5934] CHIP:DMG:                         AttributePathIB =
+          [1683775112.601856][5932:5934] CHIP:DMG:                         {
+          [1683775112.601859][5932:5934] CHIP:DMG:                                 Endpoint = 0x0,
+          [1683775112.601861][5932:5934] CHIP:DMG:                                 Cluster = 0x1f,
+          [1683775112.601864][5932:5934] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1683775112.601867][5932:5934] CHIP:DMG:                                 ListIndex = Null,
+          [1683775112.601870][5932:5934] CHIP:DMG:                         }
+          [1683775112.601874][5932:5934] CHIP:DMG:
+          [1683775112.601877][5932:5934] CHIP:DMG:                         StatusIB =
+          [1683775112.601880][5932:5934] CHIP:DMG:                         {
+          [1683775112.601883][5932:5934] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1683775112.601886][5932:5934] CHIP:DMG:                         },
+          [1683775112.601888][5932:5934] CHIP:DMG:
+          [1683775112.601891][5932:5934] CHIP:DMG:                 },
+          [1683775112.601895][5932:5934] CHIP:DMG:
+          [1683775112.601897][5932:5934] CHIP:DMG:         ],
+          [1683775112.601903][5932:5934] CHIP:DMG:
+          [1683775112.601905][5932:5934] CHIP:DMG:         InteractionModelRevision = 1
+          [1683775112.601907][5932:5934] CHIP:DMG: }
+          [1683775112.601932][5932:5934] CHIP:DMG: WriteClient moving to [AwaitingDe]
+
+          #3. TH2 sends a subscription request to subscribe to all attributes on all clusters on a specific Endpoint for which it does not have access.
+          AttributePath = [[ Endpoint = EndpointID ]].
+          any subscribe-by-id 0xFFFFFFFF 0xFFFFFFFF 10 100 1 1 --commissioner-nodeid 4
+          [1683775488.708071][5932:5934] CHIP:EM: Rxd Ack; Removing MessageCounter:62779651 from Retrans Table on exchange 50806i
+          [1683775488.708083][5932:5934] CHIP:DMG: StatusResponseMessage =
+          [1683775488.708086][5932:5934] CHIP:DMG: {
+          [1683775488.708089][5932:5934] CHIP:DMG:         Status = 0x80 (INVALID_ACTION),
+          [1683775488.708093][5932:5934] CHIP:DMG:         InteractionModelRevision = 1
+          [1683775488.708095][5932:5934] CHIP:DMG: }
+          [1683775488.708098][5932:5934] CHIP:IM: Received status response, status is 0x80 (INVALID_ACTION)
+          [1683775488.708117][5932:5934] CHIP:EM: <<< [E:50806i S:51174 M:62779652 (Ack:125024288)] (S) Msg TX to 2:0000000000000001 [C380] --- Type 0001:01 (IM:StatusResponse)
+          [1683775488.708121][5932:5934] CHIP:IN: (S) Sending msg 62779652 on secure session with LSID: 51174
+
+          With the ACL command in step-2, we are overwriting the default privilege that chip-tool has an admin. After this step-3 you need to send below mentioned command to Grant access to all clusters again.
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233, 4], "targets":null}]' 1 0
       disabled: true
 
     - label:
@@ -195,8 +362,92 @@ tests:
           all endpoints on a Node for which it does not have access.
           AttributePath = [[ ]]."
       verification: |
-          Out of scope for V1.0
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1984
+          The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
+          #1:- Please  run this test in chip tool interactive mode
+
+          ./chip-tool interactive start
+
+
+          #2:- To Setup the TH2(chip-tool) such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command and Here by sending below mentioned ACL command giving only access for specific Node
+
+          accesscontrol write acl '[{ "fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}  , {"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects":[4], "targets": [{ "cluster":null, "endpoint":0, "deviceType":null }]}]' 1 0
+          [1683776952.246779][6312:6314] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1683776952.246805][6312:6314] CHIP:DMG: WriteResponseMessage =
+          [1683776952.246814][6312:6314] CHIP:DMG: {
+          [1683776952.246820][6312:6314] CHIP:DMG:         AttributeStatusIBs =
+          [1683776952.246830][6312:6314] CHIP:DMG:         [
+          [1683776952.246837][6312:6314] CHIP:DMG:                 AttributeStatusIB =
+          [1683776952.246845][6312:6314] CHIP:DMG:                 {
+          [1683776952.246851][6312:6314] CHIP:DMG:                         AttributePathIB =
+          [1683776952.246859][6312:6314] CHIP:DMG:                         {
+          [1683776952.246868][6312:6314] CHIP:DMG:                                 Endpoint = 0x0,
+          [1683776952.246875][6312:6314] CHIP:DMG:                                 Cluster = 0x1f,
+          [1683776952.246883][6312:6314] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1683776952.246890][6312:6314] CHIP:DMG:                         }
+          [1683776952.246900][6312:6314] CHIP:DMG:
+          [1683776952.246906][6312:6314] CHIP:DMG:                         StatusIB =
+          [1683776952.246914][6312:6314] CHIP:DMG:                         {
+          [1683776952.246922][6312:6314] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1683776952.246929][6312:6314] CHIP:DMG:                         },
+          [1683776952.246936][6312:6314] CHIP:DMG:
+          [1683776952.246942][6312:6314] CHIP:DMG:                 },
+          [1683776952.246955][6312:6314] CHIP:DMG:
+          [1683776952.246961][6312:6314] CHIP:DMG:                 AttributeStatusIB =
+          [1683776952.246968][6312:6314] CHIP:DMG:                 {
+          [1683776952.246974][6312:6314] CHIP:DMG:                         AttributePathIB =
+          [1683776952.246982][6312:6314] CHIP:DMG:                         {
+          [1683776952.246989][6312:6314] CHIP:DMG:                                 Endpoint = 0x0,
+          [1683776952.246996][6312:6314] CHIP:DMG:                                 Cluster = 0x1f,
+          [1683776952.247004][6312:6314] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1683776952.247012][6312:6314] CHIP:DMG:                                 ListIndex = Null,
+          [1683776952.247018][6312:6314] CHIP:DMG:                         }
+          [1683776952.247028][6312:6314] CHIP:DMG:
+          [1683776952.247035][6312:6314] CHIP:DMG:                         StatusIB =
+          [1683776952.247039][6312:6314] CHIP:DMG:                         {
+          [1683776952.247041][6312:6314] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1683776952.247043][6312:6314] CHIP:DMG:                         },
+          [1683776952.247045][6312:6314] CHIP:DMG:
+          [1683776952.247047][6312:6314] CHIP:DMG:                 },
+          [1683776952.247050][6312:6314] CHIP:DMG:
+          [1683776952.247052][6312:6314] CHIP:DMG:                 AttributeStatusIB =
+          [1683776952.247054][6312:6314] CHIP:DMG:                 {
+          [1683776952.247056][6312:6314] CHIP:DMG:                         AttributePathIB =
+          [1683776952.247058][6312:6314] CHIP:DMG:                         {
+          [1683776952.247060][6312:6314] CHIP:DMG:                                 Endpoint = 0x0,
+          [1683776952.247063][6312:6314] CHIP:DMG:                                 Cluster = 0x1f,
+          [1683776952.247065][6312:6314] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1683776952.247067][6312:6314] CHIP:DMG:                                 ListIndex = Null,
+          [1683776952.247069][6312:6314] CHIP:DMG:                         }
+          [1683776952.247072][6312:6314] CHIP:DMG:
+          [1683776952.247074][6312:6314] CHIP:DMG:                         StatusIB =
+          [1683776952.247076][6312:6314] CHIP:DMG:                         {
+          [1683776952.247078][6312:6314] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1683776952.247080][6312:6314] CHIP:DMG:                         },
+          [1683776952.247082][6312:6314] CHIP:DMG:
+          [1683776952.247084][6312:6314] CHIP:DMG:                 },
+          [1683776952.247086][6312:6314] CHIP:DMG:
+          [1683776952.247088][6312:6314] CHIP:DMG:         ],
+          [1683776952.247093][6312:6314] CHIP:DMG:
+          [1683776952.247095][6312:6314] CHIP:DMG:         InteractionModelRevision = 1
+          [1683776952.247096][6312:6314] CHIP:DMG: }
+          [1683776952.247119][6312:6314] CHIP:DMG: WriteClient moving to [AwaitingDe]
+
+          TH2 sends a subscription request to subscribe to all attributes on all clusters on all endpoints on a Node for which it does not have access.
+          >>> any subscribe-by-id 0xFFFFFFFF 0xFFFFFFFF 10 100 1 1 --commissioner-nodeid 2
+          [1683776997.979233][6312:6314] CHIP:EM: Found matching exchange: 25484i, Delegate: 0x7f86ec018080
+          [1683776997.979243][6312:6314] CHIP:EM: Rxd Ack; Removing MessageCounter:58561824 from Retrans Table on exchange 25484i
+          [1683776997.979257][6312:6314] CHIP:DMG: StatusResponseMessage =
+          [1683776997.979261][6312:6314] CHIP:DMG: {
+          [1683776997.979264][6312:6314] CHIP:DMG:         Status = 0x80 (INVALID_ACTION),
+          [1683776997.979268][6312:6314] CHIP:DMG:         InteractionModelRevision = 1
+          [1683776997.979271][6312:6314] CHIP:DMG: }
+          [1683776997.979276][6312:6314] CHIP:IM: Received status response, status is 0x80 (INVALID_ACTION)
+          [1683776997.979302][6312:6314] CHIP:EM: <<< [E:25484i S:51642 M:58561825 (Ack:236305332)] (S) Msg TX to 2:0000000000000001 [6D8A] --- Type 0001:01 (IM:StatusResponse)
+          [1683776997.979310][6312:6314] CHIP:IN: (S) Sending msg 58561825 on secure session with LSID: 51642
+
+
+          With the ACL command in step-2, we are overwriting the default privilege that chip-tool has an admin. After this step-3 you need to send below mentioned command to Grant access to all clusters again.
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode":2, "subjects":[112233, 4], "targets":null}]' 1 0
       disabled: true
 
     - label:
