@@ -36,6 +36,8 @@
 #endif
 #include "spidrv.h"
 
+#include "silabs_utils.h"
+
 #include "gpiointerrupt.h"
 #include "sl_device_init_clocks.h"
 #include "sl_status.h"
@@ -140,13 +142,10 @@ void rsi_hal_board_init(void)
     xSemaphoreGive(spiTransferLock);
 
     /* GPIO INIT of MG12 & MG24 : Reset, Wakeup, Interrupt */
-    SILABS_LOG("RSI_HAL: init GPIO");
     sl_wfx_host_gpio_init();
 
     /* Reset of Wifi chip */
-    SILABS_LOG("RSI_HAL: Reset Wifi");
     sl_wfx_host_reset_chip();
-    SILABS_LOG("RSI_HAL: Init done");
 }
 
 /*****************************************************************************

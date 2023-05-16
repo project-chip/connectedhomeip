@@ -17,27 +17,21 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "silabs_utils.h"
+#include "init_efrPlatform.h"
+#include "sl_system_kernel.h"
 
-// EFR Logging
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <matter_config.h>
 
-void silabsInitLog(void);
-
-void efr32Log(const char * aFormat, ...);
-#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
-void appError(int err);
-
-#ifdef __cplusplus
+void appError(int err)
+{
+    SILABS_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
+    portDISABLE_INTERRUPTS();
+    while (true)
+        ;
 }
 
-// Output logs to RTT by defaults
-#ifndef SILABS_LOG_OUT_UART
-#define SILABS_LOG_OUT_UART 0
-#endif
-
-#include <lib/core/CHIPError.h>
-void appError(CHIP_ERROR error);
-#endif
+void appError(CHIP_ERROR error)
+{
+    appError(static_cast<int>(error.AsInteger()));
+}

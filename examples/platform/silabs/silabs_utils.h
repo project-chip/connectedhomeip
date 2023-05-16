@@ -19,19 +19,24 @@
 
 #pragma once
 
-// SiWx917 Logging
+// EFR Logging
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void silabsInitLog(void);
 
-void efr32Log(const char * aFormat, ...);
-#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
+void silabsLog(const char * aFormat, ...);
+#define SILABS_LOG(...) silabsLog(__VA_ARGS__);
 void appError(int err);
 
 #ifdef __cplusplus
 }
+
+// Output logs to RTT by defaults
+#ifndef SILABS_LOG_OUT_UART
+#define SILABS_LOG_OUT_UART 0
+#endif
 
 #include <lib/core/CHIPError.h>
 void appError(CHIP_ERROR error);

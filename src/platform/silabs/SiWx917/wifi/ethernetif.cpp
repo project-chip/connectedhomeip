@@ -40,8 +40,8 @@
 
 #ifndef SILABS_LOG
 extern "C" {
-void efr32Log(const char * aFormat, ...);
-#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
+void silabsLog(const char * aFormat, ...);
+#define SILABS_LOG(...) silabsLog(__VA_ARGS__);
 }
 #endif
 
