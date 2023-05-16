@@ -45,6 +45,7 @@ ClustersWithInitFunctions:
     - Time Format Localization
     - Thermostat
     - Mode Select
+    - Temperature Control
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic

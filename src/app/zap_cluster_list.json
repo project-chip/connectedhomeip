@@ -175,6 +175,7 @@
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
         "SWITCH_CLUSTER": ["switch-server"],
         "TARGET_NAVIGATOR_CLUSTER": ["target-navigator-server"],
+        "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
         "TEMPERATURE_MEASUREMENT_CLUSTER": [],
         "THERMOSTAT_CLUSTER": ["thermostat-server"],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [

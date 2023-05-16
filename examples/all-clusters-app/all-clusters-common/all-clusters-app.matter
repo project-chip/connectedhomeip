@@ -2276,6 +2276,35 @@ server cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** This cluster provides an interface for controlling the set temperature on devices such as washers, refrigerators, and water heaters. */
+server cluster TemperatureControl = 86 {
+  bitmap TemperatureControlFeature : BITMAP32 {
+    kTemperatureNumber = 0x1;
+    kTemperatureLevel = 0x2;
+  }
+
+  struct TemperatureLevelStruct {
+    char_string label = 0;
+    int8u temperatureLevel = 1;
+  }
+
+  readonly attribute int8u currentTemperatureLevelIndex = 4;
+  readonly attribute TemperatureLevelStruct supportedTemperatureLevels[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTemperatureRequest {
+    INT16S targetTemperature = 0;
+    INT8U targetTemperatureLevel = 1;
+  }
+
+  command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
+}
+
 /** An interface to a generic way to secure a door */
 server cluster DoorLock = 257 {
   enum AlarmCodeEnum : ENUM8 {
@@ -5070,6 +5099,17 @@ endpoint 1 {
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
     ram      attribute manufacturerExtension default = 255;
+  }
+
+  server cluster TemperatureControl {
+    ram      attribute currentTemperatureLevelIndex;
+    callback attribute supportedTemperatureLevels;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster DoorLock {
