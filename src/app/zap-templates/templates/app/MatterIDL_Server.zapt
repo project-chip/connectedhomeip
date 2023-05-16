@@ -12,7 +12,7 @@
 {{>idl_cluster_definition generateClientCluster=1}}
 {{else~}}
 {{>idl_cluster_definition generateClientCluster=0}}
-{{/if}
+{{/if}}
 
 {{/all_user_clusters}}
 {{#user_endpoints}}
