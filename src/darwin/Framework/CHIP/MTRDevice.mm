@@ -156,6 +156,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 
 @property (nonatomic) BOOL expirationCheckScheduled;
 
+@property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
+
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -262,6 +264,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
         if (state != MTRDeviceStateReachable) {
             MTR_LOG_INFO("%@ Set estimated start time to nil due to state change", self);
             _estimatedStartTime = nil;
+            _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
         }
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if (delegate) {
@@ -393,12 +396,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     }
 }
 
-- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)fromSubscription
 {
     os_unfair_lock_lock(&self->_lock);
 
     // _getAttributesToReportWithReportedValues will log attribute paths reported
-    [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport]];
+    [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport fromSubscription:fromSubscription]];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -413,10 +416,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
         MTREventPath * eventPath = eventDict[MTREventPathKey];
         BOOL isStartUpEvent = (eventPath.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID)
             && (eventPath.event.unsignedLongValue == MTREventIDTypeClusterBasicInformationEventStartUpID);
-        // Only reset estimate if subscription resumed after reboot. Otherwise ignore StartUp event during priming
+        // StartUp event would be received when server resumes subscription
         if (isStartUpEvent && (_state == MTRDeviceStateReachable)) {
-            MTR_LOG_INFO("%@ Set estimated start time to nil due to startup event", self);
-            _estimatedStartTime = nil;
+            if (_estimatedStartTimeFromGeneralDiagnosticsUpTime) {
+                // If UpTime was received, make use of it as mark of system start time
+                MTR_LOG_INFO("%@ StartUp event: set estimated start time forward to %@", self,
+                    _estimatedStartTimeFromGeneralDiagnosticsUpTime);
+                _estimatedStartTime = _estimatedStartTimeFromGeneralDiagnosticsUpTime;
+            } else {
+                // If UpTime was not received, reset estimated start time in case of reboot
+                MTR_LOG_INFO("%@ StartUp event: set estimated start time to nil", self);
+                _estimatedStartTime = nil;
+            }
         }
 
         // If event time is of MTREventTimeTypeSystemUpTime type, then update estimated start time as needed
@@ -520,7 +531,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                            MTR_LOG_INFO("%@ got attribute report %@", self, value);
                            dispatch_async(self.queue, ^{
                                // OnAttributeData (after OnReportEnd)
-                               [self _handleAttributeReport:value];
+                               [self _handleAttributeReport:value fromSubscription:YES];
                            });
                        },
                        ^(NSArray * value) {
@@ -628,7 +639,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                                       // Since the format is the same data-value dictionary, this looks like an attribute
                                       // report
                                       MTR_LOG_INFO("%@ completion values %@", logPrefix, values);
-                                      [self _handleAttributeReport:values];
+                                      [self _handleAttributeReport:values fromSubscription:NO];
                                   }
 
                                   // TODO: better retry logic
@@ -904,6 +915,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 
 // assume lock is held
 - (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues
+                                     fromSubscription:(BOOL)fromSubscription
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -960,12 +972,24 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                 if ([attributeDataValue[MTRTypeKey] isEqual:MTRUnsignedIntegerValueType]) {
                     NSNumber * upTimeNumber = attributeDataValue[MTRValueKey];
                     NSTimeInterval upTime = upTimeNumber.unsignedLongLongValue; // UpTime unit is defined as seconds in the spec
-                    NSDate * oldSystemStartTime = _estimatedStartTime;
                     NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-upTime];
-                    if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
-                        MTR_LOG_INFO("%@ General Diagnostics UpTime %.3lf: estimated start time %@ => %@", self, upTime,
-                            oldSystemStartTime, potentialSystemStartTime);
-                        _estimatedStartTime = potentialSystemStartTime;
+
+                    if (!fromSubscription || (_state != MTRDeviceStateReachable)) {
+                        // When UpTime comes from a direct read, or is part of priming report, the new estimate should be used to
+                        // update estimate backwards (more accurate)
+                        NSDate * oldSystemStartTime = _estimatedStartTime;
+                        if (!_estimatedStartTime
+                            || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
+                            MTR_LOG_INFO("%@ General Diagnostics UpTime %.3lf: estimated start time %@ => %@", self, upTime,
+                                oldSystemStartTime, potentialSystemStartTime);
+                            _estimatedStartTime = potentialSystemStartTime;
+                        }
+                    } else {
+                        // Otherwise it's a result from subscription report, which implies it's a resumed subscription,
+                        // because it's a "Changes Omitted" attribute. In this case:
+                        //   * Save UpTime-derived estimate
+                        //   * At StartUp event, update the estimated start time forward to the saved value
+                        _estimatedStartTimeFromGeneralDiagnosticsUpTime = potentialSystemStartTime;
                     }
                 }
             }
