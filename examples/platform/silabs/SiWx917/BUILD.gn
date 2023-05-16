@@ -43,9 +43,6 @@ declare_args() {
 
   #default Wifi Password
   chip_default_wifi_psk = ""
-
-  #use nvm for DIC
-  enable_nvm_DIC = false
 }
 
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
@@ -100,12 +97,11 @@ if (enable_dic) {
     ]
     if (enable_nvm_DIC) {
       sources += [ "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic_nvm_cert.cpp" ]
-      defines = [ "DIC_ENABLE_NVM_SUPPORT=1" ]
     }
     public_deps = [
       "${chip_root}/src/inet",
       "${chip_root}/src/lwip",
-      "${chip_root}/src/platform/silabs/efr32",
+      "${chip_root}/src/platform/silabs/SiWx917",
     ]
     public_configs = [ ":efr32_dic_config" ]
   }

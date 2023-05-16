@@ -250,6 +250,9 @@ template("efr32_sdk") {
       if (chip_enable_wifi_ipv4) {
         defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
       }
+      if(enable_nvm_DIC){
+      defines += [ "DIC_ENABLE_NVM_SUPPORT" ]
+      }
       if (use_rs9116 || use_SiWx917) {
         defines += [
           "SL_HEAP_SIZE=32768",

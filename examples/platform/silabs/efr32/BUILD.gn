@@ -119,7 +119,6 @@ if (enable_dic) {
     ]
     if (enable_nvm_DIC) {
       sources += [ "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic_nvm_cert.cpp" ]
-      defines = [ "DIC_ENABLE_NVM_SUPPORT" ]
     }
     public_deps = [
       "${chip_root}/src/inet",
