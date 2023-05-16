@@ -130,6 +130,9 @@ public final class ChipIdLookup {
     if (clusterId == 69L) {
       return "BooleanState";
     }
+    if (clusterId == 70L) {
+      return "IcdManagement";
+    }
     if (clusterId == 80L) {
       return "ModeSelect";
     }
@@ -1764,6 +1767,45 @@ public final class ChipIdLookup {
     if (clusterId == 69L) {
       if (attributeId == 0L) {
         return "StateValue";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 70L) {
+      if (attributeId == 0L) {
+        return "IdleModeInterval";
+      }
+      if (attributeId == 1L) {
+        return "ActiveModeInterval";
+      }
+      if (attributeId == 2L) {
+        return "ActiveModeThreshold";
+      }
+      if (attributeId == 3L) {
+        return "RegisteredClients";
+      }
+      if (attributeId == 4L) {
+        return "ICDCounter";
+      }
+      if (attributeId == 5L) {
+        return "ClientsSupportedPerFabric";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -4563,6 +4605,9 @@ public final class ChipIdLookup {
       if (eventId == 0L) {
         return "StateChange";
       }
+      return "";
+    }
+    if (clusterId == 70L) {
       return "";
     }
     if (clusterId == 80L) {

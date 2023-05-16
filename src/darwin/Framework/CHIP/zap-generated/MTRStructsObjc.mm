@@ -2599,6 +2599,44 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRICDManagementClusterMonitoringRegistrationStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _checkInNodeID = @(0);
+
+        _monitoredSubject = @(0);
+
+        _key = [NSData data];
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRICDManagementClusterMonitoringRegistrationStruct alloc] init];
+
+    other.checkInNodeID = self.checkInNodeID;
+    other.monitoredSubject = self.monitoredSubject;
+    other.key = self.key;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; key:%@; fabricIndex:%@; >", NSStringFromClass([self class]),
+        _checkInNodeID, _monitoredSubject, [_key base64EncodedStringWithOptions:0], _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {

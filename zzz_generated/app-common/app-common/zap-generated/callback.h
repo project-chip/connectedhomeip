@@ -353,6 +353,14 @@ void emberAfProxyValidClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief ICD Management Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfIcdManagementClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Mode Select Cluster Init
  *
  * Cluster Init
@@ -688,14 +696,6 @@ void emberAfAccountLoginClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfElectricalMeasurementClusterInitCallback(chip::EndpointId endpoint);
-
-/** @brief Client Monitoring Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfClientMonitoringClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Unit Testing Cluster Init
  *
@@ -3795,6 +3795,84 @@ void emberAfBooleanStateClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfBooleanStateClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// ICD Management Cluster
+//
+
+/** @brief ICD Management Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfIcdManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief ICD Management Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterIcdManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief ICD Management Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfIcdManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief ICD Management Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterIcdManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief ICD Management Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterIcdManagementClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                            EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief ICD Management Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterIcdManagementClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                            EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief ICD Management Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfIcdManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief ICD Management Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfIcdManagementClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Mode Select Cluster
@@ -7034,84 +7112,6 @@ void emberAfElectricalMeasurementClusterServerTickCallback(chip::EndpointId endp
 void emberAfElectricalMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Client Monitoring Cluster
-//
-
-/** @brief Client Monitoring Cluster Server Init
- *
- * Server Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfClientMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Client Monitoring Cluster Server Shutdown
- *
- * Server Shutdown
- *
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterClientMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/** @brief Client Monitoring Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfClientMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Client Monitoring Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterClientMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Client Monitoring Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterClientMonitoringClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Client Monitoring Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterClientMonitoringClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Client Monitoring Cluster Server Tick
- *
- * Server Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfClientMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Client Monitoring Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfClientMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
-
-//
 // Unit Testing Cluster
 //
 
@@ -7741,6 +7741,24 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData);
 /**
+ * @brief ICD Management Cluster RegisterClient Command callback (from client)
+ */
+bool emberAfIcdManagementClusterRegisterClientCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData);
+/**
+ * @brief ICD Management Cluster UnregisterClient Command callback (from client)
+ */
+bool emberAfIcdManagementClusterUnregisterClientCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
+/**
+ * @brief ICD Management Cluster StayActiveRequest Command callback (from client)
+ */
+bool emberAfIcdManagementClusterStayActiveRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::DecodableType & commandData);
+/**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */
 bool emberAfModeSelectClusterChangeToModeCallback(
@@ -8315,24 +8333,6 @@ bool emberAfElectricalMeasurementClusterGetProfileInfoCommandCallback(
 bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::DecodableType & commandData);
-/**
- * @brief Client Monitoring Cluster RegisterClientMonitoring Command callback (from client)
- */
-bool emberAfClientMonitoringClusterRegisterClientMonitoringCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoring::DecodableType & commandData);
-/**
- * @brief Client Monitoring Cluster UnregisterClientMonitoring Command callback (from client)
- */
-bool emberAfClientMonitoringClusterUnregisterClientMonitoringCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::DecodableType & commandData);
-/**
- * @brief Client Monitoring Cluster StayAwakeRequest Command callback (from client)
- */
-bool emberAfClientMonitoringClusterStayAwakeRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClientMonitoring::Commands::StayAwakeRequest::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */

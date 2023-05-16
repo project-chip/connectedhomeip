@@ -6422,6 +6422,153 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedIcdManagementClusterRegisterClientResponseCallback
+      implements ChipClusters.IcdManagementCluster.RegisterClientResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Long ICDCounter) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo ICDCounterResponseValue = new CommandResponseInfo("ICDCounter", "Long");
+      responseValues.put(ICDCounterResponseValue, ICDCounter);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedIcdManagementClusterRegisteredClientsAttributeCallback
+      implements ChipClusters.IcdManagementCluster.RegisteredClientsAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        List<ChipStructs.IcdManagementClusterMonitoringRegistrationStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo(
+              "valueList", "List<ChipStructs.IcdManagementClusterMonitoringRegistrationStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedIcdManagementClusterGeneratedCommandListAttributeCallback
+      implements ChipClusters.IcdManagementCluster.GeneratedCommandListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedIcdManagementClusterAcceptedCommandListAttributeCallback
+      implements ChipClusters.IcdManagementCluster.AcceptedCommandListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedIcdManagementClusterEventListAttributeCallback
+      implements ChipClusters.IcdManagementCluster.EventListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedIcdManagementClusterAttributeListAttributeCallback
+      implements ChipClusters.IcdManagementCluster.AttributeListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedModeSelectClusterStandardNamespaceAttributeCallback
       implements ChipClusters.ModeSelectCluster.StandardNamespaceAttributeCallback,
           DelegatedClusterCallback {
@@ -14568,6 +14715,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.BooleanStateCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("booleanState", booleanStateClusterInfo);
+    ClusterInfo icdManagementClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.IcdManagementCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("icdManagement", icdManagementClusterInfo);
     ClusterInfo modeSelectClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ModeSelectCluster(ptr, endpointId),
@@ -14846,6 +14998,7 @@ public class ClusterInfoMapping {
     destination.get("fixedLabel").combineCommands(source.get("fixedLabel"));
     destination.get("userLabel").combineCommands(source.get("userLabel"));
     destination.get("booleanState").combineCommands(source.get("booleanState"));
+    destination.get("icdManagement").combineCommands(source.get("icdManagement"));
     destination.get("modeSelect").combineCommands(source.get("modeSelect"));
     destination.get("airQuality").combineCommands(source.get("airQuality"));
     destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
@@ -16896,6 +17049,82 @@ public class ClusterInfoMapping {
     commandMap.put("userLabel", userLabelClusterInteractionInfoMap);
     Map<String, InteractionInfo> booleanStateClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("booleanState", booleanStateClusterInteractionInfoMap);
+    Map<String, InteractionInfo> icdManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> icdManagementregisterClientCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo icdManagementregisterClientcheckInNodeIDCommandParameterInfo =
+        new CommandParameterInfo("checkInNodeID", Long.class, Long.class);
+    icdManagementregisterClientCommandParams.put(
+        "checkInNodeID", icdManagementregisterClientcheckInNodeIDCommandParameterInfo);
+
+    CommandParameterInfo icdManagementregisterClientmonitoredSubjectCommandParameterInfo =
+        new CommandParameterInfo("monitoredSubject", Long.class, Long.class);
+    icdManagementregisterClientCommandParams.put(
+        "monitoredSubject", icdManagementregisterClientmonitoredSubjectCommandParameterInfo);
+
+    CommandParameterInfo icdManagementregisterClientkeyCommandParameterInfo =
+        new CommandParameterInfo("key", byte[].class, byte[].class);
+    icdManagementregisterClientCommandParams.put(
+        "key", icdManagementregisterClientkeyCommandParameterInfo);
+
+    CommandParameterInfo icdManagementregisterClientverificationKeyCommandParameterInfo =
+        new CommandParameterInfo("verificationKey", Optional.class, byte[].class);
+    icdManagementregisterClientCommandParams.put(
+        "verificationKey", icdManagementregisterClientverificationKeyCommandParameterInfo);
+
+    InteractionInfo icdManagementregisterClientInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .registerClient(
+                      (ChipClusters.IcdManagementCluster.RegisterClientResponseCallback) callback,
+                      (Long) commandArguments.get("checkInNodeID"),
+                      (Long) commandArguments.get("monitoredSubject"),
+                      (byte[]) commandArguments.get("key"),
+                      (Optional<byte[]>) commandArguments.get("verificationKey"));
+            },
+            () -> new DelegatedIcdManagementClusterRegisterClientResponseCallback(),
+            icdManagementregisterClientCommandParams);
+    icdManagementClusterInteractionInfoMap.put(
+        "registerClient", icdManagementregisterClientInteractionInfo);
+    Map<String, CommandParameterInfo> icdManagementunregisterClientCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo icdManagementunregisterClientcheckInNodeIDCommandParameterInfo =
+        new CommandParameterInfo("checkInNodeID", Long.class, Long.class);
+    icdManagementunregisterClientCommandParams.put(
+        "checkInNodeID", icdManagementunregisterClientcheckInNodeIDCommandParameterInfo);
+
+    CommandParameterInfo icdManagementunregisterClientkeyCommandParameterInfo =
+        new CommandParameterInfo("key", Optional.class, byte[].class);
+    icdManagementunregisterClientCommandParams.put(
+        "key", icdManagementunregisterClientkeyCommandParameterInfo);
+
+    InteractionInfo icdManagementunregisterClientInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .unregisterClient(
+                      (DefaultClusterCallback) callback,
+                      (Long) commandArguments.get("checkInNodeID"),
+                      (Optional<byte[]>) commandArguments.get("key"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            icdManagementunregisterClientCommandParams);
+    icdManagementClusterInteractionInfoMap.put(
+        "unregisterClient", icdManagementunregisterClientInteractionInfo);
+    Map<String, CommandParameterInfo> icdManagementstayActiveRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo icdManagementstayActiveRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.IcdManagementCluster) cluster)
+                  .stayActiveRequest((DefaultClusterCallback) callback);
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            icdManagementstayActiveRequestCommandParams);
+    icdManagementClusterInteractionInfoMap.put(
+        "stayActiveRequest", icdManagementstayActiveRequestInteractionInfo);
+    commandMap.put("icdManagement", icdManagementClusterInteractionInfoMap);
     Map<String, InteractionInfo> modeSelectClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> modeSelectchangeToModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

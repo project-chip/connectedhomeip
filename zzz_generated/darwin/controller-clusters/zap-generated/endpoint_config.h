@@ -518,6 +518,19 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: ICD Management (client) */ \
+      .clusterId = 0x00000046, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Mode Select (client) */ \
       .clusterId = 0x00000050, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \

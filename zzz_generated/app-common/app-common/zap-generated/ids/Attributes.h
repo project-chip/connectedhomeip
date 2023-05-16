@@ -2351,6 +2351,60 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace BooleanState
 
+namespace IcdManagement {
+namespace Attributes {
+
+namespace IdleModeInterval {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace IdleModeInterval
+
+namespace ActiveModeInterval {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveModeInterval
+
+namespace ActiveModeThreshold {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ActiveModeThreshold
+
+namespace RegisteredClients {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace RegisteredClients
+
+namespace ICDCounter {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ICDCounter
+
+namespace ClientsSupportedPerFabric {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace ClientsSupportedPerFabric
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace IcdManagement
+
 namespace ModeSelect {
 namespace Attributes {
 
@@ -5490,56 +5544,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace ElectricalMeasurement
-
-namespace ClientMonitoring {
-namespace Attributes {
-
-namespace IdleModeInterval {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace IdleModeInterval
-
-namespace ActiveModeInterval {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace ActiveModeInterval
-
-namespace ActiveModeThreshold {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace ActiveModeThreshold
-
-namespace ExpectedClients {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace ExpectedClients
-
-namespace ICDCounter {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace ICDCounter
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace EventList {
-static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace ClientMonitoring
 
 namespace UnitTesting {
 namespace Attributes {
