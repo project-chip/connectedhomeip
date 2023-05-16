@@ -279,7 +279,7 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // First time retrieving the counter
-        mGroupControlCounter = chip::Crypto::GetRandU32();
+        mGroupControlCounter = (chip::Crypto::GetRandU32() & kMessageCounterRandomInitMask) + 1;
     }
     else if (err != CHIP_NO_ERROR)
     {
@@ -294,7 +294,7 @@ CHIP_ERROR GroupOutgoingCounters::Init(chip::PersistentStorageDelegate * storage
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // First time retrieving the counter
-        mGroupDataCounter = chip::Crypto::GetRandU32();
+        mGroupDataCounter = (chip::Crypto::GetRandU32() & kMessageCounterRandomInitMask) + 1;
     }
     else if (err != CHIP_NO_ERROR)
     {
