@@ -77,7 +77,7 @@ using namespace ::chip::DeviceLayer::Internal;
 
 void sl_ble_init()
 {
-    uint8_t randomAddrRSI[6] = { 0 };
+    uint8_t randomAddrBLE[6] = { 0 };
 	  uint64_t randomAddr = chip::Crypto::GetRandU64();
 
     // registering the GAP callback functions
@@ -95,8 +95,8 @@ void sl_ble_init()
 
     //  initializing the application events map
     rsi_ble_app_init_events();
-		memcpy(randomAddrRSI, &randomAddr, 6);
-    rsi_ble_set_random_address_with_value(randomAddrRSI);
+		memcpy(randomAddrBLE, &randomAddr, 6);
+    rsi_ble_set_random_address_with_value(randomAddrBLE);
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
 
