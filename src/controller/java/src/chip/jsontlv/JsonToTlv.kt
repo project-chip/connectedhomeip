@@ -22,7 +22,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.google.protobuf.ByteString
 import java.util.Base64
 import chip.tlv.*
 
@@ -150,8 +149,8 @@ private fun extractTagAndTypeFromJsonKey(key: String): Triple<Tag, String, Strin
   return Triple(tag, type, subType)
 }
 
-private fun String.base64Encode(): ByteString {
-  return ByteString.copyFrom(Base64.getDecoder().decode(this))
+private fun String.base64Encode(): ByteArray {
+  return Base64.getDecoder().decode(this)
 }
 
 /** Verifies JsonElement is Number. If yes, returns the value. */

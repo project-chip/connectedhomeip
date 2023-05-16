@@ -91,8 +91,7 @@ private fun TlvReader.getStructJson(): JsonObject {
         }
       }
       is Utf8StringValue -> json.addProperty(key, value.value)
-      is ByteStringValue ->
-        json.addProperty(key, Base64.getEncoder().encodeToString(value.value.toByteArray()))
+      is ByteStringValue -> json.addProperty(key, Base64.getEncoder().encodeToString(value.value))
       is BooleanValue -> json.addProperty(key, value.value)
       is FloatValue -> json.addProperty(key, validateFloat(value.value))
       is DoubleValue -> json.addProperty(key, validateDouble(value.value))
@@ -144,7 +143,7 @@ private fun TlvReader.getArrayJsonWithElementsType(): Pair<JsonArray, String> {
         }
       }
       is Utf8StringValue -> json.add(value.value)
-      is ByteStringValue -> json.add(Base64.getEncoder().encodeToString(value.value.toByteArray()))
+      is ByteStringValue -> json.add(Base64.getEncoder().encodeToString(value.value))
       is BooleanValue -> json.add(value.value)
       is FloatValue -> json.add(validateFloat(value.value))
       is DoubleValue -> json.add(validateDouble(value.value))
