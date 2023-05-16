@@ -113,7 +113,7 @@ def runArgumentsParser() -> CmdLineArgs:
     #
     # All the rest of the files (app-templates.json) are generally built at
     # compile time.
-    default_templates = 'src/app/zap-templates/matter-idl.json'
+    default_templates = 'src/app/zap-templates/matter-idl-server.json'
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
