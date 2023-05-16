@@ -38,7 +38,7 @@ limitations under the License.
         <description>Allows servers to ensure that listed clients are notified when a server is available for communication.</description>
 
         <!-- Cluster feature map -->
-        <globalAttribute side="server" code="0xFFFC" value="0x0001"/>
+        <globalAttribute side="server" code="0xFFFC" value="0x0000"/>
         <!-- Current cluster version -->
         <globalAttribute side="either" code="0xFFFD" value="1"/>
 
