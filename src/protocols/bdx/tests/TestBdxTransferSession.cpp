@@ -330,7 +330,7 @@ void SendAndVerifyBlockAck(nlTestSuite * inSuite, void * inContext, TransferSess
 {
     TransferSession::OutputEventType expectedEventType =
         expectEOF ? TransferSession::OutputEventType::kAckEOFReceived : TransferSession::OutputEventType::kAckReceived;
-    MessageType expectedMsgType = expectEOF ? MessageType::BlockAckEOF : MessageType::BlockAck;
+    MessageType expectedMsgType = MessageType::BlockAck;
 
     // Verify PrepareBlockAck() outputs message to send
     CHIP_ERROR err = ackSender.PrepareBlockAck();

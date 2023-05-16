@@ -160,6 +160,7 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
     initMsg.Metadata           = initData.Metadata;
     initMsg.MetadataLength     = initData.MetadataLength;
 
+        ChipLogError(BDX, "WriteToPacketBuffer %s", __FUNCTION__);
     ReturnErrorOnFailure(WriteToPacketBuffer(initMsg, mPendingMsgHandle));
 
     const MessageType msgType = (mRole == TransferRole::kSender) ? MessageType::SendInit : MessageType::ReceiveInit;
@@ -223,6 +224,7 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
         acceptMsg.Metadata       = acceptData.Metadata;
         acceptMsg.MetadataLength = acceptData.MetadataLength;
 
+            ChipLogError(BDX, "WriteToPacketBuffer %s", __FUNCTION__);
         ReturnErrorOnFailure(WriteToPacketBuffer(acceptMsg, mPendingMsgHandle));
         msgType = MessageType::ReceiveAccept;
 
@@ -240,6 +242,7 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
         acceptMsg.Metadata       = acceptData.Metadata;
         acceptMsg.MetadataLength = acceptData.MetadataLength;
 
+            ChipLogError(BDX, "WriteToPacketBuffer %s", __FUNCTION__);
         ReturnErrorOnFailure(WriteToPacketBuffer(acceptMsg, mPendingMsgHandle));
         msgType = MessageType::SendAccept;
 
@@ -302,6 +305,7 @@ CHIP_ERROR TransferSession::PrepareBlockQueryWithSkip(const uint64_t & bytesToSk
     queryMsg.BlockCounter = mNextQueryNum;
     queryMsg.BytesToSkip  = bytesToSkip;
 
+        ChipLogError(BDX, "WriteToPacketBuffer %s", __FUNCTION__);
     ReturnErrorOnFailure(WriteToPacketBuffer(queryMsg, mPendingMsgHandle));
 
 #if CHIP_AUTOMATION_LOGGING
@@ -332,6 +336,7 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
     blockMsg.Data         = inData.Data;
     blockMsg.DataLength   = inData.Length;
 
+        ChipLogError(BDX, "WriteToPacketBuffer %s", __FUNCTION__);
     ReturnErrorOnFailure(WriteToPacketBuffer(blockMsg, mPendingMsgHandle));
 
     const MessageType msgType = inData.IsEof ? MessageType::BlockEOF : MessageType::Block;
@@ -365,6 +370,7 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
     ackMsg.BlockCounter       = mLastBlockNum;
     const MessageType msgType = (mState == TransferState::kReceivedEOF) ? MessageType::BlockAckEOF : MessageType::BlockAck;
 
+        ChipLogError(BDX, "WriteToPacketBuffer %s", __FUNCTION__);
     ReturnErrorOnFailure(WriteToPacketBuffer(ackMsg, mPendingMsgHandle));
 
 #if CHIP_AUTOMATION_LOGGING
