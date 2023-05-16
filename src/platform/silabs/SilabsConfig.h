@@ -112,6 +112,11 @@ public:
     static constexpr Key kConfigKey_ProductURL            = SilabsConfigKey(kMatterFactory_KeyBase, 0x11);
     static constexpr Key kConfigKey_PartNumber            = SilabsConfigKey(kMatterFactory_KeyBase, 0x12);
     static constexpr Key kConfigKey_UniqueId              = SilabsConfigKey(kMatterFactory_KeyBase, 0x1F);
+#ifdef DIC_ENABLE
+    static constexpr Key kConfigKey_CACerts               = SilabsConfigKey(kMatterFactory_KeyBase, 0x13);
+    static constexpr Key kConfigKey_DeviceCerts           = SilabsConfigKey(kMatterFactory_KeyBase, 0x14);
+    static constexpr Key kConfigKey_DeviceKey             = SilabsConfigKey(kMatterFactory_KeyBase, 0x15);
+#endif //DIC_ENABLE
     // Matter Config Keys
     static constexpr Key kConfigKey_ServiceConfig      = SilabsConfigKey(kMatterConfig_KeyBase, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = SilabsConfigKey(kMatterConfig_KeyBase, 0x02);

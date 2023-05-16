@@ -105,7 +105,7 @@ CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
-    if (spake2Salt != NULL)
+    if (strlen(spake2Salt) != 0)
     {
         err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_Spake2pSalt, spake2Salt);
         if (err != CHIP_NO_ERROR)
@@ -113,7 +113,7 @@ CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
-    if (spake2Verifier != NULL)
+     if (strlen(spake2Verifier) != 0)
     {
         err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_Spake2pVerifier, spake2Verifier);
         if (err != CHIP_NO_ERROR)
@@ -145,6 +145,32 @@ CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
+#ifdef DIC_ENABLE
+    if (strlen(ca_cert) != 0)
+    {
+        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_CACerts, ca_cert);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+    }
+    if (strlen(dev_cert) != 0)
+    {
+        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_DeviceCerts, dev_cert);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+    }
+    if (strlen(dev_key) != 0)
+    {
+        err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_DeviceKey, dev_key);
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+    }
+#endif //DIC_ENABLE
     if (strlen(vendorName) != 0)
     {
         err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_VendorName, vendorName);

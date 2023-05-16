@@ -48,6 +48,9 @@ class FactoryDataWriter:
     PRODUCT_LABEL_NVM3_KEY = "0x87210:"
     PRODUCT_URL_NVM3_KEY = "0x87211:"
     PART_NUMBER_NVM3_KEY = "0x87212:"
+    DIC_CA_CERT_OFFSET = "0x87213:"
+    DIC_DEV_CERT_OFFSET = "0x87214:"
+    DIC_DEV_KEY_OFFSET = "0x87215:"
 
     def generate_spake2p_verifier(self):
         """ Generate Spake2+ verifier using the external spake2p tool
@@ -285,6 +288,18 @@ class FactoryDataWriter:
             productUrlByteArray = bytes(self._args.product_url, 'utf-8').hex()
             cmd.extend(["--object", self.PRODUCT_URL_NVM3_KEY + str(productUrlByteArray)])
 
+        if self._args.ca_cert:
+            ca_certArray = bytes(self._args.ca_cert, 'utf-8').hex()
+            cmd.extend(["--object", self.DIC_CA_CERT_OFFSET + str(ca_certArray)])
+
+        if self._args.device_cert:
+            device_certArray = bytes(self._args.device_cert, 'utf-8').hex()
+            cmd.extend(["--object", self.DIC_DEV_CERT_OFFSET + str(device_certArray)])
+
+        if self._args.device_key:
+            device_keyArray = bytes(self._args.device_key, 'utf-8').hex()
+            cmd.extend(["--object", self.DIC_DEV_KEY_OFFSET + str(device_keyArray)])
+
         cmd.extend(["--outfile", self.OUT_FILE])
         results = subprocess.run(cmd)
 
@@ -350,6 +365,12 @@ def main():
                         help="[int| hex] Provide Commissioning Flow: 0=Standard, 1=kUserActionRequired, 2=Custom (Default:Standard)")
     parser.add_argument("--rendezvous_flag", type=all_int_format, default=2,
                         help="[int| hex] Provide Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Default=BLE Only)")
+    parser.add_argument("--ca_cert", type=str, 
+                        help="[string] Provide ca_cert.")
+    parser.add_argument("--device_cert", type=str,
+                        help="[string] Provide device_cert.")
+    parser.add_argument("--device_key", type=str,
+                        help="[string] Provide device_key.")
 
     args = parser.parse_args()
     writer = FactoryDataWriter(args)
