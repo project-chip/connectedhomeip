@@ -365,7 +365,7 @@ def main():
                         help="[int| hex] Provide Commissioning Flow: 0=Standard, 1=kUserActionRequired, 2=Custom (Default:Standard)")
     parser.add_argument("--rendezvous_flag", type=all_int_format, default=2,
                         help="[int| hex] Provide Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Default=BLE Only)")
-    parser.add_argument("--ca_cert", type=str, 
+    parser.add_argument("--ca_cert", type=str,
                         help="[string] Provide ca_cert.")
     parser.add_argument("--device_cert", type=str,
                         help="[string] Provide device_cert.")
