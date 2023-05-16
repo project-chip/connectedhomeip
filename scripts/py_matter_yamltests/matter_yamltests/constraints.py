@@ -582,7 +582,9 @@ class _ConstraintIsUpperCase(BaseConstraint):
         self._is_upper_case = is_upper_case
 
     def check_response(self, value, value_type_name) -> bool:
-        return value.isupper() == self._is_upper_case
+        # Make sure we don't have any lowercase characters.
+        hasLower = any(c.islower() for c in value)
+        return hasLower != self._is_upper_case
 
     def get_reason(self, value, value_type_name) -> str:
         if self._is_upper_case:
@@ -608,7 +610,9 @@ class _ConstraintIsLowerCase(BaseConstraint):
         self._is_lower_case = is_lower_case
 
     def check_response(self, value, value_type_name) -> bool:
-        return value.islower() == self._is_lower_case
+        # Make sure we don't have any uppercase characters.
+        hasUpper = any(c.isupper() for c in value)
+        return hasUpper != self._is_lower_case
 
     def get_reason(self, value, value_type_name) -> str:
         if self._is_lower_case:

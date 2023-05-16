@@ -41,7 +41,7 @@
 #include "include/wake-on-lan/WakeOnLanManager.h"
 
 #if defined(ENABLE_CHIP_SHELL)
-#include <lib/shell/Engine.h>
+#include <lib/shell/Engine.h> // nogncheck
 #endif
 
 using namespace chip;
