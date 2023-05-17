@@ -18194,11 +18194,12 @@ class DoorLock(Cluster):
             kNotFullyLocked = 0x00
             kLocked = 0x01
             kUnlocked = 0x02
+            kUnlatched = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 4,
 
         class DlLockType(MatterIntEnum):
             kDeadBolt = 0x00
@@ -18212,11 +18213,12 @@ class DoorLock(Cluster):
             kInterconnectedLock = 0x08
             kDeadLatch = 0x09
             kDoorFurniture = 0x0A
+            kEurocylinder = 0x0B
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 11,
+            kUnknownEnumValue = 12,
 
         class DlStatus(MatterIntEnum):
             kSuccess = 0x00
@@ -18339,11 +18341,12 @@ class DoorLock(Cluster):
             kUnlock = 0x01
             kNonAccessUserEvent = 0x02
             kForcedUserEvent = 0x03
+            kUnlatch = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 5,
 
         class OperatingModeEnum(MatterIntEnum):
             kNormal = 0x00
@@ -18538,6 +18541,7 @@ class DoorLock(Cluster):
             kNotification = 0x200
             kYearDayAccessSchedules = 0x400
             kHolidaySchedules = 0x800
+            kUnbolt = 0x1000
 
     class Structs:
         @dataclass
@@ -19081,6 +19085,26 @@ class DoorLock(Cluster):
                 return True
 
             credential: 'typing.Union[Nullable, DoorLock.Structs.CredentialStruct]' = NullValue
+
+        @dataclass
+        class UnboltDoor(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0101
+            command_id: typing.ClassVar[int] = 0x00000027
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="PINCode", Tag=0, Type=typing.Optional[bytes]),
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+            PINCode: 'typing.Optional[bytes]' = None
 
     class Attributes:
         @dataclass

@@ -9125,6 +9125,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     = 0x00000025,
     MTRCommandIDTypeClusterDoorLockCommandClearCredentialID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000026,
+    MTRCommandIDTypeClusterDoorLockCommandUnboltDoorID MTR_NEWLY_AVAILABLE = 0x00000027,
 
     // Cluster WindowCovering deprecated command id names
     MTRClusterWindowCoveringCommandUpOrOpenID MTR_DEPRECATED("Please use MTRCommandIDTypeClusterWindowCoveringCommandUpOrOpenID",

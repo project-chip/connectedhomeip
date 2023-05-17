@@ -8252,6 +8252,37 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRDoorLockClusterUnboltDoorParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _pinCode = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDoorLockClusterUnboltDoorParams alloc] init];
+
+    other.pinCode = self.pinCode;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: pinCode:%@; >", NSStringFromClass([self class]), [_pinCode base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
 @implementation MTRWindowCoveringClusterUpOrOpenParams
 - (instancetype)init
 {

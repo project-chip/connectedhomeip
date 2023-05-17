@@ -7562,6 +7562,11 @@
           BridgedDeviceBasic:
               - ProductFinishEnum
               - ColorEnum
+      enum values:
+          # Unlatch was never present for the old operation type enum name.
+          DoorLock:
+              DlLockOperationType:
+                  - Unlatch
   renames:
       attributes:
           TimeSynchronization:
