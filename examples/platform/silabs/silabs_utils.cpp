@@ -18,8 +18,6 @@
  */
 
 #include "silabs_utils.h"
-#include "init_efrPlatform.h"
-#include "sl_system_kernel.h"
 
 #include <matter_config.h>
 
