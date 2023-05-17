@@ -116,7 +116,7 @@ tests:
       arguments:
           values:
               - name: "Count"
-                value: 1
+                value: 2
 
     - label: "Verify that Skip Channel Command set correct current channel"
       command: "readAttribute"
