@@ -206,7 +206,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
     uint32_t err = SL_BOOTLOADER_OK;
 
-    ChipLogProgress(SoftwareUpdate, "%s: started");
+    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
 
     // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
