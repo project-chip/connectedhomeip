@@ -111,12 +111,15 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     uint16_t index = 0;
     for (auto const & channel : mChannels)
     {
-        index++;
         // verify if CharSpan matches channel name
         // or callSign or affiliateCallSign or majorNumber.minorNumber
         if (isChannelMatched(channel, match))
         {
-            matchedChannels.push_back(channel);
+            matchedChannels.push_back(channel);    
+        } else if (matchedChannels.size() == 0) {
+            // Keep track of index record only if there's channel matches
+            // Multiple matches is sign of error
+            index++;
         }
     }
 
@@ -151,7 +154,6 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
     uint16_t index      = 0;
     for (auto const & channel : mChannels)
     {
-        index++;
         // verify if major & minor matches one of the channel from the list
         if (channel.minorNumber == minorNumber && channel.majorNumber == majorNumber)
         {
@@ -163,6 +165,7 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
                 mCurrentChannel      = channel;
             }
         }
+        index++;
     }
     return channelChanged;
 }
