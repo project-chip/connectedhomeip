@@ -6,8 +6,6 @@
 #import "MTRDevice.h"
 #import "MTRDevice_Internal.h"
 
-#include <zap-generated/CHIPClusters.h>
-
 {{#zcl_clusters}}
 
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
