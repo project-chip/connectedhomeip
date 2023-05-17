@@ -257,7 +257,6 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
           "${_app_root}/clusters/scenes-server/SceneTableImpl.cpp",
-          "${_app_root}/clusters/scenes-server/scenes-tokens.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
