@@ -1381,7 +1381,27 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace ModeSelect
 
-<<<<<<< HEAD
+namespace AirQuality {
+namespace Attributes {
+
+namespace AirQuality {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum * value); // AirQualityEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum value);
+} // namespace AirQuality
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace AirQuality
+
 namespace SmokeCoAlarm {
 namespace Attributes {
 
@@ -1445,15 +1465,6 @@ namespace SensitivityLevel {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum * value); // SensitivityEnum
 EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value);
 } // namespace SensitivityLevel
-=======
-namespace AirQuality {
-namespace Attributes {
-
-namespace AirQuality {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum * value); // AirQualityEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum value);
-} // namespace AirQuality
->>>>>>> master
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -1466,10 +1477,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-<<<<<<< HEAD
 } // namespace SmokeCoAlarm
-=======
-} // namespace AirQuality
 
 namespace HepaFilterMonitoring {
 namespace Attributes {
@@ -1927,7 +1935,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 } // namespace Attributes
 } // namespace TonerCartridgeMonitoring
->>>>>>> master
 
 namespace DoorLock {
 namespace Attributes {

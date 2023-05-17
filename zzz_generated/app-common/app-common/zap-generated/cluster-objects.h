@@ -14192,9 +14192,6 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ModeSelect
-<<<<<<< HEAD
-namespace SmokeCoAlarm {
-=======
 namespace AirQuality {
 
 namespace Attributes {
@@ -14268,32 +14265,20 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace AirQuality
-namespace HepaFilterMonitoring {
->>>>>>> master
+namespace SmokeCoAlarm {
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-<<<<<<< HEAD
 namespace SelfTestRequest {
 struct Type;
 struct DecodableType;
 } // namespace SelfTestRequest
-=======
-namespace ResetCondition {
-struct Type;
-struct DecodableType;
-} // namespace ResetCondition
->>>>>>> master
 
 } // namespace Commands
 
 namespace Commands {
-<<<<<<< HEAD
 namespace SelfTestRequest {
-=======
-namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -14302,13 +14287,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-<<<<<<< HEAD
     static constexpr CommandId GetCommandId() { return Commands::SelfTestRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-=======
-    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
->>>>>>> master
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14320,26 +14300,16 @@ public:
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
     static constexpr CommandId GetCommandId() { return Commands::SelfTestRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SelfTestRequest
-=======
-    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ResetCondition
->>>>>>> master
 } // namespace Commands
 
 namespace Attributes {
 
-<<<<<<< HEAD
 namespace ExpressedState {
 struct TypeInfo
 {
@@ -14401,52 +14371,12 @@ struct TypeInfo
 };
 } // namespace DeviceMuted
 namespace TestInProgress {
-=======
-namespace Condition {
-struct TypeInfo
-{
-    using Type             = chip::Percent;
-    using DecodableType    = chip::Percent;
-    using DecodableArgType = chip::Percent;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Condition
-namespace DegradationDirection {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum;
-    using DecodableType    = chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum;
-    using DecodableArgType = chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DegradationDirection
-namespace ChangeIndication {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum;
-    using DecodableType    = chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum;
-    using DecodableArgType = chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ChangeIndication
-namespace InPlaceIndicator {
->>>>>>> master
 struct TypeInfo
 {
     using Type             = bool;
     using DecodableType    = bool;
     using DecodableArgType = bool;
 
-<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TestInProgress::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
@@ -14528,67 +14458,36 @@ namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-=======
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace InPlaceIndicator
-namespace GeneratedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
->>>>>>> master
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-=======
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
->>>>>>> master
 };
 } // namespace AcceptedCommandList
 namespace EventList {
 struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
 {
-<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-=======
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
->>>>>>> master
 };
 } // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-=======
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
->>>>>>> master
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-=======
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
->>>>>>> master
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-<<<<<<< HEAD
     static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-=======
-    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
->>>>>>> master
 };
 } // namespace ClusterRevision
 
@@ -14596,7 +14495,6 @@ struct TypeInfo
 {
     struct DecodableType
     {
-<<<<<<< HEAD
         static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
@@ -14622,7 +14520,460 @@ struct TypeInfo
             static_cast<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>(0);
         Attributes::SensitivityLevel::TypeInfo::DecodableType sensitivityLevel =
             static_cast<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>(0);
-=======
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace SmokeAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SmokeAlarm
+namespace COAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::COAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::COAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace COAlarm
+namespace LowBattery {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::LowBattery::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::LowBattery::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace LowBattery
+namespace HardwareFault {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::HardwareFault::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::HardwareFault::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace HardwareFault
+namespace EndOfService {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EndOfService::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EndOfService::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace EndOfService
+namespace SelfTestComplete {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SelfTestComplete::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SelfTestComplete::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SelfTestComplete
+namespace AlarmMuted {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AlarmMuted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AlarmMuted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AlarmMuted
+namespace MuteEnded {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MuteEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MuteEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace MuteEnded
+namespace InterconnectSmokeAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectSmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectSmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace InterconnectSmokeAlarm
+namespace InterconnectCOAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectCOAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectCOAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace InterconnectCOAlarm
+namespace AllClear {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AllClear::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AllClear::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AllClear
+} // namespace Events
+} // namespace SmokeCoAlarm
+namespace HepaFilterMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
         static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
@@ -14633,7 +14984,6 @@ struct TypeInfo
         Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
             static_cast<chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum>(0);
         Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
->>>>>>> master
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -14643,12 +14993,6 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-<<<<<<< HEAD
-namespace Events {
-namespace SmokeAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
 } // namespace HepaFilterMonitoring
 namespace ActivatedCarbonFilterMonitoring {
 
@@ -14664,7 +15008,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -14672,14 +15015,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::SmokeAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
@@ -14689,24 +15024,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::SmokeAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace SmokeAlarm
-namespace COAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
 
@@ -14840,7 +15162,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -14848,14 +15169,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::COAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
@@ -14865,24 +15178,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::COAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace COAlarm
-namespace LowBattery {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
 
@@ -15016,7 +15316,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -15024,14 +15323,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::LowBattery::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
@@ -15041,24 +15332,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::LowBattery::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace LowBattery
-namespace HardwareFault {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
 
@@ -15192,7 +15470,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -15200,14 +15477,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::HardwareFault::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
@@ -15217,24 +15486,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::HardwareFault::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace HardwareFault
-namespace EndOfService {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
 
@@ -15368,7 +15624,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -15376,14 +15631,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::EndOfService::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
@@ -15393,24 +15640,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::EndOfService::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace EndOfService
-namespace SelfTestComplete {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
 
@@ -15544,7 +15778,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -15552,14 +15785,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::SelfTestComplete::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
@@ -15569,24 +15794,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::SelfTestComplete::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace SelfTestComplete
-namespace AlarmMuted {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
 
@@ -15720,7 +15932,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -15728,14 +15939,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AlarmMuted::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
@@ -15745,24 +15948,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AlarmMuted::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace AlarmMuted
-namespace MuteEnded {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
 
@@ -15896,7 +16086,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -15904,14 +16093,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::MuteEnded::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
@@ -15921,24 +16102,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::MuteEnded::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace MuteEnded
-namespace InterconnectSmokeAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
 
@@ -16072,7 +16240,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -16080,14 +16247,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::InterconnectSmokeAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
@@ -16097,24 +16256,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::InterconnectSmokeAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace InterconnectSmokeAlarm
-namespace InterconnectCOAlarm {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
 
@@ -16248,7 +16394,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -16256,14 +16401,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::InterconnectCOAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
@@ -16273,24 +16410,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::InterconnectCOAlarm::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace InterconnectCOAlarm
-namespace AllClear {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
 
@@ -16424,7 +16548,6 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCondition {
->>>>>>> master
 enum class Fields : uint8_t
 {
 };
@@ -16432,14 +16555,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AllClear::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-=======
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
@@ -16449,23 +16564,11 @@ public:
     using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
->>>>>>> master
 };
 
 struct DecodableType
 {
 public:
-<<<<<<< HEAD
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AllClear::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace AllClear
-} // namespace Events
-} // namespace SmokeCoAlarm
-=======
     static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
 
@@ -16585,7 +16688,6 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace TonerCartridgeMonitoring
->>>>>>> master
 namespace DoorLock {
 namespace Structs {
 namespace CredentialStruct {

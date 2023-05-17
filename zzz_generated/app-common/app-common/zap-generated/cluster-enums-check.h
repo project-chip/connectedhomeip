@@ -1284,7 +1284,24 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
-<<<<<<< HEAD
+static auto __attribute__((unused)) EnsureKnownEnumValue(AirQuality::AirQualityEnum val)
+{
+    using EnumType = AirQuality::AirQualityEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kGood:
+    case EnumType::kFair:
+    case EnumType::kModerate:
+    case EnumType::kPoor:
+    case EnumType::kVeryPoor:
+    case EnumType::kExtremelyPoor:
+        return val;
+    default:
+        return static_cast<EnumType>(7);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::AlarmStateEnum val)
 {
     using EnumType = SmokeCoAlarm::AlarmStateEnum;
@@ -1370,22 +1387,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::Sensitivi
         return val;
     default:
         return static_cast<EnumType>(3);
-=======
-static auto __attribute__((unused)) EnsureKnownEnumValue(AirQuality::AirQualityEnum val)
-{
-    using EnumType = AirQuality::AirQualityEnum;
-    switch (val)
-    {
-    case EnumType::kUnknown:
-    case EnumType::kGood:
-    case EnumType::kFair:
-    case EnumType::kModerate:
-    case EnumType::kPoor:
-    case EnumType::kVeryPoor:
-    case EnumType::kExtremelyPoor:
-        return val;
-    default:
-        return static_cast<EnumType>(7);
     }
 }
 
@@ -1698,7 +1699,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TonerCartridgeMonitorin
         return val;
     default:
         return static_cast<EnumType>(2);
->>>>>>> master
     }
 }
 

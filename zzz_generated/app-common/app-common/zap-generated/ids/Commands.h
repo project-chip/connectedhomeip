@@ -641,7 +641,6 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace ModeSelect
 
-<<<<<<< HEAD
 namespace SmokeCoAlarm {
 namespace Commands {
 
@@ -651,7 +650,7 @@ static constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace SmokeCoAlarm
-=======
+
 namespace HepaFilterMonitoring {
 namespace Commands {
 
@@ -771,7 +770,6 @@ static constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace TonerCartridgeMonitoring
->>>>>>> master
 
 namespace DoorLock {
 namespace Commands {

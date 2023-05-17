@@ -369,20 +369,21 @@ void emberAfIcdManagementClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
-<<<<<<< HEAD
-/** @brief Smoke CO Alarm Cluster Init
-=======
 /** @brief Air Quality Cluster Init
->>>>>>> master
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-<<<<<<< HEAD
-void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint);
-=======
 void emberAfAirQualityClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Smoke CO Alarm Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief HEPA Filter Monitoring Cluster Init
  *
@@ -479,7 +480,6 @@ void emberAfInkCartridgeMonitoringClusterInitCallback(chip::EndpointId endpoint)
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfTonerCartridgeMonitoringClusterInitCallback(chip::EndpointId endpoint);
->>>>>>> master
 
 /** @brief Door Lock Cluster Init
  *
@@ -3961,73 +3961,42 @@ void emberAfModeSelectClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-<<<<<<< HEAD
-// Smoke CO Alarm Cluster
-//
-
-/** @brief Smoke CO Alarm Cluster Server Init
-=======
 // Air Quality Cluster
 //
 
 /** @brief Air Quality Cluster Server Init
->>>>>>> master
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-<<<<<<< HEAD
-void emberAfSmokeCoAlarmClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Smoke CO Alarm Cluster Server Shutdown
-=======
 void emberAfAirQualityClusterServerInitCallback(chip::EndpointId endpoint);
 
 /** @brief Air Quality Cluster Server Shutdown
->>>>>>> master
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
-<<<<<<< HEAD
-void MatterSmokeCoAlarmClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/** @brief Smoke CO Alarm Cluster Client Init
-=======
 void MatterAirQualityClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Air Quality Cluster Client Init
->>>>>>> master
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-<<<<<<< HEAD
-void emberAfSmokeCoAlarmClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Smoke CO Alarm Cluster Server Attribute Changed
-=======
 void emberAfAirQualityClusterClientInitCallback(chip::EndpointId endpoint);
 
 /** @brief Air Quality Cluster Server Attribute Changed
->>>>>>> master
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-<<<<<<< HEAD
-void MatterSmokeCoAlarmClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Smoke CO Alarm Cluster Server Pre Attribute Changed
-=======
 void MatterAirQualityClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 /** @brief Air Quality Cluster Server Pre Attribute Changed
->>>>>>> master
  *
  * Server Pre Attribute Changed
  *
@@ -4037,17 +4006,10 @@ void MatterAirQualityClusterServerAttributeChangedCallback(const chip::app::Conc
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-<<<<<<< HEAD
-MatterSmokeCoAlarmClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Smoke CO Alarm Cluster Client Pre Attribute Changed
-=======
 MatterAirQualityClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Air Quality Cluster Client Pre Attribute Changed
->>>>>>> master
  *
  * Client Pre Attribute Changed
  *
@@ -4057,40 +4019,102 @@ MatterAirQualityClusterServerPreAttributeChangedCallback(const chip::app::Concre
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-<<<<<<< HEAD
-MatterSmokeCoAlarmClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Smoke CO Alarm Cluster Server Tick
-=======
 MatterAirQualityClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 /** @brief Air Quality Cluster Server Tick
->>>>>>> master
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-<<<<<<< HEAD
-void emberAfSmokeCoAlarmClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Smoke CO Alarm Cluster Client Tick
-=======
 void emberAfAirQualityClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @brief Air Quality Cluster Client Tick
->>>>>>> master
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-<<<<<<< HEAD
-void emberAfSmokeCoAlarmClusterClientTickCallback(chip::EndpointId endpoint);
-=======
 void emberAfAirQualityClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Smoke CO Alarm Cluster
+//
+
+/** @brief Smoke CO Alarm Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSmokeCoAlarmClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Smoke CO Alarm Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterSmokeCoAlarmClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Smoke CO Alarm Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSmokeCoAlarmClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Smoke CO Alarm Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterSmokeCoAlarmClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Smoke CO Alarm Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterSmokeCoAlarmClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Smoke CO Alarm Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterSmokeCoAlarmClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Smoke CO Alarm Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfSmokeCoAlarmClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Smoke CO Alarm Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfSmokeCoAlarmClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // HEPA Filter Monitoring Cluster
@@ -5005,7 +5029,6 @@ void emberAfTonerCartridgeMonitoringClusterServerTickCallback(chip::EndpointId e
  * @param endpoint  Endpoint that is being served
  */
 void emberAfTonerCartridgeMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
->>>>>>> master
 
 //
 // Door Lock Cluster
@@ -7828,13 +7851,12 @@ bool emberAfModeSelectClusterChangeToModeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::DecodableType & commandData);
 /**
-<<<<<<< HEAD
  * @brief Smoke CO Alarm Cluster SelfTestRequest Command callback (from client)
  */
 bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
-=======
+/**
  * @brief HEPA Filter Monitoring Cluster ResetCondition Command callback (from client)
  */
 bool emberAfHepaFilterMonitoringClusterResetConditionCallback(
@@ -7906,7 +7928,6 @@ bool emberAfInkCartridgeMonitoringClusterResetConditionCallback(
 bool emberAfTonerCartridgeMonitoringClusterResetConditionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TonerCartridgeMonitoring::Commands::ResetCondition::DecodableType & commandData);
->>>>>>> master
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */

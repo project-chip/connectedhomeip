@@ -292,16 +292,16 @@
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
 #endif
 
-<<<<<<< HEAD
-#if defined(ZCL_USING_SMOKE_CO_ALARM_CLUSTER_SERVER) || defined(ZCL_USING_SMOKE_CO_ALARM_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER { chip::app::Clusters::SmokeCoAlarm::Id, "Smoke CO Alarm" },
-#else
-#define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER
-=======
 #if defined(ZCL_USING_AIR_QUALITY_CLUSTER_SERVER) || defined(ZCL_USING_AIR_QUALITY_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER { chip::app::Clusters::AirQuality::Id, "Air Quality" },
 #else
 #define CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER
+#endif
+
+#if defined(ZCL_USING_SMOKE_CO_ALARM_CLUSTER_SERVER) || defined(ZCL_USING_SMOKE_CO_ALARM_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER { chip::app::Clusters::SmokeCoAlarm::Id, "Smoke CO Alarm" },
+#else
+#define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER
 #endif
 
 #if defined(ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_CLIENT)
@@ -384,7 +384,6 @@
     { chip::app::Clusters::TonerCartridgeMonitoring::Id, "Toner Cartridge Monitoring" },
 #else
 #define CHIP_PRINTCLUSTER_TONER_CARTRIDGE_MONITORING_CLUSTER
->>>>>>> master
 #endif
 
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
@@ -619,10 +618,8 @@
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
-<<<<<<< HEAD
-    CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
-=======
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
     CHIP_PRINTCLUSTER_CERAMIC_FILTER_MONITORING_CLUSTER                                                                            \
@@ -635,7 +632,6 @@
     CHIP_PRINTCLUSTER_FUEL_TANK_MONITORING_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_INK_CARTRIDGE_MONITORING_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_TONER_CARTRIDGE_MONITORING_CLUSTER                                                                           \
->>>>>>> master
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \

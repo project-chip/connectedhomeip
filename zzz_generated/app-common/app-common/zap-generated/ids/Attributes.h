@@ -2459,7 +2459,40 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ModeSelect
 
-<<<<<<< HEAD
+namespace AirQuality {
+namespace Attributes {
+
+namespace AirQuality {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace AirQuality
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace AirQuality
+
 namespace SmokeCoAlarm {
 namespace Attributes {
 
@@ -2510,14 +2543,6 @@ static constexpr AttributeId Id = 0x0000000A;
 namespace SensitivityLevel {
 static constexpr AttributeId Id = 0x0000000B;
 } // namespace SensitivityLevel
-=======
-namespace AirQuality {
-namespace Attributes {
-
-namespace AirQuality {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace AirQuality
->>>>>>> master
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -2544,10 +2569,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-<<<<<<< HEAD
 } // namespace SmokeCoAlarm
-=======
-} // namespace AirQuality
 
 namespace HepaFilterMonitoring {
 namespace Attributes {
@@ -3100,7 +3122,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace TonerCartridgeMonitoring
->>>>>>> master
 
 namespace DoorLock {
 namespace Attributes {
