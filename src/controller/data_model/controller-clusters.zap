@@ -11430,7 +11430,7 @@
           "name": "Electrostatic Filter Monitoring",
           "code": 116,
           "mfgCode": null,
-          "define": "ELECTROSTATIC_FILTER_MONITORING",
+          "define": "ELECTROSTATIC_FILTER_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -11472,7 +11472,7 @@
           "name": "Electrostatic Filter Monitoring",
           "code": 116,
           "mfgCode": null,
-          "define": "ELECTROSTATIC_FILTER_MONITORING",
+          "define": "ELECTROSTATIC_FILTER_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -12066,7 +12066,7 @@
           "name": "Zeolite Filter Monitoring",
           "code": 119,
           "mfgCode": null,
-          "define": "ZEOLITE_FILTER_MONITORING",
+          "define": "ZEOLITE_FILTER_MONITORING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -12108,7 +12108,7 @@
           "name": "Zeolite Filter Monitoring",
           "code": 119,
           "mfgCode": null,
-          "define": "ZEOLITE_FILTER_MONITORING",
+          "define": "ZEOLITE_FILTER_MONITORING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [

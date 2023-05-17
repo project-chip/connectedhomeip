@@ -326,11 +326,12 @@
 #define CHIP_PRINTCLUSTER_CERAMIC_FILTER_MONITORING_CLUSTER
 #endif
 
-#if defined(ZCL_USING_ELECTROSTATIC_FILTER_MONITORING_SERVER) || defined(ZCL_USING_ELECTROSTATIC_FILTER_MONITORING_CLIENT)
-#define CHIP_PRINTCLUSTER_ELECTROSTATIC_FILTER_MONITORING                                                                          \
+#if defined(ZCL_USING_ELECTROSTATIC_FILTER_MONITORING_CLUSTER_SERVER) ||                                                           \
+    defined(ZCL_USING_ELECTROSTATIC_FILTER_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ELECTROSTATIC_FILTER_MONITORING_CLUSTER                                                                  \
     { chip::app::Clusters::ElectrostaticFilterMonitoring::Id, "Electrostatic Filter Monitoring" },
 #else
-#define CHIP_PRINTCLUSTER_ELECTROSTATIC_FILTER_MONITORING
+#define CHIP_PRINTCLUSTER_ELECTROSTATIC_FILTER_MONITORING_CLUSTER
 #endif
 
 #if defined(ZCL_USING_UV_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_UV_FILTER_MONITORING_CLUSTER_CLIENT)
@@ -346,11 +347,11 @@
 #define CHIP_PRINTCLUSTER_IONIZING_FILTER_MONITORING_CLUSTER
 #endif
 
-#if defined(ZCL_USING_ZEOLITE_FILTER_MONITORING_SERVER) || defined(ZCL_USING_ZEOLITE_FILTER_MONITORING_CLIENT)
-#define CHIP_PRINTCLUSTER_ZEOLITE_FILTER_MONITORING                                                                                \
+#if defined(ZCL_USING_ZEOLITE_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_ZEOLITE_FILTER_MONITORING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ZEOLITE_FILTER_MONITORING_CLUSTER                                                                        \
     { chip::app::Clusters::ZeoliteFilterMonitoring::Id, "Zeolite Filter Monitoring" },
 #else
-#define CHIP_PRINTCLUSTER_ZEOLITE_FILTER_MONITORING
+#define CHIP_PRINTCLUSTER_ZEOLITE_FILTER_MONITORING_CLUSTER
 #endif
 
 #if defined(ZCL_USING_OZONE_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_OZONE_FILTER_MONITORING_CLUSTER_CLIENT)
@@ -623,10 +624,10 @@
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
     CHIP_PRINTCLUSTER_CERAMIC_FILTER_MONITORING_CLUSTER                                                                            \
-    CHIP_PRINTCLUSTER_ELECTROSTATIC_FILTER_MONITORING                                                                              \
+    CHIP_PRINTCLUSTER_ELECTROSTATIC_FILTER_MONITORING_CLUSTER                                                                      \
     CHIP_PRINTCLUSTER_UV_FILTER_MONITORING_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_IONIZING_FILTER_MONITORING_CLUSTER                                                                           \
-    CHIP_PRINTCLUSTER_ZEOLITE_FILTER_MONITORING                                                                                    \
+    CHIP_PRINTCLUSTER_ZEOLITE_FILTER_MONITORING_CLUSTER                                                                            \
     CHIP_PRINTCLUSTER_OZONE_FILTER_MONITORING_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_WATER_TANK_MONITORING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_FUEL_TANK_MONITORING_CLUSTER                                                                                 \
