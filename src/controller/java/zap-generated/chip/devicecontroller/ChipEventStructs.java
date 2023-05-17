@@ -653,6 +653,88 @@ public class ChipEventStructs {
     }
   }
 
+  public static class TimeSynchronizationClusterDSTTableEmptyEvent {
+
+    public TimeSynchronizationClusterDSTTableEmptyEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterDSTTableEmptyEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TimeSynchronizationClusterDSTStatusEvent {
+    public Boolean DSTOffsetActive;
+
+    public TimeSynchronizationClusterDSTStatusEvent(Boolean DSTOffsetActive) {
+      this.DSTOffsetActive = DSTOffsetActive;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterDSTStatusEvent {\n");
+      output.append("\tDSTOffsetActive: ");
+      output.append(DSTOffsetActive);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TimeSynchronizationClusterTimeZoneStatusEvent {
+    public Long offset;
+    public Optional<String> name;
+
+    public TimeSynchronizationClusterTimeZoneStatusEvent(Long offset, Optional<String> name) {
+      this.offset = offset;
+      this.name = name;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterTimeZoneStatusEvent {\n");
+      output.append("\toffset: ");
+      output.append(offset);
+      output.append("\n");
+      output.append("\tname: ");
+      output.append(name);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TimeSynchronizationClusterTimeFailureEvent {
+
+    public TimeSynchronizationClusterTimeFailureEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterTimeFailureEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TimeSynchronizationClusterMissingTrustedTimeSourceEvent {
+
+    public TimeSynchronizationClusterMissingTrustedTimeSourceEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterMissingTrustedTimeSourceEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class BridgedDeviceBasicInformationClusterStartUpEvent {
     public Long softwareVersion;
 
