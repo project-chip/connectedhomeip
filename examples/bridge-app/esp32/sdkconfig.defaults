@@ -45,3 +45,6 @@ CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT=y
 
 # Disable softap support by default
 CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+
+# Enable HKDF in mbedtls
+CONFIG_MBEDTLS_HKDF_C=y
