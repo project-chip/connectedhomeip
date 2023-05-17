@@ -162,6 +162,7 @@ function(chip_zapgen TARGET_NAME)
             #       out links of template files and zap files and such
             SET(EXTRA_DEPENDENCIES
                 "${CHIP_ROOT}/src/app/zap-templates/partials/header.zapt"
+                "${CHIP_ROOT}/src/app/zap-templates/partials/idl/cluster_definition.zapt"
                 "${CHIP_ROOT}/src/app/zap-templates/partials/idl/command_request_response.zapt"
                 "${CHIP_ROOT}/src/app/zap-templates/partials/idl/command_request_struct.zapt"
                 "${CHIP_ROOT}/src/app/zap-templates/partials/idl/command_response_struct.zapt"
@@ -174,7 +175,7 @@ function(chip_zapgen TARGET_NAME)
                 "${CHIP_ROOT}/src/app/zap-templates/templates/app/endpoint_config.zapt"
                 "${CHIP_ROOT}/src/app/zap-templates/templates/app/gen_config.zapt"
                 "${CHIP_ROOT}/src/app/zap-templates/templates/app/im-cluster-command-handler.zapt"
-                "${CHIP_ROOT}/src/app/zap-templates/templates/app/MatterIDL.zapt"
+                "${CHIP_ROOT}/src/app/zap-templates/templates/app/MatterIDL_Server.zapt"
            )
            SET(OUTPUT_SUBDIR "zap-generated")
         else()
