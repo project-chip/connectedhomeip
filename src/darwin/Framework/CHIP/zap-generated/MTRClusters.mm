@@ -36,11 +36,11 @@
 using chip::Callback::Callback;
 using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
-using chip::Messaging::ExchangeManager;
-using chip::SessionHandle;
 using chip::Optional;
-using chip::System::Clock::Timeout;
+using chip::SessionHandle;
+using chip::Messaging::ExchangeManager;
 using chip::System::Clock::Seconds16;
+using chip::System::Clock::Timeout;
 
 static void MTRClustersLogEnqueue(NSString * logPrefix, MTRAsyncCallbackWorkQueue * workQueue)
 {
