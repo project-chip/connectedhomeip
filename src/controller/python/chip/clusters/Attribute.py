@@ -50,6 +50,7 @@ class EventPriority(Enum):
     DEBUG = 0
     INFO = 1
     CRITICAL = 2
+    INVALID = 3
 
 
 @dataclass
