@@ -183,7 +183,7 @@ tests:
       verification: |
           ./chip-tool ethernetnetworkdiagnostics read attribute-list 1 0
 
-          Verify " AttributeList " value consists the list of mandatory attributes (65533, 65532, 65531, 65529, 65528) and if DUT supports it lists optional attribute (0, 1, 2 , 3, 4, 5, 6, 7, 8) where 2, 3 if PCKCNT supported 4, 5, 6 if ERRCNT supported on the TH(Chip-tool) Log: 
+          Verify " AttributeList " value consists the list of mandatory attributes (65533, 65532, 65531, 65529, 65528) and if DUT supports it lists optional attribute (0, 1, 2 , 3, 4, 5, 6, 7, 8) where 2, 3 if PCKCNT supported 4, 5, 6 if ERRCNT supported on the TH(Chip-tool) Log:
 
           [1676280358.144465][4074:4076] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFB DataVersion: 1151677028
           [1676280358.144560][4074:4076] CHIP:TOO:   AttributeList: 15 entries

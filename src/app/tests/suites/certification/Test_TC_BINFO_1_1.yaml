@@ -267,7 +267,7 @@ tests:
           0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where XXXX is the
           allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
-          ./chip-tool  basicinformation read event-list 1 
+          ./chip-tool  basicinformation read event-list 1
 
           Verify "EventList " consists the list of supported events (0, 1, 2)on the TH(Chip-tool) Log:
 

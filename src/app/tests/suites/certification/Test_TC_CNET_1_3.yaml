@@ -354,7 +354,7 @@ tests:
           0x0000_FFFF), (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 -
           0xFFFF_FFFF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
       verification: |
-          ( WiFi) 
+          ( WiFi)
           ./chip-tool networkcommissioning read generated-command-list 1 0
 
 
@@ -378,7 +378,7 @@ tests:
           [1660315548.937327][32333:32338] CHIP:TOO:   GeneratedCommandList: 0 entries
 
 
-          ( Thread ) 
+          ( Thread )
           ./chip-tool networkcommissioning read generated-command-list 51 0
 
 

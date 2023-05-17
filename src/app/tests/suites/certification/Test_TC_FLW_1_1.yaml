@@ -82,7 +82,7 @@ tests:
       verification: |
           ./chip-tool flowmeasurement read  attribute-list 1 1
 
-          Verify " AttributeList " value consists the list of mandatory attributes (0, 1, 2), global attributes (65528, 65529, 65530, 65531, 65532, 65533) and if DUT supports it lists optional attribute (value 3 ) in RPI on the TH(Chip-tool) Log: 
+          Verify " AttributeList " value consists the list of mandatory attributes (0, 1, 2), global attributes (65528, 65529, 65530, 65531, 65532, 65533) and if DUT supports it lists optional attribute (value 3 ) in RPI on the TH(Chip-tool) Log:
 
           [1676283744.634470][6703:6705] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_FFFB DataVersion: 1355474720
           [1676283744.634550][6703:6705] CHIP:TOO:   AttributeList: 10 entries

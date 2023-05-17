@@ -73,7 +73,7 @@ tests:
       verification: |
           ./chip-tool userlabel read attribute-list 1 0
 
-          Verify "AttributeList"  contains a list of mandatory attributes (value 0) and  global attributes (65528, 65529, 65530, 65531, 65532, 65533) on the TH(Chip-tool) Log: 
+          Verify "AttributeList"  contains a list of mandatory attributes (value 0) and  global attributes (65528, 65529, 65530, 65531, 65532, 65533) on the TH(Chip-tool) Log:
 
           [1676293294.573680][3554:3556] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_FFFB DataVersion: 3959145955
           [1676293294.573778][3554:3556] CHIP:TOO:   AttributeList: 7 entries
