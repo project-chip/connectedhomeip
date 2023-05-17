@@ -332,7 +332,7 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
 
-idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)
+idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
 
 if(CONFIG_BT_ENABLED)
     idf_component_get_property(bt_lib bt COMPONENT_LIB)
@@ -385,7 +385,7 @@ endif()
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
-                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}>
+                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${mbedtls_lib}>
                                                 -Wl,--end-group)
 
 # Make the component dependent on our CHIP build
