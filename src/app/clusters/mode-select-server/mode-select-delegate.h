@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#ifndef SOME_UNIQUE_NAME_HERE
-#define SOME_UNIQUE_NAME_HERE
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -109,5 +107,3 @@ public:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-#endif
