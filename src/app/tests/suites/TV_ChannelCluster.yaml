@@ -287,15 +287,6 @@ tests:
 
     # Test Skip Channel Up 5 #
 
-    - label: "Test 5.1 - Start from Channel 3"
-      command: "ChangeChannelByNumber"
-      arguments:
-          values:
-              - name: "MajorNumber"
-                value: 9
-              - name: "MinorNumber"
-                value: 2
-
     - label: "Test 5.2 - Skip Up By 5"
       command: "SkipChannel"
       arguments:
@@ -543,15 +534,6 @@ tests:
               }
 
     # Test Skip Channel Down 5 #
-
-    - label: "Test 5.1 - Start from Channel 3"
-      command: "ChangeChannelByNumber"
-      arguments:
-          values:
-              - name: "MajorNumber"
-                value: 9
-              - name: "MinorNumber"
-                value: 2
 
     - label: "Test 5.2 - Skip Down By 5"
       command: "SkipChannel"

@@ -119,8 +119,9 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
         }
         else if (matchedChannels.size() == 0)
         {
-            // Keep track of index record only if there's channel matches
-            // Multiple matches is sign of error
+            // "index" is only used when we end up with matchedChannels.size() == 1.
+            // In that case, we want it to be the number of non-matching channels we saw before
+            // the matching one.
             index++;
         }
     }
