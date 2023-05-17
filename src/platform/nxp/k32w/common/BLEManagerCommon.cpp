@@ -929,6 +929,8 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
     event.CHIPoBLEConnectionError.ConId  = deviceId;
     event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
 
+    CancelBleAdvTimeoutTimer();
+
     PlatformMgr().PostEventOrDie(&event);
     mFlags.Set(Flags::kRestartAdvertising);
     mFlags.Set(Flags::kFastAdvertisingEnabled);
