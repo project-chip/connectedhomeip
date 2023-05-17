@@ -66,7 +66,7 @@ class TestParserBuilder:
         self.__tests = copy.copy(config.tests)
         self.__config = config
         self.__duration = 0
-        self.__done = False
+        self.done = False
 
     def __iter__(self):
         self.__config.hooks.start(len(self.__tests))
@@ -76,9 +76,9 @@ class TestParserBuilder:
         if len(self.__tests):
             return self.__get_test_parser(self.__tests.pop(0))
 
-        if not self.__done:
+        if not self.done:
             self.__config.hooks.stop(round(self.__duration))
-        self.__done = True
+        self.done = True
 
         raise StopIteration
 

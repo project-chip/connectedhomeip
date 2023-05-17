@@ -16,7 +16,7 @@
 name: 3.10.2. [TC-TGTNAV-8.2] Navigate Target Verification (DUT as Client)
 
 PICS:
-    - TGTNAV.S
+    - TGTNAV.C
 
 config:
     nodeId: 0x12344321

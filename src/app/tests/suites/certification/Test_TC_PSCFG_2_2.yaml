@@ -51,7 +51,7 @@ tests:
 
     - label:
           "TH reads the Order attribute from Power Source Cluster at
-          Enpoint[eNr] of the DUT"
+          Endpoint[eNr] of the DUT"
       verification: |
           ./chip-tool powersource read order 1 2
 

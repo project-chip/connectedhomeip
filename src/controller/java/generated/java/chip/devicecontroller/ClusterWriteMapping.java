@@ -591,6 +591,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("userLabel", writeUserLabelInteractionInfo);
     Map<String, InteractionInfo> writeBooleanStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("booleanState", writeBooleanStateInteractionInfo);
+    Map<String, InteractionInfo> writeIcdManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("icdManagement", writeIcdManagementInteractionInfo);
     Map<String, InteractionInfo> writeModeSelectInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeModeSelectStartUpModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -625,6 +627,40 @@ public class ClusterWriteMapping {
     writeModeSelectInteractionInfo.put(
         "writeOnModeAttribute", writeModeSelectOnModeAttributeInteractionInfo);
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
+    Map<String, InteractionInfo> writeAirQualityInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("airQuality", writeAirQualityInteractionInfo);
+    Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("hepaFilterMonitoring", writeHepaFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeActivatedCarbonFilterMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "activatedCarbonFilterMonitoring", writeActivatedCarbonFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeCeramicFilterMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("ceramicFilterMonitoring", writeCeramicFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeElectrostaticFilterMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "electrostaticFilterMonitoring", writeElectrostaticFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeUvFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("uvFilterMonitoring", writeUvFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeIonizingFilterMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("ionizingFilterMonitoring", writeIonizingFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeZeoliteFilterMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("zeoliteFilterMonitoring", writeZeoliteFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeOzoneFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("ozoneFilterMonitoring", writeOzoneFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeWaterTankMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("waterTankMonitoring", writeWaterTankMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeFuelTankMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("fuelTankMonitoring", writeFuelTankMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeInkCartridgeMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("inkCartridgeMonitoring", writeInkCartridgeMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeTonerCartridgeMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("tonerCartridgeMonitoring", writeTonerCartridgeMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

@@ -7024,11 +7024,169 @@
 - release: "TBD"
   versions: "future"
   introduced:
+      clusters:
+          - HEPAFilterMonitoring
+          - ActivatedCarbonFilterMonitoring
+          - CeramicFilterMonitoring
+          - ElectrostaticFilterMonitoring
+          - UVFilterMonitoring
+          - IonizingFilterMonitoring
+          - ZeoliteFilterMonitoring
+          - OzoneFilterMonitoring
+          - WaterTankMonitoring
+          - FuelTankMonitoring
+          - InkCartridgeMonitoring
+          - TonerCartridgeMonitoring
       attributes:
           BasicInformation:
               - ProductAppearance
           BridgedDeviceBasicInformation:
               - ProductAppearance
+          HEPAFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ActivatedCarbonFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          CeramicFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ElectrostaticFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          UVFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          IonizingFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ZeoliteFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OzoneFilterMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          WaterTankMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          FuelTankMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          InkCartridgeMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          TonerCartridgeMonitoring:
+              - Condition
+              - DegradationDirection
+              - ChangeIndication
+              - InPlaceIndicator
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+      commands:
+          HEPAFilterMonitoring:
+              - ResetCondition
+          ActivatedCarbonFilterMonitoring:
+              - ResetCondition
+          CeramicFilterMonitoring:
+              - ResetCondition
+          ElectrostaticFilterMonitoring:
+              - ResetCondition
+          UVFilterMonitoring:
+              - ResetCondition
+          IonizingFilterMonitoring:
+              - ResetCondition
+          ZeoliteFilterMonitoring:
+              - ResetCondition
+          OzoneFilterMonitoring:
+              - ResetCondition
+          WaterTankMonitoring:
+              - ResetCondition
+          FuelTankMonitoring:
+              - ResetCondition
+          InkCartridgeMonitoring:
+              - ResetCondition
+          TonerCartridgeMonitoring:
+              - ResetCondition
       structs:
           BasicInformation:
               - ProductAppearanceStruct
@@ -7050,6 +7208,42 @@
           BridgedDeviceBasicInformation:
               - ColorEnum
               - ProductFinishEnum
+          HEPAFilterMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          ActivatedCarbonFilterMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          CeramicFilterMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          ElectrostaticFilterMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          UVFilterMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          IonizingFilterMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          ZeoliteFilterMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          OzoneFilterMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          WaterTankMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          FuelTankMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          InkCartridgeMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
+          TonerCartridgeMonitoring:
+              - ChangeIndicationEnum
+              - DegradationDirectionEnum
       enum values:
           BasicInformation:
               ColorEnum:
@@ -7111,6 +7305,102 @@
                   - Rugged
                   - Fabric
                   - Other
+          HEPAFilterMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          ActivatedCarbonFilterMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          CeramicFilterMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          ElectrostaticFilterMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          UVFilterMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          IonizingFilterMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          ZeoliteFilterMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          OzoneFilterMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          WaterTankMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          FuelTankMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          InkCartridgeMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
+          TonerCartridgeMonitoring:
+              ChangeIndicationEnum:
+                  - OK
+                  - Warning
+                  - Critical
+              DegradationDirectionEnum:
+                  - Up
+                  - Down
       bitmaps:
           Groups:
               - GroupsFeature
@@ -7120,6 +7410,30 @@
               - PumpConfigurationAndControlFeature
           Scenes:
               - ScenesFeature
+          HEPAFilterMonitoring:
+              - Feature
+          ActivatedCarbonFilterMonitoring:
+              - Feature
+          CeramicFilterMonitoring:
+              - Feature
+          ElectrostaticFilterMonitoring:
+              - Feature
+          UVFilterMonitoring:
+              - Feature
+          IonizingFilterMonitoring:
+              - Feature
+          ZeoliteFilterMonitoring:
+              - Feature
+          OzoneFilterMonitoring:
+              - Feature
+          WaterTankMonitoring:
+              - Feature
+          FuelTankMonitoring:
+              - Feature
+          InkCartridgeMonitoring:
+              - Feature
+          TonerCartridgeMonitoring:
+              - Feature
       bitmap values:
           Groups:
               GroupsFeature:
@@ -7139,6 +7453,54 @@
           Scenes:
               ScenesFeature:
                   - SceneNames
+          HEPAFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          ActivatedCarbonFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          CeramicFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          ElectrostaticFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          UVFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          IonizingFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          ZeoliteFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          OzoneFilterMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          WaterTankMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          FuelTankMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          InkCartridgeMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
+          TonerCartridgeMonitoring:
+              Feature:
+                  - Condition
+                  - Warning
       ids:
           attributes:
               TimeSynchronization:
@@ -7211,6 +7573,31 @@
   provisional:
       # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
+      attributes:
+          HEPAFilterMonitoring:
+              - EventList
+          ActivatedCarbonFilterMonitoring:
+              - EventList
+          CeramicFilterMonitoring:
+              - EventList
+          ElectrostaticFilterMonitoring:
+              - EventList
+          UVFilterMonitoring:
+              - EventList
+          IonizingFilterMonitoring:
+              - EventList
+          ZeoliteFilterMonitoring:
+              - EventList
+          OzoneFilterMonitoring:
+              - EventList
+          WaterTankMonitoring:
+              - EventList
+          FuelTankMonitoring:
+              - EventList
+          InkCartridgeMonitoring:
+              - EventList
+          TonerCartridgeMonitoring:
+              - EventList
       ids:
           attributes:
               TimeSynchronization:

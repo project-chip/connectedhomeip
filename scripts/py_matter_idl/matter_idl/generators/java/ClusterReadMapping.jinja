@@ -23,13 +23,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ClusterReadMapping {
-    public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
-        Map<String, Map<String, InteractionInfo>> readAttributeMap = new HashMap<>();
 
-    {%- for cluster in clientClusters | sort(attribute='code') %}
-      {%-  set typeLookup = idl | createLookupContext(cluster) %}
-        Map<String, InteractionInfo> read{{cluster.name}}InteractionInfo = new LinkedHashMap<>();
-      {%- for attribute in cluster.attributes | sort(attribute='name') | attributesWithCallback(typeLookup) %}
+{% for cluster in clientClusters | sort(attribute='code') %}
+  {%-  set typeLookup = idl | createLookupContext(cluster) %}
+    private static Map<String, InteractionInfo> read{{cluster.name}}InteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();
+     {%- for attribute in cluster.attributes | sort(attribute='name') | attributesWithCallback(typeLookup) %}
         {#- TODO: add support for struct-typed attributes -#}
         Map<String, CommandParameterInfo> read{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo read{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo = new InteractionInfo(
@@ -41,11 +40,20 @@ public class ClusterReadMapping {
           () -> new ClusterInfoMapping.{{ attribute | delegatedCallbackName(typeLookup)}}(),
           read{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams
         );
-        read{{cluster.name}}InteractionInfo.put("read{{attribute.definition.name | upfirst}}Attribute", read{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo);
-      {%- endfor %}
-        readAttributeMap.put("{{cluster.name | lowfirst_except_acronym}}", read{{cluster.name}}InteractionInfo);
+        result.put("read{{attribute.definition.name | upfirst}}Attribute", read{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo);
+     {% endfor %}
+       return result;
+    }
+
+{%- endfor %}
+    @SuppressWarnings("serial")
+    public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
+
+        return new HashMap<String, Map<String, InteractionInfo>>(){% raw %}{{{% endraw %}
+    {%- for cluster in clientClusters | sort(attribute='code') %}
+            put("{{cluster.name | lowfirst_except_acronym}}", read{{cluster.name}}InteractionInfo());
     {%- endfor -%}
-        return readAttributeMap;
+        }};
     }
 }
 

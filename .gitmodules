@@ -58,7 +58,7 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13x2_26x2,bouffalolab,efr32,esp32,k32w0,infineon,qpg,cc32xx,silabs_docker
+	platforms = ameba,cc13xx_26xx,bouffalolab,efr32,esp32,k32w0,infineon,qpg,cc32xx,silabs_docker
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
@@ -224,12 +224,17 @@
 	path = third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx
 	url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
 	branch = main
-	platforms = cc13x2_26x2
+	platforms = cc13xx_26xx
 [submodule "third_party/ti_simplelink_sdk/repo_cc32xx"]
 	path = third_party/ti_simplelink_sdk/repo_cc32xx
 	url = https://github.com/TexasInstruments/cc32xx_open_sdk.git
 	branch = main
 	platforms = cc32xx
+[submodule "third_party/openthread/ot-ti"]
+	path = third_party/openthread/ot-ti
+	url = https://github.com/TexasInstruments/ot-ti.git
+	branch = main
+	platforms = cc13xx_26xx
 [submodule "third_party/nxp/mw320_sdk/repo"]
 	path = third_party/nxp/mw320_sdk/repo
 	url = https://github.com/nxptest/mw320_sdk
@@ -293,3 +298,13 @@
 	path = third_party/imgui/repo
 	url = https://github.com/ocornut/imgui
 	platforms = linux
+[submodule "third_party/asr/asr582x/asr_sdk"]
+	path = third_party/asr/asr582x/asr_sdk
+	url = https://github.com/asriot/ASR582X_Freertos.git
+	branch = matter
+	platforms = asr
+[submodule "third_party/asr/asr595x/asr_sdk"]
+	path = third_party/asr/asr595x/asr_sdk
+	url = https://github.com/asriot/ASR595X_Freertos.git
+	branch = matter
+	platforms = asr

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1768,6 +1768,40 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
     return ExtractKIDFromX509Cert(false, certificate, akid);
 }
 
+CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber)
+{
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    uint8_t * p      = nullptr;
+    size_t len       = 0;
+    mbedtls_x509_crt mbed_cert;
+
+    mbedtls_x509_crt_init(&mbed_cert);
+
+    result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(certificate.data()), certificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    p   = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(serial).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
+    len = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(serial).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
+    VerifyOrExit(len <= serialNumber.size(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(serialNumber.data(), p, len);
+    serialNumber.reduce_size(len);
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_x509_crt_free(&mbed_cert);
+
+#else
+    (void) certificate;
+    (void) serialNumber;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
+    return error;
+}
+
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
@@ -1825,9 +1859,9 @@ exit:
 }
 
 namespace {
-#if defined(MBEDTLS_X509_CRT_PARSE_C)
-CHIP_ERROR ExtractRawSubjectFromX509Cert(const ByteSpan & certificate, MutableByteSpan & subject)
+CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certificate, MutableByteSpan & dn)
 {
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     uint8_t * p      = nullptr;
@@ -1840,28 +1874,50 @@ CHIP_ERROR ExtractRawSubjectFromX509Cert(const ByteSpan & certificate, MutableBy
     result = mbedtls_x509_crt_parse(&mbedCertificate, Uint8::to_const_uchar(certificate.data()), certificate.size());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    len = mbedCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(subject_raw).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
-    p   = mbedCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(subject_raw).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
+    if (extractSubject)
+    {
+        len = mbedCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(subject_raw).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
+        p   = mbedCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(subject_raw).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
+    }
+    else
+    {
+        len = mbedCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(issuer_raw).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
+        p   = mbedCertificate.CHIP_CRYPTO_PAL_PRIVATE_X509(issuer_raw).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
+    }
 
-    VerifyOrExit(len <= subject.size(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(subject.data(), p, len);
-    subject.reduce_size(len);
+    VerifyOrExit(len <= dn.size(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(dn.data(), p, len);
+    dn.reduce_size(len);
 
 exit:
     _log_mbedTLS_error(result);
     mbedtls_x509_crt_free(&mbedCertificate);
 
+#else
+    (void) certificate;
+    (void) dn;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
     return error;
 }
-#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 } // namespace
+
+CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteSpan & subject)
+{
+    return ExtractRawDNFromX509Cert(true, certificate, subject);
+}
+
+CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer)
+{
+    return ExtractRawDNFromX509Cert(false, certificate, issuer);
+}
 
 CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate, const ByteSpan * candidateCertificates,
                                           size_t candidateCertificatesCount, ByteSpan & outCertificate)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
-    constexpr size_t kMaxCertificateSubjectLength = 150;
-    uint8_t referenceSubjectBuf[kMaxCertificateSubjectLength];
+    uint8_t referenceSubjectBuf[kMaxCertificateDistinguishedNameLength];
     uint8_t referenceSKIDBuf[kSubjectKeyIdentifierLength];
     MutableByteSpan referenceSubject(referenceSubjectBuf);
     MutableByteSpan referenceSKID(referenceSKIDBuf);
@@ -1870,18 +1926,18 @@ CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate,
 
     ReturnErrorCodeIf(candidateCertificates == nullptr || candidateCertificatesCount == 0, CHIP_NO_ERROR);
 
-    ReturnErrorOnFailure(ExtractRawSubjectFromX509Cert(referenceCertificate, referenceSubject));
+    ReturnErrorOnFailure(ExtractSubjectFromX509Cert(referenceCertificate, referenceSubject));
     ReturnErrorOnFailure(ExtractSKIDFromX509Cert(referenceCertificate, referenceSKID));
 
     for (size_t i = 0; i < candidateCertificatesCount; i++)
     {
         const ByteSpan candidateCertificate = candidateCertificates[i];
-        uint8_t candidateSubjectBuf[kMaxCertificateSubjectLength];
+        uint8_t candidateSubjectBuf[kMaxCertificateDistinguishedNameLength];
         uint8_t candidateSKIDBuf[kSubjectKeyIdentifierLength];
         MutableByteSpan candidateSubject(candidateSubjectBuf);
         MutableByteSpan candidateSKID(candidateSKIDBuf);
 
-        ReturnErrorOnFailure(ExtractRawSubjectFromX509Cert(candidateCertificate, candidateSubject));
+        ReturnErrorOnFailure(ExtractSubjectFromX509Cert(candidateCertificate, candidateSubject));
         ReturnErrorOnFailure(ExtractSKIDFromX509Cert(candidateCertificate, candidateSKID));
 
         if (referenceSKID.data_equal(candidateSKID) && referenceSubject.data_equal(candidateSubject))

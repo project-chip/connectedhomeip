@@ -35,8 +35,8 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
 
-          ./chip-tool audiooutput rename-output 1 "Kitchen Speakers" 1 1
-          ./chip-tv-casting-app audiooutput rename-output 1 "Kitchen Speakers" 1 1
+          ./chip-tool audiooutput rename-output 1 'Kitchen Speakers' 1 1
+          ./chip-tv-casting-app audiooutput rename-output 1 'Kitchen Speakers' 1 1
 
 
           The log below shows the resulting log on the TH (tv-app or all-clusters-app):

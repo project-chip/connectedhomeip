@@ -19,10 +19,11 @@ import asyncio
 import logging
 import random
 import re
-import shlex
 
 from chip import discovery, exceptions
+from chip.clusters import Attribute as ClusterAttribute
 from chip.clusters import Objects as GeneratedObjects
+from chip.interaction_model import delegate as IM
 from chip.setup_payload import SetupPayload
 
 log = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ def get_setup_payload(device):
     :param device: serial device instance
     :return: setup payload or None
     """
-    ret = device.wait_for_output("SetupQRCode")
+    ret = device.wait_for_output("SetupQRCode", timeout=30)
     if ret is None or len(ret) < 2:
         return None
 
@@ -74,9 +75,10 @@ def discover_device(devCtrl, setupPayload):
     return res[0]
 
 
-def connect_device(setupPayload, commissionableDevice, nodeId=None):
+def connect_device(devCtrl, setupPayload, commissionableDevice, nodeId=None):
     """
     Connect to Matter discovered device on network
+    :param devCtrl: device controller instance
     :param setupPayload: device setup payload
     :param commissionableDevice: CommissionableNode object with discovered device
     :param nodeId: device node ID
@@ -87,9 +89,13 @@ def connect_device(setupPayload, commissionableDevice, nodeId=None):
 
     pincode = int(setupPayload.attributes['SetUpPINCode'])
     try:
-        commissionableDevice.Commission(nodeId, pincode)
+        res = devCtrl.CommissionOnNetwork(
+            nodeId, pincode, filterType=discovery.FilterType.INSTANCE_NAME, filter=commissionableDevice.instanceName)
     except exceptions.ChipStackError as ex:
         log.error("Commission discovered device failed {}".format(str(ex)))
+        return None
+    if not res:
+        log.info("Commission discovered device failed")
         return None
     return nodeId
 
@@ -109,89 +115,28 @@ def disconnect_device(devCtrl, nodeId):
     return True
 
 
-class ParsingError(exceptions.ChipStackException):
-    def __init__(self, msg=None):
-        self.msg = "Parsing Error: " + msg
-
-    def __str__(self):
-        return self.msg
-
-
-def ParseEncodedString(value):
-    if value.find(":") < 0:
-        raise ParsingError(
-            "Value should be encoded in encoding:encodedvalue format")
-    enc, encValue = value.split(":", 1)
-    if enc == "str":
-        return encValue.encode("utf-8") + b'\x00'
-    elif enc == "hex":
-        return bytes.fromhex(encValue)
-    raise ParsingError("Only str and hex encoding is supported")
-
-
-def ParseValueWithType(value, type):
-    if type == 'int':
-        return int(value)
-    elif type == 'str':
-        return value
-    elif type == 'bytes':
-        return ParseEncodedString(value)
-    elif type == 'bool':
-        return (value.upper() not in ['F', 'FALSE', '0'])
-    else:
-        raise ParsingError('Cannot recognize type: {}'.format(type))
-
-
-def ParseValueWithStruct(value, cluster):
-    return eval(f"GeneratedObjects.{cluster}.Structs.{value}")
-
-
-def ParseValue(value, valueType, cluster):
-    if valueType:
-        return ParseValueWithType(value, valueType)
-    elif value.find(":") > 0 and value.split(":", 1)[0] == "struct":
-        return ParseValueWithStruct(value.split(":", 1)[1], cluster)
-    else:
-        raise ParsingError('Cannot parse value: {}'.format(value))
-
-
-def FormatZCLArguments(cluster, args, cmdArgsWithType):
-    cmdArgsDict = {}
-    for kvPair in args:
-        if kvPair.find("=") < 0:
-            raise ParsingError("Argument should in key=value format")
-        key, value = kvPair.split("=", 1)
-        valueType = cmdArgsWithType.get(key, None)
-        cmdArgsDict[key] = ParseValue(value, valueType, cluster)
-    return cmdArgsDict
-
-
-def send_zcl_command(devCtrl, line, requestTimeoutMs: int = None):
+def send_zcl_command(devCtrl, cluster: str, command: str, nodeId: int, endpoint: int, args, requestTimeoutMs: int = None):
     """
-    Format and send ZCL message to device.
+    Send ZCL command to device.
     :param devCtrl: device controller instance
-    :param line: command line
+    :param cluster: cluster name
+    :param command: command name
+    :param nodeId: device node ID
+    :param endpoint: device endpoint
+    :parma args: command argument in dictionary format
     :param requestTimeoutMs: command request timeout in ms
     :return: error code and command response
     """
     res = None
     err = 0
     try:
-        args = shlex.split(line)
-        if len(args) < 4:
-            raise exceptions.InvalidArgumentCount(4, len(args))
-
-        cluster, command, nodeId, endpoint = args[0:4]
-        cmdArgsLine = args[4:]
         allCommands = devCtrl.ZCLCommandList()
         if cluster not in allCommands:
             raise exceptions.UnknownCluster(cluster)
-        cmdArgsWithType = allCommands.get(cluster).get(command, None)
-        # When command takes no arguments, (not command) is True
-        if command is None:
+        cmd = allCommands.get(cluster).get(command)
+        if cmd is None:
             raise exceptions.UnknownCommand(cluster, command)
 
-        args = FormatZCLArguments(cluster, cmdArgsLine, cmdArgsWithType)
         clusterObj = getattr(GeneratedObjects, cluster)
         commandObj = getattr(clusterObj.Commands, command)
         req = commandObj(**args)
@@ -208,32 +153,76 @@ def send_zcl_command(devCtrl, line, requestTimeoutMs: int = None):
     return (err, res)
 
 
-def read_zcl_attribute(devCtrl, line):
+def write_zcl_attribute(devCtrl, cluster: str, attribute: str, nodeId: int, endpoint: int, value):
     """
-    Read ZCL attribute from device:
-    <cluster> <attribute> <nodeid> <endpoint>
+    Write ZCL attribute to device.
     :param devCtrl: device controller instance
-    :param line: command line
+    :param cluster: cluster name
+    :param attribute: attribute name
+    :param nodeId: device node ID
+    :param endpoint: device endpoint
+    :parma value: attribute value to write
     :return: error code and attribute response
     """
     res = None
     err = 0
     try:
-        args = shlex.split(line)
-        if len(args) < 4:
-            raise exceptions.InvalidArgumentCount(4, len(args))
-
-        cluster, attribute, nodeId, endpoint = args[0:4]
         allAttrs = devCtrl.ZCLAttributeList()
         if cluster not in allAttrs:
             raise exceptions.UnknownCluster(cluster)
 
-        attrDetails = allAttrs.get(cluster).get(attribute, None)
+        attrDetails = allAttrs.get(cluster).get(attribute)
         if attrDetails is None:
             raise exceptions.UnknownAttribute(cluster, attribute)
 
-        res = devCtrl.ZCLReadAttribute(cluster, attribute, int(
-            nodeId), int(endpoint), 0)
+        clusterObj = getattr(GeneratedObjects, cluster)
+        attributeObj = getattr(clusterObj.Attributes, attribute)
+        req = attributeObj(value)
+
+        res = asyncio.run(devCtrl.WriteAttribute(nodeId, [(endpoint, req)]))
+
+    except exceptions.ChipStackException as ex:
+        log.error("An exception occurred during processing ZCL attribute: {}".format(str(ex)))
+        err = -1
+    except Exception as ex:
+        log.error("An exception occurred during processing input: {}".format(str(ex)))
+        err = -1
+
+    return (err, res)
+
+
+def read_zcl_attribute(devCtrl, cluster: str, attribute: str, nodeId: int, endpoint: int):
+    """
+    Read ZCL attribute from device.
+    :param devCtrl: device controller instance
+    :param cluster: cluster name
+    :param attribute: attribute name
+    :param nodeId: device node ID
+    :param endpoint: device endpoint
+    :return: error code and attribute response
+    """
+    res = None
+    err = 0
+    try:
+        allAttrs = devCtrl.ZCLAttributeList()
+        if cluster not in allAttrs:
+            raise exceptions.UnknownCluster(cluster)
+
+        attrDetails = allAttrs.get(cluster).get(attribute)
+        if attrDetails is None:
+            raise exceptions.UnknownAttribute(cluster, attribute)
+
+        clusterObj = getattr(GeneratedObjects, cluster)
+        attributeObj = getattr(clusterObj.Attributes, attribute)
+
+        result = asyncio.run(devCtrl.ReadAttribute(nodeId, [(endpoint, attributeObj)]))
+
+        path = ClusterAttribute.AttributePath(
+            EndpointId=endpoint, Attribute=attributeObj)
+
+        res = IM.AttributeReadResult(path=IM.AttributePath(nodeId=nodeId, endpointId=path.EndpointId, clusterId=path.ClusterId,
+                                     attributeId=path.AttributeId), status=0, value=result[endpoint][clusterObj][attributeObj])
+
     except exceptions.ChipStackException as ex:
         log.error("An exception occurred during processing ZCL attribute: {}".format(str(ex)))
         err = -1

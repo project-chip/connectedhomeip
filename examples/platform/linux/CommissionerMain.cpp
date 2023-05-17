@@ -55,10 +55,6 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/KeyValueStoreManager.h>
 
-#if defined(PW_RPC_ENABLED)
-#include <CommonRpc.h>
-#endif
-
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED

@@ -119,6 +119,6 @@ tests:
           Verify the Multicast address follows the format "FF35:0040:FD<Fabric ID>00:<Group ID> and UDP port is 5540   on DUT(chip-tool)log
 
           <<< [E:15304i M:15000] (G) Msg TX to 1:FFFFFFFFFFFF0001 [D5AE] --- Type 0001:08 (IM:InvokeCommandRequest)
-          [1670395515.064662][14427:14429] CHIP:IN: (G) Sending msg 15000 to Multicast IPV6 address "UDP:[ff35:40:fd00::100:1]:5540"
+          [1670395515.064662][14427:14429] CHIP:IN: (G) Sending msg 15000 to Multicast IPV6 address 'UDP:[ff35:40:fd00::100:1]:5540'
           [1670395515.067533][14427:14429] CHIP:IN: Interface eth0 has a link local address
       disabled: true

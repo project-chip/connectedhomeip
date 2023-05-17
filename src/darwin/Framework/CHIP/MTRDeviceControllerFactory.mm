@@ -57,6 +57,7 @@ static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while c
 static NSString * const kErrorDACVerifierInit = @"Init failure while creating the device attestation verifier";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
+static NSString * const kErrorCertificateValidityPolicyInit = @"Init certificate validity policy failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
 static NSString * const kErrorKeystoreInit = @"Init failure while initializing persistent storage keystore";
 static NSString * const kErrorCertStoreInit = @"Init failure while initializing persistent storage operational certificate store";
@@ -86,6 +87,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property (readonly) MTROperationalBrowser * operationalBrowser;
 @property () chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
 @property (readonly) BOOL advertiseOperational;
+@property (nonatomic, readonly) Credentials::IgnoreCertificateValidityPeriodPolicy * certificateValidityPolicy;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(MTRDeviceControllerStartupParams *)params
@@ -150,6 +152,11 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         return nil;
     }
 
+    _certificateValidityPolicy = new Credentials::IgnoreCertificateValidityPeriodPolicy();
+    if ([self checkForInitError:(_certificateValidityPolicy != nil) logMsg:kErrorCertificateValidityPolicyInit]) {
+        return nil;
+    }
+
     return self;
 }
 
@@ -203,6 +210,11 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     if (_sessionKeystore) {
         delete _sessionKeystore;
         _sessionKeystore = nullptr;
+    }
+
+    if (_certificateValidityPolicy) {
+        delete _certificateValidityPolicy;
+        _certificateValidityPolicy = nullptr;
     }
 }
 
@@ -443,6 +455,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
         params.operationalKeystore = _keystore;
         params.opCertStore = _opCertStore;
+        params.certificateValidityPolicy = _certificateValidityPolicy;
         errorCode = _controllerFactory->Init(params);
         if (errorCode != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);

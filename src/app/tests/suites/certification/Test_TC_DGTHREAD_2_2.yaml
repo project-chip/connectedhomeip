@@ -16,6 +16,7 @@ name: 50.2.2. [TC-DGTHREAD-2.2] Attributes-Tx [DUT- Server]
 
 PICS:
     - DGTHREAD.S
+    - DGTHREAD.S.F03
 
 config:
     nodeId: 0x12344321
