@@ -342,6 +342,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback
+    : public Callback::Callback<CHIPTimeSynchronizationClusterSetTimeZoneResponseCallbackType>
+{
+public:
+    CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback(jobject javaCallback);
+
+    ~CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPOperationalCredentialsClusterAttestationResponseCallback
     : public Callback::Callback<CHIPOperationalCredentialsClusterAttestationResponseCallbackType>
 {
