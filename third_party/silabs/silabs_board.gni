@@ -41,6 +41,9 @@ declare_args() {
   #Disable MQTT by default
   enable_dic = false
 
+  #Disbale DIC nvm embed cert by default
+  sl_enable_dic_nvm_embed_cert = false
+
   # Disable UART log forwarding by default
   sl_uart_log_output = false
 }

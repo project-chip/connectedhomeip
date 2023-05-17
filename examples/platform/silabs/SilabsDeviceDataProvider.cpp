@@ -145,7 +145,7 @@ CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
-#if defined(DIC_ENABLE) && defined(DIC_ENABLE_NVM_SUPPORT)
+#ifdef SL_DIC_NVM_EMBED_CERT
     if (strlen(ca_cert) != 0)
     {
         err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_CACerts, ca_cert);
@@ -170,7 +170,7 @@ CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
-#endif // DIC_ENABLE & DIC_ENABLE_NVM_SUPPORT
+#endif // SL_DIC_NVM_EMBED_CERT
     if (strlen(vendorName) != 0)
     {
         err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_VendorName, vendorName);
