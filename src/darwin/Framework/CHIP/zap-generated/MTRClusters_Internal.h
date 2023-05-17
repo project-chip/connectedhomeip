@@ -198,11 +198,6 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterICDManagement ()
-@property (nonatomic, readonly) uint16_t endpoint;
-@property (nonatomic, readonly) MTRDevice * device;
-@end
-
 @interface MTRClusterModeSelect ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;

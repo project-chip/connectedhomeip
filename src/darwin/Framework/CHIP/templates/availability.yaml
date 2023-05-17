@@ -6214,10 +6214,6 @@
                   - Dual
               CredentialRuleEnum:
                   - Double
-  provisional:
-      clusters:
-          # Not ready to be public API yet.
-          - ClientMonitoring
   renames:
       clusters:
           UnitTesting: TestCluster
@@ -7025,6 +7021,7 @@
   versions: "future"
   introduced:
       clusters:
+          - AirQuality
           - HEPAFilterMonitoring
           - ActivatedCarbonFilterMonitoring
           - CeramicFilterMonitoring
@@ -7038,6 +7035,13 @@
           - InkCartridgeMonitoring
           - TonerCartridgeMonitoring
       attributes:
+          AirQuality:
+              - AirQuality
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           BasicInformation:
               - ProductAppearance
           BridgedDeviceBasicInformation:
@@ -7202,6 +7206,8 @@
                   - finish
                   - primaryColor
       enums:
+          AirQuality:
+              - AirQualityEnum
           BasicInformation:
               - ColorEnum
               - ProductFinishEnum
@@ -7245,6 +7251,15 @@
               - ChangeIndicationEnum
               - DegradationDirectionEnum
       enum values:
+          AirQuality:
+              AirQualityEnum:
+                  - Unknown
+                  - Good
+                  - Fair
+                  - Moderate
+                  - Poor
+                  - VeryPoor
+                  - ExtremelyPoor
           BasicInformation:
               ColorEnum:
                   - Black
@@ -7402,6 +7417,8 @@
                   - Up
                   - Down
       bitmaps:
+          AirQuality:
+              - Feature
           Groups:
               - GroupsFeature
           PressureMeasurement:
@@ -7435,6 +7452,12 @@
           TonerCartridgeMonitoring:
               - Feature
       bitmap values:
+          AirQuality:
+              Feature:
+                  - Fair
+                  - Moderate
+                  - VeryPoor
+                  - ExtremelyPoor
           Groups:
               GroupsFeature:
                   - GroupNames
@@ -7571,9 +7594,14 @@
           PumpConfigurationAndControl:
               PumpConfigurationAndControlFeature: PumpFeature
   provisional:
+      clusters:
+          # Not ready to be public API yet.
+          - ICDManagement
       # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
       attributes:
+          AirQuality:
+              - EventList
           HEPAFilterMonitoring:
               - EventList
           ActivatedCarbonFilterMonitoring:

@@ -275,7 +275,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeProxyDiscoveryID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000043,
     MTRClusterIDTypeProxyValidID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000044,
     MTRClusterIDTypeBooleanStateID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
-    MTRClusterIDTypeICDManagementID MTR_NEWLY_AVAILABLE = 0x00000046,
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
     MTRClusterIDTypeAirQualityID MTR_NEWLY_AVAILABLE = 0x0000005B,
     MTRClusterIDTypeHEPAFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000071,
@@ -3590,23 +3589,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterBooleanStateAttributeFeatureMapID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterBooleanStateAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster ICDManagement attributes
-    MTRAttributeIDTypeClusterICDManagementAttributeIdleModeIntervalID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterICDManagementAttributeActiveModeIntervalID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterICDManagementAttributeActiveModeThresholdID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterICDManagementAttributeRegisteredClientsID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterICDManagementAttributeICDCounterID MTR_NEWLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterICDManagementAttributeClientsSupportedPerFabricID MTR_NEWLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterICDManagementAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterICDManagementAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterICDManagementAttributeAttributeListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterICDManagementAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterICDManagementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ModeSelect deprecated attribute names
@@ -8959,12 +8941,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesResponseID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000005,
-
-    // Cluster ICDManagement commands
-    MTRCommandIDTypeClusterICDManagementCommandRegisterClientID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterICDManagementCommandRegisterClientResponseID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterICDManagementCommandUnregisterClientID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterICDManagementCommandStayActiveRequestID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster ModeSelect deprecated command id names
     MTRClusterModeSelectCommandChangeToModeID MTR_DEPRECATED("Please use MTRCommandIDTypeClusterModeSelectCommandChangeToModeID",
