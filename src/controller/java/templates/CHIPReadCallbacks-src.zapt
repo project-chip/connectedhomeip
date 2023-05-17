@@ -1,5 +1,4 @@
 {{> header}}
-{{#if_enabled_clusters side='client'}}
 #include <jni/CHIPReadCallbacks.h>
 
 #include <zap-generated/CHIPClientCallbacks.h>
@@ -174,5 +173,3 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
 {{/if_unsupported_attribute_callback}}
 {{/zcl_attributes_server}}
 {{/zcl_clusters}}
-
-{{/if_enabled_clusters}}
