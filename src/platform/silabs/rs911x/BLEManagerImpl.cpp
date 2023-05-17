@@ -118,7 +118,6 @@ void sl_ble_event_handling_task(void)
         case RSI_BLE_CONN_EVENT: {
             rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
             BLEMgrImpl().HandleConnectEvent();
-            SILABS_LOG("%s Module got connected", __func__);
             // Requests the connection parameters change with the remote device
             rsi_ble_conn_params_update(event_msg.resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
                                        BLE_MAX_CONNECTION_INTERVAL_MS, BLE_SLAVE_LATENCY_MS, BLE_TIMEOUT_MS);
@@ -126,7 +125,6 @@ void sl_ble_event_handling_task(void)
         break;
         case RSI_BLE_DISCONN_EVENT: {
             // event invokes when disconnection was completed
-            SILABS_LOG("%s Module got Disconnected", __func__);
             BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
@@ -134,7 +132,6 @@ void sl_ble_event_handling_task(void)
         break;
         case RSI_BLE_MTU_EVENT: {
             // event invokes when write/notification events received
-            SILABS_LOG("%s RSI_BLE_MTU_EVENT", __func__);
             BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
@@ -142,14 +139,12 @@ void sl_ble_event_handling_task(void)
         break;
         case RSI_BLE_GATT_WRITE_EVENT: {
             // event invokes when write/notification events received
-            SILABS_LOG("%s RSI_BLE_GATT_WRITE_EVENT", __func__);
             BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
         }
         break;
         case RSI_BLE_GATT_INDICATION_CONFIRMATION: {
-            SILABS_LOG("%s indication confirmation", __func__);
             BLEMgrImpl().HandleTxConfirmationEvent(1);
             rsi_ble_app_clear_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
         }
