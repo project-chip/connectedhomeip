@@ -14028,20 +14028,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
 } // namespace ClearUser.
 namespace SetCredential {
-=======
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace WindowCovering
-namespace BarrierControl {
-
-namespace Commands {
-namespace BarrierControlGoToPercent {
->>>>>>> 527fe00c24 (Update the generated files)
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -14110,7 +14098,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-<<<<<<< HEAD
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14138,10 +14125,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         }
     }
-=======
-namespace Events {
-} // namespace Events
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
@@ -14184,23 +14167,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
 } // namespace GetCredentialStatus.
 namespace GetCredentialStatusResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-=======
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace BarrierControl
-namespace PumpConfigurationAndControl {
-
-namespace Commands {} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
->>>>>>> 527fe00c24 (Update the generated files)
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
@@ -14372,33 +14341,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::NumberOfHolidaySchedulesSupported::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, numberOfHolidaySchedulesSupported));
         break;
-<<<<<<< HEAD
     case Attributes::MaxPINCodeLength::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, maxPINCodeLength));
-=======
-    }
-
-    return CHIP_NO_ERROR;
-}
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace BarrierControl
-namespace PumpConfigurationAndControl {
-
-namespace Commands {
-} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
-    {
-    case Attributes::MaxPressure::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, maxPressure));
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
         break;
     case Attributes::MinPINCodeLength::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, minPINCodeLength));
@@ -15584,13 +15528,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
-=======
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -15611,7 +15548,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
     }
 
-<<<<<<< HEAD
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
@@ -15625,22 +15561,14 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-=======
-namespace Commands {
-} // namespace Commands
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-<<<<<<< HEAD
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
     VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
-<<<<<<< HEAD
-=======
-=======
     {
         if (!TLV::IsContextTag(reader.GetTag()))
         {
@@ -15657,301 +15585,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace ClearWeeklySchedule.
-} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
-    {
-    case Attributes::LocalTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, localTemperature));
-        break;
-    case Attributes::OutdoorTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, outdoorTemperature));
-        break;
-    case Attributes::Occupancy::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupancy));
-        break;
-    case Attributes::AbsMinHeatSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, absMinHeatSetpointLimit));
-        break;
-    case Attributes::AbsMaxHeatSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, absMaxHeatSetpointLimit));
-        break;
-    case Attributes::AbsMinCoolSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, absMinCoolSetpointLimit));
-        break;
-    case Attributes::AbsMaxCoolSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, absMaxCoolSetpointLimit));
-        break;
-    case Attributes::PICoolingDemand::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, PICoolingDemand));
-        break;
-    case Attributes::PIHeatingDemand::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, PIHeatingDemand));
-        break;
-    case Attributes::HVACSystemTypeConfiguration::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, HVACSystemTypeConfiguration));
-        break;
-    case Attributes::LocalTemperatureCalibration::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, localTemperatureCalibration));
-        break;
-    case Attributes::OccupiedCoolingSetpoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupiedCoolingSetpoint));
-        break;
-    case Attributes::OccupiedHeatingSetpoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupiedHeatingSetpoint));
-        break;
-    case Attributes::UnoccupiedCoolingSetpoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, unoccupiedCoolingSetpoint));
-        break;
-    case Attributes::UnoccupiedHeatingSetpoint::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, unoccupiedHeatingSetpoint));
-        break;
-    case Attributes::MinHeatSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, minHeatSetpointLimit));
-        break;
-    case Attributes::MaxHeatSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, maxHeatSetpointLimit));
-        break;
-    case Attributes::MinCoolSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, minCoolSetpointLimit));
-        break;
-    case Attributes::MaxCoolSetpointLimit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, maxCoolSetpointLimit));
-        break;
-    case Attributes::MinSetpointDeadBand::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, minSetpointDeadBand));
-        break;
-    case Attributes::RemoteSensing::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, remoteSensing));
-        break;
-    case Attributes::ControlSequenceOfOperation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, controlSequenceOfOperation));
-        break;
-    case Attributes::SystemMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, systemMode));
-        break;
-    case Attributes::ThermostatRunningMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, thermostatRunningMode));
-        break;
-    case Attributes::StartOfWeek::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, startOfWeek));
-        break;
-    case Attributes::NumberOfWeeklyTransitions::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfWeeklyTransitions));
-        break;
-    case Attributes::NumberOfDailyTransitions::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfDailyTransitions));
-        break;
-    case Attributes::TemperatureSetpointHold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, temperatureSetpointHold));
-        break;
-    case Attributes::TemperatureSetpointHoldDuration::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, temperatureSetpointHoldDuration));
-        break;
-    case Attributes::ThermostatProgrammingOperationMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, thermostatProgrammingOperationMode));
-        break;
-    case Attributes::ThermostatRunningState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, thermostatRunningState));
-        break;
-    case Attributes::SetpointChangeSource::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, setpointChangeSource));
-        break;
-    case Attributes::SetpointChangeAmount::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, setpointChangeAmount));
-        break;
-    case Attributes::SetpointChangeSourceTimestamp::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, setpointChangeSourceTimestamp));
-        break;
-    case Attributes::OccupiedSetback::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupiedSetback));
-        break;
-    case Attributes::OccupiedSetbackMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupiedSetbackMin));
-        break;
-    case Attributes::OccupiedSetbackMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupiedSetbackMax));
-        break;
-    case Attributes::UnoccupiedSetback::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, unoccupiedSetback));
-        break;
-    case Attributes::UnoccupiedSetbackMin::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, unoccupiedSetbackMin));
-        break;
-    case Attributes::UnoccupiedSetbackMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, unoccupiedSetbackMax));
-        break;
-    case Attributes::EmergencyHeatDelta::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, emergencyHeatDelta));
-        break;
-    case Attributes::ACType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ACType));
-        break;
-    case Attributes::ACCapacity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ACCapacity));
-        break;
-    case Attributes::ACRefrigerantType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ACRefrigerantType));
-        break;
-    case Attributes::ACCompressorType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ACCompressorType));
-        break;
-    case Attributes::ACErrorCode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ACErrorCode));
-        break;
-    case Attributes::ACLouverPosition::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ACLouverPosition));
-        break;
-    case Attributes::ACCoilTemperature::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ACCoilTemperature));
-        break;
-    case Attributes::ACCapacityformat::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ACCapacityformat));
-        break;
-    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
-        break;
-    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
-        break;
-    case Attributes::EventList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
-        break;
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
-        break;
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
-        break;
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
-        break;
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace Thermostat
-namespace FanControl {
-
-namespace Commands {} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
->>>>>>> 527fe00c24 (Update the generated files)
-    switch (path.mAttributeId)
-    {
-    case Attributes::FanMode::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, fanMode));
-        break;
-    case Attributes::FanModeSequence::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, fanModeSequence));
-        break;
-    case Attributes::PercentSetting::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, percentSetting));
-        break;
-    case Attributes::PercentCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, percentCurrent));
-        break;
-    case Attributes::SpeedMax::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, speedMax));
-        break;
-    case Attributes::SpeedSetting::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, speedSetting));
-        break;
-    case Attributes::SpeedCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, speedCurrent));
-        break;
-    case Attributes::RockSupport::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, rockSupport));
-        break;
-    case Attributes::RockSetting::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, rockSetting));
-        break;
-    case Attributes::WindSupport::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, windSupport));
-        break;
-    case Attributes::WindSetting::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, windSetting));
-        break;
-    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
-        break;
-    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
-        break;
-    case Attributes::EventList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
-        break;
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
-        break;
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
-        break;
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
-        break;
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace FanControl
-namespace ThermostatUserInterfaceConfiguration {
-
-namespace Commands {} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-<<<<<<< HEAD
 } // namespace ElectronicTemperatureHigh.
 namespace PumpBlocked {
-=======
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace ThermostatUserInterfaceConfiguration
-namespace ColorControl {
-
-namespace Commands {
-namespace MoveToHue {
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -16789,16 +16424,9 @@ namespace Events {} // namespace Events
 } // namespace ThermostatUserInterfaceConfiguration
 namespace ColorControl {
 
-<<<<<<< HEAD
 namespace Commands {
 namespace MoveToHue {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-=======
-namespace Commands {} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
->>>>>>> 527fe00c24 (Update the generated files)
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
@@ -16811,19 +16439,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     return CHIP_NO_ERROR;
 }
 
-<<<<<<< HEAD
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-=======
-namespace Events {} // namespace Events
-
-} // namespace TemperatureMeasurement
-namespace PressureMeasurement {
-
-namespace Commands {} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
->>>>>>> 527fe00c24 (Update the generated files)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
@@ -16861,23 +16477,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
 } // namespace MoveToHue.
 namespace MoveHue {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-=======
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace PressureMeasurement
-namespace FlowMeasurement {
-
-namespace Commands {} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
->>>>>>> 527fe00c24 (Update the generated files)
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
@@ -16888,22 +16490,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-=======
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace FlowMeasurement
-namespace RelativeHumidityMeasurement {
-
-namespace Commands {} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
->>>>>>> 527fe00c24 (Update the generated files)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
@@ -16952,17 +16540,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
-=======
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace RelativeHumidityMeasurement
-namespace OccupancySensing {
-
-namespace Commands {} // namespace Commands
->>>>>>> 527fe00c24 (Update the generated files)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -16972,7 +16549,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.EnterContainer(outer));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-<<<<<<< HEAD
         if (!TLV::IsContextTag(reader.GetTag()))
         {
             continue;
@@ -16997,124 +16573,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         default:
             break;
         }
-=======
-    case Attributes::Occupancy::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupancy));
-        break;
-    case Attributes::OccupancySensorType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupancySensorType));
-        break;
-    case Attributes::OccupancySensorTypeBitmap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupancySensorTypeBitmap));
-        break;
-    case Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, PIROccupiedToUnoccupiedDelay));
-        break;
-    case Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, PIRUnoccupiedToOccupiedDelay));
-        break;
-    case Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, PIRUnoccupiedToOccupiedThreshold));
-        break;
-    case Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicOccupiedToUnoccupiedDelay));
-        break;
-    case Attributes::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedDelay));
-        break;
-    case Attributes::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedThreshold));
-        break;
-    case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactOccupiedToUnoccupiedDelay));
-        break;
-    case Attributes::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedDelay));
-        break;
-    case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedThreshold));
-        break;
-    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
-        break;
-    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
-        break;
-    case Attributes::EventList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
-        break;
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
-        break;
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
-        break;
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
-        break;
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace OccupancySensing
-namespace WakeOnLan {
-
-namespace Commands {} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
-    {
-    case Attributes::MACAddress::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, MACAddress));
-        break;
-    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
-        break;
-    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
-        break;
-    case Attributes::EventList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
-        break;
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
-        break;
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
-        break;
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
-        break;
-    default:
-        break;
->>>>>>> 527fe00c24 (Update the generated files)
     }
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
 } // namespace StepHue.
 namespace MoveToSaturation {
-=======
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace WakeOnLan
-namespace Channel {
-namespace Structs {
-namespace ChannelInfoStruct {
->>>>>>> 527fe00c24 (Update the generated files)
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -17225,13 +16691,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
-=======
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -17267,7 +16726,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
     }
 
-<<<<<<< HEAD
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
@@ -17286,10 +16744,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-=======
-namespace Commands {
-} // namespace Commands
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -17343,19 +16797,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
-=======
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace BallastConfiguration
-namespace IlluminanceMeasurement {
-
-namespace Commands {
-} // namespace Commands
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -17408,19 +16849,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
-=======
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace IlluminanceMeasurement
-namespace TemperatureMeasurement {
-
-namespace Commands {
-} // namespace Commands
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -17457,24 +16885,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
 } // namespace MoveColor.
 namespace StepColor {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-=======
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace TemperatureMeasurement
-namespace PressureMeasurement {
-
-namespace Commands {
-} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
@@ -17486,19 +16899,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
-=======
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace PressureMeasurement
-namespace FlowMeasurement {
-
-namespace Commands {
-} // namespace Commands
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -17551,19 +16951,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
-=======
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace FlowMeasurement
-namespace RelativeHumidityMeasurement {
-
-namespace Commands {
-} // namespace Commands
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -17600,138 +16987,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
 } // namespace MoveToColorTemperature.
 namespace EnhancedMoveToHue {
-=======
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace RelativeHumidityMeasurement
-namespace OccupancySensing {
-
-namespace Commands {
-} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
-    {
-    case Attributes::Occupancy::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupancy));
-        break;
-    case Attributes::OccupancySensorType::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupancySensorType));
-        break;
-    case Attributes::OccupancySensorTypeBitmap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, occupancySensorTypeBitmap));
-        break;
-    case Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, PIROccupiedToUnoccupiedDelay));
-        break;
-    case Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, PIRUnoccupiedToOccupiedDelay));
-        break;
-    case Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, PIRUnoccupiedToOccupiedThreshold));
-        break;
-    case Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicOccupiedToUnoccupiedDelay));
-        break;
-    case Attributes::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedDelay));
-        break;
-    case Attributes::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedThreshold));
-        break;
-    case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactOccupiedToUnoccupiedDelay));
-        break;
-    case Attributes::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedDelay));
-        break;
-    case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedThreshold));
-        break;
-    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
-        break;
-    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
-        break;
-    case Attributes::EventList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
-        break;
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
-        break;
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
-        break;
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
-        break;
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace OccupancySensing
-namespace WakeOnLan {
-
-namespace Commands {
-} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
-    {
-    case Attributes::MACAddress::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, MACAddress));
-        break;
-    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
-        break;
-    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
-        break;
-    case Attributes::EventList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
-        break;
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
-        break;
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
-        break;
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
-        break;
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace WakeOnLan
-namespace Channel {
-namespace Structs {
-namespace ChannelInfoStruct {
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -17999,61 +17256,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
 } // namespace ColorLoopSet.
 namespace StopMoveStep {
-=======
-} // namespace SkipChannel.
-} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
-    {
-    case Attributes::ChannelList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, channelList));
-        break;
-    case Attributes::Lineup::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, lineup));
-        break;
-    case Attributes::CurrentChannel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, currentChannel));
-        break;
-    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
-        break;
-    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
-        break;
-    case Attributes::EventList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, eventList));
-        break;
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
-        break;
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
-        break;
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
-        break;
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace Channel
-namespace TargetNavigator {
-namespace Structs {
-namespace TargetInfoStruct {
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -18404,89 +17608,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     return CHIP_NO_ERROR;
 }
 } // namespace Attributes
-<<<<<<< HEAD
-=======
-
-namespace Events {} // namespace Events
-
-} // namespace TargetNavigator
-namespace MediaPlayback {
-namespace Structs {
-namespace PlaybackPositionStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kUpdatedAt), updatedAt));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kPosition), position));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kUpdatedAt):
-            ReturnErrorOnFailure(DataModel::Decode(reader, updatedAt));
-            break;
-        case to_underlying(Fields::kPosition):
-            ReturnErrorOnFailure(DataModel::Decode(reader, position));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    return CHIP_NO_ERROR;
-}
-
-} // namespace PlaybackPositionStruct
-} // namespace Structs
-
-namespace Commands {
-namespace Play {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        default:
-            break;
-        }
-    }
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 namespace Events {} // namespace Events
 
@@ -18569,22 +17690,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 } // namespace Attributes
 
 namespace Events {} // namespace Events
-<<<<<<< HEAD
-=======
-
-} // namespace MediaInput
-namespace LowPower {
-
-namespace Commands {
-namespace Sleep {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
->>>>>>> 527fe00c24 (Update the generated files)
 
 } // namespace BallastConfiguration
 namespace IlluminanceMeasurement {
@@ -18638,60 +17743,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 } // namespace Attributes
 
 namespace Events {} // namespace Events
-<<<<<<< HEAD
-=======
-
-} // namespace LowPower
-namespace KeypadInput {
-
-namespace Commands {
-namespace SendKey {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kKeyCode), keyCode));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kKeyCode):
-            ReturnErrorOnFailure(DataModel::Decode(reader, keyCode));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace SendKey.
-namespace SendKeyResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kStatus), status));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
->>>>>>> 527fe00c24 (Update the generated files)
 
 } // namespace IlluminanceMeasurement
 namespace TemperatureMeasurement {
@@ -18806,8 +17857,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace PressureMeasurement
 namespace FlowMeasurement {
@@ -19383,13 +18433,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
-=======
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
 } // namespace TargetInfoStruct
 } // namespace Structs
@@ -19741,18 +18784,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
-=======
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace ApplicationLauncher
-namespace ApplicationBasic {
-namespace Structs {} // namespace Structs
-
-namespace Commands {} // namespace Commands
->>>>>>> 527fe00c24 (Update the generated files)
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
@@ -19787,7 +18818,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-<<<<<<< HEAD
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19806,9 +18836,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         }
     }
-=======
-namespace Events {} // namespace Events
->>>>>>> 527fe00c24 (Update the generated files)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));
@@ -19884,20 +18911,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-<<<<<<< HEAD
 } // namespace SkipForward.
 namespace SkipBackward {
-=======
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace ContentLauncher
-namespace AudioOutput {
-namespace Structs {
-namespace OutputInfoStruct {
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20309,10 +19324,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
-<<<<<<< HEAD
 } // namespace MediaInput
 namespace LowPower {
 
@@ -20350,14 +19363,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace Sleep.
-=======
-} // namespace ApplicationLauncher
-namespace ApplicationBasic {
-namespace Structs {
-} // namespace Structs
-
-namespace Commands {
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 } // namespace Commands
 
 namespace Attributes {
@@ -20391,8 +19396,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace LowPower
 namespace KeypadInput {
@@ -20614,7 +19618,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     return CHIP_NO_ERROR;
 }
 
-<<<<<<< HEAD
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20643,10 +19646,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         }
     }
-=======
-namespace Events {
-} // namespace Events
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outer));

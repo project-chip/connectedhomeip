@@ -3491,16 +3491,6 @@ namespace AccountLogin {} // namespace AccountLogin
 
 namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-namespace ClientMonitoring {
-} // namespace ClientMonitoring
-=======
-namespace ClientMonitoring {} // namespace ClientMonitoring
->>>>>>> 527fe00c24 (Update the generated files)
-
->>>>>>> 3f95ee532c (MediaClusters: Update SkipChannel per issue 26104)
 namespace UnitTesting {
 
 // Enum for SimpleEnum
