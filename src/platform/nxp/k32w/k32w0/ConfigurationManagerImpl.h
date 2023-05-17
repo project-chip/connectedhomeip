@@ -75,7 +75,7 @@ private:
     void RunConfigUnitTest(void) override;
 
     // ===== Private members reserved for use by this class only.
-    CHIP_ERROR DetermineBootReason();
+    CHIP_ERROR DetermineBootReason(uint8_t rebootCause);
     static void DoFactoryReset(intptr_t arg);
 };
 

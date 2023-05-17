@@ -49,6 +49,7 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
+    uint8_t rebootCause = POWER_GetResetCause();
 
     if (K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_RebootCount))
     {
@@ -67,7 +68,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err = StoreTotalOperationalHours(0));
     }
 
-    SuccessOrExit(err = DetermineBootReason());
+    SuccessOrExit(err = DetermineBootReason(rebootCause));
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<K32WConfig>::Init();
@@ -239,20 +240,19 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void) {}
 
-CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason()
+CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
 {
     BootReasonType bootReason = BootReasonType::kUnspecified;
-    uint8_t rebootCause = POWER_GetResetCause();
 
-    if ((rebootCause == RESET_POR) || (rebootCause == RESET_EXT_PIN))
+    if ((rebootCause & RESET_POR) || (rebootCause & RESET_EXT_PIN))
     {
         bootReason = BootReasonType::kPowerOnReboot;
     }
-    else if (rebootCause == RESET_BOR)
+    else if (rebootCause & RESET_BOR)
     {
         bootReason = BootReasonType::kBrownOutReset;
     }
-    else if (rebootCause == RESET_SW_REQ)
+    else if (rebootCause & RESET_SW_REQ)
     {
         if (K32WConfig::ConfigValueExists(K32WConfig::kConfigKey_SoftwareUpdateCompleted))
         {
@@ -263,7 +263,7 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason()
             bootReason = BootReasonType::kSoftwareReset;
         }
     }
-    else if (rebootCause == RESET_WDT)
+    else if (rebootCause & RESET_WDT)
     {
         /* Reboot can be due to hardware or software watchdog */
         bootReason = BootReasonType::kSoftwareWatchdogReset;
