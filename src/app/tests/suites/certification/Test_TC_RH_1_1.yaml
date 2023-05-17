@@ -80,9 +80,10 @@ tests:
           constraints:
               type: list
 
+    #Manufacturer specific event IDs check not possible
     - label:
-          "Read EventList attribute from the DUT and Verify that the DUT
-          response provides a list of supported events."
+          "Read EventList attribute from the DUT.For this cluster the list is
+          usually empty but it can contain manufacturer specific event IDs."
       verification: |
           ./chip-tool relativehumiditymeasurement read event-list 1 1
 
