@@ -173,7 +173,7 @@ void rsi_hal_board_init(void)
 #if defined(EFR32MG24)
 sl_status_t sl_wfx_host_spi_cs_assert()
 {
-    SILABS_LOG("%s started.", __func__);
+    // SILABS_LOG("%s started.", __func__);
     configASSERT(spi_sem_sync_hdl);
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
@@ -192,13 +192,13 @@ sl_status_t sl_wfx_host_spi_cs_assert()
         spi_enabled = true;
     }
     GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
-    SILABS_LOG("%s completed.", __func__);
+    // SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_spi_cs_deassert()
 {
-    SILABS_LOG("%s started.", __func__);
+    // SILABS_LOG("%s started.", __func__);
     if (spi_enabled)
     {
         SPIDRV_DeInit(SL_SPIDRV_HANDLE);
@@ -208,7 +208,7 @@ sl_status_t sl_wfx_host_spi_cs_deassert()
     // TODO: should be done by deinit, check once.
     GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = 0;
     xSemaphoreGive(spi_sem_sync_hdl);
-    SILABS_LOG("%s completed.", __func__);
+    // SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 
@@ -317,7 +317,7 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
  **************************************************************************/
 int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint8_t mode)
 {
-    SILABS_LOG("%s started.", __func__);
+    // SILABS_LOG("%s started.", __func__);
 #if defined(EFR32MG24)
     sl_wfx_host_spi_cs_assert();
 #endif /* EFR32MG24 */
@@ -366,7 +366,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
             int itemsTransferred = 0;
             int itemsRemaining   = 0;
             SPIDRV_GetTransferStatus(SL_SPIDRV_HANDLE, &itemsTransferred, &itemsRemaining);
-            SILABS_LOG("SPI transfert timed out %d/%d (rx%x rx%x)", itemsTransferred, itemsRemaining, (uint32_t) tx_buf,
+            SILABS_LOG("%s: timed out %d/%d (rx%x rx%x)", __func__, itemsTransferred, itemsRemaining, (uint32_t) tx_buf,
                        (uint32_t) rx_buf);
 
             SPIDRV_AbortTransfer(SL_SPIDRV_HANDLE);
@@ -375,7 +375,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     }
     else
     {
-        SILABS_LOG("SPI transfert failed with err:%x (tx%x rx%x)", spiError, (uint32_t) tx_buf, (uint32_t) rx_buf);
+        SILABS_LOG("%s: failed with err:%x (tx%x rx%x)", __func__, spiError, (uint32_t) tx_buf, (uint32_t) rx_buf);
         rsiError               = RSI_ERROR_SPI_FAIL;
         spiInitiatorTaskHandle = NULL; // SPI operation failed. No notification to received.
     }
@@ -384,6 +384,6 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
 #if defined(EFR32MG24)
     sl_wfx_host_spi_cs_deassert();
 #endif /* EFR32MG24 */
-    SILABS_LOG("%s completed.", __func__);
+    // SILABS_LOG("%s completed.", __func__);
     return rsiError;
 }
