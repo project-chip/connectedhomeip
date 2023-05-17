@@ -122,6 +122,12 @@ void TimeSynchronizationServer::Init()
         tz[i].name.SetValue(chip::CharSpan(buf, sizeof(mNames[i].name)));
     }
     mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
+    if (mTimeZoneListSize == 0) // initialize default value
+    {
+        mTimeZoneList[0].offset  = 0;
+        mTimeZoneList[0].validAt = 0;
+        mTimeZoneListSize        = 1;
+    }
     mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetList, mDstOffsetListSize);
     // TODO if trusted time source is available schedule a time read
     if (!mTrustedTimeSource.IsNull())
