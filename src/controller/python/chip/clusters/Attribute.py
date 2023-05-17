@@ -27,7 +27,7 @@ from asyncio.futures import Future
 from ctypes import CFUNCTYPE, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union, Tuple
 
 import chip.exceptions
 import chip.interaction_model
