@@ -90,7 +90,7 @@ class YamlLoader:
             'nodeId': int,
             'runIf': str,  # Should be a variable.
             'groupId': int,
-            'endpoint': int,
+            'endpoint': (int, str),  # Can be a variable
             'cluster': str,
             'attribute': str,
             'command': str,
