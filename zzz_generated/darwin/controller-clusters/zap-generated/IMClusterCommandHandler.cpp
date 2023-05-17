@@ -35,7 +35,9 @@ namespace app {
 
 // Cluster specific command parsing
 
-namespace Clusters {} // namespace Clusters
+namespace Clusters {
+
+} // namespace Clusters
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {

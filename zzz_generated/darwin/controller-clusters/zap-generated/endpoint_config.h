@@ -28,11 +28,13 @@
 // Separate block is generated for big-endian and little-endian cases.
 #if BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
-    {}
+    {                                                                                                                              \
+    }
 
 #else // !BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
-    {}
+    {                                                                                                                              \
+    }
 
 #endif // BIGENDIAN_CPU
 
@@ -41,12 +43,14 @@
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 0
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
-    {}
+    {                                                                                                                              \
+    }
 
 // This is an array of EmberAfAttributeMetadata structures.
 #define GENERATED_ATTRIBUTE_COUNT 0
 #define GENERATED_ATTRIBUTES                                                                                                       \
-    {}
+    {                                                                                                                              \
+    }
 
 // clang-format off
 #define GENERATED_EVENT_COUNT 0

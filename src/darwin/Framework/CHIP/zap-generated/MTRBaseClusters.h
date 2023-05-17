@@ -9489,6 +9489,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params
                        completion:(MTRStatusCompletion)completion API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+/**
+ * Command UnboltDoor
+ *
+ * This command causes the lock device to unlock the door without pulling the latch.
+ */
+- (void)unboltDoorWithParams:(MTRDoorLockClusterUnboltDoorParams * _Nullable)params
+                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeLockStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -22350,6 +22357,7 @@ typedef NS_ENUM(uint8_t, MTRDoorLockDlLockState) {
     MTRDoorLockDlLockStateNotFullyLocked API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRDoorLockDlLockStateLocked API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRDoorLockDlLockStateUnlocked API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
+    MTRDoorLockDlLockStateUnlatched MTR_NEWLY_AVAILABLE = 0x03,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRDoorLockDlLockType) {
@@ -22364,6 +22372,7 @@ typedef NS_ENUM(uint8_t, MTRDoorLockDlLockType) {
     MTRDoorLockDlLockTypeInterconnectedLock API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
     MTRDoorLockDlLockTypeDeadLatch API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x09,
     MTRDoorLockDlLockTypeDoorFurniture API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0A,
+    MTRDoorLockDlLockTypeEurocylinder MTR_NEWLY_AVAILABLE = 0x0B,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRDoorLockDlStatus) {
@@ -22547,6 +22556,7 @@ typedef NS_ENUM(uint8_t, MTRDoorLockLockOperationType) {
     MTRDoorLockLockOperationTypeUnlock API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x01,
     MTRDoorLockLockOperationTypeNonAccessUserEvent API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x02,
     MTRDoorLockLockOperationTypeForcedUserEvent API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x03,
+    MTRDoorLockLockOperationTypeUnlatch MTR_NEWLY_AVAILABLE = 0x04,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 typedef NS_ENUM(uint8_t, MTRDoorLockDlLockOperationType) {
@@ -22941,6 +22951,7 @@ typedef NS_OPTIONS(uint32_t, MTRDoorLockFeature) {
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x400,
     MTRDoorLockFeatureHolidaySchedules API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x800,
+    MTRDoorLockFeatureUnbolt MTR_NEWLY_AVAILABLE = 0x1000,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRWindowCoveringEndProductType) {
