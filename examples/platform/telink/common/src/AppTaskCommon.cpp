@@ -33,6 +33,10 @@
 #include "OTAUtil.h"
 #endif
 
+#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
+#include <app/InteractionModelEngine.h>
+#endif
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
@@ -225,6 +229,10 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Set up a valid Network Commissioning cluster on endpoint 0 is done in
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+#endif
+
+#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
 #endif
 
     // Add CHIP event handler and start CHIP thread.

@@ -39,6 +39,10 @@
 #include <platform/telink/FactoryDataProvider.h>
 #endif
 
+#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
+#include "ICDUtil.h"
+#endif
+
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <cstdint>
