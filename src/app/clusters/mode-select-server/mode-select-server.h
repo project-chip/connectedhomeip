@@ -66,7 +66,7 @@ public:
 private:
     EndpointId endpointId{};
     ClusterId clusterId{};
-    Delegate * msDelegate;
+    Delegate * delegate;
 
     void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
     void HandleChangeToModeWithStatus(HandlerContext & ctx, const Commands::ChangeToModeWithStatus::DecodableType & req);
@@ -85,7 +85,7 @@ public:
     {
         endpointId = aEndpointId;
         clusterId  = aClusterId;
-        msDelegate = aDelegate;
+        delegate   = aDelegate;
     }
 
     ~Instance() override

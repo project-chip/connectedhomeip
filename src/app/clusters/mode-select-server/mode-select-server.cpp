@@ -201,7 +201,7 @@ CHIP_ERROR Instance::Init()
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(msDelegate->Init());
+    ReturnErrorOnFailure(delegate->Init());
 
     ModeSelectAliasesInstanceMap[clusterId] = this;
 
@@ -317,14 +317,14 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
 {
     uint8_t newMode = commandData.newMode;
 
-    if (!msDelegate->IsSupportedMode(newMode))
+    if (!delegate->IsSupportedMode(newMode))
     {
         ChipLogError(Zcl, "ModeSelect: Failed to find the option with mode %u", newMode);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
         return;
     }
 
-    Status checkIsChangeToThisModeAllowed = msDelegate->HandleChangeToMode(newMode);
+    Status checkIsChangeToThisModeAllowed = delegate->HandleChangeToMode(newMode);
     if (Status::Success != checkIsChangeToThisModeAllowed)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, checkIsChangeToThisModeAllowed);
@@ -343,7 +343,7 @@ void Instance::HandleChangeToModeWithStatus(HandlerContext & ctx,
 
     ModeSelect::Commands::ChangeToModeResponse::Type response;
 
-    if (!msDelegate->IsSupportedMode(newMode))
+    if (!delegate->IsSupportedMode(newMode))
     {
         ChipLogError(Zcl, "ModeSelect: Failed to find the option with mode %u", newMode);
         response.status = static_cast<uint8_t>(ModeSelect::ChangeToModeResponseStatus::kUnsupportedMode);
@@ -351,7 +351,7 @@ void Instance::HandleChangeToModeWithStatus(HandlerContext & ctx,
         return;
     }
 
-    msDelegate->HandleChangeToModeWitheStatus(newMode, response);
+    delegate->HandleChangeToModeWitheStatus(newMode, response);
 
     if (response.status == static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess))
     {
@@ -412,14 +412,14 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     switch (aPath.mAttributeId)
     {
     case Attributes::SupportedModes::Id:
-        if (msDelegate->modeOptions.empty())
+        if (delegate->modeOptions.empty())
         {
             aEncoder.EncodeEmptyList();
             return CHIP_NO_ERROR;
         }
 
         CHIP_ERROR err;
-        const auto mo = msDelegate->modeOptions;
+        const auto mo = delegate->modeOptions;
         err           = aEncoder.EncodeList([mo](const auto & encoder) -> CHIP_ERROR {
             for (ModeOptionStructType mode : mo)
             {
@@ -455,7 +455,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
         uint8_t newMode;
         ReturnErrorOnFailure(aDecoder.Decode(newMode));
 
-        if (!msDelegate->IsSupportedMode(newMode))
+        if (!delegate->IsSupportedMode(newMode))
         {
             return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
         }
