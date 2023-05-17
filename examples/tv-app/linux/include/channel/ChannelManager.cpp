@@ -179,15 +179,11 @@ bool ChannelManager::HandleSkipChannel(const int16_t & count)
     uint16_t channelsSize   = static_cast<uint16_t>(mChannels.size());
 
     // handle larger than maximum -> channel size case
-    if (newChannelIndex >= channelsSize)
-    {
-        newChannelIndex = newChannelIndex % channelsSize;
-    }
+    newChannelIndex = newChannelIndex % channelsSize;
 
-    // handle smaller than 0
     if (newChannelIndex < 0)
     {
-        newChannelIndex = (newChannelIndex % channelsSize) % channelsSize;
+        newChannelIndex = (newChannelIndex + channelsSize) % channelsSize;
     }
 
     mCurrentChannelIndex = static_cast<uint16_t>(newChannelIndex);
