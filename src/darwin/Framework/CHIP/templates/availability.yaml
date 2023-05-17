@@ -6174,19 +6174,7 @@
       enum values:
           EthernetNetworkDiagnostics:
               # Both the enum and the values got renamed, so don't output the
-              # new values with the old enum name or the old values with the
-              # new enum name.
-              PHYRateType:
-                  - Rate10M
-                  - Rate100M
-                  - Rate1G
-                  - Rate25G
-                  - Rate5G
-                  - Rate10G
-                  - Rate40G
-                  - Rate100G
-                  - Rate200G
-                  - Rate400G
+              # old values with the new enum name.
               PHYRateEnum:
                   - 10M
                   - 100M
@@ -6199,19 +6187,13 @@
                   - 200G
                   - 400G
           OperationalCredentials:
-              # Both the enum and the values got renamed, so don't output the
-              # new value with the old enum name or the old value with the
-              # new enum name.
+              # Both the enum and the value got renamed, so don't output the
+              # old value with the new enum name.
               NodeOperationalCertStatusEnum:
                   - SUCCESS
-              OperationalCertStatus:
-                  - OK
           DoorLock:
               # Both the enum and the values got renamed, so don't output the
-              # new values with the old enum name or the old values with the
-              # new enum name.
-              DlCredentialRule:
-                  - Dual
+              # old value with the new enum name.
               CredentialRuleEnum:
                   - Double
   renames:
@@ -6976,14 +6958,6 @@
               - EventList
           FaultInjection:
               - EventList
-  removed:
-      enum values:
-          DoorLock:
-              DlLockDataType:
-                  # These values never existed for this enum name so, don't
-                  # start exposing them.  They're exposed for LockDataTypeEnum
-                  - FingerVein
-                  - Face
   renames:
       attributes:
           TimeSynchronization:
@@ -7531,6 +7505,10 @@
                   - DefaultNTP
                   - NTPServerAvailable
   deprecated:
+      clusters:
+          # We apparently forgot to deprecate BridgedDeviceBasic when we
+          # introduced BridgedDeviceBasicInformation.
+          - BridgedDeviceBasic
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -7538,35 +7516,6 @@
               - PressureFeature
           PumpConfigurationAndControl:
               - PumpFeature
-  removed:
-      attributes:
-          # The ProductAppearance bits never happened for the old Basic and
-          # BridgedDeviceBasic cluster names.
-          Basic:
-              - ProductAppearance
-          BridgedDeviceBasic:
-              - ProductAppearance
-      structs:
-          # The ProductAppearance bits never happened for the old Basic and
-          # BridgedDeviceBasic cluster names.
-          Basic:
-              - ProductAppearanceStruct
-          BridgedDeviceBasic:
-              - ProductAppearanceStruct
-      enums:
-          # The ProductAppearance bits never happened for the old Basic and
-          # BridgedDeviceBasic cluster names.
-          Basic:
-              - ProductFinishEnum
-              - ColorEnum
-          BridgedDeviceBasic:
-              - ProductFinishEnum
-              - ColorEnum
-      enum values:
-          # Unlatch was never present for the old operation type enum name.
-          DoorLock:
-              DlLockOperationType:
-                  - Unlatch
   renames:
       attributes:
           TimeSynchronization:

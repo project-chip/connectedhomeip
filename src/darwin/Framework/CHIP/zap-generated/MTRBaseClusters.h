@@ -20520,6 +20520,7 @@ MTR_DEPRECATED(
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterBridgedDeviceBasicInformation")
 @interface MTRBaseClusterBridgedDeviceBasic : MTRBaseClusterBridgedDeviceBasicInformation
 @end
 
