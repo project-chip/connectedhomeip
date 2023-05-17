@@ -33,7 +33,7 @@ Status Delegate::HandleChangeToMode(uint8_t mode)
 
 void Delegate::HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type &response)
 {
-    response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess);
+    response.status = to_underlying(ChangeToModeResponseStatus::kSuccess);
 }
 
 bool Delegate::IsSupportedMode(uint8_t modeValue)
