@@ -313,7 +313,16 @@ CHIP_ERROR SilabsDeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadBu
 CHIP_ERROR SilabsDeviceDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
     size_t vendorNameLen = 0; // without counting null-terminator
-    return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
+    CHIP_ERROR err       = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
+#if defined(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        VerifyOrReturnError(buf != nullptr, CHIP_ERROR_NO_MEMORY);
+        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME, bufSize);
+        err = CHIP_NO_ERROR;
+    }
+#endif
+    return err;
 }
 
 CHIP_ERROR SilabsDeviceDataProvider::GetVendorId(uint16_t & vendorId)
@@ -339,7 +348,16 @@ CHIP_ERROR SilabsDeviceDataProvider::GetVendorId(uint16_t & vendorId)
 CHIP_ERROR SilabsDeviceDataProvider::GetProductName(char * buf, size_t bufSize)
 {
     size_t productNameLen = 0; // without counting null-terminator
-    return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_ProductName, buf, bufSize, productNameLen);
+    CHIP_ERROR err        = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_ProductName, buf, bufSize, productNameLen);
+#if defined(CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        VerifyOrReturnError(buf != nullptr, CHIP_ERROR_NO_MEMORY);
+        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME, bufSize);
+        err = CHIP_NO_ERROR;
+    }
+#endif
+    return err;
 }
 
 CHIP_ERROR SilabsDeviceDataProvider::GetProductId(uint16_t & productId)
@@ -370,6 +388,7 @@ CHIP_ERROR SilabsDeviceDataProvider::GetHardwareVersionString(char * buf, size_t
 #if defined(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
+        VerifyOrReturnError(buf != nullptr, CHIP_ERROR_NO_MEMORY);
         memcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING, bufSize);
         err = CHIP_NO_ERROR;
     }
