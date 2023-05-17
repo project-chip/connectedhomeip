@@ -115,8 +115,10 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
         // or callSign or affiliateCallSign or majorNumber.minorNumber
         if (isChannelMatched(channel, match))
         {
-            matchedChannels.push_back(channel);    
-        } else if (matchedChannels.size() == 0) {
+            matchedChannels.push_back(channel);
+        }
+        else if (matchedChannels.size() == 0)
+        {
             // Keep track of index record only if there's channel matches
             // Multiple matches is sign of error
             index++;
