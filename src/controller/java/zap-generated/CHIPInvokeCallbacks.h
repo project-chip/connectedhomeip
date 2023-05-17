@@ -449,6 +449,36 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPOperationalStateClusterOperationalCommandResponseCallback
+    : public Callback::Callback<CHIPOperationalStateClusterOperationalCommandResponseCallbackType>
+{
+public:
+    CHIPOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
+
+    ~CHIPOperationalStateClusterOperationalCommandResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPWasherControlsClusterWasherControlCommandResponseCallback
+    : public Callback::Callback<CHIPWasherControlsClusterWasherControlCommandResponseCallbackType>
+{
+public:
+    CHIPWasherControlsClusterWasherControlCommandResponseCallback(jobject javaCallback);
+
+    ~CHIPWasherControlsClusterWasherControlCommandResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::WasherControls::Commands::WasherControlCommandResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterGetWeekDayScheduleResponseCallback
     : public Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {

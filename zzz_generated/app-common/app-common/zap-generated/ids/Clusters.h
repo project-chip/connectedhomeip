@@ -154,6 +154,12 @@ static constexpr ClusterId Id = 0x00000050;
 namespace AirQuality {
 static constexpr ClusterId Id = 0x0000005B;
 } // namespace AirQuality
+namespace OperationalState {
+static constexpr ClusterId Id = 0x00000060;
+} // namespace OperationalState
+namespace WasherControls {
+static constexpr ClusterId Id = 0x00000061;
+} // namespace WasherControls
 namespace HepaFilterMonitoring {
 static constexpr ClusterId Id = 0x00000071;
 } // namespace HepaFilterMonitoring

@@ -1882,6 +1882,149 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ModeSelect::Structs::M
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ErrorStateStruct.errorStateID", "errorStateID", value.isMember("errorStateID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ErrorStateStruct.errorStateLabel", "errorStateLabel",
+                                                                  value.isMember("errorStateLabel")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ErrorStateStruct.errorStateDetails", "errorStateDetails",
+                                                                  value.isMember("errorStateDetails")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorStateID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.errorStateID, value["errorStateID"]));
+    valueCopy.removeMember("errorStateID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorStateLabel");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.errorStateLabel, value["errorStateLabel"]));
+    valueCopy.removeMember("errorStateLabel");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorStateDetails");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.errorStateDetails, value["errorStateDetails"]));
+    valueCopy.removeMember("errorStateDetails");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.errorStateID);
+    ComplexArgumentParser::Finalize(request.errorStateLabel);
+    ComplexArgumentParser::Finalize(request.errorStateDetails);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("OperationalStateStruct.operationalStateID", "operationalStateID",
+                                                                  value.isMember("operationalStateID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
+        "OperationalStateStruct.operationalStateLabel", "operationalStateLabel", value.isMember("operationalStateLabel")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "operationalStateID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.operationalStateID, value["operationalStateID"]));
+    valueCopy.removeMember("operationalStateID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "operationalStateLabel");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.operationalStateLabel, value["operationalStateLabel"]));
+    valueCopy.removeMember("operationalStateLabel");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.operationalStateID);
+    ComplexArgumentParser::Finalize(request.operationalStateLabel);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::WasherControls::Structs::ErrorStateStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ErrorStateStruct.errorStateID", "errorStateID", value.isMember("errorStateID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ErrorStateStruct.errorStateLabel", "errorStateLabel",
+                                                                  value.isMember("errorStateLabel")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ErrorStateStruct.errorStateDetails", "errorStateDetails",
+                                                                  value.isMember("errorStateDetails")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorStateID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.errorStateID, value["errorStateID"]));
+    valueCopy.removeMember("errorStateID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorStateLabel");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.errorStateLabel, value["errorStateLabel"]));
+    valueCopy.removeMember("errorStateLabel");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorStateDetails");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.errorStateDetails, value["errorStateDetails"]));
+    valueCopy.removeMember("errorStateDetails");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::WasherControls::Structs::ErrorStateStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.errorStateID);
+    ComplexArgumentParser::Finalize(request.errorStateLabel);
+    ComplexArgumentParser::Finalize(request.errorStateDetails);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::WasherControls::Structs::SpinSpeedIndex::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SpinSpeedIndex.washerControlsID", "washerControlsID",
+                                                                  value.isMember("washerControlsID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SpinSpeedIndex.washerControlsLabel", "washerControlsLabel",
+                                                                  value.isMember("washerControlsLabel")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "washerControlsID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.washerControlsID, value["washerControlsID"]));
+    valueCopy.removeMember("washerControlsID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "washerControlsLabel");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.washerControlsLabel, value["washerControlsLabel"]));
+    valueCopy.removeMember("washerControlsLabel");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::WasherControls::Structs::SpinSpeedIndex::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.washerControlsID);
+    ComplexArgumentParser::Finalize(request.washerControlsLabel);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                                         Json::Value & value)
 {

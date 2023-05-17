@@ -2221,6 +2221,250 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::OperationalState::Id: {
+        using namespace app::Clusters::OperationalState;
+        switch (aPath.mEventId)
+        {
+        case Events::OperationalError::Id: {
+            Events::OperationalError::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_errorState;
+            jobject value_errorState_errorStateID;
+            std::string value_errorState_errorStateIDClassName     = "java/lang/Integer";
+            std::string value_errorState_errorStateIDCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_errorState_errorStateIDClassName.c_str(), value_errorState_errorStateIDCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.errorState.errorStateID), value_errorState_errorStateID);
+            jobject value_errorState_errorStateLabel;
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorState.errorStateLabel,
+                                                                                 value_errorState_errorStateLabel));
+            jobject value_errorState_errorStateDetails;
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorState.errorStateDetails,
+                                                                                 value_errorState_errorStateDetails));
+
+            jclass errorStateStructStructClass_0;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$OperationalStateClusterErrorStateStruct", errorStateStructStructClass_0);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$OperationalStateClusterErrorStateStruct");
+                return nullptr;
+            }
+            jmethodID errorStateStructStructCtor_0 = env->GetMethodID(errorStateStructStructClass_0, "<init>",
+                                                                      "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
+            if (errorStateStructStructCtor_0 == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$OperationalStateClusterErrorStateStruct constructor");
+                return nullptr;
+            }
+
+            value_errorState =
+                env->NewObject(errorStateStructStructClass_0, errorStateStructStructCtor_0, value_errorState_errorStateID,
+                               value_errorState_errorStateLabel, value_errorState_errorStateDetails);
+
+            jclass operationalErrorStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$OperationalStateClusterOperationalErrorEvent",
+                operationalErrorStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$OperationalStateClusterOperationalErrorEvent");
+                return nullptr;
+            }
+            jmethodID operationalErrorStructCtor =
+                env->GetMethodID(operationalErrorStructClass, "<init>",
+                                 "(Lchip/devicecontroller/ChipStructs$OperationalStateClusterErrorStateStruct;)V");
+            if (operationalErrorStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$OperationalStateClusterOperationalErrorEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(operationalErrorStructClass, operationalErrorStructCtor, value_errorState);
+
+            return value;
+        }
+        case Events::OperationCompletion::Id: {
+            Events::OperationCompletion::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_completionErrorCode;
+            std::string value_completionErrorCodeClassName     = "java/lang/Integer";
+            std::string value_completionErrorCodeCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_completionErrorCodeClassName.c_str(), value_completionErrorCodeCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.completionErrorCode), value_completionErrorCode);
+
+            jobject value_totalOperationalTime;
+            std::string value_totalOperationalTimeClassName     = "java/lang/Long";
+            std::string value_totalOperationalTimeCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(
+                value_totalOperationalTimeClassName.c_str(), value_totalOperationalTimeCtorSignature.c_str(),
+                cppValue.totalOperationalTime, value_totalOperationalTime);
+
+            jobject value_pausedTime;
+            std::string value_pausedTimeClassName     = "java/lang/Long";
+            std::string value_pausedTimeCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(
+                value_pausedTimeClassName.c_str(), value_pausedTimeCtorSignature.c_str(), cppValue.pausedTime, value_pausedTime);
+
+            jclass operationCompletionStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$OperationalStateClusterOperationCompletionEvent",
+                operationCompletionStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$OperationalStateClusterOperationCompletionEvent");
+                return nullptr;
+            }
+            jmethodID operationCompletionStructCtor = env->GetMethodID(operationCompletionStructClass, "<init>",
+                                                                       "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;)V");
+            if (operationCompletionStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$OperationalStateClusterOperationCompletionEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(operationCompletionStructClass, operationCompletionStructCtor, value_completionErrorCode,
+                                           value_totalOperationalTime, value_pausedTime);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::WasherControls::Id: {
+        using namespace app::Clusters::WasherControls;
+        switch (aPath.mEventId)
+        {
+        case Events::OperationalError::Id: {
+            Events::OperationalError::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_errorState;
+            jobject value_errorState_errorStateID;
+            std::string value_errorState_errorStateIDClassName     = "java/lang/Integer";
+            std::string value_errorState_errorStateIDCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_errorState_errorStateIDClassName.c_str(), value_errorState_errorStateIDCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.errorState.errorStateID), value_errorState_errorStateID);
+            jobject value_errorState_errorStateLabel;
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorState.errorStateLabel,
+                                                                                 value_errorState_errorStateLabel));
+            jobject value_errorState_errorStateDetails;
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorState.errorStateDetails,
+                                                                                 value_errorState_errorStateDetails));
+
+            jclass errorStateStructStructClass_0;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$WasherControlsClusterErrorStateStruct", errorStateStructStructClass_0);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$WasherControlsClusterErrorStateStruct");
+                return nullptr;
+            }
+            jmethodID errorStateStructStructCtor_0 = env->GetMethodID(errorStateStructStructClass_0, "<init>",
+                                                                      "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
+            if (errorStateStructStructCtor_0 == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$WasherControlsClusterErrorStateStruct constructor");
+                return nullptr;
+            }
+
+            value_errorState =
+                env->NewObject(errorStateStructStructClass_0, errorStateStructStructCtor_0, value_errorState_errorStateID,
+                               value_errorState_errorStateLabel, value_errorState_errorStateDetails);
+
+            jclass operationalErrorStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$WasherControlsClusterOperationalErrorEvent",
+                operationalErrorStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$WasherControlsClusterOperationalErrorEvent");
+                return nullptr;
+            }
+            jmethodID operationalErrorStructCtor =
+                env->GetMethodID(operationalErrorStructClass, "<init>",
+                                 "(Lchip/devicecontroller/ChipStructs$WasherControlsClusterErrorStateStruct;)V");
+            if (operationalErrorStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$WasherControlsClusterOperationalErrorEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(operationalErrorStructClass, operationalErrorStructCtor, value_errorState);
+
+            return value;
+        }
+        case Events::OperationCompletion::Id: {
+            Events::OperationCompletion::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_completionErrorCode;
+            std::string value_completionErrorCodeClassName     = "java/lang/Integer";
+            std::string value_completionErrorCodeCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_completionErrorCodeClassName.c_str(), value_completionErrorCodeCtorSignature.c_str(),
+                static_cast<uint8_t>(cppValue.completionErrorCode), value_completionErrorCode);
+
+            jobject value_totalOperationalTime;
+            std::string value_totalOperationalTimeClassName     = "java/lang/Long";
+            std::string value_totalOperationalTimeCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(
+                value_totalOperationalTimeClassName.c_str(), value_totalOperationalTimeCtorSignature.c_str(),
+                cppValue.totalOperationalTime, value_totalOperationalTime);
+
+            jobject value_pausedTime;
+            std::string value_pausedTimeClassName     = "java/lang/Long";
+            std::string value_pausedTimeCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(
+                value_pausedTimeClassName.c_str(), value_pausedTimeCtorSignature.c_str(), cppValue.pausedTime, value_pausedTime);
+
+            jclass operationCompletionStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$WasherControlsClusterOperationCompletionEvent",
+                operationCompletionStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$WasherControlsClusterOperationCompletionEvent");
+                return nullptr;
+            }
+            jmethodID operationCompletionStructCtor = env->GetMethodID(operationCompletionStructClass, "<init>",
+                                                                       "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;)V");
+            if (operationCompletionStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$WasherControlsClusterOperationCompletionEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(operationCompletionStructClass, operationCompletionStructCtor, value_completionErrorCode,
+                                           value_totalOperationalTime, value_pausedTime);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::HepaFilterMonitoring::Id: {
         using namespace app::Clusters::HepaFilterMonitoring;
         switch (aPath.mEventId)

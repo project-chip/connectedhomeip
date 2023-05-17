@@ -641,6 +641,50 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace ModeSelect
 
+namespace OperationalState {
+namespace Commands {
+
+namespace Pause {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Pause
+
+namespace Stop {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Stop
+
+namespace Start {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Start
+
+namespace Resume {
+static constexpr CommandId Id = 0x00000003;
+} // namespace Resume
+
+namespace OperationalCommandResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace OperationalCommandResponse
+
+} // namespace Commands
+} // namespace OperationalState
+
+namespace WasherControls {
+namespace Commands {
+
+namespace SetSpinSpeed {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetSpinSpeed
+
+namespace SetNumberOfRinses {
+static constexpr CommandId Id = 0x00000001;
+} // namespace SetNumberOfRinses
+
+namespace WasherControlCommandResponse {
+static constexpr CommandId Id = 0x00000004;
+} // namespace WasherControlCommandResponse
+
+} // namespace Commands
+} // namespace WasherControls
+
 namespace HepaFilterMonitoring {
 namespace Commands {
 

@@ -629,6 +629,62 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
     Map<String, InteractionInfo> writeAirQualityInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("airQuality", writeAirQualityInteractionInfo);
+    Map<String, InteractionInfo> writeOperationalStateInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("operationalState", writeOperationalStateInteractionInfo);
+    Map<String, InteractionInfo> writeWasherControlsInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeWasherControlsSpinSpeedCurrentCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo washerControlsspinSpeedCurrentCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeWasherControlsSpinSpeedCurrentCommandParams.put(
+        "value", washerControlsspinSpeedCurrentCommandParameterInfo);
+    InteractionInfo writeWasherControlsSpinSpeedCurrentAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .writeSpinSpeedCurrentAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeWasherControlsSpinSpeedCurrentCommandParams);
+    writeWasherControlsInteractionInfo.put(
+        "writeSpinSpeedCurrentAttribute",
+        writeWasherControlsSpinSpeedCurrentAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeWasherControlsNumberOfRinsesCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo washerControlsnumberOfRinsesCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeWasherControlsNumberOfRinsesCommandParams.put(
+        "value", washerControlsnumberOfRinsesCommandParameterInfo);
+    InteractionInfo writeWasherControlsNumberOfRinsesAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .writeNumberOfRinsesAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeWasherControlsNumberOfRinsesCommandParams);
+    writeWasherControlsInteractionInfo.put(
+        "writeNumberOfRinsesAttribute", writeWasherControlsNumberOfRinsesAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeWasherControlsMaxRinsesCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo washerControlsmaxRinsesCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeWasherControlsMaxRinsesCommandParams.put(
+        "value", washerControlsmaxRinsesCommandParameterInfo);
+    InteractionInfo writeWasherControlsMaxRinsesAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .writeMaxRinsesAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeWasherControlsMaxRinsesCommandParams);
+    writeWasherControlsInteractionInfo.put(
+        "writeMaxRinsesAttribute", writeWasherControlsMaxRinsesAttributeInteractionInfo);
+    writeAttributeMap.put("washerControls", writeWasherControlsInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("hepaFilterMonitoring", writeHepaFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeActivatedCarbonFilterMonitoringInteractionInfo =

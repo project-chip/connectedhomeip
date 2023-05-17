@@ -1403,6 +1403,116 @@ public class ChipStructs {
     }
   }
 
+  public static class OperationalStateClusterErrorStateStruct {
+    public Integer errorStateID;
+    public String errorStateLabel;
+    public String errorStateDetails;
+
+    public OperationalStateClusterErrorStateStruct(
+        Integer errorStateID, String errorStateLabel, String errorStateDetails) {
+      this.errorStateID = errorStateID;
+      this.errorStateLabel = errorStateLabel;
+      this.errorStateDetails = errorStateDetails;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("OperationalStateClusterErrorStateStruct {\n");
+      output.append("\terrorStateID: ");
+      output.append(errorStateID);
+      output.append("\n");
+      output.append("\terrorStateLabel: ");
+      output.append(errorStateLabel);
+      output.append("\n");
+      output.append("\terrorStateDetails: ");
+      output.append(errorStateDetails);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class OperationalStateClusterOperationalStateStruct {
+    public Integer operationalStateID;
+    public String operationalStateLabel;
+
+    public OperationalStateClusterOperationalStateStruct(
+        Integer operationalStateID, String operationalStateLabel) {
+      this.operationalStateID = operationalStateID;
+      this.operationalStateLabel = operationalStateLabel;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("OperationalStateClusterOperationalStateStruct {\n");
+      output.append("\toperationalStateID: ");
+      output.append(operationalStateID);
+      output.append("\n");
+      output.append("\toperationalStateLabel: ");
+      output.append(operationalStateLabel);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class WasherControlsClusterErrorStateStruct {
+    public Integer errorStateID;
+    public String errorStateLabel;
+    public String errorStateDetails;
+
+    public WasherControlsClusterErrorStateStruct(
+        Integer errorStateID, String errorStateLabel, String errorStateDetails) {
+      this.errorStateID = errorStateID;
+      this.errorStateLabel = errorStateLabel;
+      this.errorStateDetails = errorStateDetails;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("WasherControlsClusterErrorStateStruct {\n");
+      output.append("\terrorStateID: ");
+      output.append(errorStateID);
+      output.append("\n");
+      output.append("\terrorStateLabel: ");
+      output.append(errorStateLabel);
+      output.append("\n");
+      output.append("\terrorStateDetails: ");
+      output.append(errorStateDetails);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class WasherControlsClusterSpinSpeedIndex {
+    public Integer washerControlsID;
+    public String washerControlsLabel;
+
+    public WasherControlsClusterSpinSpeedIndex(
+        Integer washerControlsID, String washerControlsLabel) {
+      this.washerControlsID = washerControlsID;
+      this.washerControlsLabel = washerControlsLabel;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("WasherControlsClusterSpinSpeedIndex {\n");
+      output.append("\twasherControlsID: ");
+      output.append(washerControlsID);
+      output.append("\n");
+      output.append("\twasherControlsLabel: ");
+      output.append(washerControlsLabel);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class DoorLockClusterCredentialStruct {
     public Integer credentialType;
     public Integer credentialIndex;

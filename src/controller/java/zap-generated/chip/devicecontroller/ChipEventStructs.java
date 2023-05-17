@@ -881,6 +881,106 @@ public class ChipEventStructs {
     }
   }
 
+  public static class OperationalStateClusterOperationalErrorEvent {
+    public ChipStructs.OperationalStateClusterErrorStateStruct errorState;
+
+    public OperationalStateClusterOperationalErrorEvent(
+        ChipStructs.OperationalStateClusterErrorStateStruct errorState) {
+      this.errorState = errorState;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("OperationalStateClusterOperationalErrorEvent {\n");
+      output.append("\terrorState: ");
+      output.append(errorState);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class OperationalStateClusterOperationCompletionEvent {
+    public Integer completionErrorCode;
+    public Long totalOperationalTime;
+    public Long pausedTime;
+
+    public OperationalStateClusterOperationCompletionEvent(
+        Integer completionErrorCode, Long totalOperationalTime, Long pausedTime) {
+      this.completionErrorCode = completionErrorCode;
+      this.totalOperationalTime = totalOperationalTime;
+      this.pausedTime = pausedTime;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("OperationalStateClusterOperationCompletionEvent {\n");
+      output.append("\tcompletionErrorCode: ");
+      output.append(completionErrorCode);
+      output.append("\n");
+      output.append("\ttotalOperationalTime: ");
+      output.append(totalOperationalTime);
+      output.append("\n");
+      output.append("\tpausedTime: ");
+      output.append(pausedTime);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class WasherControlsClusterOperationalErrorEvent {
+    public ChipStructs.WasherControlsClusterErrorStateStruct errorState;
+
+    public WasherControlsClusterOperationalErrorEvent(
+        ChipStructs.WasherControlsClusterErrorStateStruct errorState) {
+      this.errorState = errorState;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("WasherControlsClusterOperationalErrorEvent {\n");
+      output.append("\terrorState: ");
+      output.append(errorState);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class WasherControlsClusterOperationCompletionEvent {
+    public Integer completionErrorCode;
+    public Long totalOperationalTime;
+    public Long pausedTime;
+
+    public WasherControlsClusterOperationCompletionEvent(
+        Integer completionErrorCode, Long totalOperationalTime, Long pausedTime) {
+      this.completionErrorCode = completionErrorCode;
+      this.totalOperationalTime = totalOperationalTime;
+      this.pausedTime = pausedTime;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("WasherControlsClusterOperationCompletionEvent {\n");
+      output.append("\tcompletionErrorCode: ");
+      output.append(completionErrorCode);
+      output.append("\n");
+      output.append("\ttotalOperationalTime: ");
+      output.append(totalOperationalTime);
+      output.append("\n");
+      output.append("\tpausedTime: ");
+      output.append(pausedTime);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class DoorLockClusterDoorLockAlarmEvent {
     public Integer alarmCode;
 

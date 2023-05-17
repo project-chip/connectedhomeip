@@ -232,6 +232,26 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Str
 
 static void Finalize(chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::WasherControls::Structs::ErrorStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::WasherControls::Structs::ErrorStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::WasherControls::Structs::SpinSpeedIndex::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::WasherControls::Structs::SpinSpeedIndex::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);
 

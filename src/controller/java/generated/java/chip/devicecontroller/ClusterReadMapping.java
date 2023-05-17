@@ -7243,6 +7243,308 @@ public class ClusterReadMapping {
     return result;
   }
 
+  private static Map<String, InteractionInfo> readOperationalStateInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readOperationalStatePhaseListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalStatePhaseListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalStateCluster) cluster)
+                  .readPhaseListAttribute(
+                      (ChipClusters.OperationalStateCluster.PhaseListAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping.DelegatedOperationalStateClusterPhaseListAttributeCallback(),
+            readOperationalStatePhaseListCommandParams);
+    result.put("readPhaseListAttribute", readOperationalStatePhaseListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOperationalStateCurrentPhaseCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalStateCurrentPhaseAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalStateCluster) cluster)
+                  .readCurrentPhaseAttribute(
+                      (ChipClusters.OperationalStateCluster.CurrentPhaseAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOperationalStateClusterCurrentPhaseAttributeCallback(),
+            readOperationalStateCurrentPhaseCommandParams);
+    result.put(
+        "readCurrentPhaseAttribute", readOperationalStateCurrentPhaseAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOperationalStateCountdownTimeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalStateCountdownTimeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalStateCluster) cluster)
+                  .readCountdownTimeAttribute(
+                      (ChipClusters.OperationalStateCluster.CountdownTimeAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOperationalStateClusterCountdownTimeAttributeCallback(),
+            readOperationalStateCountdownTimeCommandParams);
+    result.put(
+        "readCountdownTimeAttribute", readOperationalStateCountdownTimeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOperationalStateOperationalStateListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalStateOperationalStateListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalStateCluster) cluster)
+                  .readOperationalStateListAttribute(
+                      (ChipClusters.OperationalStateCluster.OperationalStateListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOperationalStateClusterOperationalStateListAttributeCallback(),
+            readOperationalStateOperationalStateListCommandParams);
+    result.put(
+        "readOperationalStateListAttribute",
+        readOperationalStateOperationalStateListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOperationalStateGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalStateGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalStateCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.OperationalStateCluster.GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOperationalStateClusterGeneratedCommandListAttributeCallback(),
+            readOperationalStateGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readOperationalStateGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOperationalStateAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalStateAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalStateCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.OperationalStateCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOperationalStateClusterAcceptedCommandListAttributeCallback(),
+            readOperationalStateAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readOperationalStateAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOperationalStateEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalStateEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalStateCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.OperationalStateCluster.EventListAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping.DelegatedOperationalStateClusterEventListAttributeCallback(),
+            readOperationalStateEventListCommandParams);
+    result.put("readEventListAttribute", readOperationalStateEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOperationalStateAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalStateAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalStateCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.OperationalStateCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOperationalStateClusterAttributeListAttributeCallback(),
+            readOperationalStateAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute", readOperationalStateAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOperationalStateFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalStateFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalStateCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readOperationalStateFeatureMapCommandParams);
+    result.put("readFeatureMapAttribute", readOperationalStateFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOperationalStateClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOperationalStateClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OperationalStateCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readOperationalStateClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readOperationalStateClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
+  private static Map<String, InteractionInfo> readWasherControlsInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readWasherControlsSpinSpeedsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWasherControlsSpinSpeedsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .readSpinSpeedsAttribute(
+                      (ChipClusters.WasherControlsCluster.SpinSpeedsAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping.DelegatedWasherControlsClusterSpinSpeedsAttributeCallback(),
+            readWasherControlsSpinSpeedsCommandParams);
+    result.put("readSpinSpeedsAttribute", readWasherControlsSpinSpeedsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWasherControlsSpinSpeedCurrentCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWasherControlsSpinSpeedCurrentAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .readSpinSpeedCurrentAttribute(
+                      (ChipClusters.WasherControlsCluster.SpinSpeedCurrentAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedWasherControlsClusterSpinSpeedCurrentAttributeCallback(),
+            readWasherControlsSpinSpeedCurrentCommandParams);
+    result.put(
+        "readSpinSpeedCurrentAttribute",
+        readWasherControlsSpinSpeedCurrentAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWasherControlsNumberOfRinsesCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWasherControlsNumberOfRinsesAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .readNumberOfRinsesAttribute(
+                      (ChipClusters.WasherControlsCluster.NumberOfRinsesAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedWasherControlsClusterNumberOfRinsesAttributeCallback(),
+            readWasherControlsNumberOfRinsesCommandParams);
+    result.put(
+        "readNumberOfRinsesAttribute", readWasherControlsNumberOfRinsesAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWasherControlsMaxRinsesCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWasherControlsMaxRinsesAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .readMaxRinsesAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readWasherControlsMaxRinsesCommandParams);
+    result.put("readMaxRinsesAttribute", readWasherControlsMaxRinsesAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWasherControlsGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWasherControlsGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.WasherControlsCluster.GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedWasherControlsClusterGeneratedCommandListAttributeCallback(),
+            readWasherControlsGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readWasherControlsGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWasherControlsAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWasherControlsAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.WasherControlsCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedWasherControlsClusterAcceptedCommandListAttributeCallback(),
+            readWasherControlsAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readWasherControlsAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWasherControlsEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWasherControlsEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.WasherControlsCluster.EventListAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedWasherControlsClusterEventListAttributeCallback(),
+            readWasherControlsEventListCommandParams);
+    result.put("readEventListAttribute", readWasherControlsEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWasherControlsAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWasherControlsAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.WasherControlsCluster.AttributeListAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedWasherControlsClusterAttributeListAttributeCallback(),
+            readWasherControlsAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute", readWasherControlsAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWasherControlsFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWasherControlsFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readWasherControlsFeatureMapCommandParams);
+    result.put("readFeatureMapAttribute", readWasherControlsFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWasherControlsClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWasherControlsClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WasherControlsCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readWasherControlsClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute", readWasherControlsClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
   private static Map<String, InteractionInfo> readHepaFilterMonitoringInteractionInfo() {
     Map<String, InteractionInfo> result = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readHepaFilterMonitoringConditionCommandParams =
@@ -18559,6 +18861,8 @@ public class ClusterReadMapping {
         put("icdManagement", readIcdManagementInteractionInfo());
         put("modeSelect", readModeSelectInteractionInfo());
         put("airQuality", readAirQualityInteractionInfo());
+        put("operationalState", readOperationalStateInteractionInfo());
+        put("washerControls", readWasherControlsInteractionInfo());
         put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());
         put(
             "activatedCarbonFilterMonitoring",
