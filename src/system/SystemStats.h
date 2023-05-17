@@ -108,6 +108,7 @@ const Label * GetStrings();
     do                                                                                                                             \
     {                                                                                                                              \
         chip::System::Stats::count_t new_value = ++(chip::System::Stats::GetResourcesInUse()[entry]);                              \
+        ChipLogError(chipSystemLayer, " SYSTEM_STATS_INCREMENT new value %d", new_value);                                          \
         if (chip::System::Stats::GetHighWatermarks()[entry] < new_value)                                                           \
         {                                                                                                                          \
             chip::System::Stats::GetHighWatermarks()[entry] = new_value;                                                           \
@@ -117,19 +118,22 @@ const Label * GetStrings();
 #define SYSTEM_STATS_DECREMENT(entry)                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        chip::System::Stats::GetResourcesInUse()[entry]--;                                                                         \
-    } while (0)
+        chip::System::Stats::GetResourcesInUse()[entry]--;   \
+        ChipLogError(chipSystemLayer, " SYSTEM_STATS_DECREMENT GetResourcesInUse %d", chip::System::Stats::GetResourcesInUse()[entry]);  \
+    } while (0) \
 
 #define SYSTEM_STATS_DECREMENT_BY_N(entry, count)                                                                                  \
     do                                                                                                                             \
     {                                                                                                                              \
-        chip::System::Stats::GetResourcesInUse()[entry] -= (count);                                                                \
-    } while (0)
+        chip::System::Stats::GetResourcesInUse()[entry] -= (count); \
+        ChipLogError(chipSystemLayer, "SYSTEM_STATS_DECREMENT_BY_N GetResourcesInUse %d", chip::System::Stats::GetResourcesInUse()[entry]); \
+    } while (0) \
 
 #define SYSTEM_STATS_SET(entry, count)                                                                                             \
     do                                                                                                                             \
     {                                                                                                                              \
-        chip::System::Stats::count_t new_value = chip::System::Stats::GetResourcesInUse()[entry] = (count);                        \
+        chip::System::Stats::count_t new_value = chip::System::Stats::GetResourcesInUse()[entry] = (count);  \
+        ChipLogError(chipSystemLayer, " SYSTEM_STATS_SET new value %d", new_value);                                                 \
         if (chip::System::Stats::GetHighWatermarks()[entry] < new_value)                                                           \
         {                                                                                                                          \
             chip::System::Stats::GetHighWatermarks()[entry] = new_value;                                                           \
@@ -139,13 +143,15 @@ const Label * GetStrings();
 #define SYSTEM_STATS_RESET(entry)                                                                                                  \
     do                                                                                                                             \
     {                                                                                                                              \
-        chip::System::Stats::GetResourcesInUse()[entry] = 0;                                                                       \
+        chip::System::Stats::GetResourcesInUse()[entry] = 0; \
+        ChipLogError(chipSystemLayer, " SYSTEM_STATS_RESET GetResourcesInUse %d", chip::System::Stats::GetResourcesInUse()[entry]); \
     } while (0)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 #define SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS()                                                                                     \
     do                                                                                                                             \
-    {                                                                                                                              \
+    { 
+        ChipLogError(chipSystemLayer, "stats enabled"); \
         chip::System::Stats::UpdateLwipPbufCounts();                                                                               \
     } while (0)
 #else // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS

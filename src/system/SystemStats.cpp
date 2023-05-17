@@ -65,6 +65,7 @@ const Label * GetStrings()
 
 count_t * GetResourcesInUse()
 {
+    ChipLogError(chipSystemLayer, "GetResourcesInUse %d", *sResourcesInUse);
     return sResourcesInUse;
 }
 
@@ -76,6 +77,7 @@ count_t * GetHighWatermarks()
 void UpdateSnapshot(Snapshot & aSnapshot)
 {
     memcpy(&aSnapshot.mResourcesInUse, &sResourcesInUse, sizeof(aSnapshot.mResourcesInUse));
+    ChipLogError(chipSystemLayer, "UpdateSnapshot %d", *sResourcesInUse);
     memcpy(&aSnapshot.mHighWatermarks, &sHighWatermarks, sizeof(aSnapshot.mHighWatermarks));
 
 #if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
@@ -99,6 +101,7 @@ bool Difference(Snapshot & result, Snapshot & after, Snapshot & before)
 
         if (result.mResourcesInUse[i] > 0)
         {
+            ChipLogError(chipSystemLayer, "Difference leak true resources still in use %d", result.mResourcesInUse[i]);
             leak = true;
         }
     }
@@ -111,8 +114,11 @@ bool Difference(Snapshot & result, Snapshot & after, Snapshot & before)
 void UpdateLwipPbufCounts(void)
 {
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
+    ChipLogError(chipSystemLayer, "UpdateLwipPbufCounts custom pool");
     size_t lwip_pool_idx = PBUF_CUSTOM_POOL_IDX_END;
     size_t system_idx    = 0;
+    
+    ChipLogError(chipSystemLayer, "UpdateLwipPbufCounts lwip_pool_idx %lu ", static_cast<unsigned long>(lwip_pool_idx));
 
     while (lwip_pool_idx <= PBUF_CUSTOM_POOL_IDX_START)
     {
@@ -120,12 +126,15 @@ void UpdateLwipPbufCounts(void)
         chip::System::Stats::GetHighWatermarks()[system_idx] = MEMP_STATS_GET(max, lwip_pool_idx);
         lwip_pool_idx++;
         system_idx++;
+        ChipLogError(chipSystemLayer, "UpdateLwipPbufCounts lwip_pool_idx %lu system_idx %lu", static_cast<unsigned long>(lwip_pool_idx), static_cast<unsigned long>(system_idx));
+        ChipLogError(chipSystemLayer, "UpdateLwipPbufCounts GetResourcesInUse %d", chip::System::Stats::GetResourcesInUse()[system_idx]);
     }
 
 #else // LWIP_PBUF_FROM_CUSTOM_POOLS
-
+    ChipLogError(chipSystemLayer, "UpdateLwipPbufCounts not custom pool");
     chip::System::Stats::GetResourcesInUse()[kSystemLayer_NumPacketBufs] = MEMP_STATS_GET(used, MEMP_PBUF_POOL);
     chip::System::Stats::GetHighWatermarks()[kSystemLayer_NumPacketBufs] = MEMP_STATS_GET(max, MEMP_PBUF_POOL);
+    ChipLogError(chipSystemLayer, "UpdateLwipPbufCounts GetResourcesInUse %d", chip::System::Stats::GetResourcesInUse()[kSystemLayer_NumPacketBufs]);
 
 #endif // LWIP_PBUF_FROM_CUSTOM_POOLS
 }
