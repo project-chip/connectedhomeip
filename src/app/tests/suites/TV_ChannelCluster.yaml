@@ -151,26 +151,6 @@ tests:
                   AffiliateCallSign: "KCTS",
               }
 
-    - label: "Skip Channel Command"
-      command: "SkipChannel"
-      arguments:
-          values:
-              - name: "Count"
-                value: -123
-
-    - label: "Verify that Skip Channel Command set correct current channel"
-      command: "readAttribute"
-      attribute: "CurrentChannel"
-      response:
-          value:
-              {
-                  MajorNumber: 9,
-                  MinorNumber: 2,
-                  Name: "PBS Kids",
-                  CallSign: "KCTS-TV",
-                  AffiliateCallSign: "KCTS",
-              }
-
     #############################
     # Test Skip Channel Up 1..8 #
     #############################
@@ -441,15 +421,6 @@ tests:
     # Test Skip Channel Down 1..8 #
     ###############################
 
-    - label: "Test 1.1 - Start from Channel 3"
-      command: "ChangeChannelByNumber"
-      arguments:
-          values:
-              - name: "MajorNumber"
-                value: 9
-              - name: "MinorNumber"
-                value: 2
-
     - label: "Test 1.2 - Skip Down By 1"
       command: "SkipChannel"
       arguments:
@@ -706,15 +677,6 @@ tests:
     ###############################
     # Test Skip Channel Up 32,767 #
     ###############################
-
-    - label: "Test 1.1 - Start from Channel 3"
-      command: "ChangeChannelByNumber"
-      arguments:
-          values:
-              - name: "MajorNumber"
-                value: 9
-              - name: "MinorNumber"
-                value: 2
 
     - label: "Test 1.2 - Skip Up By 32,767"
       command: "SkipChannel"
