@@ -1446,4 +1446,12 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value: []
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [CommissionerNodeId],
+                      Targets: null,
+                  },
+              ]

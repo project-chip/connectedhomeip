@@ -609,6 +609,28 @@ static constexpr CommandId Id = 0x00000005;
 } // namespace Commands
 } // namespace GroupKeyManagement
 
+namespace IcdManagement {
+namespace Commands {
+
+namespace RegisterClient {
+static constexpr CommandId Id = 0x00000000;
+} // namespace RegisterClient
+
+namespace RegisterClientResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace RegisterClientResponse
+
+namespace UnregisterClient {
+static constexpr CommandId Id = 0x00000002;
+} // namespace UnregisterClient
+
+namespace StayActiveRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace StayActiveRequest
+
+} // namespace Commands
+} // namespace IcdManagement
+
 namespace ModeSelect {
 namespace Commands {
 
@@ -619,6 +641,7 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace ModeSelect
 
+<<<<<<< HEAD
 namespace SmokeCoAlarm {
 namespace Commands {
 
@@ -628,6 +651,127 @@ static constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace SmokeCoAlarm
+=======
+namespace HepaFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace HepaFilterMonitoring
+
+namespace ActivatedCarbonFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace ActivatedCarbonFilterMonitoring
+
+namespace CeramicFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace CeramicFilterMonitoring
+
+namespace ElectrostaticFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace ElectrostaticFilterMonitoring
+
+namespace UvFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace UvFilterMonitoring
+
+namespace IonizingFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace IonizingFilterMonitoring
+
+namespace ZeoliteFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace ZeoliteFilterMonitoring
+
+namespace OzoneFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace OzoneFilterMonitoring
+
+namespace WaterTankMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace WaterTankMonitoring
+
+namespace FuelTankMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace FuelTankMonitoring
+
+namespace InkCartridgeMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace InkCartridgeMonitoring
+
+namespace TonerCartridgeMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace TonerCartridgeMonitoring
+>>>>>>> master
 
 namespace DoorLock {
 namespace Commands {
@@ -1120,28 +1264,6 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace ElectricalMeasurement
-
-namespace ClientMonitoring {
-namespace Commands {
-
-namespace RegisterClientMonitoring {
-static constexpr CommandId Id = 0x00000000;
-} // namespace RegisterClientMonitoring
-
-namespace RegisterClientMonitoringResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace RegisterClientMonitoringResponse
-
-namespace UnregisterClientMonitoring {
-static constexpr CommandId Id = 0x00000002;
-} // namespace UnregisterClientMonitoring
-
-namespace StayAwakeRequest {
-static constexpr CommandId Id = 0x00000003;
-} // namespace StayAwakeRequest
-
-} // namespace Commands
-} // namespace ClientMonitoring
 
 namespace UnitTesting {
 namespace Commands {

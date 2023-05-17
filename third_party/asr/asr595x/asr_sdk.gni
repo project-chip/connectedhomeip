@@ -1,0 +1,278 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/jlink.gni")
+import("//build_overrides/mbedtls.gni")
+
+import("//build_overrides/asr.gni")
+
+# Defines an asr SDK build target.
+#
+# Parameters:
+#   sources - The sources files to build.
+#
+template("asr_sdk_sources") {
+  if (defined(invoker.asr_project_dir)) {
+    asr_project_dir = invoker.asr_project_dir
+  }
+
+  # While most asr sdk includes come from the asr_sdk_config config (in
+  # BUILD.gn), this template gets instantiated by each project each of which
+  # provides a few extra includes/defines. Handle those here.
+  config("project_configs") {
+    include_dirs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+    include_dirs += [ "${asr_project_dir}/include" ]
+
+    defines = []
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+  }
+
+  sdk_target_name = target_name
+
+  # Add sources here
+  source_set(sdk_target_name) {
+    sources = []
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    _third_party_src = [
+      #at
+      "at_cmd/atcmd_comm.c",
+      "at_cmd/atcmd_user.c",
+      "at_cmd/atcmd_matter.c",
+
+      #common
+      "common/alto/src/alto_common.c",
+      "common/alto/src/hbird_common.c",
+      "common/alto/src/system_hbird.c",
+      "common/alto/src/GCC/startup_hbird.S",
+      "common/alto/src/GCC/intexc_hbird.S",
+
+      #rtos
+      "freertos/Source/croutine.c",
+      "freertos/Source/event_groups.c",
+      "freertos/Source/list.c",
+      "freertos/Source/portable/GCC/port.c",
+      "freertos/Source/portable/GCC/portasm.S",
+      "freertos/Source/portable/MemMang/heap_5.c",
+      "freertos/Source/queue.c",
+      "freertos/Source/stream_buffer.c",
+      "freertos/Source/tasks.c",
+      "freertos/Source/timers.c",
+      "legartos/lega_rtos.c",
+
+      #peripheral
+      "peripheral/asr/src/alto/asr_alto_apll_rf.c",
+      "peripheral/asr/src/alto/asr_alto_board.c",
+      "peripheral/asr/src/alto/asr_alto_efuse.c",
+      "peripheral/asr/src/alto/asr_alto_pinmux.c",
+      "peripheral/asr/src/alto/asr_alto_port.c",
+      "peripheral/asr/src/alto/asr_alto_boot.c",
+      "peripheral/asr/src/alto/asr_alto_ram_layout.c",
+      "peripheral/asr/src/asr_dma.c",
+      "peripheral/asr/src/asr_efuse.c",
+      "peripheral/asr/src/asr_flash.c",
+      "peripheral/asr/src/asr_flash_alg.c",
+      "peripheral/asr/src/asr_i2c.c",
+      "peripheral/asr/src/asr_gpio.c",
+      "peripheral/asr/src/asr_pwm.c",
+      "peripheral/asr/src/asr_pinmux.c",
+      "peripheral/asr/src/asr_adc.c",
+      "peripheral/asr/src/asr_psram.c",
+      "peripheral/asr/src/asr_rf_spi.c",
+      "peripheral/asr/src/asr_rtc.c",
+      "peripheral/asr/src/asr_timer.c",
+      "peripheral/asr/src/asr_uart.c",
+      "peripheral/asr/src/asr_wdg.c",
+
+      #platform
+      "platform/alto/system/prinfs/printf-stdarg.c",
+      "platform/alto/system/prinfs/printf_uart.c",
+      "platform/alto/system/prinfs/sysCalls.c",
+      "platform/alto/system/soc/soc_init.c",
+      "platform/alto/system/soc/system_cm4.c",
+      "platform/alto/system/soc/systick_delay.c",
+
+      #elog
+      "common/alto/easylogger/elog_async.c",
+      "common/alto/easylogger/elog_buf.c",
+      "common/alto/easylogger/elog_module.c",
+      "common/alto/easylogger/elog_port.c",
+      "common/alto/easylogger/elog_utils.c",
+      "common/alto/easylogger/elog.c",
+
+      #ble
+      "projects/alto_demo/ble_demo/duet_hl_matter/app.c",
+      "projects/alto_demo/ble_demo/duet_hl_matter/user_platform.c",
+
+      #matter
+      "matter/asr_factory_config.c",
+
+      #lwip
+      "lwip/lwip_2.1.2/netif/ethernet.c",
+      "lwip/lwip_2.1.2/port/sys_arch.c",
+      "lwip/lwip_2.1.2/api/api_lib.c",
+      "lwip/lwip_2.1.2/api/api_msg.c",
+      "lwip/lwip_2.1.2/api/err.c",
+      "lwip/lwip_2.1.2/api/if_api.c",
+      "lwip/lwip_2.1.2/api/netbuf.c",
+      "lwip/lwip_2.1.2/api/netdb.c",
+      "lwip/lwip_2.1.2/api/netifapi.c",
+      "lwip/lwip_2.1.2/api/sockets.c",
+      "lwip/lwip_2.1.2/api/tcpip.c",
+      "lwip/lwip_2.1.2/core/altcp.c",
+      "lwip/lwip_2.1.2/core/altcp_alloc.c",
+      "lwip/lwip_2.1.2/core/altcp_tcp.c",
+      "lwip/lwip_2.1.2/core/def.c",
+      "lwip/lwip_2.1.2/core/dns.c",
+      "lwip/lwip_2.1.2/core/inet_chksum.c",
+      "lwip/lwip_2.1.2/core/init.c",
+      "lwip/lwip_2.1.2/core/ip.c",
+      "lwip/lwip_2.1.2/core/ipv4/autoip.c",
+      "lwip/lwip_2.1.2/core/ipv4/dhcp.c",
+      "lwip/lwip_2.1.2/core/ipv4/etharp.c",
+      "lwip/lwip_2.1.2/core/ipv4/icmp.c",
+      "lwip/lwip_2.1.2/core/ipv4/igmp.c",
+      "lwip/lwip_2.1.2/core/ipv4/ip4.c",
+      "lwip/lwip_2.1.2/core/ipv4/ip4_addr.c",
+      "lwip/lwip_2.1.2/core/ipv4/ip4_frag.c",
+      "lwip/lwip_2.1.2/core/ipv6/dhcp6.c",
+      "lwip/lwip_2.1.2/core/ipv6/ethip6.c",
+      "lwip/lwip_2.1.2/core/ipv6/icmp6.c",
+      "lwip/lwip_2.1.2/core/ipv6/inet6.c",
+      "lwip/lwip_2.1.2/core/ipv6/ip6.c",
+      "lwip/lwip_2.1.2/core/ipv6/ip6_addr.c",
+      "lwip/lwip_2.1.2/core/ipv6/ip6_frag.c",
+      "lwip/lwip_2.1.2/core/ipv6/mld6.c",
+      "lwip/lwip_2.1.2/core/ipv6/nd6.c",
+      "lwip/lwip_2.1.2/core/lwip_hooks.c",
+      "lwip/lwip_2.1.2/core/mem.c",
+      "lwip/lwip_2.1.2/core/memp.c",
+      "lwip/lwip_2.1.2/core/netif.c",
+      "lwip/lwip_2.1.2/core/pbuf.c",
+      "lwip/lwip_2.1.2/core/raw.c",
+      "lwip/lwip_2.1.2/core/stats.c",
+      "lwip/lwip_2.1.2/core/sys.c",
+      "lwip/lwip_2.1.2/core/tcp.c",
+      "lwip/lwip_2.1.2/core/tcp_in.c",
+      "lwip/lwip_2.1.2/core/tcp_out.c",
+      "lwip/lwip_2.1.2/core/timeouts.c",
+      "lwip/lwip_2.1.2/core/udp.c",
+
+      #mbedtls
+      "lwip/mbedtls-mbedtls-2.18/library/aes.c",
+      "lwip/mbedtls-mbedtls-2.18/library/aesni.c",
+      "lwip/mbedtls-mbedtls-2.18/library/arc4.c",
+      "lwip/mbedtls-mbedtls-2.18/library/aria.c",
+      "lwip/mbedtls-mbedtls-2.18/library/asn1parse.c",
+      "lwip/mbedtls-mbedtls-2.18/library/asn1write.c",
+      "lwip/mbedtls-mbedtls-2.18/library/base64.c",
+      "lwip/mbedtls-mbedtls-2.18/library/bignum.c",
+      "lwip/mbedtls-mbedtls-2.18/library/blowfish.c",
+      "lwip/mbedtls-mbedtls-2.18/library/camellia.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ccm.c",
+      "lwip/mbedtls-mbedtls-2.18/library/certs.c",
+      "lwip/mbedtls-mbedtls-2.18/library/chacha20.c",
+      "lwip/mbedtls-mbedtls-2.18/library/chachapoly.c",
+      "lwip/mbedtls-mbedtls-2.18/library/cipher.c",
+      "lwip/mbedtls-mbedtls-2.18/library/cipher_wrap.c",
+      "lwip/mbedtls-mbedtls-2.18/library/cmac.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ctr_drbg.c",
+      "lwip/mbedtls-mbedtls-2.18/library/debug.c",
+      "lwip/mbedtls-mbedtls-2.18/library/des.c",
+      "lwip/mbedtls-mbedtls-2.18/library/dhm.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ecdh.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ecdsa.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ecjpake.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ecp.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ecp_curves.c",
+      "lwip/mbedtls-mbedtls-2.18/library/entropy.c",
+      "lwip/mbedtls-mbedtls-2.18/library/entropy_poll.c",
+      "lwip/mbedtls-mbedtls-2.18/library/error.c",
+      "lwip/mbedtls-mbedtls-2.18/library/gcm.c",
+      "lwip/mbedtls-mbedtls-2.18/library/havege.c",
+      "lwip/mbedtls-mbedtls-2.18/library/hkdf.c",
+      "lwip/mbedtls-mbedtls-2.18/library/hmac_drbg.c",
+      "lwip/mbedtls-mbedtls-2.18/library/md.c",
+      "lwip/mbedtls-mbedtls-2.18/library/md2.c",
+      "lwip/mbedtls-mbedtls-2.18/library/md4.c",
+      "lwip/mbedtls-mbedtls-2.18/library/md5.c",
+      "lwip/mbedtls-mbedtls-2.18/library/md_wrap.c",
+      "lwip/mbedtls-mbedtls-2.18/library/memory_buffer_alloc.c",
+      "lwip/mbedtls-mbedtls-2.18/library/nist_kw.c",
+      "lwip/mbedtls-mbedtls-2.18/library/oid.c",
+      "lwip/mbedtls-mbedtls-2.18/library/padlock.c",
+      "lwip/mbedtls-mbedtls-2.18/library/pem.c",
+      "lwip/mbedtls-mbedtls-2.18/library/pk.c",
+      "lwip/mbedtls-mbedtls-2.18/library/pk_wrap.c",
+      "lwip/mbedtls-mbedtls-2.18/library/pkcs11.c",
+      "lwip/mbedtls-mbedtls-2.18/library/pkcs12.c",
+      "lwip/mbedtls-mbedtls-2.18/library/pkcs5.c",
+      "lwip/mbedtls-mbedtls-2.18/library/pkparse.c",
+      "lwip/mbedtls-mbedtls-2.18/library/pkwrite.c",
+      "lwip/mbedtls-mbedtls-2.18/library/platform.c",
+      "lwip/mbedtls-mbedtls-2.18/library/platform_util.c",
+      "lwip/mbedtls-mbedtls-2.18/library/poly1305.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ripemd160.c",
+      "lwip/mbedtls-mbedtls-2.18/library/rsa.c",
+      "lwip/mbedtls-mbedtls-2.18/library/rsa_internal.c",
+      "lwip/mbedtls-mbedtls-2.18/library/sha1.c",
+      "lwip/mbedtls-mbedtls-2.18/library/sha256.c",
+      "lwip/mbedtls-mbedtls-2.18/library/sha512.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ssl_cache.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ssl_ciphersuites.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ssl_cli.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ssl_cookie.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ssl_srv.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ssl_ticket.c",
+      "lwip/mbedtls-mbedtls-2.18/library/ssl_tls.c",
+      "lwip/mbedtls-mbedtls-2.18/library/threading.c",
+      "lwip/mbedtls-mbedtls-2.18/library/timing.c",
+      "lwip/mbedtls-mbedtls-2.18/library/version.c",
+      "lwip/mbedtls-mbedtls-2.18/library/version_features.c",
+      "lwip/mbedtls-mbedtls-2.18/library/x509.c",
+      "lwip/mbedtls-mbedtls-2.18/library/x509_create.c",
+      "lwip/mbedtls-mbedtls-2.18/library/x509_crl.c",
+      "lwip/mbedtls-mbedtls-2.18/library/x509_crt.c",
+      "lwip/mbedtls-mbedtls-2.18/library/x509_csr.c",
+      "lwip/mbedtls-mbedtls-2.18/library/x509write_crt.c",
+      "lwip/mbedtls-mbedtls-2.18/library/x509write_csr.c",
+      "lwip/mbedtls-mbedtls-2.18/library/xtea.c",
+      "lwip/mbedtls-mbedtls-2.18/asr_mbedtls/alt/entropy_hardware_alt.c",
+      "lwip/mbedtls-mbedtls-2.18/asr_mbedtls/alt/aes_alt.c",
+      "lwip/mbedtls-mbedtls-2.18/asr_mbedtls/alt/sha1_alt.c",
+      "lwip/mbedtls-mbedtls-2.18/asr_mbedtls/alt/sha256_alt.c",
+    ]
+
+    foreach(src, _third_party_src) {
+      sources += [ rebase_path(src,
+                               "${asr_project_dir}",
+                               "${asr_sdk_build_root}/asr_sdk/") ]
+    }
+
+    public_deps = [ "${chip_root}/src/lwip:lwip" ]
+
+    public_configs = [ ":project_configs" ]
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+  }
+}

@@ -83,7 +83,6 @@ extern "C" {
 #endif
 void wfx_rsidev_init(void);
 void wfx_rsi_task(void * arg);
-void efr32Log(const char * aFormat, ...);
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -94,7 +93,6 @@ int32_t wfx_rsi_disconnect();
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
 int32_t wfx_rsi_power_save();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
-#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
 
 #ifdef __cplusplus
 }

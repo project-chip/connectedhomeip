@@ -76,9 +76,12 @@ function atomicType(arg)
     return 'chip::Percent100ths';
   case 'epoch_us':
   case 'systime_us':
+  case 'posix_ms':
+  case 'systime_ms':
     return 'uint64_t';
   case 'epoch_s':
   case 'utc':
+  case 'elapsed_s':
     return 'uint32_t';
   default:
     throw 'not overriding';

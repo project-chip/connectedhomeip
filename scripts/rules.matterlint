@@ -75,6 +75,8 @@ load "../src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml"
 load "../src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml";
 load "../src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/air-quality-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/replacable-monitoring-cluster.xml";
 
 all endpoints {
     // These attributes follow a different code path and do not have to be

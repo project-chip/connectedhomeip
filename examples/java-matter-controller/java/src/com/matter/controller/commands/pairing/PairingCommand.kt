@@ -70,8 +70,8 @@ abstract class PairingCommand(
       PairingModeType.NONE -> {}
       PairingModeType.CODE, PairingModeType.CODE_PASE_ONLY -> {
         addArgument("payload", onboardingPayload, null, false)
-        addArgument("discover-once", discoverOnce, null, false)
-        addArgument("use-only-onnetwork-discovery", useOnlyOnNetworkDiscovery, null, false)
+        addArgument("discover-once", discoverOnce, null, true)
+        addArgument("use-only-onnetwork-discovery", useOnlyOnNetworkDiscovery, null, true)
       }
 
       PairingModeType.ADDRESS_PASE_ONLY -> {
@@ -243,6 +243,14 @@ abstract class PairingCommand(
   private fun String.hexToByteArray(): ByteArray {
     return chunked(2).map { byteStr -> byteStr.toUByte(16).toByte() }.toByteArray()
   }
+
+  fun getDiscoverOnce(): Boolean {
+    return discoverOnce.get()
+  }
+
+  fun getUseOnlyOnNetworkDiscovery(): Boolean {
+    return useOnlyOnNetworkDiscovery.get()
+  }  
 
   companion object {
     private val logger = Logger.getLogger(PairingCommand::class.java.name)

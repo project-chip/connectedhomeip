@@ -293,9 +293,6 @@ tests:
           In the case of chip tool as a client, here is an example command the client can write an attribute in the basic cluster in the TH to change the value that the client subscribed in the above command.
 
 
-           Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
-
           basicinformation subscribe node-label 30 200  1 0
 
           On TH (On the reference app) Verify if DUT is responding with the below status response for the above command
@@ -357,6 +354,7 @@ tests:
           [1657884902.176771][2938:2943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 3826372940
           [1657884902.176833][2938:2943] CHIP:TOO:   NodeLabel: label
           [1657884902.176910][2938:2943] CHIP:DMG: Refresh LivenessCheckTime for 225000 milliseconds with SubscriptionId = 0x6a6457a1 Peer = 01:0000000000000001
+
 
           Verify the above command multiple times by changing attribute value(3 times)
       disabled: true
@@ -492,7 +490,7 @@ tests:
           DUT implementation required to verify subscribe an attribute of data type signed integer
 
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -506,7 +504,7 @@ tests:
 
 
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:
@@ -520,7 +518,7 @@ tests:
 
 
 
-          If the Vendor DUT doesn"t implement/supported this attribute, Please mark the test step as "Not Applicable"
+          If the Vendor DUT doesn't implement/supported this attribute, Please mark the test step as "Not Applicable"
       disabled: true
 
     - label:

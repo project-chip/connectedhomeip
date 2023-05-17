@@ -443,6 +443,7 @@ public:
      * @param[in] rendezvousParams      The Rendezvous connection parameters
      */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams);
+
     /**
      * @overload
      * @param[in] remoteDeviceId        The remote device Id.

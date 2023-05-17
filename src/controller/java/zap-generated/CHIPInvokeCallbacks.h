@@ -434,6 +434,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPIcdManagementClusterRegisterClientResponseCallback
+    : public Callback::Callback<CHIPIcdManagementClusterRegisterClientResponseCallbackType>
+{
+public:
+    CHIPIcdManagementClusterRegisterClientResponseCallback(jobject javaCallback);
+
+    ~CHIPIcdManagementClusterRegisterClientResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterGetWeekDayScheduleResponseCallback
     : public Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {
