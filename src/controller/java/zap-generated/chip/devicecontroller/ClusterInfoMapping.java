@@ -6858,6 +6858,102 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedSmokeCoAlarmClusterGeneratedCommandListAttributeCallback
+      implements ChipClusters.SmokeCoAlarmCluster.GeneratedCommandListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeCoAlarmClusterAcceptedCommandListAttributeCallback
+      implements ChipClusters.SmokeCoAlarmCluster.AcceptedCommandListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeCoAlarmClusterEventListAttributeCallback
+      implements ChipClusters.SmokeCoAlarmCluster.EventListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedSmokeCoAlarmClusterAttributeListAttributeCallback
+      implements ChipClusters.SmokeCoAlarmCluster.AttributeListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedHepaFilterMonitoringClusterGeneratedCommandListAttributeCallback
       implements ChipClusters.HepaFilterMonitoringCluster.GeneratedCommandListAttributeCallback,
           DelegatedClusterCallback {
@@ -14730,6 +14826,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.AirQualityCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("airQuality", airQualityClusterInfo);
+    ClusterInfo smokeCoAlarmClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.SmokeCoAlarmCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("smokeCoAlarm", smokeCoAlarmClusterInfo);
     ClusterInfo hepaFilterMonitoringClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.HepaFilterMonitoringCluster(ptr, endpointId),
@@ -15001,6 +15102,7 @@ public class ClusterInfoMapping {
     destination.get("icdManagement").combineCommands(source.get("icdManagement"));
     destination.get("modeSelect").combineCommands(source.get("modeSelect"));
     destination.get("airQuality").combineCommands(source.get("airQuality"));
+    destination.get("smokeCoAlarm").combineCommands(source.get("smokeCoAlarm"));
     destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
     destination
         .get("activatedCarbonFilterMonitoring")
@@ -17146,6 +17248,20 @@ public class ClusterInfoMapping {
     commandMap.put("modeSelect", modeSelectClusterInteractionInfoMap);
     Map<String, InteractionInfo> airQualityClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("airQuality", airQualityClusterInteractionInfoMap);
+    Map<String, InteractionInfo> smokeCoAlarmClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> smokeCoAlarmselfTestRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo smokeCoAlarmselfTestRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .selfTestRequest((DefaultClusterCallback) callback);
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            smokeCoAlarmselfTestRequestCommandParams);
+    smokeCoAlarmClusterInteractionInfoMap.put(
+        "selfTestRequest", smokeCoAlarmselfTestRequestInteractionInfo);
+    commandMap.put("smokeCoAlarm", smokeCoAlarmClusterInteractionInfoMap);
     Map<String, InteractionInfo> hepaFilterMonitoringClusterInteractionInfoMap =
         new LinkedHashMap<>();
     commandMap.put("hepaFilterMonitoring", hepaFilterMonitoringClusterInteractionInfoMap);
