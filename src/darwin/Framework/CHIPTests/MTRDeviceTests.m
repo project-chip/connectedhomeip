@@ -1271,6 +1271,17 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      };
                                      XCTAssertEqualObjects(result[MTRDataKey], expectedResult);
                                      XCTAssertNil(result[MTRErrorKey]);
+
+                                     // Now check our strong-typed parsing bits.
+                                     NSError * parseError;
+                                     __auto_type * response =
+                                         [[MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams alloc]
+                                             initWithResponseValue:result
+                                                             error:&parseError];
+                                     XCTAssertNil(parseError);
+                                     XCTAssertNotNil(response);
+                                     XCTAssertEqual(response.groupKeySetIDs.count, 1);
+                                     XCTAssertEqualObjects(response.groupKeySetIDs[0], @(0));
                                  }
                                  XCTAssertEqual([resultArray count], 1);
                              }

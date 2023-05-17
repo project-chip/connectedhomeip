@@ -16,6 +16,13 @@
  */
 
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRBaseDevice_Internal.h"
+#import "MTRCommandPayloads_Internal.h"
+#import "MTRError_Internal.h"
+#import "MTRLogging_Internal.h"
+
+#include <app/data-model/Decode.h>
+#include <lib/core/TLV.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -162,6 +169,61 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRGroupsClusterAddGroupResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRGroupsClusterAddGroupResponseParams (Deprecated)
@@ -253,6 +315,66 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRGroupsClusterViewGroupResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.groupName = [[NSString alloc] initWithBytes:decodableStruct.groupName.data()
+                                                  length:decodableStruct.groupName.size()
+                                                encoding:NSUTF8StringEncoding];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRGroupsClusterViewGroupResponseParams (Deprecated)
@@ -328,6 +450,79 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRGroupsClusterGetGroupMembershipResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &)decodableStruct
+{
+    {
+        if (decodableStruct.capacity.IsNull()) {
+            self.capacity = nil;
+        } else {
+            self.capacity = [NSNumber numberWithUnsignedChar:decodableStruct.capacity.Value()];
+        }
+    }
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.groupList.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            self.groupList = array_0;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRGroupsClusterRemoveGroupParams
 - (instancetype)init
@@ -403,6 +598,61 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRGroupsClusterRemoveGroupResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRGroupsClusterRemoveGroupResponseParams (Deprecated)
@@ -592,6 +842,64 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesClusterAddSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRScenesClusterAddSceneResponseParams (Deprecated)
@@ -717,6 +1025,137 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesClusterViewSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    {
+        if (decodableStruct.transitionTime.HasValue()) {
+            self.transitionTime = [NSNumber numberWithUnsignedShort:decodableStruct.transitionTime.Value()];
+        } else {
+            self.transitionTime = nil;
+        }
+    }
+    {
+        if (decodableStruct.sceneName.HasValue()) {
+            self.sceneName = [[NSString alloc] initWithBytes:decodableStruct.sceneName.Value().data()
+                                                      length:decodableStruct.sceneName.Value().size()
+                                                    encoding:NSUTF8StringEncoding];
+        } else {
+            self.sceneName = nil;
+        }
+    }
+    {
+        if (decodableStruct.extensionFieldSets.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.extensionFieldSets.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRScenesClusterExtensionFieldSet * newElement_1;
+                    newElement_1 = [MTRScenesClusterExtensionFieldSet new];
+                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.attributeValueList.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            MTRScenesClusterAttributeValuePair * newElement_3;
+                            newElement_3 = [MTRScenesClusterAttributeValuePair new];
+                            if (entry_3.attributeID.HasValue()) {
+                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
+                            } else {
+                                newElement_3.attributeID = nil;
+                            }
+                            { // Scope for our temporary variables
+                                auto * array_5 = [NSMutableArray new];
+                                auto iter_5 = entry_3.attributeValue.begin();
+                                while (iter_5.Next()) {
+                                    auto & entry_5 = iter_5.GetValue();
+                                    NSNumber * newElement_5;
+                                    newElement_5 = [NSNumber numberWithUnsignedChar:entry_5];
+                                    [array_5 addObject:newElement_5];
+                                }
+                                CHIP_ERROR err = iter_5.GetStatus();
+                                if (err != CHIP_NO_ERROR) {
+                                    return err;
+                                }
+                                newElement_3.attributeValue = array_5;
+                            }
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            return err;
+                        }
+                        newElement_1.attributeValueList = array_3;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.extensionFieldSets = array_1;
+            }
+        } else {
+            self.extensionFieldSets = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRScenesClusterViewSceneResponseParams (Deprecated)
@@ -832,6 +1271,64 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesClusterRemoveSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRScenesClusterRemoveSceneResponseParams (Deprecated)
@@ -930,6 +1427,61 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesClusterRemoveAllScenesResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRScenesClusterRemoveAllScenesResponseParams (Deprecated)
@@ -1035,6 +1587,64 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesClusterStoreSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRScenesClusterStoreSceneResponseParams (Deprecated)
@@ -1199,6 +1809,89 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesClusterGetSceneMembershipResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        if (decodableStruct.capacity.IsNull()) {
+            self.capacity = nil;
+        } else {
+            self.capacity = [NSNumber numberWithUnsignedChar:decodableStruct.capacity.Value()];
+        }
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        if (decodableStruct.sceneList.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.sceneList.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    NSNumber * newElement_1;
+                    newElement_1 = [NSNumber numberWithUnsignedChar:entry_1];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.sceneList = array_1;
+            }
+        } else {
+            self.sceneList = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRScenesClusterGetSceneMembershipResponseParams (Deprecated)
@@ -1314,6 +2007,64 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesClusterEnhancedAddSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRScenesClusterEnhancedAddSceneResponseParams (Deprecated)
@@ -1439,6 +2190,137 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesClusterEnhancedViewSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    {
+        if (decodableStruct.transitionTime.HasValue()) {
+            self.transitionTime = [NSNumber numberWithUnsignedShort:decodableStruct.transitionTime.Value()];
+        } else {
+            self.transitionTime = nil;
+        }
+    }
+    {
+        if (decodableStruct.sceneName.HasValue()) {
+            self.sceneName = [[NSString alloc] initWithBytes:decodableStruct.sceneName.Value().data()
+                                                      length:decodableStruct.sceneName.Value().size()
+                                                    encoding:NSUTF8StringEncoding];
+        } else {
+            self.sceneName = nil;
+        }
+    }
+    {
+        if (decodableStruct.extensionFieldSets.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.extensionFieldSets.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRScenesClusterExtensionFieldSet * newElement_1;
+                    newElement_1 = [MTRScenesClusterExtensionFieldSet new];
+                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.attributeValueList.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            MTRScenesClusterAttributeValuePair * newElement_3;
+                            newElement_3 = [MTRScenesClusterAttributeValuePair new];
+                            if (entry_3.attributeID.HasValue()) {
+                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
+                            } else {
+                                newElement_3.attributeID = nil;
+                            }
+                            { // Scope for our temporary variables
+                                auto * array_5 = [NSMutableArray new];
+                                auto iter_5 = entry_3.attributeValue.begin();
+                                while (iter_5.Next()) {
+                                    auto & entry_5 = iter_5.GetValue();
+                                    NSNumber * newElement_5;
+                                    newElement_5 = [NSNumber numberWithUnsignedChar:entry_5];
+                                    [array_5 addObject:newElement_5];
+                                }
+                                CHIP_ERROR err = iter_5.GetStatus();
+                                if (err != CHIP_NO_ERROR) {
+                                    return err;
+                                }
+                                newElement_3.attributeValue = array_5;
+                            }
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            return err;
+                        }
+                        newElement_1.attributeValueList = array_3;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.extensionFieldSets = array_1;
+            }
+        } else {
+            self.extensionFieldSets = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRScenesClusterEnhancedViewSceneResponseParams (Deprecated)
@@ -1585,6 +2467,64 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesClusterCopySceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupIdentifierFrom = [NSNumber numberWithUnsignedShort:decodableStruct.groupIdentifierFrom];
+    }
+    {
+        self.sceneIdentifierFrom = [NSNumber numberWithUnsignedChar:decodableStruct.sceneIdentifierFrom];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRScenesClusterCopySceneResponseParams (Deprecated)
@@ -2733,6 +3673,113 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTROTASoftwareUpdateProviderClusterQueryImageResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.delayedActionTime.HasValue()) {
+            self.delayedActionTime = [NSNumber numberWithUnsignedInt:decodableStruct.delayedActionTime.Value()];
+        } else {
+            self.delayedActionTime = nil;
+        }
+    }
+    {
+        if (decodableStruct.imageURI.HasValue()) {
+            self.imageURI = [[NSString alloc] initWithBytes:decodableStruct.imageURI.Value().data()
+                                                     length:decodableStruct.imageURI.Value().size()
+                                                   encoding:NSUTF8StringEncoding];
+        } else {
+            self.imageURI = nil;
+        }
+    }
+    {
+        if (decodableStruct.softwareVersion.HasValue()) {
+            self.softwareVersion = [NSNumber numberWithUnsignedInt:decodableStruct.softwareVersion.Value()];
+        } else {
+            self.softwareVersion = nil;
+        }
+    }
+    {
+        if (decodableStruct.softwareVersionString.HasValue()) {
+            self.softwareVersionString = [[NSString alloc] initWithBytes:decodableStruct.softwareVersionString.Value().data()
+                                                                  length:decodableStruct.softwareVersionString.Value().size()
+                                                                encoding:NSUTF8StringEncoding];
+        } else {
+            self.softwareVersionString = nil;
+        }
+    }
+    {
+        if (decodableStruct.updateToken.HasValue()) {
+            self.updateToken = [NSData dataWithBytes:decodableStruct.updateToken.Value().data()
+                                              length:decodableStruct.updateToken.Value().size()];
+        } else {
+            self.updateToken = nil;
+        }
+    }
+    {
+        if (decodableStruct.userConsentNeeded.HasValue()) {
+            self.userConsentNeeded = [NSNumber numberWithBool:decodableStruct.userConsentNeeded.Value()];
+        } else {
+            self.userConsentNeeded = nil;
+        }
+    }
+    {
+        if (decodableStruct.metadataForRequestor.HasValue()) {
+            self.metadataForRequestor = [NSData dataWithBytes:decodableStruct.metadataForRequestor.Value().data()
+                                                       length:decodableStruct.metadataForRequestor.Value().size()];
+        } else {
+            self.metadataForRequestor = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams
@@ -2806,6 +3853,61 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &)decodableStruct
+{
+    {
+        self.action = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.action)];
+    }
+    {
+        self.delayedActionTime = [NSNumber numberWithUnsignedInt:decodableStruct.delayedActionTime];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
@@ -2984,6 +4086,63 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRGeneralCommissioningClusterArmFailSafeResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &)decodableStruct
+{
+    {
+        self.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.errorCode)];
+    }
+    {
+        self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.data()
+                                                  length:decodableStruct.debugText.size()
+                                                encoding:NSUTF8StringEncoding];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRGeneralCommissioningClusterSetRegulatoryConfigParams
 - (instancetype)init
@@ -3053,6 +4212,63 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &)decodableStruct
+{
+    {
+        self.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.errorCode)];
+    }
+    {
+        self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.data()
+                                                  length:decodableStruct.debugText.size()
+                                                encoding:NSUTF8StringEncoding];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRGeneralCommissioningClusterCommissioningCompleteParams
 - (instancetype)init
@@ -3112,6 +4328,63 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRGeneralCommissioningClusterCommissioningCompleteResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &)decodableStruct
+{
+    {
+        self.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.errorCode)];
+    }
+    {
+        self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.data()
+                                                  length:decodableStruct.debugText.size()
+                                                encoding:NSUTF8StringEncoding];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRNetworkCommissioningClusterScanNetworksParams
 - (instancetype)init
@@ -3185,6 +4458,126 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRNetworkCommissioningClusterScanNetworksResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &)decodableStruct
+{
+    {
+        self.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.networkingStatus)];
+    }
+    {
+        if (decodableStruct.debugText.HasValue()) {
+            self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.Value().data()
+                                                      length:decodableStruct.debugText.Value().size()
+                                                    encoding:NSUTF8StringEncoding];
+        } else {
+            self.debugText = nil;
+        }
+    }
+    {
+        if (decodableStruct.wiFiScanResults.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.wiFiScanResults.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_1;
+                    newElement_1 = [MTRNetworkCommissioningClusterWiFiInterfaceScanResult new];
+                    newElement_1.security = [NSNumber numberWithUnsignedChar:entry_1.security.Raw()];
+                    newElement_1.ssid = [NSData dataWithBytes:entry_1.ssid.data() length:entry_1.ssid.size()];
+                    newElement_1.bssid = [NSData dataWithBytes:entry_1.bssid.data() length:entry_1.bssid.size()];
+                    newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
+                    newElement_1.wiFiBand = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.wiFiBand)];
+                    newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.wiFiScanResults = array_1;
+            }
+        } else {
+            self.wiFiScanResults = nil;
+        }
+    }
+    {
+        if (decodableStruct.threadScanResults.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.threadScanResults.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRNetworkCommissioningClusterThreadInterfaceScanResult * newElement_1;
+                    newElement_1 = [MTRNetworkCommissioningClusterThreadInterfaceScanResult new];
+                    newElement_1.panId = [NSNumber numberWithUnsignedShort:entry_1.panId];
+                    newElement_1.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_1.extendedPanId];
+                    newElement_1.networkName = [[NSString alloc] initWithBytes:entry_1.networkName.data()
+                                                                        length:entry_1.networkName.size()
+                                                                      encoding:NSUTF8StringEncoding];
+                    newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
+                    newElement_1.version = [NSNumber numberWithUnsignedChar:entry_1.version];
+                    newElement_1.extendedAddress = [NSData dataWithBytes:entry_1.extendedAddress.data()
+                                                                  length:entry_1.extendedAddress.size()];
+                    newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
+                    newElement_1.lqi = [NSNumber numberWithUnsignedChar:entry_1.lqi];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.threadScanResults = array_1;
+            }
+        } else {
+            self.threadScanResults = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams
 - (instancetype)init
@@ -3328,6 +4721,74 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRNetworkCommissioningClusterNetworkConfigResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &)decodableStruct
+{
+    {
+        self.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.networkingStatus)];
+    }
+    {
+        if (decodableStruct.debugText.HasValue()) {
+            self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.Value().data()
+                                                      length:decodableStruct.debugText.Value().size()
+                                                    encoding:NSUTF8StringEncoding];
+        } else {
+            self.debugText = nil;
+        }
+    }
+    {
+        if (decodableStruct.networkIndex.HasValue()) {
+            self.networkIndex = [NSNumber numberWithUnsignedChar:decodableStruct.networkIndex.Value()];
+        } else {
+            self.networkIndex = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRNetworkCommissioningClusterConnectNetworkParams
 - (instancetype)init
@@ -3398,6 +4859,74 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRNetworkCommissioningClusterConnectNetworkResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &)decodableStruct
+{
+    {
+        self.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.networkingStatus)];
+    }
+    {
+        if (decodableStruct.debugText.HasValue()) {
+            self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.Value().data()
+                                                      length:decodableStruct.debugText.Value().size()
+                                                    encoding:NSUTF8StringEncoding];
+        } else {
+            self.debugText = nil;
+        }
+    }
+    {
+        if (decodableStruct.errorValue.IsNull()) {
+            self.errorValue = nil;
+        } else {
+            self.errorValue = [NSNumber numberWithInt:decodableStruct.errorValue.Value()];
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRNetworkCommissioningClusterReorderNetworkParams
 - (instancetype)init
@@ -3512,6 +5041,75 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRDiagnosticLogsClusterRetrieveLogsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        self.logContent = [NSData dataWithBytes:decodableStruct.logContent.data() length:decodableStruct.logContent.size()];
+    }
+    {
+        if (decodableStruct.UTCTimeStamp.HasValue()) {
+            self.utcTimeStamp = [NSNumber numberWithUnsignedLongLong:decodableStruct.UTCTimeStamp.Value()];
+        } else {
+            self.utcTimeStamp = nil;
+        }
+    }
+    {
+        if (decodableStruct.timeSinceBoot.HasValue()) {
+            self.timeSinceBoot = [NSNumber numberWithUnsignedLongLong:decodableStruct.timeSinceBoot.Value()];
+        } else {
+            self.timeSinceBoot = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRDiagnosticLogsClusterRetrieveLogsResponseParams (Deprecated)
@@ -3895,6 +5493,63 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTROperationalCredentialsClusterAttestationResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &)decodableStruct
+{
+    {
+        self.attestationElements = [NSData dataWithBytes:decodableStruct.attestationElements.data()
+                                                  length:decodableStruct.attestationElements.size()];
+    }
+    {
+        self.attestationSignature = [NSData dataWithBytes:decodableStruct.attestationSignature.data()
+                                                   length:decodableStruct.attestationSignature.size()];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTROperationalCredentialsClusterAttestationResponseParams (Deprecated)
@@ -3968,6 +5623,58 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTROperationalCredentialsClusterCertificateChainResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &)decodableStruct
+{
+    {
+        self.certificate = [NSData dataWithBytes:decodableStruct.certificate.data() length:decodableStruct.certificate.size()];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTROperationalCredentialsClusterCSRRequestParams
 - (instancetype)init
@@ -4036,6 +5743,63 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTROperationalCredentialsClusterCSRResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &)decodableStruct
+{
+    {
+        self.nocsrElements = [NSData dataWithBytes:decodableStruct.NOCSRElements.data()
+                                            length:decodableStruct.NOCSRElements.size()];
+    }
+    {
+        self.attestationSignature = [NSData dataWithBytes:decodableStruct.attestationSignature.data()
+                                                   length:decodableStruct.attestationSignature.size()];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTROperationalCredentialsClusterAddNOCParams
 - (instancetype)init
@@ -4152,6 +5916,74 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTROperationalCredentialsClusterNOCResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &)decodableStruct
+{
+    {
+        self.statusCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.statusCode)];
+    }
+    {
+        if (decodableStruct.fabricIndex.HasValue()) {
+            self.fabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.fabricIndex.Value()];
+        } else {
+            self.fabricIndex = nil;
+        }
+    }
+    {
+        if (decodableStruct.debugText.HasValue()) {
+            self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.Value().data()
+                                                      length:decodableStruct.debugText.Value().size()
+                                                    encoding:NSUTF8StringEncoding];
+        } else {
+            self.debugText = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTROperationalCredentialsClusterUpdateFabricLabelParams
 - (instancetype)init
@@ -4348,6 +6180,97 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRGroupKeyManagementClusterKeySetReadResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &)decodableStruct
+{
+    {
+        self.groupKeySet = [MTRGroupKeyManagementClusterGroupKeySetStruct new];
+        self.groupKeySet.groupKeySetID = [NSNumber numberWithUnsignedShort:decodableStruct.groupKeySet.groupKeySetID];
+        self.groupKeySet.groupKeySecurityPolicy =
+            [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.groupKeySet.groupKeySecurityPolicy)];
+        if (decodableStruct.groupKeySet.epochKey0.IsNull()) {
+            self.groupKeySet.epochKey0 = nil;
+        } else {
+            self.groupKeySet.epochKey0 = [NSData dataWithBytes:decodableStruct.groupKeySet.epochKey0.Value().data()
+                                                        length:decodableStruct.groupKeySet.epochKey0.Value().size()];
+        }
+        if (decodableStruct.groupKeySet.epochStartTime0.IsNull()) {
+            self.groupKeySet.epochStartTime0 = nil;
+        } else {
+            self.groupKeySet.epochStartTime0 =
+                [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime0.Value()];
+        }
+        if (decodableStruct.groupKeySet.epochKey1.IsNull()) {
+            self.groupKeySet.epochKey1 = nil;
+        } else {
+            self.groupKeySet.epochKey1 = [NSData dataWithBytes:decodableStruct.groupKeySet.epochKey1.Value().data()
+                                                        length:decodableStruct.groupKeySet.epochKey1.Value().size()];
+        }
+        if (decodableStruct.groupKeySet.epochStartTime1.IsNull()) {
+            self.groupKeySet.epochStartTime1 = nil;
+        } else {
+            self.groupKeySet.epochStartTime1 =
+                [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime1.Value()];
+        }
+        if (decodableStruct.groupKeySet.epochKey2.IsNull()) {
+            self.groupKeySet.epochKey2 = nil;
+        } else {
+            self.groupKeySet.epochKey2 = [NSData dataWithBytes:decodableStruct.groupKeySet.epochKey2.Value().data()
+                                                        length:decodableStruct.groupKeySet.epochKey2.Value().size()];
+        }
+        if (decodableStruct.groupKeySet.epochStartTime2.IsNull()) {
+            self.groupKeySet.epochStartTime2 = nil;
+        } else {
+            self.groupKeySet.epochStartTime2 =
+                [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime2.Value()];
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRGroupKeyManagementClusterKeySetRemoveParams
 - (instancetype)init
@@ -4439,6 +6362,72 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &)decodableStruct
+{
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.groupKeySetIDs.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            self.groupKeySetIDs = array_0;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRModeSelectClusterChangeToModeParams
 - (instancetype)init
@@ -5026,6 +7015,99 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRDoorLockClusterGetWeekDayScheduleResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &)decodableStruct
+{
+    {
+        self.weekDayIndex = [NSNumber numberWithUnsignedChar:decodableStruct.weekDayIndex];
+    }
+    {
+        self.userIndex = [NSNumber numberWithUnsignedShort:decodableStruct.userIndex];
+    }
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.daysMask.HasValue()) {
+            self.daysMask = [NSNumber numberWithUnsignedChar:decodableStruct.daysMask.Value().Raw()];
+        } else {
+            self.daysMask = nil;
+        }
+    }
+    {
+        if (decodableStruct.startHour.HasValue()) {
+            self.startHour = [NSNumber numberWithUnsignedChar:decodableStruct.startHour.Value()];
+        } else {
+            self.startHour = nil;
+        }
+    }
+    {
+        if (decodableStruct.startMinute.HasValue()) {
+            self.startMinute = [NSNumber numberWithUnsignedChar:decodableStruct.startMinute.Value()];
+        } else {
+            self.startMinute = nil;
+        }
+    }
+    {
+        if (decodableStruct.endHour.HasValue()) {
+            self.endHour = [NSNumber numberWithUnsignedChar:decodableStruct.endHour.Value()];
+        } else {
+            self.endHour = nil;
+        }
+    }
+    {
+        if (decodableStruct.endMinute.HasValue()) {
+            self.endMinute = [NSNumber numberWithUnsignedChar:decodableStruct.endMinute.Value()];
+        } else {
+            self.endMinute = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRDoorLockClusterClearWeekDayScheduleParams
 - (instancetype)init
@@ -5177,6 +7259,78 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRDoorLockClusterGetYearDayScheduleResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &)decodableStruct
+{
+    {
+        self.yearDayIndex = [NSNumber numberWithUnsignedChar:decodableStruct.yearDayIndex];
+    }
+    {
+        self.userIndex = [NSNumber numberWithUnsignedShort:decodableStruct.userIndex];
+    }
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.localStartTime.HasValue()) {
+            self.localStartTime = [NSNumber numberWithUnsignedInt:decodableStruct.localStartTime.Value()];
+        } else {
+            self.localStartTime = nil;
+        }
+    }
+    {
+        if (decodableStruct.localEndTime.HasValue()) {
+            self.localEndTime = [NSNumber numberWithUnsignedInt:decodableStruct.localEndTime.Value()];
+        } else {
+            self.localEndTime = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRDoorLockClusterClearYearDayScheduleParams
 - (instancetype)init
@@ -5325,6 +7479,82 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRDoorLockClusterGetHolidayScheduleResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &)decodableStruct
+{
+    {
+        self.holidayIndex = [NSNumber numberWithUnsignedChar:decodableStruct.holidayIndex];
+    }
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.localStartTime.HasValue()) {
+            self.localStartTime = [NSNumber numberWithUnsignedInt:decodableStruct.localStartTime.Value()];
+        } else {
+            self.localStartTime = nil;
+        }
+    }
+    {
+        if (decodableStruct.localEndTime.HasValue()) {
+            self.localEndTime = [NSNumber numberWithUnsignedInt:decodableStruct.localEndTime.Value()];
+        } else {
+            self.localEndTime = nil;
+        }
+    }
+    {
+        if (decodableStruct.operatingMode.HasValue()) {
+            self.operatingMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.operatingMode.Value())];
+        } else {
+            self.operatingMode = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRDoorLockClusterClearHolidayScheduleParams
 - (instancetype)init
@@ -5510,6 +7740,139 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRDoorLockClusterGetUserResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &)decodableStruct
+{
+    {
+        self.userIndex = [NSNumber numberWithUnsignedShort:decodableStruct.userIndex];
+    }
+    {
+        if (decodableStruct.userName.IsNull()) {
+            self.userName = nil;
+        } else {
+            self.userName = [[NSString alloc] initWithBytes:decodableStruct.userName.Value().data()
+                                                     length:decodableStruct.userName.Value().size()
+                                                   encoding:NSUTF8StringEncoding];
+        }
+    }
+    {
+        if (decodableStruct.userUniqueID.IsNull()) {
+            self.userUniqueID = nil;
+        } else {
+            self.userUniqueID = [NSNumber numberWithUnsignedInt:decodableStruct.userUniqueID.Value()];
+        }
+    }
+    {
+        if (decodableStruct.userStatus.IsNull()) {
+            self.userStatus = nil;
+        } else {
+            self.userStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.userStatus.Value())];
+        }
+    }
+    {
+        if (decodableStruct.userType.IsNull()) {
+            self.userType = nil;
+        } else {
+            self.userType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.userType.Value())];
+        }
+    }
+    {
+        if (decodableStruct.credentialRule.IsNull()) {
+            self.credentialRule = nil;
+        } else {
+            self.credentialRule = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.credentialRule.Value())];
+        }
+    }
+    {
+        if (decodableStruct.credentials.IsNull()) {
+            self.credentials = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.credentials.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRDoorLockClusterCredentialStruct * newElement_1;
+                    newElement_1 = [MTRDoorLockClusterCredentialStruct new];
+                    newElement_1.credentialType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.credentialType)];
+                    newElement_1.credentialIndex = [NSNumber numberWithUnsignedShort:entry_1.credentialIndex];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.credentials = array_1;
+            }
+        }
+    }
+    {
+        if (decodableStruct.creatorFabricIndex.IsNull()) {
+            self.creatorFabricIndex = nil;
+        } else {
+            self.creatorFabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.creatorFabricIndex.Value()];
+        }
+    }
+    {
+        if (decodableStruct.lastModifiedFabricIndex.IsNull()) {
+            self.lastModifiedFabricIndex = nil;
+        } else {
+            self.lastModifiedFabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.lastModifiedFabricIndex.Value()];
+        }
+    }
+    {
+        if (decodableStruct.nextUserIndex.IsNull()) {
+            self.nextUserIndex = nil;
+        } else {
+            self.nextUserIndex = [NSNumber numberWithUnsignedShort:decodableStruct.nextUserIndex.Value()];
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRDoorLockClusterGetUserResponseParams (Deprecated)
@@ -5636,6 +7999,72 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRDoorLockClusterSetCredentialResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.userIndex.IsNull()) {
+            self.userIndex = nil;
+        } else {
+            self.userIndex = [NSNumber numberWithUnsignedShort:decodableStruct.userIndex.Value()];
+        }
+    }
+    {
+        if (decodableStruct.nextCredentialIndex.IsNull()) {
+            self.nextCredentialIndex = nil;
+        } else {
+            self.nextCredentialIndex = [NSNumber numberWithUnsignedShort:decodableStruct.nextCredentialIndex.Value()];
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRDoorLockClusterGetCredentialStatusParams
 - (instancetype)init
@@ -5711,6 +8140,86 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRDoorLockClusterGetCredentialStatusResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &)decodableStruct
+{
+    {
+        self.credentialExists = [NSNumber numberWithBool:decodableStruct.credentialExists];
+    }
+    {
+        if (decodableStruct.userIndex.IsNull()) {
+            self.userIndex = nil;
+        } else {
+            self.userIndex = [NSNumber numberWithUnsignedShort:decodableStruct.userIndex.Value()];
+        }
+    }
+    {
+        if (decodableStruct.creatorFabricIndex.IsNull()) {
+            self.creatorFabricIndex = nil;
+        } else {
+            self.creatorFabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.creatorFabricIndex.Value()];
+        }
+    }
+    {
+        if (decodableStruct.lastModifiedFabricIndex.IsNull()) {
+            self.lastModifiedFabricIndex = nil;
+        } else {
+            self.lastModifiedFabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.lastModifiedFabricIndex.Value()];
+        }
+    }
+    {
+        if (decodableStruct.nextCredentialIndex.IsNull()) {
+            self.nextCredentialIndex = nil;
+        } else {
+            self.nextCredentialIndex = [NSNumber numberWithUnsignedShort:decodableStruct.nextCredentialIndex.Value()];
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRDoorLockClusterClearCredentialParams
 - (instancetype)init
@@ -6076,6 +8585,92 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRThermostatClusterGetWeeklyScheduleResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &)decodableStruct
+{
+    {
+        self.numberOfTransitionsForSequence = [NSNumber numberWithUnsignedChar:decodableStruct.numberOfTransitionsForSequence];
+    }
+    {
+        self.dayOfWeekForSequence = [NSNumber numberWithUnsignedChar:decodableStruct.dayOfWeekForSequence.Raw()];
+    }
+    {
+        self.modeForSequence = [NSNumber numberWithUnsignedChar:decodableStruct.modeForSequence.Raw()];
+    }
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.transitions.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRThermostatClusterThermostatScheduleTransition * newElement_0;
+                newElement_0 = [MTRThermostatClusterThermostatScheduleTransition new];
+                newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
+                if (entry_0.heatSetpoint.IsNull()) {
+                    newElement_0.heatSetpoint = nil;
+                } else {
+                    newElement_0.heatSetpoint = [NSNumber numberWithShort:entry_0.heatSetpoint.Value()];
+                }
+                if (entry_0.coolSetpoint.IsNull()) {
+                    newElement_0.coolSetpoint = nil;
+                } else {
+                    newElement_0.coolSetpoint = [NSNumber numberWithShort:entry_0.coolSetpoint.Value()];
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            self.transitions = array_0;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRThermostatClusterSetWeeklyScheduleParams
 - (instancetype)init
@@ -7077,6 +9672,67 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRChannelClusterChangeChannelResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.data.HasValue()) {
+            self.data = [[NSString alloc] initWithBytes:decodableStruct.data.Value().data()
+                                                 length:decodableStruct.data.Value().size()
+                                               encoding:NSUTF8StringEncoding];
+        } else {
+            self.data = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRChannelClusterChangeChannelByNumberParams
 - (instancetype)init
@@ -7207,6 +9863,67 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRTargetNavigatorClusterNavigateTargetResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.data.HasValue()) {
+            self.data = [[NSString alloc] initWithBytes:decodableStruct.data.Value().data()
+                                                 length:decodableStruct.data.Value().size()
+                                               encoding:NSUTF8StringEncoding];
+        } else {
+            self.data = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRMediaPlaybackClusterPlayParams
 - (instancetype)init
@@ -7520,6 +10237,67 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRMediaPlaybackClusterPlaybackResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.data.HasValue()) {
+            self.data = [[NSString alloc] initWithBytes:decodableStruct.data.Value().data()
+                                                 length:decodableStruct.data.Value().size()
+                                               encoding:NSUTF8StringEncoding];
+        } else {
+            self.data = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRMediaPlaybackClusterSeekParams
 - (instancetype)init
@@ -7753,6 +10531,58 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRKeypadInputClusterSendKeyResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRContentLauncherClusterLaunchContentParams
 - (instancetype)init
@@ -7859,6 +10689,67 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRContentLauncherClusterLauncherResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.data.HasValue()) {
+            self.data = [[NSString alloc] initWithBytes:decodableStruct.data.Value().data()
+                                                 length:decodableStruct.data.Value().size()
+                                               encoding:NSUTF8StringEncoding];
+        } else {
+            self.data = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRContentLauncherClusterLaunchResponseParams
@@ -8054,6 +10945,65 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRApplicationLauncherClusterLauncherResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.data.HasValue()) {
+            self.data = [NSData dataWithBytes:decodableStruct.data.Value().data() length:decodableStruct.data.Value().size()];
+        } else {
+            self.data = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRAccountLoginClusterGetSetupPINParams
 - (instancetype)init
@@ -8113,6 +11063,60 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRAccountLoginClusterGetSetupPINResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &)decodableStruct
+{
+    {
+        self.setupPIN = [[NSString alloc] initWithBytes:decodableStruct.setupPIN.data()
+                                                 length:decodableStruct.setupPIN.size()
+                                               encoding:NSUTF8StringEncoding];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRAccountLoginClusterLoginParams
 - (instancetype)init
@@ -8213,6 +11217,81 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &)decodableStruct
+{
+    {
+        self.profileCount = [NSNumber numberWithUnsignedChar:decodableStruct.profileCount];
+    }
+    {
+        self.profileIntervalPeriod = [NSNumber numberWithUnsignedChar:decodableStruct.profileIntervalPeriod];
+    }
+    {
+        self.maxNumberOfIntervals = [NSNumber numberWithUnsignedChar:decodableStruct.maxNumberOfIntervals];
+    }
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.listOfAttributes.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            self.listOfAttributes = array_0;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRElectricalMeasurementClusterGetProfileInfoCommandParams
 - (instancetype)init
@@ -8286,6 +11365,88 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType &)
+        decodableStruct
+{
+    {
+        self.startTime = [NSNumber numberWithUnsignedInt:decodableStruct.startTime];
+    }
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.profileIntervalPeriod = [NSNumber numberWithUnsignedChar:decodableStruct.profileIntervalPeriod];
+    }
+    {
+        self.numberOfIntervalsDelivered = [NSNumber numberWithUnsignedChar:decodableStruct.numberOfIntervalsDelivered];
+    }
+    {
+        self.attributeId = [NSNumber numberWithUnsignedShort:decodableStruct.attributeId];
+    }
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.intervals.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            self.intervals = array_0;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams
 - (instancetype)init
@@ -8382,6 +11543,58 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestSpecificResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType &)decodableStruct
+{
+    {
+        self.returnValue = [NSNumber numberWithUnsignedChar:decodableStruct.returnValue];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterTestSpecificResponseParams
@@ -8444,6 +11657,58 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestAddArgumentsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType &)decodableStruct
+{
+    {
+        self.returnValue = [NSNumber numberWithUnsignedChar:decodableStruct.returnValue];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterTestAddArgumentsResponseParams
@@ -8506,6 +11771,58 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestSimpleArgumentResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType &)decodableStruct
+{
+    {
+        self.returnValue = [NSNumber numberWithBool:decodableStruct.returnValue];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterTestSimpleArgumentResponseParams
@@ -8583,6 +11900,221 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestStructArrayArgumentResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType &)decodableStruct
+{
+    { { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+    auto iter_0 = decodableStruct.arg1.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        MTRUnitTestingClusterNestedStructList * newElement_0;
+        newElement_0 = [MTRUnitTestingClusterNestedStructList new];
+        newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+        newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+        newElement_0.c = [MTRUnitTestingClusterSimpleStruct new];
+        newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
+        newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
+        newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
+        newElement_0.c.d = [NSData dataWithBytes:entry_0.c.d.data() length:entry_0.c.d.size()];
+        newElement_0.c.e = [[NSString alloc] initWithBytes:entry_0.c.e.data()
+                                                    length:entry_0.c.e.size()
+                                                  encoding:NSUTF8StringEncoding];
+        newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
+        newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
+        newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+        { // Scope for our temporary variables
+            auto * array_2 = [NSMutableArray new];
+            auto iter_2 = entry_0.d.begin();
+            while (iter_2.Next()) {
+                auto & entry_2 = iter_2.GetValue();
+                MTRUnitTestingClusterSimpleStruct * newElement_2;
+                newElement_2 = [MTRUnitTestingClusterSimpleStruct new];
+                newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
+                newElement_2.b = [NSNumber numberWithBool:entry_2.b];
+                newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
+                newElement_2.d = [NSData dataWithBytes:entry_2.d.data() length:entry_2.d.size()];
+                newElement_2.e = [[NSString alloc] initWithBytes:entry_2.e.data()
+                                                          length:entry_2.e.size()
+                                                        encoding:NSUTF8StringEncoding];
+                newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
+                newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
+                newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
+                [array_2 addObject:newElement_2];
+            }
+            CHIP_ERROR err = iter_2.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            newElement_0.d = array_2;
+        }
+        { // Scope for our temporary variables
+            auto * array_2 = [NSMutableArray new];
+            auto iter_2 = entry_0.e.begin();
+            while (iter_2.Next()) {
+                auto & entry_2 = iter_2.GetValue();
+                NSNumber * newElement_2;
+                newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
+                [array_2 addObject:newElement_2];
+            }
+            CHIP_ERROR err = iter_2.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            newElement_0.e = array_2;
+        }
+        { // Scope for our temporary variables
+            auto * array_2 = [NSMutableArray new];
+            auto iter_2 = entry_0.f.begin();
+            while (iter_2.Next()) {
+                auto & entry_2 = iter_2.GetValue();
+                NSData * newElement_2;
+                newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                [array_2 addObject:newElement_2];
+            }
+            CHIP_ERROR err = iter_2.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            newElement_0.f = array_2;
+        }
+        { // Scope for our temporary variables
+            auto * array_2 = [NSMutableArray new];
+            auto iter_2 = entry_0.g.begin();
+            while (iter_2.Next()) {
+                auto & entry_2 = iter_2.GetValue();
+                NSNumber * newElement_2;
+                newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
+                [array_2 addObject:newElement_2];
+            }
+            CHIP_ERROR err = iter_2.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            newElement_0.g = array_2;
+        }
+        [array_0 addObject:newElement_0];
+    }
+    CHIP_ERROR err = iter_0.GetStatus();
+    if (err != CHIP_NO_ERROR) {
+        return err;
+    }
+    self.arg1 = array_0;
+}
+}
+{
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = decodableStruct.arg2.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            MTRUnitTestingClusterSimpleStruct * newElement_0;
+            newElement_0 = [MTRUnitTestingClusterSimpleStruct new];
+            newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+            newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+            newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
+            newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
+            newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data()
+                                                      length:entry_0.e.size()
+                                                    encoding:NSUTF8StringEncoding];
+            newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
+            newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
+            newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            return err;
+        }
+        self.arg2 = array_0;
+    }
+}
+{
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = decodableStruct.arg3.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            return err;
+        }
+        self.arg3 = array_0;
+    }
+}
+{
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = decodableStruct.arg4.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithBool:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            return err;
+        }
+        self.arg4 = array_0;
+    }
+}
+{
+    self.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.arg5)];
+}
+{
+    self.arg6 = [NSNumber numberWithBool:decodableStruct.arg6];
+}
+return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterTestStructArrayArgumentResponseParams
@@ -8651,6 +12183,72 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestListInt8UReverseResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType &)decodableStruct
+{
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.arg1.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            self.arg1 = array_0;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterTestListInt8UReverseResponseParams
@@ -8719,6 +12317,61 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestEnumsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType &)decodableStruct
+{
+    {
+        self.arg1 = [NSNumber numberWithUnsignedShort:chip::to_underlying(decodableStruct.arg1)];
+    }
+    {
+        self.arg2 = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.arg2)];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterTestEnumsResponseParams
@@ -8809,6 +12462,83 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestNullableOptionalResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType &)decodableStruct
+{
+    {
+        self.wasPresent = [NSNumber numberWithBool:decodableStruct.wasPresent];
+    }
+    {
+        if (decodableStruct.wasNull.HasValue()) {
+            self.wasNull = [NSNumber numberWithBool:decodableStruct.wasNull.Value()];
+        } else {
+            self.wasNull = nil;
+        }
+    }
+    {
+        if (decodableStruct.value.HasValue()) {
+            self.value = [NSNumber numberWithUnsignedChar:decodableStruct.value.Value()];
+        } else {
+            self.value = nil;
+        }
+    }
+    {
+        if (decodableStruct.originalValue.HasValue()) {
+            if (decodableStruct.originalValue.Value().IsNull()) {
+                self.originalValue = nil;
+            } else {
+                self.originalValue = [NSNumber numberWithUnsignedChar:decodableStruct.originalValue.Value().Value()];
+            }
+        } else {
+            self.originalValue = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterTestNullableOptionalResponseParams
@@ -8969,6 +12699,292 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestComplexNullableOptionalResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType &)decodableStruct
+{
+    {
+        self.nullableIntWasNull = [NSNumber numberWithBool:decodableStruct.nullableIntWasNull];
+    }
+    {
+        if (decodableStruct.nullableIntValue.HasValue()) {
+            self.nullableIntValue = [NSNumber numberWithUnsignedShort:decodableStruct.nullableIntValue.Value()];
+        } else {
+            self.nullableIntValue = nil;
+        }
+    }
+    {
+        self.optionalIntWasPresent = [NSNumber numberWithBool:decodableStruct.optionalIntWasPresent];
+    }
+    {
+        if (decodableStruct.optionalIntValue.HasValue()) {
+            self.optionalIntValue = [NSNumber numberWithUnsignedShort:decodableStruct.optionalIntValue.Value()];
+        } else {
+            self.optionalIntValue = nil;
+        }
+    }
+    {
+        self.nullableOptionalIntWasPresent = [NSNumber numberWithBool:decodableStruct.nullableOptionalIntWasPresent];
+    }
+    {
+        if (decodableStruct.nullableOptionalIntWasNull.HasValue()) {
+            self.nullableOptionalIntWasNull = [NSNumber numberWithBool:decodableStruct.nullableOptionalIntWasNull.Value()];
+        } else {
+            self.nullableOptionalIntWasNull = nil;
+        }
+    }
+    {
+        if (decodableStruct.nullableOptionalIntValue.HasValue()) {
+            self.nullableOptionalIntValue = [NSNumber numberWithUnsignedShort:decodableStruct.nullableOptionalIntValue.Value()];
+        } else {
+            self.nullableOptionalIntValue = nil;
+        }
+    }
+    {
+        self.nullableStringWasNull = [NSNumber numberWithBool:decodableStruct.nullableStringWasNull];
+    }
+    {
+        if (decodableStruct.nullableStringValue.HasValue()) {
+            self.nullableStringValue = [[NSString alloc] initWithBytes:decodableStruct.nullableStringValue.Value().data()
+                                                                length:decodableStruct.nullableStringValue.Value().size()
+                                                              encoding:NSUTF8StringEncoding];
+        } else {
+            self.nullableStringValue = nil;
+        }
+    }
+    {
+        self.optionalStringWasPresent = [NSNumber numberWithBool:decodableStruct.optionalStringWasPresent];
+    }
+    {
+        if (decodableStruct.optionalStringValue.HasValue()) {
+            self.optionalStringValue = [[NSString alloc] initWithBytes:decodableStruct.optionalStringValue.Value().data()
+                                                                length:decodableStruct.optionalStringValue.Value().size()
+                                                              encoding:NSUTF8StringEncoding];
+        } else {
+            self.optionalStringValue = nil;
+        }
+    }
+    {
+        self.nullableOptionalStringWasPresent = [NSNumber numberWithBool:decodableStruct.nullableOptionalStringWasPresent];
+    }
+    {
+        if (decodableStruct.nullableOptionalStringWasNull.HasValue()) {
+            self.nullableOptionalStringWasNull = [NSNumber numberWithBool:decodableStruct.nullableOptionalStringWasNull.Value()];
+        } else {
+            self.nullableOptionalStringWasNull = nil;
+        }
+    }
+    {
+        if (decodableStruct.nullableOptionalStringValue.HasValue()) {
+            self.nullableOptionalStringValue =
+                [[NSString alloc] initWithBytes:decodableStruct.nullableOptionalStringValue.Value().data()
+                                         length:decodableStruct.nullableOptionalStringValue.Value().size()
+                                       encoding:NSUTF8StringEncoding];
+        } else {
+            self.nullableOptionalStringValue = nil;
+        }
+    }
+    {
+        self.nullableStructWasNull = [NSNumber numberWithBool:decodableStruct.nullableStructWasNull];
+    }
+    {
+        if (decodableStruct.nullableStructValue.HasValue()) {
+            self.nullableStructValue = [MTRUnitTestingClusterSimpleStruct new];
+            self.nullableStructValue.a = [NSNumber numberWithUnsignedChar:decodableStruct.nullableStructValue.Value().a];
+            self.nullableStructValue.b = [NSNumber numberWithBool:decodableStruct.nullableStructValue.Value().b];
+            self.nullableStructValue.c =
+                [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.nullableStructValue.Value().c)];
+            self.nullableStructValue.d = [NSData dataWithBytes:decodableStruct.nullableStructValue.Value().d.data()
+                                                        length:decodableStruct.nullableStructValue.Value().d.size()];
+            self.nullableStructValue.e = [[NSString alloc] initWithBytes:decodableStruct.nullableStructValue.Value().e.data()
+                                                                  length:decodableStruct.nullableStructValue.Value().e.size()
+                                                                encoding:NSUTF8StringEncoding];
+            self.nullableStructValue.f = [NSNumber numberWithUnsignedChar:decodableStruct.nullableStructValue.Value().f.Raw()];
+            self.nullableStructValue.g = [NSNumber numberWithFloat:decodableStruct.nullableStructValue.Value().g];
+            self.nullableStructValue.h = [NSNumber numberWithDouble:decodableStruct.nullableStructValue.Value().h];
+        } else {
+            self.nullableStructValue = nil;
+        }
+    }
+    {
+        self.optionalStructWasPresent = [NSNumber numberWithBool:decodableStruct.optionalStructWasPresent];
+    }
+    {
+        if (decodableStruct.optionalStructValue.HasValue()) {
+            self.optionalStructValue = [MTRUnitTestingClusterSimpleStruct new];
+            self.optionalStructValue.a = [NSNumber numberWithUnsignedChar:decodableStruct.optionalStructValue.Value().a];
+            self.optionalStructValue.b = [NSNumber numberWithBool:decodableStruct.optionalStructValue.Value().b];
+            self.optionalStructValue.c =
+                [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.optionalStructValue.Value().c)];
+            self.optionalStructValue.d = [NSData dataWithBytes:decodableStruct.optionalStructValue.Value().d.data()
+                                                        length:decodableStruct.optionalStructValue.Value().d.size()];
+            self.optionalStructValue.e = [[NSString alloc] initWithBytes:decodableStruct.optionalStructValue.Value().e.data()
+                                                                  length:decodableStruct.optionalStructValue.Value().e.size()
+                                                                encoding:NSUTF8StringEncoding];
+            self.optionalStructValue.f = [NSNumber numberWithUnsignedChar:decodableStruct.optionalStructValue.Value().f.Raw()];
+            self.optionalStructValue.g = [NSNumber numberWithFloat:decodableStruct.optionalStructValue.Value().g];
+            self.optionalStructValue.h = [NSNumber numberWithDouble:decodableStruct.optionalStructValue.Value().h];
+        } else {
+            self.optionalStructValue = nil;
+        }
+    }
+    {
+        self.nullableOptionalStructWasPresent = [NSNumber numberWithBool:decodableStruct.nullableOptionalStructWasPresent];
+    }
+    {
+        if (decodableStruct.nullableOptionalStructWasNull.HasValue()) {
+            self.nullableOptionalStructWasNull = [NSNumber numberWithBool:decodableStruct.nullableOptionalStructWasNull.Value()];
+        } else {
+            self.nullableOptionalStructWasNull = nil;
+        }
+    }
+    {
+        if (decodableStruct.nullableOptionalStructValue.HasValue()) {
+            self.nullableOptionalStructValue = [MTRUnitTestingClusterSimpleStruct new];
+            self.nullableOptionalStructValue.a =
+                [NSNumber numberWithUnsignedChar:decodableStruct.nullableOptionalStructValue.Value().a];
+            self.nullableOptionalStructValue.b = [NSNumber numberWithBool:decodableStruct.nullableOptionalStructValue.Value().b];
+            self.nullableOptionalStructValue.c =
+                [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.nullableOptionalStructValue.Value().c)];
+            self.nullableOptionalStructValue.d =
+                [NSData dataWithBytes:decodableStruct.nullableOptionalStructValue.Value().d.data()
+                               length:decodableStruct.nullableOptionalStructValue.Value().d.size()];
+            self.nullableOptionalStructValue.e =
+                [[NSString alloc] initWithBytes:decodableStruct.nullableOptionalStructValue.Value().e.data()
+                                         length:decodableStruct.nullableOptionalStructValue.Value().e.size()
+                                       encoding:NSUTF8StringEncoding];
+            self.nullableOptionalStructValue.f =
+                [NSNumber numberWithUnsignedChar:decodableStruct.nullableOptionalStructValue.Value().f.Raw()];
+            self.nullableOptionalStructValue.g = [NSNumber numberWithFloat:decodableStruct.nullableOptionalStructValue.Value().g];
+            self.nullableOptionalStructValue.h = [NSNumber numberWithDouble:decodableStruct.nullableOptionalStructValue.Value().h];
+        } else {
+            self.nullableOptionalStructValue = nil;
+        }
+    }
+    {
+        self.nullableListWasNull = [NSNumber numberWithBool:decodableStruct.nullableListWasNull];
+    }
+    {
+        if (decodableStruct.nullableListValue.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.nullableListValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    NSNumber * newElement_1;
+                    newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.nullableListValue = array_1;
+            }
+        } else {
+            self.nullableListValue = nil;
+        }
+    }
+    {
+        self.optionalListWasPresent = [NSNumber numberWithBool:decodableStruct.optionalListWasPresent];
+    }
+    {
+        if (decodableStruct.optionalListValue.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.optionalListValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    NSNumber * newElement_1;
+                    newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.optionalListValue = array_1;
+            }
+        } else {
+            self.optionalListValue = nil;
+        }
+    }
+    {
+        self.nullableOptionalListWasPresent = [NSNumber numberWithBool:decodableStruct.nullableOptionalListWasPresent];
+    }
+    {
+        if (decodableStruct.nullableOptionalListWasNull.HasValue()) {
+            self.nullableOptionalListWasNull = [NSNumber numberWithBool:decodableStruct.nullableOptionalListWasNull.Value()];
+        } else {
+            self.nullableOptionalListWasNull = nil;
+        }
+    }
+    {
+        if (decodableStruct.nullableOptionalListValue.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.nullableOptionalListValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    NSNumber * newElement_1;
+                    newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.nullableOptionalListValue = array_1;
+            }
+        } else {
+            self.nullableOptionalListValue = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterTestComplexNullableOptionalResponseParams
@@ -9033,6 +13049,58 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterBooleanResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType &)decodableStruct
+{
+    {
+        self.value = [NSNumber numberWithBool:decodableStruct.value];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterBooleanResponseParams
@@ -9097,6 +13165,68 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterSimpleStructResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType &)decodableStruct
+{
+    {
+        self.arg1 = [MTRUnitTestingClusterSimpleStruct new];
+        self.arg1.a = [NSNumber numberWithUnsignedChar:decodableStruct.arg1.a];
+        self.arg1.b = [NSNumber numberWithBool:decodableStruct.arg1.b];
+        self.arg1.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.arg1.c)];
+        self.arg1.d = [NSData dataWithBytes:decodableStruct.arg1.d.data() length:decodableStruct.arg1.d.size()];
+        self.arg1.e = [[NSString alloc] initWithBytes:decodableStruct.arg1.e.data()
+                                               length:decodableStruct.arg1.e.size()
+                                             encoding:NSUTF8StringEncoding];
+        self.arg1.f = [NSNumber numberWithUnsignedChar:decodableStruct.arg1.f.Raw()];
+        self.arg1.g = [NSNumber numberWithFloat:decodableStruct.arg1.g];
+        self.arg1.h = [NSNumber numberWithDouble:decodableStruct.arg1.h];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterSimpleStructResponseParams
@@ -9161,6 +13291,58 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestEmitTestEventResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType &)decodableStruct
+{
+    {
+        self.value = [NSNumber numberWithUnsignedLongLong:decodableStruct.value];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterTestEmitTestEventResponseParams
@@ -9225,6 +13407,58 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &)decodableStruct
+{
+    {
+        self.value = [NSNumber numberWithUnsignedLongLong:decodableStruct.value];
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 
 @implementation MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams

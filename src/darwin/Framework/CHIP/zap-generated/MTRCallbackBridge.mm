@@ -17,6 +17,7 @@
 
 #import "MTRCallbackBridge.h"
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRCommandPayloads_Internal.h"
 #import "MTRStructsObjc.h"
 
 #include <lib/support/TypeTraits.h>
@@ -12848,11 +12849,10 @@ void MTRGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & data)
 {
     auto * response = [MTRGroupsClusterAddGroupResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12861,16 +12861,10 @@ void MTRGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & data)
 {
     auto * response = [MTRGroupsClusterViewGroupResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.groupName = [[NSString alloc] initWithBytes:data.groupName.data()
-                                                      length:data.groupName.size()
-                                                    encoding:NSUTF8StringEncoding];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12879,30 +12873,10 @@ void MTRGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & data)
 {
     auto * response = [MTRGroupsClusterGetGroupMembershipResponseParams new];
-    {
-        if (data.capacity.IsNull()) {
-            response.capacity = nil;
-        } else {
-            response.capacity = [NSNumber numberWithUnsignedChar:data.capacity.Value()];
-        }
-    }
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.groupList.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            response.groupList = array_0;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12911,11 +12885,10 @@ void MTRGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data)
 {
     auto * response = [MTRGroupsClusterRemoveGroupResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12924,14 +12897,10 @@ void MTRScenesClusterAddSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterAddSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -12940,90 +12909,10 @@ void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterViewSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
-    }
-    {
-        if (data.transitionTime.HasValue()) {
-            response.transitionTime = [NSNumber numberWithUnsignedShort:data.transitionTime.Value()];
-        } else {
-            response.transitionTime = nil;
-        }
-    }
-    {
-        if (data.sceneName.HasValue()) {
-            response.sceneName = [[NSString alloc] initWithBytes:data.sceneName.Value().data()
-                                                          length:data.sceneName.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.sceneName = nil;
-        }
-    }
-    {
-        if (data.extensionFieldSets.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.extensionFieldSets.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRScenesClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRScenesClusterExtensionFieldSet new];
-                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
-                    { // Scope for our temporary variables
-                        auto * array_3 = [NSMutableArray new];
-                        auto iter_3 = entry_1.attributeValueList.begin();
-                        while (iter_3.Next()) {
-                            auto & entry_3 = iter_3.GetValue();
-                            MTRScenesClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
-                            { // Scope for our temporary variables
-                                auto * array_5 = [NSMutableArray new];
-                                auto iter_5 = entry_3.attributeValue.begin();
-                                while (iter_5.Next()) {
-                                    auto & entry_5 = iter_5.GetValue();
-                                    NSNumber * newElement_5;
-                                    newElement_5 = [NSNumber numberWithUnsignedChar:entry_5];
-                                    [array_5 addObject:newElement_5];
-                                }
-                                CHIP_ERROR err = iter_5.GetStatus();
-                                if (err != CHIP_NO_ERROR) {
-                                    OnFailureFn(context, err);
-                                    return;
-                                }
-                                newElement_3.attributeValue = array_5;
-                            }
-                            [array_3 addObject:newElement_3];
-                        }
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            OnFailureFn(context, err);
-                            return;
-                        }
-                        newElement_1.attributeValueList = array_3;
-                    }
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.extensionFieldSets = array_1;
-            }
-        } else {
-            response.extensionFieldSets = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13032,14 +12921,10 @@ void MTRScenesClusterRemoveSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterRemoveSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13048,11 +12933,10 @@ void MTRScenesClusterRemoveAllScenesResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterRemoveAllScenesResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13061,14 +12945,10 @@ void MTRScenesClusterStoreSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterStoreSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13077,40 +12957,10 @@ void MTRScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterGetSceneMembershipResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        if (data.capacity.IsNull()) {
-            response.capacity = nil;
-        } else {
-            response.capacity = [NSNumber numberWithUnsignedChar:data.capacity.Value()];
-        }
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        if (data.sceneList.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.sceneList.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedChar:entry_1];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.sceneList = array_1;
-            }
-        } else {
-            response.sceneList = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13119,14 +12969,10 @@ void MTRScenesClusterEnhancedAddSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterEnhancedAddSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13135,90 +12981,10 @@ void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterEnhancedViewSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
-    }
-    {
-        if (data.transitionTime.HasValue()) {
-            response.transitionTime = [NSNumber numberWithUnsignedShort:data.transitionTime.Value()];
-        } else {
-            response.transitionTime = nil;
-        }
-    }
-    {
-        if (data.sceneName.HasValue()) {
-            response.sceneName = [[NSString alloc] initWithBytes:data.sceneName.Value().data()
-                                                          length:data.sceneName.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.sceneName = nil;
-        }
-    }
-    {
-        if (data.extensionFieldSets.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.extensionFieldSets.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRScenesClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRScenesClusterExtensionFieldSet new];
-                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
-                    { // Scope for our temporary variables
-                        auto * array_3 = [NSMutableArray new];
-                        auto iter_3 = entry_1.attributeValueList.begin();
-                        while (iter_3.Next()) {
-                            auto & entry_3 = iter_3.GetValue();
-                            MTRScenesClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
-                            { // Scope for our temporary variables
-                                auto * array_5 = [NSMutableArray new];
-                                auto iter_5 = entry_3.attributeValue.begin();
-                                while (iter_5.Next()) {
-                                    auto & entry_5 = iter_5.GetValue();
-                                    NSNumber * newElement_5;
-                                    newElement_5 = [NSNumber numberWithUnsignedChar:entry_5];
-                                    [array_5 addObject:newElement_5];
-                                }
-                                CHIP_ERROR err = iter_5.GetStatus();
-                                if (err != CHIP_NO_ERROR) {
-                                    OnFailureFn(context, err);
-                                    return;
-                                }
-                                newElement_3.attributeValue = array_5;
-                            }
-                            [array_3 addObject:newElement_3];
-                        }
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            OnFailureFn(context, err);
-                            return;
-                        }
-                        newElement_1.attributeValueList = array_3;
-                    }
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.extensionFieldSets = array_1;
-            }
-        } else {
-            response.extensionFieldSets = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13227,14 +12993,10 @@ void MTRScenesClusterCopySceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterCopySceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupIdentifierFrom = [NSNumber numberWithUnsignedShort:data.groupIdentifierFrom];
-    }
-    {
-        response.sceneIdentifierFrom = [NSNumber numberWithUnsignedChar:data.sceneIdentifierFrom];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13243,62 +13005,10 @@ void MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSucc
     void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data)
 {
     auto * response = [MTROTASoftwareUpdateProviderClusterQueryImageResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.delayedActionTime.HasValue()) {
-            response.delayedActionTime = [NSNumber numberWithUnsignedInt:data.delayedActionTime.Value()];
-        } else {
-            response.delayedActionTime = nil;
-        }
-    }
-    {
-        if (data.imageURI.HasValue()) {
-            response.imageURI = [[NSString alloc] initWithBytes:data.imageURI.Value().data()
-                                                         length:data.imageURI.Value().size()
-                                                       encoding:NSUTF8StringEncoding];
-        } else {
-            response.imageURI = nil;
-        }
-    }
-    {
-        if (data.softwareVersion.HasValue()) {
-            response.softwareVersion = [NSNumber numberWithUnsignedInt:data.softwareVersion.Value()];
-        } else {
-            response.softwareVersion = nil;
-        }
-    }
-    {
-        if (data.softwareVersionString.HasValue()) {
-            response.softwareVersionString = [[NSString alloc] initWithBytes:data.softwareVersionString.Value().data()
-                                                                      length:data.softwareVersionString.Value().size()
-                                                                    encoding:NSUTF8StringEncoding];
-        } else {
-            response.softwareVersionString = nil;
-        }
-    }
-    {
-        if (data.updateToken.HasValue()) {
-            response.updateToken = [NSData dataWithBytes:data.updateToken.Value().data() length:data.updateToken.Value().size()];
-        } else {
-            response.updateToken = nil;
-        }
-    }
-    {
-        if (data.userConsentNeeded.HasValue()) {
-            response.userConsentNeeded = [NSNumber numberWithBool:data.userConsentNeeded.Value()];
-        } else {
-            response.userConsentNeeded = nil;
-        }
-    }
-    {
-        if (data.metadataForRequestor.HasValue()) {
-            response.metadataForRequestor = [NSData dataWithBytes:data.metadataForRequestor.Value().data()
-                                                           length:data.metadataForRequestor.Value().size()];
-        } else {
-            response.metadataForRequestor = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13307,11 +13017,10 @@ void MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSuc
     void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data)
 {
     auto * response = [MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams new];
-    {
-        response.action = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.action)];
-    }
-    {
-        response.delayedActionTime = [NSNumber numberWithUnsignedInt:data.delayedActionTime];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13320,13 +13029,10 @@ void MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccessF
     void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
 {
     auto * response = [MTRGeneralCommissioningClusterArmFailSafeResponseParams new];
-    {
-        response.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13335,13 +13041,10 @@ void MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::On
     void * context, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data)
 {
     auto * response = [MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams new];
-    {
-        response.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13350,13 +13053,10 @@ void MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge::
     void * context, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data)
 {
     auto * response = [MTRGeneralCommissioningClusterCommissioningCompleteResponseParams new];
-    {
-        response.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13365,78 +13065,10 @@ void MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSuccess
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data)
 {
     auto * response = [MTRNetworkCommissioningClusterScanNetworksResponseParams new];
-    {
-        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
-    }
-    {
-        if (data.debugText.HasValue()) {
-            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                          length:data.debugText.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.debugText = nil;
-        }
-    }
-    {
-        if (data.wiFiScanResults.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.wiFiScanResults.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_1;
-                    newElement_1 = [MTRNetworkCommissioningClusterWiFiInterfaceScanResult new];
-                    newElement_1.security = [NSNumber numberWithUnsignedChar:entry_1.security.Raw()];
-                    newElement_1.ssid = [NSData dataWithBytes:entry_1.ssid.data() length:entry_1.ssid.size()];
-                    newElement_1.bssid = [NSData dataWithBytes:entry_1.bssid.data() length:entry_1.bssid.size()];
-                    newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
-                    newElement_1.wiFiBand = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.wiFiBand)];
-                    newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.wiFiScanResults = array_1;
-            }
-        } else {
-            response.wiFiScanResults = nil;
-        }
-    }
-    {
-        if (data.threadScanResults.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.threadScanResults.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRNetworkCommissioningClusterThreadInterfaceScanResult * newElement_1;
-                    newElement_1 = [MTRNetworkCommissioningClusterThreadInterfaceScanResult new];
-                    newElement_1.panId = [NSNumber numberWithUnsignedShort:entry_1.panId];
-                    newElement_1.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_1.extendedPanId];
-                    newElement_1.networkName = [[NSString alloc] initWithBytes:entry_1.networkName.data()
-                                                                        length:entry_1.networkName.size()
-                                                                      encoding:NSUTF8StringEncoding];
-                    newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
-                    newElement_1.version = [NSNumber numberWithUnsignedChar:entry_1.version];
-                    newElement_1.extendedAddress = [NSData dataWithBytes:entry_1.extendedAddress.data()
-                                                                  length:entry_1.extendedAddress.size()];
-                    newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
-                    newElement_1.lqi = [NSNumber numberWithUnsignedChar:entry_1.lqi];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.threadScanResults = array_1;
-            }
-        } else {
-            response.threadScanResults = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13445,24 +13077,10 @@ void MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge::OnSucces
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
     auto * response = [MTRNetworkCommissioningClusterNetworkConfigResponseParams new];
-    {
-        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
-    }
-    {
-        if (data.debugText.HasValue()) {
-            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                          length:data.debugText.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.debugText = nil;
-        }
-    }
-    {
-        if (data.networkIndex.HasValue()) {
-            response.networkIndex = [NSNumber numberWithUnsignedChar:data.networkIndex.Value()];
-        } else {
-            response.networkIndex = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13471,24 +13089,10 @@ void MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge::OnSucce
     void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
 {
     auto * response = [MTRNetworkCommissioningClusterConnectNetworkResponseParams new];
-    {
-        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
-    }
-    {
-        if (data.debugText.HasValue()) {
-            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                          length:data.debugText.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.debugText = nil;
-        }
-    }
-    {
-        if (data.errorValue.IsNull()) {
-            response.errorValue = nil;
-        } else {
-            response.errorValue = [NSNumber numberWithInt:data.errorValue.Value()];
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13497,25 +13101,10 @@ void MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data)
 {
     auto * response = [MTRDiagnosticLogsClusterRetrieveLogsResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        response.logContent = [NSData dataWithBytes:data.logContent.data() length:data.logContent.size()];
-    }
-    {
-        if (data.UTCTimeStamp.HasValue()) {
-            response.utcTimeStamp = [NSNumber numberWithUnsignedLongLong:data.UTCTimeStamp.Value()];
-        } else {
-            response.utcTimeStamp = nil;
-        }
-    }
-    {
-        if (data.timeSinceBoot.HasValue()) {
-            response.timeSinceBoot = [NSNumber numberWithUnsignedLongLong:data.timeSinceBoot.Value()];
-        } else {
-            response.timeSinceBoot = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13524,13 +13113,10 @@ void MTROperationalCredentialsClusterAttestationResponseCallbackBridge::OnSucces
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data)
 {
     auto * response = [MTROperationalCredentialsClusterAttestationResponseParams new];
-    {
-        response.attestationElements = [NSData dataWithBytes:data.attestationElements.data()
-                                                      length:data.attestationElements.size()];
-    }
-    {
-        response.attestationSignature = [NSData dataWithBytes:data.attestationSignature.data()
-                                                       length:data.attestationSignature.size()];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13539,8 +13125,10 @@ void MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnS
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data)
 {
     auto * response = [MTROperationalCredentialsClusterCertificateChainResponseParams new];
-    {
-        response.certificate = [NSData dataWithBytes:data.certificate.data() length:data.certificate.size()];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13549,12 +13137,10 @@ void MTROperationalCredentialsClusterCSRResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data)
 {
     auto * response = [MTROperationalCredentialsClusterCSRResponseParams new];
-    {
-        response.nocsrElements = [NSData dataWithBytes:data.NOCSRElements.data() length:data.NOCSRElements.size()];
-    }
-    {
-        response.attestationSignature = [NSData dataWithBytes:data.attestationSignature.data()
-                                                       length:data.attestationSignature.size()];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13563,24 +13149,10 @@ void MTROperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data)
 {
     auto * response = [MTROperationalCredentialsClusterNOCResponseParams new];
-    {
-        response.statusCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.statusCode)];
-    }
-    {
-        if (data.fabricIndex.HasValue()) {
-            response.fabricIndex = [NSNumber numberWithUnsignedChar:data.fabricIndex.Value()];
-        } else {
-            response.fabricIndex = nil;
-        }
-    }
-    {
-        if (data.debugText.HasValue()) {
-            response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                          length:data.debugText.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.debugText = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13589,44 +13161,10 @@ void MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data)
 {
     auto * response = [MTRGroupKeyManagementClusterKeySetReadResponseParams new];
-    {
-        response.groupKeySet = [MTRGroupKeyManagementClusterGroupKeySetStruct new];
-        response.groupKeySet.groupKeySetID = [NSNumber numberWithUnsignedShort:data.groupKeySet.groupKeySetID];
-        response.groupKeySet.groupKeySecurityPolicy =
-            [NSNumber numberWithUnsignedChar:chip::to_underlying(data.groupKeySet.groupKeySecurityPolicy)];
-        if (data.groupKeySet.epochKey0.IsNull()) {
-            response.groupKeySet.epochKey0 = nil;
-        } else {
-            response.groupKeySet.epochKey0 = [NSData dataWithBytes:data.groupKeySet.epochKey0.Value().data()
-                                                            length:data.groupKeySet.epochKey0.Value().size()];
-        }
-        if (data.groupKeySet.epochStartTime0.IsNull()) {
-            response.groupKeySet.epochStartTime0 = nil;
-        } else {
-            response.groupKeySet.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime0.Value()];
-        }
-        if (data.groupKeySet.epochKey1.IsNull()) {
-            response.groupKeySet.epochKey1 = nil;
-        } else {
-            response.groupKeySet.epochKey1 = [NSData dataWithBytes:data.groupKeySet.epochKey1.Value().data()
-                                                            length:data.groupKeySet.epochKey1.Value().size()];
-        }
-        if (data.groupKeySet.epochStartTime1.IsNull()) {
-            response.groupKeySet.epochStartTime1 = nil;
-        } else {
-            response.groupKeySet.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime1.Value()];
-        }
-        if (data.groupKeySet.epochKey2.IsNull()) {
-            response.groupKeySet.epochKey2 = nil;
-        } else {
-            response.groupKeySet.epochKey2 = [NSData dataWithBytes:data.groupKeySet.epochKey2.Value().data()
-                                                            length:data.groupKeySet.epochKey2.Value().size()];
-        }
-        if (data.groupKeySet.epochStartTime2.IsNull()) {
-            response.groupKeySet.epochStartTime2 = nil;
-        } else {
-            response.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime2.Value()];
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13635,23 +13173,10 @@ void MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnS
     void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data)
 {
     auto * response = [MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams new];
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.groupKeySetIDs.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            response.groupKeySetIDs = array_0;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13660,49 +13185,10 @@ void MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterGetWeekDayScheduleResponseParams new];
-    {
-        response.weekDayIndex = [NSNumber numberWithUnsignedChar:data.weekDayIndex];
-    }
-    {
-        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
-    }
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.daysMask.HasValue()) {
-            response.daysMask = [NSNumber numberWithUnsignedChar:data.daysMask.Value().Raw()];
-        } else {
-            response.daysMask = nil;
-        }
-    }
-    {
-        if (data.startHour.HasValue()) {
-            response.startHour = [NSNumber numberWithUnsignedChar:data.startHour.Value()];
-        } else {
-            response.startHour = nil;
-        }
-    }
-    {
-        if (data.startMinute.HasValue()) {
-            response.startMinute = [NSNumber numberWithUnsignedChar:data.startMinute.Value()];
-        } else {
-            response.startMinute = nil;
-        }
-    }
-    {
-        if (data.endHour.HasValue()) {
-            response.endHour = [NSNumber numberWithUnsignedChar:data.endHour.Value()];
-        } else {
-            response.endHour = nil;
-        }
-    }
-    {
-        if (data.endMinute.HasValue()) {
-            response.endMinute = [NSNumber numberWithUnsignedChar:data.endMinute.Value()];
-        } else {
-            response.endMinute = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13711,28 +13197,10 @@ void MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterGetYearDayScheduleResponseParams new];
-    {
-        response.yearDayIndex = [NSNumber numberWithUnsignedChar:data.yearDayIndex];
-    }
-    {
-        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
-    }
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.localStartTime.HasValue()) {
-            response.localStartTime = [NSNumber numberWithUnsignedInt:data.localStartTime.Value()];
-        } else {
-            response.localStartTime = nil;
-        }
-    }
-    {
-        if (data.localEndTime.HasValue()) {
-            response.localEndTime = [NSNumber numberWithUnsignedInt:data.localEndTime.Value()];
-        } else {
-            response.localEndTime = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13741,32 +13209,10 @@ void MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterGetHolidayScheduleResponseParams new];
-    {
-        response.holidayIndex = [NSNumber numberWithUnsignedChar:data.holidayIndex];
-    }
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.localStartTime.HasValue()) {
-            response.localStartTime = [NSNumber numberWithUnsignedInt:data.localStartTime.Value()];
-        } else {
-            response.localStartTime = nil;
-        }
-    }
-    {
-        if (data.localEndTime.HasValue()) {
-            response.localEndTime = [NSNumber numberWithUnsignedInt:data.localEndTime.Value()];
-        } else {
-            response.localEndTime = nil;
-        }
-    }
-    {
-        if (data.operatingMode.HasValue()) {
-            response.operatingMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.operatingMode.Value())];
-        } else {
-            response.operatingMode = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13775,90 +13221,10 @@ void MTRDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterGetUserResponseParams new];
-    {
-        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
-    }
-    {
-        if (data.userName.IsNull()) {
-            response.userName = nil;
-        } else {
-            response.userName = [[NSString alloc] initWithBytes:data.userName.Value().data()
-                                                         length:data.userName.Value().size()
-                                                       encoding:NSUTF8StringEncoding];
-        }
-    }
-    {
-        if (data.userUniqueID.IsNull()) {
-            response.userUniqueID = nil;
-        } else {
-            response.userUniqueID = [NSNumber numberWithUnsignedInt:data.userUniqueID.Value()];
-        }
-    }
-    {
-        if (data.userStatus.IsNull()) {
-            response.userStatus = nil;
-        } else {
-            response.userStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus.Value())];
-        }
-    }
-    {
-        if (data.userType.IsNull()) {
-            response.userType = nil;
-        } else {
-            response.userType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType.Value())];
-        }
-    }
-    {
-        if (data.credentialRule.IsNull()) {
-            response.credentialRule = nil;
-        } else {
-            response.credentialRule = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.credentialRule.Value())];
-        }
-    }
-    {
-        if (data.credentials.IsNull()) {
-            response.credentials = nil;
-        } else {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.credentials.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRDoorLockClusterCredentialStruct * newElement_1;
-                    newElement_1 = [MTRDoorLockClusterCredentialStruct new];
-                    newElement_1.credentialType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.credentialType)];
-                    newElement_1.credentialIndex = [NSNumber numberWithUnsignedShort:entry_1.credentialIndex];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.credentials = array_1;
-            }
-        }
-    }
-    {
-        if (data.creatorFabricIndex.IsNull()) {
-            response.creatorFabricIndex = nil;
-        } else {
-            response.creatorFabricIndex = [NSNumber numberWithUnsignedChar:data.creatorFabricIndex.Value()];
-        }
-    }
-    {
-        if (data.lastModifiedFabricIndex.IsNull()) {
-            response.lastModifiedFabricIndex = nil;
-        } else {
-            response.lastModifiedFabricIndex = [NSNumber numberWithUnsignedChar:data.lastModifiedFabricIndex.Value()];
-        }
-    }
-    {
-        if (data.nextUserIndex.IsNull()) {
-            response.nextUserIndex = nil;
-        } else {
-            response.nextUserIndex = [NSNumber numberWithUnsignedShort:data.nextUserIndex.Value()];
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13867,22 +13233,10 @@ void MTRDoorLockClusterSetCredentialResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterSetCredentialResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.userIndex.IsNull()) {
-            response.userIndex = nil;
-        } else {
-            response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex.Value()];
-        }
-    }
-    {
-        if (data.nextCredentialIndex.IsNull()) {
-            response.nextCredentialIndex = nil;
-        } else {
-            response.nextCredentialIndex = [NSNumber numberWithUnsignedShort:data.nextCredentialIndex.Value()];
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13891,36 +13245,10 @@ void MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data)
 {
     auto * response = [MTRDoorLockClusterGetCredentialStatusResponseParams new];
-    {
-        response.credentialExists = [NSNumber numberWithBool:data.credentialExists];
-    }
-    {
-        if (data.userIndex.IsNull()) {
-            response.userIndex = nil;
-        } else {
-            response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex.Value()];
-        }
-    }
-    {
-        if (data.creatorFabricIndex.IsNull()) {
-            response.creatorFabricIndex = nil;
-        } else {
-            response.creatorFabricIndex = [NSNumber numberWithUnsignedChar:data.creatorFabricIndex.Value()];
-        }
-    }
-    {
-        if (data.lastModifiedFabricIndex.IsNull()) {
-            response.lastModifiedFabricIndex = nil;
-        } else {
-            response.lastModifiedFabricIndex = [NSNumber numberWithUnsignedChar:data.lastModifiedFabricIndex.Value()];
-        }
-    }
-    {
-        if (data.nextCredentialIndex.IsNull()) {
-            response.nextCredentialIndex = nil;
-        } else {
-            response.nextCredentialIndex = [NSNumber numberWithUnsignedShort:data.nextCredentialIndex.Value()];
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13929,43 +13257,10 @@ void MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data)
 {
     auto * response = [MTRThermostatClusterGetWeeklyScheduleResponseParams new];
-    {
-        response.numberOfTransitionsForSequence = [NSNumber numberWithUnsignedChar:data.numberOfTransitionsForSequence];
-    }
-    {
-        response.dayOfWeekForSequence = [NSNumber numberWithUnsignedChar:data.dayOfWeekForSequence.Raw()];
-    }
-    {
-        response.modeForSequence = [NSNumber numberWithUnsignedChar:data.modeForSequence.Raw()];
-    }
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.transitions.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                MTRThermostatClusterThermostatScheduleTransition * newElement_0;
-                newElement_0 = [MTRThermostatClusterThermostatScheduleTransition new];
-                newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
-                if (entry_0.heatSetpoint.IsNull()) {
-                    newElement_0.heatSetpoint = nil;
-                } else {
-                    newElement_0.heatSetpoint = [NSNumber numberWithShort:entry_0.heatSetpoint.Value()];
-                }
-                if (entry_0.coolSetpoint.IsNull()) {
-                    newElement_0.coolSetpoint = nil;
-                } else {
-                    newElement_0.coolSetpoint = [NSNumber numberWithShort:entry_0.coolSetpoint.Value()];
-                }
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            response.transitions = array_0;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13974,17 +13269,10 @@ void MTRChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data)
 {
     auto * response = [MTRChannelClusterChangeChannelResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.data.HasValue()) {
-            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                                     length:data.data.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
-        } else {
-            response.data = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -13993,17 +13281,10 @@ void MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data)
 {
     auto * response = [MTRTargetNavigatorClusterNavigateTargetResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.data.HasValue()) {
-            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                                     length:data.data.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
-        } else {
-            response.data = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14012,17 +13293,10 @@ void MTRMediaPlaybackClusterPlaybackResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data)
 {
     auto * response = [MTRMediaPlaybackClusterPlaybackResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.data.HasValue()) {
-            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                                     length:data.data.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
-        } else {
-            response.data = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14031,8 +13305,10 @@ void MTRKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data)
 {
     auto * response = [MTRKeypadInputClusterSendKeyResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14041,17 +13317,10 @@ void MTRContentLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType & data)
 {
     auto * response = [MTRContentLauncherClusterLauncherResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.data.HasValue()) {
-            response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                                     length:data.data.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
-        } else {
-            response.data = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14060,15 +13329,10 @@ void MTRApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data)
 {
     auto * response = [MTRApplicationLauncherClusterLauncherResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        if (data.data.HasValue()) {
-            response.data = [NSData dataWithBytes:data.data.Value().data() length:data.data.Value().size()];
-        } else {
-            response.data = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14077,10 +13341,10 @@ void MTRAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data)
 {
     auto * response = [MTRAccountLoginClusterGetSetupPINResponseParams new];
-    {
-        response.setupPIN = [[NSString alloc] initWithBytes:data.setupPIN.data()
-                                                     length:data.setupPIN.size()
-                                                   encoding:NSUTF8StringEncoding];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14089,8 +13353,10 @@ void MTRUnitTestingClusterTestSpecificResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestSpecificResponseParams new];
-    {
-        response.returnValue = [NSNumber numberWithUnsignedChar:data.returnValue];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14099,8 +13365,10 @@ void MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestAddArgumentsResponseParams new];
-    {
-        response.returnValue = [NSNumber numberWithUnsignedChar:data.returnValue];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14109,8 +13377,10 @@ void MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestSimpleArgumentResponseParams new];
-    {
-        response.returnValue = [NSNumber numberWithBool:data.returnValue];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14119,200 +13389,22 @@ void MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge::OnSucce
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestStructArrayArgumentResponseParams new];
-    { { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-    auto iter_0 = data.arg1.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        MTRUnitTestingClusterNestedStructList * newElement_0;
-        newElement_0 = [MTRUnitTestingClusterNestedStructList new];
-        newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-        newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-        newElement_0.c = [MTRUnitTestingClusterSimpleStruct new];
-        newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
-        newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
-        newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
-        newElement_0.c.d = [NSData dataWithBytes:entry_0.c.d.data() length:entry_0.c.d.size()];
-        newElement_0.c.e = [[NSString alloc] initWithBytes:entry_0.c.e.data()
-                                                    length:entry_0.c.e.size()
-                                                  encoding:NSUTF8StringEncoding];
-        newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
-        newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
-        newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.d.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                MTRUnitTestingClusterSimpleStruct * newElement_2;
-                newElement_2 = [MTRUnitTestingClusterSimpleStruct new];
-                newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
-                newElement_2.b = [NSNumber numberWithBool:entry_2.b];
-                newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
-                newElement_2.d = [NSData dataWithBytes:entry_2.d.data() length:entry_2.d.size()];
-                newElement_2.e = [[NSString alloc] initWithBytes:entry_2.e.data()
-                                                          length:entry_2.e.size()
-                                                        encoding:NSUTF8StringEncoding];
-                newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
-                newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
-                newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.d = array_2;
-        }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.e.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.e = array_2;
-        }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.f.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSData * newElement_2;
-                newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.f = array_2;
-        }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.g.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.g = array_2;
-        }
-        [array_0 addObject:newElement_0];
-    }
-    CHIP_ERROR err = iter_0.GetStatus();
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
     if (err != CHIP_NO_ERROR) {
         OnFailureFn(context, err);
         return;
     }
-    response.arg1 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg2.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    MTRUnitTestingClusterSimpleStruct * newElement_0;
-    newElement_0 = [MTRUnitTestingClusterSimpleStruct new];
-    newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-    newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-    newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-    newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
-    newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data() length:entry_0.e.size() encoding:NSUTF8StringEncoding];
-    newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
-    newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
-    newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg2 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg3.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    NSNumber * newElement_0;
-    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg3 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg4.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    NSNumber * newElement_0;
-    newElement_0 = [NSNumber numberWithBool:entry_0];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg4 = array_0;
-}
-}
-{
-    response.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg5)];
-}
-{
-    response.arg6 = [NSNumber numberWithBool:data.arg6];
-}
-DispatchSuccess(context, response);
-}
-;
+    DispatchSuccess(context, response);
+};
 
 void MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestListInt8UReverseResponseParams new];
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.arg1.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
-            }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            response.arg1 = array_0;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14321,11 +13413,10 @@ void MTRUnitTestingClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestEnumsResponseParams new];
-    {
-        response.arg1 = [NSNumber numberWithUnsignedShort:chip::to_underlying(data.arg1)];
-    }
-    {
-        response.arg2 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg2)];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14334,33 +13425,10 @@ void MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge::OnSuccessF
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestNullableOptionalResponseParams new];
-    {
-        response.wasPresent = [NSNumber numberWithBool:data.wasPresent];
-    }
-    {
-        if (data.wasNull.HasValue()) {
-            response.wasNull = [NSNumber numberWithBool:data.wasNull.Value()];
-        } else {
-            response.wasNull = nil;
-        }
-    }
-    {
-        if (data.value.HasValue()) {
-            response.value = [NSNumber numberWithUnsignedChar:data.value.Value()];
-        } else {
-            response.value = nil;
-        }
-    }
-    {
-        if (data.originalValue.HasValue()) {
-            if (data.originalValue.Value().IsNull()) {
-                response.originalValue = nil;
-            } else {
-                response.originalValue = [NSNumber numberWithUnsignedChar:data.originalValue.Value().Value()];
-            }
-        } else {
-            response.originalValue = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14369,242 +13437,10 @@ void MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestComplexNullableOptionalResponseParams new];
-    {
-        response.nullableIntWasNull = [NSNumber numberWithBool:data.nullableIntWasNull];
-    }
-    {
-        if (data.nullableIntValue.HasValue()) {
-            response.nullableIntValue = [NSNumber numberWithUnsignedShort:data.nullableIntValue.Value()];
-        } else {
-            response.nullableIntValue = nil;
-        }
-    }
-    {
-        response.optionalIntWasPresent = [NSNumber numberWithBool:data.optionalIntWasPresent];
-    }
-    {
-        if (data.optionalIntValue.HasValue()) {
-            response.optionalIntValue = [NSNumber numberWithUnsignedShort:data.optionalIntValue.Value()];
-        } else {
-            response.optionalIntValue = nil;
-        }
-    }
-    {
-        response.nullableOptionalIntWasPresent = [NSNumber numberWithBool:data.nullableOptionalIntWasPresent];
-    }
-    {
-        if (data.nullableOptionalIntWasNull.HasValue()) {
-            response.nullableOptionalIntWasNull = [NSNumber numberWithBool:data.nullableOptionalIntWasNull.Value()];
-        } else {
-            response.nullableOptionalIntWasNull = nil;
-        }
-    }
-    {
-        if (data.nullableOptionalIntValue.HasValue()) {
-            response.nullableOptionalIntValue = [NSNumber numberWithUnsignedShort:data.nullableOptionalIntValue.Value()];
-        } else {
-            response.nullableOptionalIntValue = nil;
-        }
-    }
-    {
-        response.nullableStringWasNull = [NSNumber numberWithBool:data.nullableStringWasNull];
-    }
-    {
-        if (data.nullableStringValue.HasValue()) {
-            response.nullableStringValue = [[NSString alloc] initWithBytes:data.nullableStringValue.Value().data()
-                                                                    length:data.nullableStringValue.Value().size()
-                                                                  encoding:NSUTF8StringEncoding];
-        } else {
-            response.nullableStringValue = nil;
-        }
-    }
-    {
-        response.optionalStringWasPresent = [NSNumber numberWithBool:data.optionalStringWasPresent];
-    }
-    {
-        if (data.optionalStringValue.HasValue()) {
-            response.optionalStringValue = [[NSString alloc] initWithBytes:data.optionalStringValue.Value().data()
-                                                                    length:data.optionalStringValue.Value().size()
-                                                                  encoding:NSUTF8StringEncoding];
-        } else {
-            response.optionalStringValue = nil;
-        }
-    }
-    {
-        response.nullableOptionalStringWasPresent = [NSNumber numberWithBool:data.nullableOptionalStringWasPresent];
-    }
-    {
-        if (data.nullableOptionalStringWasNull.HasValue()) {
-            response.nullableOptionalStringWasNull = [NSNumber numberWithBool:data.nullableOptionalStringWasNull.Value()];
-        } else {
-            response.nullableOptionalStringWasNull = nil;
-        }
-    }
-    {
-        if (data.nullableOptionalStringValue.HasValue()) {
-            response.nullableOptionalStringValue = [[NSString alloc] initWithBytes:data.nullableOptionalStringValue.Value().data()
-                                                                            length:data.nullableOptionalStringValue.Value().size()
-                                                                          encoding:NSUTF8StringEncoding];
-        } else {
-            response.nullableOptionalStringValue = nil;
-        }
-    }
-    {
-        response.nullableStructWasNull = [NSNumber numberWithBool:data.nullableStructWasNull];
-    }
-    {
-        if (data.nullableStructValue.HasValue()) {
-            response.nullableStructValue = [MTRUnitTestingClusterSimpleStruct new];
-            response.nullableStructValue.a = [NSNumber numberWithUnsignedChar:data.nullableStructValue.Value().a];
-            response.nullableStructValue.b = [NSNumber numberWithBool:data.nullableStructValue.Value().b];
-            response.nullableStructValue.c =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(data.nullableStructValue.Value().c)];
-            response.nullableStructValue.d = [NSData dataWithBytes:data.nullableStructValue.Value().d.data()
-                                                            length:data.nullableStructValue.Value().d.size()];
-            response.nullableStructValue.e = [[NSString alloc] initWithBytes:data.nullableStructValue.Value().e.data()
-                                                                      length:data.nullableStructValue.Value().e.size()
-                                                                    encoding:NSUTF8StringEncoding];
-            response.nullableStructValue.f = [NSNumber numberWithUnsignedChar:data.nullableStructValue.Value().f.Raw()];
-            response.nullableStructValue.g = [NSNumber numberWithFloat:data.nullableStructValue.Value().g];
-            response.nullableStructValue.h = [NSNumber numberWithDouble:data.nullableStructValue.Value().h];
-        } else {
-            response.nullableStructValue = nil;
-        }
-    }
-    {
-        response.optionalStructWasPresent = [NSNumber numberWithBool:data.optionalStructWasPresent];
-    }
-    {
-        if (data.optionalStructValue.HasValue()) {
-            response.optionalStructValue = [MTRUnitTestingClusterSimpleStruct new];
-            response.optionalStructValue.a = [NSNumber numberWithUnsignedChar:data.optionalStructValue.Value().a];
-            response.optionalStructValue.b = [NSNumber numberWithBool:data.optionalStructValue.Value().b];
-            response.optionalStructValue.c =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(data.optionalStructValue.Value().c)];
-            response.optionalStructValue.d = [NSData dataWithBytes:data.optionalStructValue.Value().d.data()
-                                                            length:data.optionalStructValue.Value().d.size()];
-            response.optionalStructValue.e = [[NSString alloc] initWithBytes:data.optionalStructValue.Value().e.data()
-                                                                      length:data.optionalStructValue.Value().e.size()
-                                                                    encoding:NSUTF8StringEncoding];
-            response.optionalStructValue.f = [NSNumber numberWithUnsignedChar:data.optionalStructValue.Value().f.Raw()];
-            response.optionalStructValue.g = [NSNumber numberWithFloat:data.optionalStructValue.Value().g];
-            response.optionalStructValue.h = [NSNumber numberWithDouble:data.optionalStructValue.Value().h];
-        } else {
-            response.optionalStructValue = nil;
-        }
-    }
-    {
-        response.nullableOptionalStructWasPresent = [NSNumber numberWithBool:data.nullableOptionalStructWasPresent];
-    }
-    {
-        if (data.nullableOptionalStructWasNull.HasValue()) {
-            response.nullableOptionalStructWasNull = [NSNumber numberWithBool:data.nullableOptionalStructWasNull.Value()];
-        } else {
-            response.nullableOptionalStructWasNull = nil;
-        }
-    }
-    {
-        if (data.nullableOptionalStructValue.HasValue()) {
-            response.nullableOptionalStructValue = [MTRUnitTestingClusterSimpleStruct new];
-            response.nullableOptionalStructValue.a = [NSNumber numberWithUnsignedChar:data.nullableOptionalStructValue.Value().a];
-            response.nullableOptionalStructValue.b = [NSNumber numberWithBool:data.nullableOptionalStructValue.Value().b];
-            response.nullableOptionalStructValue.c =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(data.nullableOptionalStructValue.Value().c)];
-            response.nullableOptionalStructValue.d = [NSData dataWithBytes:data.nullableOptionalStructValue.Value().d.data()
-                                                                    length:data.nullableOptionalStructValue.Value().d.size()];
-            response.nullableOptionalStructValue.e =
-                [[NSString alloc] initWithBytes:data.nullableOptionalStructValue.Value().e.data()
-                                         length:data.nullableOptionalStructValue.Value().e.size()
-                                       encoding:NSUTF8StringEncoding];
-            response.nullableOptionalStructValue.f =
-                [NSNumber numberWithUnsignedChar:data.nullableOptionalStructValue.Value().f.Raw()];
-            response.nullableOptionalStructValue.g = [NSNumber numberWithFloat:data.nullableOptionalStructValue.Value().g];
-            response.nullableOptionalStructValue.h = [NSNumber numberWithDouble:data.nullableOptionalStructValue.Value().h];
-        } else {
-            response.nullableOptionalStructValue = nil;
-        }
-    }
-    {
-        response.nullableListWasNull = [NSNumber numberWithBool:data.nullableListWasNull];
-    }
-    {
-        if (data.nullableListValue.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.nullableListValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.nullableListValue = array_1;
-            }
-        } else {
-            response.nullableListValue = nil;
-        }
-    }
-    {
-        response.optionalListWasPresent = [NSNumber numberWithBool:data.optionalListWasPresent];
-    }
-    {
-        if (data.optionalListValue.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.optionalListValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.optionalListValue = array_1;
-            }
-        } else {
-            response.optionalListValue = nil;
-        }
-    }
-    {
-        response.nullableOptionalListWasPresent = [NSNumber numberWithBool:data.nullableOptionalListWasPresent];
-    }
-    {
-        if (data.nullableOptionalListWasNull.HasValue()) {
-            response.nullableOptionalListWasNull = [NSNumber numberWithBool:data.nullableOptionalListWasNull.Value()];
-        } else {
-            response.nullableOptionalListWasNull = nil;
-        }
-    }
-    {
-        if (data.nullableOptionalListValue.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.nullableOptionalListValue.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.nullableOptionalListValue = array_1;
-            }
-        } else {
-            response.nullableOptionalListValue = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14613,8 +13449,10 @@ void MTRUnitTestingClusterBooleanResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterBooleanResponseParams new];
-    {
-        response.value = [NSNumber numberWithBool:data.value];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14623,18 +13461,10 @@ void MTRUnitTestingClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterSimpleStructResponseParams new];
-    {
-        response.arg1 = [MTRUnitTestingClusterSimpleStruct new];
-        response.arg1.a = [NSNumber numberWithUnsignedChar:data.arg1.a];
-        response.arg1.b = [NSNumber numberWithBool:data.arg1.b];
-        response.arg1.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg1.c)];
-        response.arg1.d = [NSData dataWithBytes:data.arg1.d.data() length:data.arg1.d.size()];
-        response.arg1.e = [[NSString alloc] initWithBytes:data.arg1.e.data()
-                                                   length:data.arg1.e.size()
-                                                 encoding:NSUTF8StringEncoding];
-        response.arg1.f = [NSNumber numberWithUnsignedChar:data.arg1.f.Raw()];
-        response.arg1.g = [NSNumber numberWithFloat:data.arg1.g];
-        response.arg1.h = [NSNumber numberWithDouble:data.arg1.h];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14643,8 +13473,10 @@ void MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestEmitTestEventResponseParams new];
-    {
-        response.value = [NSNumber numberWithUnsignedLongLong:data.value];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -14653,8 +13485,10 @@ void MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge::O
     void * context, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data)
 {
     auto * response = [MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams new];
-    {
-        response.value = [NSNumber numberWithUnsignedLongLong:data.value];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
