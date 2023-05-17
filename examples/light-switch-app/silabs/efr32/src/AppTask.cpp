@@ -68,6 +68,7 @@ constexpr chip::EndpointId kGenericSwitchEndpoint = 2;
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 
@@ -153,9 +154,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-#endif
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Light Switch");
@@ -229,14 +228,13 @@ void AppTask::OnIdentifyStop(Identify * identify)
 #endif
 }
 
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
     VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button);
 
     static bool mCurrentButtonState = false;
 
-    if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
+    if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         mCurrentButtonState = !mCurrentButtonState;
         LightSwitchMgr::LightSwitchAction action =
@@ -249,7 +247,7 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
         sAppTask.GetLCD().WriteDemoUI(mCurrentButtonState);
 #endif
     }
-    else if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_RELEASED)
+    else if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased))
     {
         LightSwitchMgr::GetInstance().GenericSwitchOnShortRelease();
     }
@@ -272,4 +270,3 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         sAppTask.PostEvent(&button_event);
     }
 }
-#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT

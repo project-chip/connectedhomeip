@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1571,6 +1571,40 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
 {
     return ExtractKIDFromX509Cert(false, certificate, akid);
+}
+
+CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber)
+{
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    uint8_t * p      = nullptr;
+    size_t len       = 0;
+    mbedtls_x509_crt mbed_cert;
+
+    mbedtls_x509_crt_init(&mbed_cert);
+
+    result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(certificate.data()), certificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    p   = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(serial).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
+    len = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(serial).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
+    VerifyOrExit(len <= serialNumber.size(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(serialNumber.data(), p, len);
+    serialNumber.reduce_size(len);
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_x509_crt_free(&mbed_cert);
+
+#else
+    (void) certificate;
+    (void) serialNumber;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
+    return error;
 }
 
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)

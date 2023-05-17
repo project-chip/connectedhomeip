@@ -192,6 +192,7 @@ class _TestStepWithPlaceholders:
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
         self.wait_for = _value_or_none(test, 'wait')
         self.event_number = _value_or_none(test, 'eventNumber')
+        self.run_if = _value_or_none(test, 'runIf')
 
         self.is_attribute = self.__is_attribute_command()
         self.is_event = self.__is_event_command()
@@ -477,6 +478,8 @@ class TestStep:
             self._update_placeholder_values(self.responses)
             self._test.node_id = self._config_variable_substitution(
                 self._test.node_id)
+            self._test.run_if = self._config_variable_substitution(
+                self._test.run_if)
             self._test.event_number = self._config_variable_substitution(
                 self._test.event_number)
             test.update_arguments(self.arguments)
@@ -492,7 +495,7 @@ class TestStep:
 
     @property
     def is_pics_enabled(self):
-        return self._test.is_pics_enabled
+        return self._test.is_pics_enabled and (self._test.run_if is None or self._test.run_if)
 
     @property
     def is_attribute(self):

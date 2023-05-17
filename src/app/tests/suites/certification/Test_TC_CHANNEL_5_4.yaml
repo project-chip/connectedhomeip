@@ -68,4 +68,7 @@ tests:
           [1665567814.599714][111029:111029] CHIP:DMG:         InteractionModelRevision = 1
           [1665567814.599716][111029:111029] CHIP:DMG: },
           [1665567814.599733][111029:111029] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0504 e=1 p=o
+
+
+          Enter the below command to read the current input. ./chip-tool channel read current-channel 1 1
       disabled: true

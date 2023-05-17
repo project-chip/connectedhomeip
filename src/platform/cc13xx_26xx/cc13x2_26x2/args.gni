@@ -1,0 +1,37 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/ti_simplelink_sdk.gni")
+
+# ARM architecture flags will be set based on Device Family
+arm_platform_config =
+    "${ti_simplelink_sdk_build_root}/ti_simplelink_arm_platform_config.gni"
+
+chip_device_platform = "cc13x2_26x2"
+
+mbedtls_target = "${chip_root}/third_party/ti_simplelink_sdk:mbedtls"
+openthread_external_mbedtls = mbedtls_target
+openthread_external_platform =
+    "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk"
+
+lwip_platform = "cc13xx_26xx"
+
+chip_inet_config_enable_ipv4 = false
+
+chip_build_tests = false
+
+openthread_project_core_config_file = "openthread-core-cc13x2_26x2-config.h"
+openthread_core_config_platform_check_file =
+    "openthread-core-cc13x2_26x2-config-check.h"

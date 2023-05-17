@@ -25,17 +25,18 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+
+#include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#include <platform/cc13xx_26xx/OTAImageProcessorImpl.h>
 #endif
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPMem.h>
@@ -60,7 +61,7 @@ static TaskHandle_t sAppTaskHandle;
 
 // Logging
 extern "C" {
-int cc13x2_26x2LogInit(void);
+int cc13xx_26xxLogInit(void);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -102,7 +103,7 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    cc13x2_26x2LogInit();
+    cc13xx_26xxLogInit();
 
     // Init Chip memory management before the stack
     Platform::MemoryInit();
@@ -150,7 +151,12 @@ CHIP_ERROR AppTask::Init()
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();
 #endif

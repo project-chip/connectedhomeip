@@ -42,7 +42,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool timeformatlocalization read hour-format 1 0
-          Verify HourFormat attribute read request is successful  on the TH(all-clusters-app) Log:
+          Verify HourFormat attribute read request is successful on the TH(all-clusters-app) Log:
 
           ReportDataMessage =
           [1666853690.186762][20237:20237] CHIP:DMG: {
@@ -80,6 +80,7 @@ tests:
 
           ./chip-tool timeformatlocalization write hour-format 0 1 0
           Verify TH receives write command and updates 0 to HourFormat attribute on the TH(all-clusters-app) Log:
+
           WriteRequestMessage =
           [1667882827.566742][3974:3974] CHIP:DMG: {
           [1667882827.566746][3974:3974] CHIP:DMG:         suppressResponse = false,
@@ -159,7 +160,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool timeformatlocalization read hour-format 1 0
+
           Verify  HourFormat attribute  value is the one that was set in the above step  on the TH(all-clusters-app) Log:
+
           ReportDataMessage =
           [1666853805.326001][20237:20237] CHIP:DMG: {
           [1666853805.326004][20237:20237] CHIP:DMG:         AttributeReportIBs =
@@ -195,7 +198,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool timeformatlocalization write hour-format 1 1 0
+
           Verify  TH receives write command and updates 1 to HourFormat attribute on the TH(all-clusters-app) Log:
+
           WriteRequestMessage =
           [1667882900.829307][3974:3974] CHIP:DMG: {
           [1667882900.829310][3974:3974] CHIP:DMG:         suppressResponse = false,
@@ -275,8 +280,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool timeformatlocalization read hour-format 1 0
+
           Verify HourFormat attribute value is the one that was set in the above step on the TH(all-clusters-app) Log:
-          d28
+
           ReportDataMessage =
           [1666853879.264685][20237:20237] CHIP:DMG: {
           [1666853879.264688][20237:20237] CHIP:DMG:         AttributeReportIBs =
@@ -311,7 +317,9 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+
           Verify active-calendar-type attribute read request is successful on the TH(all-clusters-app) Log:
+
           ReportDataMessage =
           [1666853928.157384][20237:20237] CHIP:DMG: {
           [1666853928.157387][20237:20237] CHIP:DMG:         AttributeReportIBs =
@@ -604,6 +612,7 @@ tests:
           ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
 
           Verify TH receives the write command and updates the respective value  on the TH(all-clusters-app) Log:
+
           WriteRequestMessage =
           [1667882949.750275][3974:3974] CHIP:DMG: {
           [1667882949.750280][3974:3974] CHIP:DMG:         suppressResponse = false,

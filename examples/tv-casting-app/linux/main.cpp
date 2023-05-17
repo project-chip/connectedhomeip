@@ -25,7 +25,7 @@
 #include "CastingUtils.h"
 #if defined(ENABLE_CHIP_SHELL)
 #include "CastingShellCommands.h"
-#include <lib/shell/Engine.h>
+#include <lib/shell/Engine.h> // nogncheck
 #include <thread>
 #endif
 

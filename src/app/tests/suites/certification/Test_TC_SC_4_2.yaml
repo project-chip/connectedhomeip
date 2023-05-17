@@ -38,7 +38,7 @@ tests:
           Run the  unknown key/value pair on second TH Terminal with the same discriminator as the one in the first teminal:
 
           avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=3840 CM=1  INVALID_TEST=40 SII=5000 SAI=300 PH=36 PI= VP=65521+3276 T=1
-          Established under name "DD200C20D25AE5F7"
+          Established under name 'DD200C20D25AE5F7'
       disabled: true
 
     - label: "DUT attempts to commission TH"
@@ -69,9 +69,9 @@ tests:
 
           [1661234862.488290][2599:2604] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1661234862.488362][2599:2604] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1661234862.488421][2599:2604] CHIP:CTL: Successfully finished commissioning step "SendComplete"
-          [1661234862.488467][2599:2604] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1661234862.488521][2599:2604] CHIP:CTL: Performing next commissioning step "Cleanup"
-          [1661234862.488624][2599:2604] CHIP:CTL: Successfully finished commissioning step "Cleanup"
+          [1661234862.488421][2599:2604] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1661234862.488467][2599:2604] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1661234862.488521][2599:2604] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1661234862.488624][2599:2604] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
           [1661234862.488684][2599:2604] CHIP:TOO: Device commissioning completed with success
       disabled: true

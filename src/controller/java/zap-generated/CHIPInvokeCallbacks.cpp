@@ -2702,6 +2702,67 @@ void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback::Callback
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySetIDs);
 }
+CHIPIcdManagementClusterRegisterClientResponseCallback::CHIPIcdManagementClusterRegisterClientResponseCallback(
+    jobject javaCallback) :
+    Callback::Callback<CHIPIcdManagementClusterRegisterClientResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPIcdManagementClusterRegisterClientResponseCallback::~CHIPIcdManagementClusterRegisterClientResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPIcdManagementClusterRegisterClientResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPIcdManagementClusterRegisterClientResponseCallback,
+                    void (*)(CHIPIcdManagementClusterRegisterClientResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPIcdManagementClusterRegisterClientResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPIcdManagementClusterRegisterClientResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Long;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject ICDCounter;
+    std::string ICDCounterClassName     = "java/lang/Long";
+    std::string ICDCounterCtorSignature = "(J)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(ICDCounterClassName.c_str(), ICDCounterCtorSignature.c_str(),
+                                                                   dataResponse.ICDCounter, ICDCounter);
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, ICDCounter);
+}
 CHIPDoorLockClusterGetWeekDayScheduleResponseCallback::CHIPDoorLockClusterGetWeekDayScheduleResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>(CallbackFn, this)
 {

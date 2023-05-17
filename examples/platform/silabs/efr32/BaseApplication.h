@@ -28,9 +28,6 @@
 
 #include "AppEvent.h"
 #include "FreeRTOS.h"
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-#include "sl_simple_button_instances.h"
-#endif
 #include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>
@@ -153,7 +150,7 @@ protected:
      * @param aEvent post event being processed
      */
     static void FunctionEventHandler(AppEvent * aEvent);
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
     /**
      * @brief PB0 Button event processing function
      *        Press and hold will trigger a factory reset timer start
@@ -162,7 +159,7 @@ protected:
      * @param aEvent button event being processed
      */
     static void ButtonHandler(AppEvent * aEvent);
-#endif
+
     /**
      * @brief Light Timer finished callback function
      *        Calls LED processing function

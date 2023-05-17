@@ -145,9 +145,51 @@ static constexpr ClusterId Id = 0x00000044;
 namespace BooleanState {
 static constexpr ClusterId Id = 0x00000045;
 } // namespace BooleanState
+namespace IcdManagement {
+static constexpr ClusterId Id = 0x00000046;
+} // namespace IcdManagement
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
+namespace AirQuality {
+static constexpr ClusterId Id = 0x0000005B;
+} // namespace AirQuality
+namespace HepaFilterMonitoring {
+static constexpr ClusterId Id = 0x00000071;
+} // namespace HepaFilterMonitoring
+namespace ActivatedCarbonFilterMonitoring {
+static constexpr ClusterId Id = 0x00000072;
+} // namespace ActivatedCarbonFilterMonitoring
+namespace CeramicFilterMonitoring {
+static constexpr ClusterId Id = 0x00000073;
+} // namespace CeramicFilterMonitoring
+namespace ElectrostaticFilterMonitoring {
+static constexpr ClusterId Id = 0x00000074;
+} // namespace ElectrostaticFilterMonitoring
+namespace UvFilterMonitoring {
+static constexpr ClusterId Id = 0x00000075;
+} // namespace UvFilterMonitoring
+namespace IonizingFilterMonitoring {
+static constexpr ClusterId Id = 0x00000076;
+} // namespace IonizingFilterMonitoring
+namespace ZeoliteFilterMonitoring {
+static constexpr ClusterId Id = 0x00000077;
+} // namespace ZeoliteFilterMonitoring
+namespace OzoneFilterMonitoring {
+static constexpr ClusterId Id = 0x00000078;
+} // namespace OzoneFilterMonitoring
+namespace WaterTankMonitoring {
+static constexpr ClusterId Id = 0x00000079;
+} // namespace WaterTankMonitoring
+namespace FuelTankMonitoring {
+static constexpr ClusterId Id = 0x0000007A;
+} // namespace FuelTankMonitoring
+namespace InkCartridgeMonitoring {
+static constexpr ClusterId Id = 0x0000007B;
+} // namespace InkCartridgeMonitoring
+namespace TonerCartridgeMonitoring {
+static constexpr ClusterId Id = 0x0000007C;
+} // namespace TonerCartridgeMonitoring
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock
@@ -232,9 +274,6 @@ static constexpr ClusterId Id = 0x0000050E;
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
-namespace ClientMonitoring {
-static constexpr ClusterId Id = 0x00001046;
-} // namespace ClientMonitoring
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting

@@ -30,8 +30,8 @@ tests:
       PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
-          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 0 1 1
+          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
+          ./chip-tv-casting-app contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
 
           On TH  verify the success response (value 0) received  from DUT
           [1651062794.114531][157317:157322] CHIP:TOO:   LaunchResponse: {
@@ -46,8 +46,8 @@ tests:
       PICS: CONTENTLAUNCHER.S.C00.Rsp
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool contentlauncher launch-content "{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 1 1 1
-          ./chip-tv-casting-app contentlauncher launch-content "{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }" 1 1 1
+          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 1 1 1
+          ./chip-tv-casting-app contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 1 1 1
 
           On TH  verify the success response (value 0) received  from DUT
           [1651062895.695667][157343:157348] CHIP:TOO:   LaunchResponse: {

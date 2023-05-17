@@ -41,7 +41,6 @@ jobs:
               with:
                   action: actions/checkout@v3
                   with: |
-                      submodules: true
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000

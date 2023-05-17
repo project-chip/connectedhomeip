@@ -22,5 +22,17 @@ import com.matter.controller.commands.common.CredentialsIssuer
 
 class PairCodeThreadCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) :
   PairingCommand(controller, "code-thread", credsIssue, PairingModeType.CODE, PairingNetworkType.THREAD) {
-  override fun runCommand() {}
+  override fun runCommand() {
+    currentCommissioner()
+      .pairDeviceWithCode(
+        getNodeId(),
+        getOnboardingPayload(),
+        getDiscoverOnce(),
+        getUseOnlyOnNetworkDiscovery(),        
+        null,
+        getThreadNetworkCredentials(),
+      )
+    currentCommissioner().setCompletionListener(this)
+    waitCompleteMs(getTimeoutMillis())
+  }
 }
