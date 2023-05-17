@@ -21861,9 +21861,9 @@ typedef NS_ENUM(uint8_t, MTRHEPAFilterMonitoringDegradationDirection) {
     MTRHEPAFilterMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRHEPAFilterMonitoringFeatures) {
-    MTRHEPAFilterMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRHEPAFilterMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRHEPAFilterMonitoringFeature) {
+    MTRHEPAFilterMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRHEPAFilterMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRActivatedCarbonFilterMonitoringChangeIndication) {
@@ -21877,9 +21877,9 @@ typedef NS_ENUM(uint8_t, MTRActivatedCarbonFilterMonitoringDegradationDirection)
     MTRActivatedCarbonFilterMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRActivatedCarbonFilterMonitoringFeatures) {
-    MTRActivatedCarbonFilterMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRActivatedCarbonFilterMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRActivatedCarbonFilterMonitoringFeature) {
+    MTRActivatedCarbonFilterMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRActivatedCarbonFilterMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRCeramicFilterMonitoringChangeIndication) {
@@ -21893,9 +21893,9 @@ typedef NS_ENUM(uint8_t, MTRCeramicFilterMonitoringDegradationDirection) {
     MTRCeramicFilterMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRCeramicFilterMonitoringFeatures) {
-    MTRCeramicFilterMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRCeramicFilterMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRCeramicFilterMonitoringFeature) {
+    MTRCeramicFilterMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRCeramicFilterMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRElectrostaticFilterMonitoringChangeIndication) {
@@ -21909,9 +21909,9 @@ typedef NS_ENUM(uint8_t, MTRElectrostaticFilterMonitoringDegradationDirection) {
     MTRElectrostaticFilterMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRElectrostaticFilterMonitoringFeatures) {
-    MTRElectrostaticFilterMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRElectrostaticFilterMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRElectrostaticFilterMonitoringFeature) {
+    MTRElectrostaticFilterMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRElectrostaticFilterMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRUVFilterMonitoringChangeIndication) {
@@ -21925,9 +21925,9 @@ typedef NS_ENUM(uint8_t, MTRUVFilterMonitoringDegradationDirection) {
     MTRUVFilterMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRUVFilterMonitoringFeatures) {
-    MTRUVFilterMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRUVFilterMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRUVFilterMonitoringFeature) {
+    MTRUVFilterMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRUVFilterMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRIonizingFilterMonitoringChangeIndication) {
@@ -21941,9 +21941,9 @@ typedef NS_ENUM(uint8_t, MTRIonizingFilterMonitoringDegradationDirection) {
     MTRIonizingFilterMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRIonizingFilterMonitoringFeatures) {
-    MTRIonizingFilterMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRIonizingFilterMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRIonizingFilterMonitoringFeature) {
+    MTRIonizingFilterMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRIonizingFilterMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRZeoliteFilterMonitoringChangeIndication) {
@@ -21957,9 +21957,9 @@ typedef NS_ENUM(uint8_t, MTRZeoliteFilterMonitoringDegradationDirection) {
     MTRZeoliteFilterMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRZeoliteFilterMonitoringFeatures) {
-    MTRZeoliteFilterMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRZeoliteFilterMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRZeoliteFilterMonitoringFeature) {
+    MTRZeoliteFilterMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRZeoliteFilterMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROzoneFilterMonitoringChangeIndication) {
@@ -21973,9 +21973,9 @@ typedef NS_ENUM(uint8_t, MTROzoneFilterMonitoringDegradationDirection) {
     MTROzoneFilterMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTROzoneFilterMonitoringFeatures) {
-    MTROzoneFilterMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTROzoneFilterMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTROzoneFilterMonitoringFeature) {
+    MTROzoneFilterMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTROzoneFilterMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRWaterTankMonitoringChangeIndication) {
@@ -21989,9 +21989,9 @@ typedef NS_ENUM(uint8_t, MTRWaterTankMonitoringDegradationDirection) {
     MTRWaterTankMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRWaterTankMonitoringFeatures) {
-    MTRWaterTankMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRWaterTankMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRWaterTankMonitoringFeature) {
+    MTRWaterTankMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRWaterTankMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRFuelTankMonitoringChangeIndication) {
@@ -22005,9 +22005,9 @@ typedef NS_ENUM(uint8_t, MTRFuelTankMonitoringDegradationDirection) {
     MTRFuelTankMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRFuelTankMonitoringFeatures) {
-    MTRFuelTankMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRFuelTankMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRFuelTankMonitoringFeature) {
+    MTRFuelTankMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRFuelTankMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRInkCartridgeMonitoringChangeIndication) {
@@ -22021,9 +22021,9 @@ typedef NS_ENUM(uint8_t, MTRInkCartridgeMonitoringDegradationDirection) {
     MTRInkCartridgeMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRInkCartridgeMonitoringFeatures) {
-    MTRInkCartridgeMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRInkCartridgeMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRInkCartridgeMonitoringFeature) {
+    MTRInkCartridgeMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRInkCartridgeMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRTonerCartridgeMonitoringChangeIndication) {
@@ -22037,9 +22037,9 @@ typedef NS_ENUM(uint8_t, MTRTonerCartridgeMonitoringDegradationDirection) {
     MTRTonerCartridgeMonitoringDegradationDirectionDown MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRTonerCartridgeMonitoringFeatures) {
-    MTRTonerCartridgeMonitoringFeaturesCondition MTR_NEWLY_AVAILABLE = 0x1,
-    MTRTonerCartridgeMonitoringFeaturesWarning MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRTonerCartridgeMonitoringFeature) {
+    MTRTonerCartridgeMonitoringFeatureCondition MTR_NEWLY_AVAILABLE = 0x1,
+    MTRTonerCartridgeMonitoringFeatureWarning MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockAlarmCode) {

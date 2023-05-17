@@ -2627,7 +2627,7 @@ client cluster HepaFilterMonitoring = 113 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2660,7 +2660,7 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2693,7 +2693,7 @@ client cluster CeramicFilterMonitoring = 115 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2726,7 +2726,7 @@ client cluster ElectrostaticFilterMonitoring = 116 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2759,7 +2759,7 @@ client cluster UvFilterMonitoring = 117 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2792,7 +2792,7 @@ client cluster IonizingFilterMonitoring = 118 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2825,7 +2825,7 @@ client cluster ZeoliteFilterMonitoring = 119 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2858,7 +2858,7 @@ client cluster OzoneFilterMonitoring = 120 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2891,7 +2891,7 @@ client cluster WaterTankMonitoring = 121 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2924,7 +2924,7 @@ client cluster FuelTankMonitoring = 122 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2957,7 +2957,7 @@ client cluster InkCartridgeMonitoring = 123 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2990,7 +2990,7 @@ client cluster TonerCartridgeMonitoring = 124 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }

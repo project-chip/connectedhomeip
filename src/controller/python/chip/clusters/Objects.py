@@ -15314,7 +15314,7 @@ class HepaFilterMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -15546,7 +15546,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -15778,7 +15778,7 @@ class CeramicFilterMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -16010,7 +16010,7 @@ class ElectrostaticFilterMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -16242,7 +16242,7 @@ class UvFilterMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -16474,7 +16474,7 @@ class IonizingFilterMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -16706,7 +16706,7 @@ class ZeoliteFilterMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -16938,7 +16938,7 @@ class OzoneFilterMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -17170,7 +17170,7 @@ class WaterTankMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -17402,7 +17402,7 @@ class FuelTankMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -17634,7 +17634,7 @@ class InkCartridgeMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
@@ -17866,7 +17866,7 @@ class TonerCartridgeMonitoring(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class Features(IntFlag):
+        class Feature(IntFlag):
             kCondition = 0x1
             kWarning = 0x2
 
