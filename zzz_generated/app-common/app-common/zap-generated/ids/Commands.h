@@ -609,6 +609,28 @@ static constexpr CommandId Id = 0x00000005;
 } // namespace Commands
 } // namespace GroupKeyManagement
 
+namespace IcdManagement {
+namespace Commands {
+
+namespace RegisterClient {
+static constexpr CommandId Id = 0x00000000;
+} // namespace RegisterClient
+
+namespace RegisterClientResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace RegisterClientResponse
+
+namespace UnregisterClient {
+static constexpr CommandId Id = 0x00000002;
+} // namespace UnregisterClient
+
+namespace StayActiveRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace StayActiveRequest
+
+} // namespace Commands
+} // namespace IcdManagement
+
 namespace ModeSelect {
 namespace Commands {
 
@@ -1230,28 +1252,6 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace ElectricalMeasurement
-
-namespace ClientMonitoring {
-namespace Commands {
-
-namespace RegisterClientMonitoring {
-static constexpr CommandId Id = 0x00000000;
-} // namespace RegisterClientMonitoring
-
-namespace RegisterClientMonitoringResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace RegisterClientMonitoringResponse
-
-namespace UnregisterClientMonitoring {
-static constexpr CommandId Id = 0x00000002;
-} // namespace UnregisterClientMonitoring
-
-namespace StayAwakeRequest {
-static constexpr CommandId Id = 0x00000003;
-} // namespace StayAwakeRequest
-
-} // namespace Commands
-} // namespace ClientMonitoring
 
 namespace UnitTesting {
 namespace Commands {

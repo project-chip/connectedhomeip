@@ -145,6 +145,9 @@ static constexpr ClusterId Id = 0x00000044;
 namespace BooleanState {
 static constexpr ClusterId Id = 0x00000045;
 } // namespace BooleanState
+namespace IcdManagement {
+static constexpr ClusterId Id = 0x00000046;
+} // namespace IcdManagement
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
@@ -271,9 +274,6 @@ static constexpr ClusterId Id = 0x0000050E;
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
-namespace ClientMonitoring {
-static constexpr ClusterId Id = 0x00001046;
-} // namespace ClientMonitoring
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting

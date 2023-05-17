@@ -1609,6 +1609,48 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("CheckInNodeID", indent + 1, value.checkInNodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CheckInNodeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MonitoredSubject", indent + 1, value.monitoredSubject);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MonitoredSubject'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Key", indent + 1, value.key);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Key'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::DecodableType & value)
 {
@@ -2161,40 +2203,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoint'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistrationStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("ClientNodeID", indent + 1, value.clientNodeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ClientNodeID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Key", indent + 1, value.key);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Key'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
             return err;
         }
     }
@@ -4173,6 +4181,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const IcdManagement::Commands::RegisterClientResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("ICDCounter", indent + 1, value.ICDCounter));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -4345,15 +4361,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("numberOfIntervalsDelivered", indent + 1, value.numberOfIntervalsDelivered));
     ReturnErrorOnFailure(DataModelLogger::LogValue("attributeId", indent + 1, value.attributeId));
     ReturnErrorOnFailure(DataModelLogger::LogValue("intervals", indent + 1, value.intervals));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ClientMonitoring::Commands::RegisterClientMonitoringResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("ICDCounter", indent + 1, value.ICDCounter));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -7332,6 +7339,74 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case BooleanState::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case IcdManagement::Id: {
+        switch (path.mAttributeId)
+        {
+        case IcdManagement::Attributes::IdleModeInterval::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("IdleModeInterval", 1, value);
+        }
+        case IcdManagement::Attributes::ActiveModeInterval::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveModeInterval", 1, value);
+        }
+        case IcdManagement::Attributes::ActiveModeThreshold::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveModeThreshold", 1, value);
+        }
+        case IcdManagement::Attributes::RegisteredClients::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RegisteredClients", 1, value);
+        }
+        case IcdManagement::Attributes::ICDCounter::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ICDCounter", 1, value);
+        }
+        case IcdManagement::Attributes::ClientsSupportedPerFabric::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClientsSupportedPerFabric", 1, value);
+        }
+        case IcdManagement::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case IcdManagement::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case IcdManagement::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case IcdManagement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case IcdManagement::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case IcdManagement::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -11204,69 +11279,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case ClientMonitoring::Id: {
-        switch (path.mAttributeId)
-        {
-        case ClientMonitoring::Attributes::IdleModeInterval::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("IdleModeInterval", 1, value);
-        }
-        case ClientMonitoring::Attributes::ActiveModeInterval::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ActiveModeInterval", 1, value);
-        }
-        case ClientMonitoring::Attributes::ActiveModeThreshold::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ActiveModeThreshold", 1, value);
-        }
-        case ClientMonitoring::Attributes::ExpectedClients::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistrationStruct::DecodableType>
-                value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ExpectedClients", 1, value);
-        }
-        case ClientMonitoring::Attributes::ICDCounter::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ICDCounter", 1, value);
-        }
-        case ClientMonitoring::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case ClientMonitoring::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case ClientMonitoring::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case ClientMonitoring::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case ClientMonitoring::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case ClientMonitoring::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
     case UnitTesting::Id: {
         switch (path.mAttributeId)
         {
@@ -11965,6 +11977,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
+    case IcdManagement::Id: {
+        switch (path.mCommandId)
+        {
+        case IcdManagement::Commands::RegisterClientResponse::Id: {
+            IcdManagement::Commands::RegisterClientResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RegisterClientResponse", 1, value);
+        }
+        }
+        break;
+    }
     case DoorLock::Id: {
         switch (path.mCommandId)
         {
@@ -12101,17 +12124,6 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetMeasurementProfileResponseCommand", 1, value);
-        }
-        }
-        break;
-    }
-    case ClientMonitoring::Id: {
-        switch (path.mCommandId)
-        {
-        case ClientMonitoring::Commands::RegisterClientMonitoringResponse::Id: {
-            ClientMonitoring::Commands::RegisterClientMonitoringResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("RegisterClientMonitoringResponse", 1, value);
         }
         }
         break;

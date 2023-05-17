@@ -404,6 +404,18 @@ typedef void (*BooleanStateEventListListAttributeCallback)(void * context,
                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*BooleanStateAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*IcdManagementRegisteredClientsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType> & data);
+typedef void (*IcdManagementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*IcdManagementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*IcdManagementEventListListAttributeCallback)(void * context,
+                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*IcdManagementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ModeSelectSupportedModesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & data);

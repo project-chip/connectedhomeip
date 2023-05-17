@@ -280,6 +280,12 @@
 #define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER
 #endif
 
+#if defined(ZCL_USING_ICD_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_ICD_MANAGEMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER { chip::app::Clusters::IcdManagement::Id, "ICD Management" },
+#else
+#define CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_MODE_SELECT_CLUSTER_SERVER) || defined(ZCL_USING_MODE_SELECT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER { chip::app::Clusters::ModeSelect::Id, "Mode Select" },
 #else
@@ -551,12 +557,6 @@
 #define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_CLIENT_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_CLIENT_MONITORING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CLIENT_MONITORING_CLUSTER { chip::app::Clusters::ClientMonitoring::Id, "Client Monitoring" },
-#else
-#define CHIP_PRINTCLUSTER_CLIENT_MONITORING_CLUSTER
-#endif
-
 #if defined(ZCL_USING_UNIT_TESTING_CLUSTER_SERVER) || defined(ZCL_USING_UNIT_TESTING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER { chip::app::Clusters::UnitTesting::Id, "Unit Testing" },
 #else
@@ -610,6 +610,7 @@
     CHIP_PRINTCLUSTER_PROXY_DISCOVERY_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
@@ -652,7 +653,6 @@
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
-    CHIP_PRINTCLUSTER_CLIENT_MONITORING_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER
 
