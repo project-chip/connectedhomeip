@@ -820,23 +820,16 @@ struct Type
 {
 public:
     Optional<chip::AttributeId> attributeID;
-    DataModel::List<const uint8_t> attributeValue;
+    uint32_t attributeValue = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
-struct DecodableType
-{
-public:
-    Optional<chip::AttributeId> attributeID;
-    DataModel::DecodableList<uint8_t> attributeValue;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace AttributeValuePair
 namespace ExtensionFieldSet {

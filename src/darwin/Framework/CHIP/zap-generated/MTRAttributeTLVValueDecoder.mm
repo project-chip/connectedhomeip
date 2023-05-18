@@ -412,6 +412,28 @@ static id _Nullable DecodeAttributeValueForScenesCluster(AttributeId aAttributeI
         }
         return value;
     }
+    case Attributes::SceneTableSize::Id: {
+        using TypeInfo = Attributes::SceneTableSize::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+    case Attributes::RemainingCapacity::Id: {
+        using TypeInfo = Attributes::RemainingCapacity::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
     case Attributes::GeneratedCommandList::Id: {
         using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -22554,183 +22576,7 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
         return DecodeAttributeValueForGroupsCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::Scenes::Id: {
-        using namespace Clusters::Scenes;
-        switch (aPath.mAttributeId) {
-        case Attributes::SceneCount::Id: {
-            using TypeInfo = Attributes::SceneCount::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
-            return value;
-        }
-        case Attributes::CurrentScene::Id: {
-            using TypeInfo = Attributes::CurrentScene::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
-            return value;
-        }
-        case Attributes::CurrentGroup::Id: {
-            using TypeInfo = Attributes::CurrentGroup::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
-            return value;
-        }
-        case Attributes::SceneValid::Id: {
-            using TypeInfo = Attributes::SceneValid::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithBool:cppValue];
-            return value;
-        }
-        case Attributes::NameSupport::Id: {
-            using TypeInfo = Attributes::NameSupport::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
-            return value;
-        }
-        case Attributes::LastConfiguredBy::Id: {
-            using TypeInfo = Attributes::LastConfiguredBy::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nullable value;
-            if (cppValue.IsNull()) {
-                value = nil;
-            } else {
-                value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
-            }
-            return value;
-        }
-        case Attributes::GeneratedCommandList::Id: {
-            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSArray * _Nonnull value;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                    [array_0 addObject:newElement_0];
-                }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                value = array_0;
-            }
-            return value;
-        }
-        case Attributes::AcceptedCommandList::Id: {
-            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSArray * _Nonnull value;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                    [array_0 addObject:newElement_0];
-                }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                value = array_0;
-            }
-            return value;
-        }
-        case Attributes::AttributeList::Id: {
-            using TypeInfo = Attributes::AttributeList::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSArray * _Nonnull value;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
-                    [array_0 addObject:newElement_0];
-                }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                value = array_0;
-            }
-            return value;
-        }
-        case Attributes::FeatureMap::Id: {
-            using TypeInfo = Attributes::FeatureMap::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
-            return value;
-        }
-        case Attributes::ClusterRevision::Id: {
-            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
-            return value;
-        }
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
-            break;
-        }
-        break;
+        return DecodeAttributeValueForScenesCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::OnOff::Id: {
         return DecodeAttributeValueForOnOffCluster(aPath.mAttributeId, aReader, aError);

@@ -154,7 +154,7 @@ tests:
                                 [
                                     {
                                         AttributeID: 0x0000,
-                                        AttributeValue: [0x01],
+                                        AttributeValue: 0x01,
                                     },
                                 ],
                         },
@@ -164,11 +164,11 @@ tests:
                                 [
                                     {
                                         AttributeID: 0x0000,
-                                        AttributeValue: [0x64],
+                                        AttributeValue: 0x64,
                                     },
                                     {
                                         AttributeID: 0x0001,
-                                        AttributeValue: [0x00, 0x00],
+                                        AttributeValue: 0x00,
                                     },
                                 ],
                         },
@@ -207,7 +207,7 @@ tests:
                                 [
                                     {
                                         AttributeID: 0x0000,
-                                        AttributeValue: [0x01],
+                                        AttributeValue: 0x01,
                                     },
                                 ],
                         },
@@ -217,11 +217,11 @@ tests:
                                 [
                                     {
                                         AttributeID: 0x0000,
-                                        AttributeValue: [0x64],
+                                        AttributeValue: 0x64,
                                     },
                                     {
                                         AttributeID: 0x0001,
-                                        AttributeValue: [0x00, 0x00],
+                                        AttributeValue: 0x00,
                                     },
                                 ],
                         },
@@ -242,7 +242,7 @@ tests:
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
-          ./chip-tool scenes enhanced-add-scene 0x0001 1 1 "Test Name" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": [value]}]}' nodeId endpointId
+          ./chip-tool scenes enhanced-add-scene 0x0001 1 1 "Test Name" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": value}]}' nodeId endpointId
 
           Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
 
@@ -304,7 +304,7 @@ tests:
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
-          ./chip-tool scenes add-scene 0x0001 1 1 "Test Name" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": [value]}]}' nodeId endpointId
+          ./chip-tool scenes add-scene 0x0001 1 1 "Test Name" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": value}]}' nodeId endpointId
 
           Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
 
@@ -389,7 +389,7 @@ tests:
                                 [
                                     {
                                         AttributeID: 0x0000,
-                                        AttributeValue: [0x01],
+                                        AttributeValue: 0x01,
                                     },
                                 ],
                         },
@@ -399,11 +399,11 @@ tests:
                                 [
                                     {
                                         AttributeID: 0x0000,
-                                        AttributeValue: [0x64],
+                                        AttributeValue: 0x64,
                                     },
                                     {
                                         AttributeID: 0x0001,
-                                        AttributeValue: [0x00, 0x00],
+                                        AttributeValue: 0x00,
                                     },
                                 ],
                         },
@@ -439,7 +439,7 @@ tests:
                                 [
                                     {
                                         AttributeID: 0x0000,
-                                        AttributeValue: [0x01],
+                                        AttributeValue: 0x01,
                                     },
                                 ],
                         },
@@ -449,11 +449,11 @@ tests:
                                 [
                                     {
                                         AttributeID: 0x0000,
-                                        AttributeValue: [0x64],
+                                        AttributeValue: 0x64,
                                     },
                                     {
                                         AttributeID: 0x0001,
-                                        AttributeValue: [0x00, 0x00],
+                                        AttributeValue: 0x00,
                                     },
                                 ],
                         },

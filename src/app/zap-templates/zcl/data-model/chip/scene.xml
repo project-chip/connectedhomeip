@@ -23,9 +23,7 @@ limitations under the License.
   <struct name="AttributeValuePair">
     <cluster code="0x0005"/>
     <item name="AttributeID" type="attrib_id" optional="true"/>
-    <!-- TODO Need a new type that can support variable attribute types and size  -->
-    <!-- One suggestion from Boris is a Type that maps to a TLVReader place in the riight elements -->
-    <item name="AttributeValue" type="INT8U" array="true"/>
+    <item name="AttributeValue" type="INT32U" optional="false"/>
   </struct>
 
   <struct name="ExtensionFieldSet">

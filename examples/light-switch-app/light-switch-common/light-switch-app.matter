@@ -186,7 +186,7 @@ client cluster Scenes = 5 {
 
   struct AttributeValuePair {
     optional attrib_id attributeID = 0;
-    int8u attributeValue[] = 1;
+    int32u attributeValue = 1;
   }
 
   struct ExtensionFieldSet {
@@ -200,6 +200,8 @@ client cluster Scenes = 5 {
   readonly attribute boolean sceneValid = 3;
   readonly attribute bitmap8 nameSupport = 4;
   readonly attribute optional nullable node_id lastConfiguredBy = 5;
+  readonly attribute int16u sceneTableSize = 6;
+  readonly attribute int8u remainingCapacity = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

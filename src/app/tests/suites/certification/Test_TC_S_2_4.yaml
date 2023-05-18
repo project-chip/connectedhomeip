@@ -96,7 +96,7 @@ tests:
                                 [
                                     {
                                         AttributeID: 0x0000,
-                                        AttributeValue: [0x01],
+                                        AttributeValue: 0x01,
                                     },
                                 ],
                         },
@@ -106,11 +106,11 @@ tests:
                                 [
                                     {
                                         AttributeID: 0x0000,
-                                        AttributeValue: [0x64],
+                                        AttributeValue: 0x64,
                                     },
                                     {
                                         AttributeID: 0x0001,
-                                        AttributeValue: [0x00, 0x00],
+                                        AttributeValue: 0x00,
                                     },
                                 ],
                         },
