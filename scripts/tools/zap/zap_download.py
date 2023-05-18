@@ -110,7 +110,15 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
     else:
         raise Exception('Unknown platform - do not know what zip file to download.')
 
-    url = f"https://github.com/project-chip/zap/releases/download/{zap_version}/zap-{zap_platform}.zip"
+    arch = os.uname().machine
+    if arch == 'arm64':
+        zap_arch = 'arm64'
+    elif arch == 'x86_64':
+        zap_arch = 'x64'
+    else:
+        raise Exception(f'Unknown architecture "${arch}" - do not know what zip file to download.')
+
+    url = f"https://github.com/project-chip/zap/releases/download/{zap_version}/zap-{zap_platform}-{zap_arch}.zip"
 
     logging.info("Fetching: %s", url)
 

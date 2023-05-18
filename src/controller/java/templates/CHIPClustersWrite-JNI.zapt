@@ -1,5 +1,4 @@
 {{> header}}
-{{#if_enabled_clusters side='client'}}
 #include <jni/CHIPCallbackTypes.h>
 #include <jni/CHIPReadCallbacks.h>
 #include "CHIPInvokeCallbacks.h"
@@ -29,7 +28,7 @@
 using namespace chip;
 using namespace chip::Controller;
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 {{#zcl_attributes_server removeKeys='isOptional'}}
 {{#if_unsupported_attribute_callback type isArray ../id}}
 {{else}}
@@ -77,7 +76,6 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
 {{/if}}
 {{/if_unsupported_attribute_callback}}
 {{/zcl_attributes_server}}
-{{/all_user_clusters}}
-{{/if_enabled_clusters}}
+{{/zcl_clusters}}
 
 #pragma clang diagnostic pop
