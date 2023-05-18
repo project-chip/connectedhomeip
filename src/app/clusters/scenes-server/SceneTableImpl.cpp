@@ -16,7 +16,6 @@
  */
 
 #include <app/clusters/scenes-server/SceneTableImpl.h>
-#include <app/util/attribute-storage.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <stdlib.h>
 
@@ -33,10 +32,9 @@ namespace scenes {
 /// kTransitionTime: Tag for the transition time of the scene in miliseconds
 enum class TagScene : uint8_t
 {
-    kGlobalSceneCount = 1,
+    kEndpointSceneCount = 1,
     kSceneCount,
     kStorageIDArray,
-    kEndpointID,
     kGroupID,
     kSceneID,
     kName,
@@ -52,18 +50,20 @@ using SceneData       = DefaultSceneTableImpl::SceneData;
 // byte value, 1 byte end struct. 8 Bytes leaves space for potential increase in count_value size.
 static constexpr size_t kPersistentBufferSceneCountBytes = 8;
 
-struct GlobalSceneCount : public PersistentData<kPersistentBufferSceneCountBytes>
+struct EndpointSceneCount : public PersistentData<kPersistentBufferSceneCountBytes>
 {
-    uint8_t count_value = 0;
+    EndpointId endpoint_id = kInvalidEndpointId;
+    uint8_t count_value    = 0;
 
-    GlobalSceneCount(uint8_t count = 0) : count_value(count) {}
-    ~GlobalSceneCount() {}
+    EndpointSceneCount(EndpointId endpoint, uint8_t count = 0) : endpoint_id(endpoint), count_value(count) {}
+    ~EndpointSceneCount() {}
 
     void Clear() override { count_value = 0; }
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
-        key = DefaultStorageKeyAllocator::GlobalSceneCountKey();
+        VerifyOrReturnError(kInvalidEndpointId != endpoint_id, CHIP_ERROR_INVALID_ARGUMENT);
+        key = DefaultStorageKeyAllocator::EndpointSceneCountKey(endpoint_id);
         return CHIP_NO_ERROR;
     }
 
@@ -71,7 +71,7 @@ struct GlobalSceneCount : public PersistentData<kPersistentBufferSceneCountBytes
     {
         TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kGlobalSceneCount), count_value));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kEndpointSceneCount), count_value));
         return writer.EndContainer(container);
     }
 
@@ -81,7 +81,7 @@ struct GlobalSceneCount : public PersistentData<kPersistentBufferSceneCountBytes
 
         TLV::TLVType container;
         ReturnErrorOnFailure(reader.EnterContainer(container));
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGlobalSceneCount)));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kEndpointSceneCount)));
         ReturnErrorOnFailure(reader.Get(count_value));
         return reader.ExitContainer(container);
     }
@@ -108,6 +108,7 @@ static constexpr size_t kPersistentSceneBufferMax = 256;
 struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneBufferMax>
 {
     FabricIndex fabric_index = kUndefinedFabricIndex;
+    EndpointId endpoint_id   = kInvalidEndpointId;
     SceneIndex index         = 0;
     bool first               = true;
 
@@ -122,7 +123,8 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
-        key = DefaultStorageKeyAllocator::FabricSceneKey(fabric_index, index);
+        VerifyOrReturnError(kInvalidEndpointId != endpoint_id, CHIP_ERROR_INVALID_ARGUMENT);
+        key = DefaultStorageKeyAllocator::FabricSceneKey(fabric_index, kInvalidEndpointId, index);
         return CHIP_NO_ERROR;
     }
 
@@ -135,7 +137,6 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         // Scene ID
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kEndpointID), mStorageId.mEndpointId));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kGroupID), mStorageId.mGroupId));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kSceneID), mStorageId.mSceneId));
 
@@ -161,8 +162,6 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
         // Scene ID
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kEndpointID)));
-        ReturnErrorOnFailure(reader.Get(mStorageId.mEndpointId));
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGroupID)));
         ReturnErrorOnFailure(reader.Get(mStorageId.mGroupId));
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneID)));
@@ -197,28 +196,30 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
 static constexpr size_t kPersistentFabricBufferMax = 128;
 
 /**
- * @brief Linked list of all scenes in a fabric, stored in persistent memory
+ * @brief Class that holds a map to all scenes in a fabric for a specific endpoint
  *
  * FabricSceneData is an access to a linked list of scenes
  */
 struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 {
+    EndpointId endpoint_id;
     FabricIndex fabric_index;
     uint8_t scene_count = 0;
     uint8_t max_scenes_per_fabric;
-    uint8_t max_scenes_global;
+    uint8_t max_scenes_per_endpoint;
     SceneStorageId scene_map[kMaxScenesPerFabric];
 
-    FabricSceneData(FabricIndex fabric = kUndefinedFabricIndex, uint8_t maxScenesPerFabric = kMaxScenesPerFabric,
-                    uint8_t maxScenesGlobal = kMaxScenesGlobal) :
-        fabric_index(fabric),
-        max_scenes_per_fabric(maxScenesPerFabric), max_scenes_global(maxScenesGlobal)
+    FabricSceneData(EndpointId endpoint = kInvalidEndpointId, FabricIndex fabric = kUndefinedFabricIndex,
+                    uint8_t maxScenesPerFabric = kMaxScenesPerFabric, uint8_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
+        endpoint_id(endpoint),
+        fabric_index(fabric), max_scenes_per_fabric(maxScenesPerFabric), max_scenes_per_endpoint(maxScenesPerEndpoint)
     {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
-        key = DefaultStorageKeyAllocator::FabricSceneDataKey(fabric_index);
+        VerifyOrReturnError(kInvalidEndpointId != endpoint_id, CHIP_ERROR_INVALID_ARGUMENT);
+        key = DefaultStorageKeyAllocator::FabricSceneDataKey(fabric_index, endpoint_id);
         return CHIP_NO_ERROR;
     }
 
@@ -245,7 +246,6 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         {
             TLV::TLVType sceneIdContainer;
             ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, sceneIdContainer));
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kEndpointID), (scene_map[i].mEndpointId)));
             ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kGroupID), (scene_map[i].mGroupId)));
             ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kSceneID), (scene_map[i].mSceneId)));
             ReturnErrorOnFailure(writer.EndContainer(sceneIdContainer));
@@ -292,8 +292,6 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             if (i < max_scenes_per_fabric)
             {
                 ReturnErrorOnFailure(reader.EnterContainer(sceneIdContainer));
-                ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kEndpointID)));
-                ReturnErrorOnFailure(reader.Get(scene_map[i].mEndpointId));
                 ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGroupID)));
                 ReturnErrorOnFailure(reader.Get(scene_map[i].mGroupId));
                 ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneID)));
@@ -304,8 +302,6 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             {
                 SceneTableData scene(fabric_index, i);
                 ReturnErrorOnFailure(reader.EnterContainer(sceneIdContainer));
-                ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kEndpointID)));
-                ReturnErrorOnFailure(reader.Get(scene.mStorageId.mEndpointId));
                 ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGroupID)));
                 ReturnErrorOnFailure(reader.Get(scene.mStorageId.mGroupId));
                 ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneID)));
@@ -323,8 +319,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         return reader.ExitContainer(fabricSceneContainer);
     }
 
-    /// @brief Finds the index where to insert current scene by going through the whole table and looking if the scene is already in
-    /// there. If the target is not in the table, sets idx to the first empty space
+    /// @brief Finds the index where to insert current scene by going through the endpoint's table and looking if the scene is
+    /// already in there. If the target is not in the table, sets idx to the first empty space
     /// @param target_scene Storage Id of scene to store
     /// @param idx Index where target or space is found
     /// @return CHIP_NO_ERROR if managed to find the target scene, CHIP_ERROR_NOT_FOUND if not found and space left
@@ -373,11 +369,11 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         if (CHIP_ERROR_NOT_FOUND == err) // If not found, scene.index should be the first free index
         {
             // Update the global scene count
-            GlobalSceneCount global_scene_count;
-            ReturnErrorOnFailure(global_scene_count.Load(storage));
-            VerifyOrReturnError(global_scene_count.count_value < max_scenes_global, CHIP_ERROR_NO_MEMORY);
-            global_scene_count.count_value++;
-            ReturnErrorOnFailure(global_scene_count.Save(storage));
+            EndpointSceneCount endpoint_scene_count(endpoint_id);
+            ReturnErrorOnFailure(endpoint_scene_count.Load(storage));
+            VerifyOrReturnError(endpoint_scene_count.count_value < max_scenes_per_endpoint, CHIP_ERROR_NO_MEMORY);
+            endpoint_scene_count.count_value++;
+            ReturnErrorOnFailure(endpoint_scene_count.Save(storage));
 
             scene_count++;
             scene_map[scene.index] = scene.mStorageId;
@@ -385,8 +381,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             err = this->Save(storage);
             if (CHIP_NO_ERROR != err)
             {
-                global_scene_count.count_value--;
-                ReturnErrorOnFailure(global_scene_count.Save(storage));
+                endpoint_scene_count.count_value--;
+                ReturnErrorOnFailure(endpoint_scene_count.Save(storage));
                 return err;
             }
 
@@ -395,8 +391,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             // on failure to save the scene, undoes the changes to Fabric Scene Data
             if (CHIP_NO_ERROR != err)
             {
-                global_scene_count.count_value--;
-                ReturnErrorOnFailure(global_scene_count.Save(storage));
+                endpoint_scene_count.count_value--;
+                ReturnErrorOnFailure(endpoint_scene_count.Save(storage));
 
                 scene_count--;
                 scene_map[scene.index].Clear();
@@ -426,10 +422,10 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             VerifyOrReturnValue(this->Find(scene_id, scene.index) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
             // Update the global scene count
-            GlobalSceneCount global_scene_count;
-            ReturnErrorOnFailure(global_scene_count.Load(storage));
-            global_scene_count.count_value--;
-            ReturnErrorOnFailure(global_scene_count.Save(storage));
+            EndpointSceneCount endpoint_scene_count(endpoint_id);
+            ReturnErrorOnFailure(endpoint_scene_count.Load(storage));
+            endpoint_scene_count.count_value--;
+            ReturnErrorOnFailure(endpoint_scene_count.Save(storage));
 
             scene_count--;
             scene_map[scene.index].Clear();
@@ -438,8 +434,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             // On failure to update the scene map, undo the global count modification
             if (CHIP_NO_ERROR != err)
             {
-                global_scene_count.count_value++;
-                ReturnErrorOnFailure(global_scene_count.Save(storage));
+                endpoint_scene_count.count_value++;
+                ReturnErrorOnFailure(endpoint_scene_count.Save(storage));
                 return err;
             }
 
@@ -448,8 +444,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             // On failure to delete scene, undo the change to the Fabric Scene Data and the global scene count
             if (CHIP_NO_ERROR != err)
             {
-                global_scene_count.count_value++;
-                ReturnErrorOnFailure(global_scene_count.Save(storage));
+                endpoint_scene_count.count_value++;
+                ReturnErrorOnFailure(endpoint_scene_count.Save(storage));
 
                 scene_count++;
                 scene_map[scene.index] = scene.mStorageId;
@@ -491,7 +487,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         // be updated
         if (deleted_scenes_count)
         {
-            GlobalSceneCount global_count;
+            EndpointSceneCount global_count(endpoint_id);
             ReturnErrorOnFailure(global_count.Load(storage));
             global_count.count_value = static_cast<uint8_t>(global_count.count_value - deleted_scenes_count);
             ReturnErrorOnFailure(global_count.Save(storage));
@@ -510,7 +506,7 @@ CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate * storage)
     }
 
     // Verified the initialized parameter respect the maximum allowed values for scene capacity
-    VerifyOrReturnError(mMaxScenesPerFabric <= kMaxScenesPerFabric && mMaxScenesGlobal <= kMaxScenesGlobal,
+    VerifyOrReturnError(mMaxScenesPerFabric <= kMaxScenesPerFabric && mMaxScenesPerEndpoint <= kMaxScenesPerEndpoint,
                         CHIP_ERROR_INVALID_INTEGER_VALUE);
     mStorage = storage;
     return CHIP_NO_ERROR;
@@ -522,43 +518,43 @@ void DefaultSceneTableImpl::Finish()
     mSceneEntryIterators.ReleaseAll();
 }
 
-CHIP_ERROR DefaultSceneTableImpl::GetGlobalSceneCount(uint8_t & scene_count)
+CHIP_ERROR DefaultSceneTableImpl::GetEndpointSceneCount(EndpointId endpoint, uint8_t & scene_count)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    GlobalSceneCount global_count;
+    EndpointSceneCount endpoint_scene_count(endpoint);
 
-    ReturnErrorOnFailure(global_count.Load(mStorage));
-    scene_count = global_count.count_value;
+    ReturnErrorOnFailure(endpoint_scene_count.Load(mStorage));
+    scene_count = endpoint_scene_count.count_value;
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DefaultSceneTableImpl::SetGlobalSceneCount(const uint8_t & scene_count)
+CHIP_ERROR DefaultSceneTableImpl::SetEndpointSceneCount(EndpointId endpoint, const uint8_t & scene_count)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    GlobalSceneCount global_count(scene_count);
-    return global_count.Save(mStorage);
+    EndpointSceneCount endpoint_scene_count(endpoint, scene_count);
+    return endpoint_scene_count.Save(mStorage);
 }
 
-CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity)
+CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(EndpointId endpoint, FabricIndex fabric_index, uint8_t & capacity)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    uint8_t global_scene_count = 0;
-    ReturnErrorOnFailure(GetGlobalSceneCount(global_scene_count));
+    uint8_t endpoint_scene_count = 0;
+    ReturnErrorOnFailure(GetEndpointSceneCount(endpoint, endpoint_scene_count));
 
     // If the global scene count is higher than the maximal Global scene capacity, this returns a capacity of 0 until enough scenes
     // have been deleted to bring the global number of scenes under the global maximum.
-    if (global_scene_count > mMaxScenesGlobal)
+    if (endpoint_scene_count > mMaxScenesPerEndpoint)
     {
         capacity = 0;
         return CHIP_NO_ERROR;
     }
-    uint8_t remaining_capacity_global = static_cast<uint8_t>(mMaxScenesGlobal - global_scene_count);
+    uint8_t remaining_capacity_global = static_cast<uint8_t>(mMaxScenesPerEndpoint - endpoint_scene_count);
     uint8_t remaining_capacity_fabric = mMaxScenesPerFabric;
 
-    FabricSceneData fabric(fabric_index);
+    FabricSceneData fabric(endpoint, fabric_index);
 
     // Load fabric data (defaults to zero)
     CHIP_ERROR err = fabric.Load(mStorage);
@@ -574,11 +570,11 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)
+CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, const SceneTableEntry & entry)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
+    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
 
     // Load fabric data (defaults to zero)
     CHIP_ERROR err = fabric.Load(mStorage);
@@ -587,11 +583,12 @@ CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, c
     return fabric.SaveScene(mStorage, entry);
 }
 
-CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
+CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id,
+                                                     SceneTableEntry & entry)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
+    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     SceneTableData scene(fabric_index);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -603,7 +600,7 @@ CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, S
     // kMaxClustersPerScene was reduced by OTA) and therefore must be deleted as is is no longer considered accessible.
     if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
     {
-        ReturnErrorOnFailure(this->RemoveSceneTableEntry(fabric_index, scene_id));
+        ReturnErrorOnFailure(this->RemoveSceneTableEntry(endpoint, fabric_index, scene_id));
     }
     ReturnErrorOnFailure(err);
 
@@ -613,11 +610,11 @@ CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, S
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)
+CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
+    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
 
@@ -629,12 +626,13 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index
 /// @param fabric_index Fabric in which the scene belongs
 /// @param scened_idx Position in the Scene Table
 /// @return CHIP_NO_ERROR if removal was successful, errors if failed to remove the scene or to update the fabric after removing it
-CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scene_idx)
+CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index,
+                                                                  SceneIndex scene_idx)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
+    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     SceneTableData scene(fabric_index, scene_idx);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -645,12 +643,13 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(FabricIndex fa
     return fabric.RemoveScene(mStorage, scene.mStorageId);
 }
 
-CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list)
+CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(EndpointId endpoint, FabricIndex fabric_index, GroupId group_id,
+                                                        Span<SceneId> & scene_list)
 {
-    FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
+    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     SceneTableData scene(fabric_index);
 
-    auto * iterator = this->IterateSceneEntries(fabric_index);
+    auto * iterator = this->IterateSceneEntries(endpoint, fabric_index);
     VerifyOrReturnError(nullptr != iterator, CHIP_ERROR_INTERNAL);
     SceneId * list      = scene_list.data();
     uint8_t scene_count = 0;
@@ -673,11 +672,11 @@ CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(FabricIndex fabric_index
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(FabricIndex fabric_index, GroupId group_id)
+CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(EndpointId endpoint, FabricIndex fabric_index, GroupId group_id)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
+    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     SceneTableData scene(fabric_index);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -720,15 +719,16 @@ void DefaultSceneTableImpl::UnregisterAllHandlers()
 
 /// @brief Gets the field sets for the clusters implemented on a specific endpoint and store them in an EFS (extension field set).
 /// Does so by going through the SceneHandler list and calling the first handler the list find for each specific clusters.
+/// @param endpoint endpoint for which the scene is saved
 /// @param scene Scene in which the EFS gets populated
-CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
+CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(EndpointId endpoint, SceneTableEntry & scene)
 {
     if (!HandlerListEmpty())
     {
         uint8_t clusterCount = 0;
         clusterId cArray[kMaxClustersPerScene];
         Span<clusterId> cSpan(cArray);
-        clusterCount = GetClustersFromEndpoint(scene.mStorageId.mEndpointId, cArray, kMaxClustersPerScene);
+        clusterCount = GetClustersFromEndpoint(endpoint, cArray, kMaxClustersPerScene);
         cSpan.reduce_size(clusterCount);
         for (clusterId cluster : cSpan)
         {
@@ -738,9 +738,9 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 
             for (auto & handler : mHandlerList)
             {
-                if (handler.SupportsCluster(scene.mStorageId.mEndpointId, cluster))
+                if (handler.SupportsCluster(endpoint, cluster))
                 {
-                    ReturnErrorOnFailure(handler.SerializeSave(scene.mStorageId.mEndpointId, EFS.mID, EFSSpan));
+                    ReturnErrorOnFailure(handler.SerializeSave(endpoint, EFS.mID, EFSSpan));
                     EFS.mUsedBytes = static_cast<uint8_t>(EFSSpan.size());
                     ReturnErrorOnFailure(scene.mStorageData.mExtensionFieldSets.InsertFieldSet(EFS));
                     break;
@@ -755,8 +755,9 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 /// @brief Retrieves the values of extension field sets on a scene and applies them to each cluster on the endpoint of the scene.
 /// Does so by iterating through mHandlerList for each cluster in the EFS and calling the FIRST handler found that supports the
 /// cluster. Does so by going through the SceneHandler list and calling the first handler the list find for each specific clusters.
+/// @param endpoint endpoint on which the scene is applied
 /// @param scene Scene providing the EFSs (extension field sets)
-CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
+CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(EndpointId endpoint, const SceneTableEntry & scene)
 {
     ExtensionFieldSet EFS;
     TransitionTimeMs time;
@@ -775,9 +776,9 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
             {
                 for (auto & handler : mHandlerList)
                 {
-                    if (handler.SupportsCluster(scene.mStorageId.mEndpointId, cluster))
+                    if (handler.SupportsCluster(endpoint, cluster))
                     {
-                        ReturnErrorOnFailure(handler.ApplyScene(scene.mStorageId.mEndpointId, cluster, EFSSpan, time));
+                        ReturnErrorOnFailure(handler.ApplyScene(endpoint, cluster, EFSSpan, time));
                         break;
                     }
                 }
@@ -792,20 +793,25 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricSceneData fabric(fabric_index);
-    SceneIndex idx = 0;
-    CHIP_ERROR err = fabric.Load(mStorage);
-    VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
-
-    while (idx < mMaxScenesPerFabric)
+    for (auto endpoint : app::EnabledEndpointsWithServerCluster(chip::app::Clusters::Scenes::Id))
     {
-        err = RemoveSceneTableEntryAtPosition(fabric_index, idx);
-        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err, err);
-        idx++;
+        FabricSceneData fabric(endpoint, fabric_index);
+        SceneIndex idx = 0;
+        CHIP_ERROR err = fabric.Load(mStorage);
+        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+
+        while (idx < mMaxScenesPerFabric)
+        {
+            err = RemoveSceneTableEntryAtPosition(endpoint, fabric_index, idx);
+            VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err, err);
+            idx++;
+        }
+
+        // Remove fabric scenes on endpoint
+        ReturnErrorOnFailure(fabric.Delete(mStorage));
     }
 
-    // Remove fabric
-    return fabric.Delete(mStorage);
+    return CHIP_NO_ERROR;
 }
 
 /// @brief wrapper function around emberAfGetClustersFromEndpoint to allow testing, shimmed in test configuration because
@@ -815,18 +821,19 @@ uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(EndpointId endpoint, Clus
     return emberAfGetClustersFromEndpoint(endpoint, clusterList, listLen, true);
 }
 
-DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(FabricIndex fabric_index)
+DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(EndpointId endpoint, FabricIndex fabric)
 {
     VerifyOrReturnError(IsInitialized(), nullptr);
-    return mSceneEntryIterators.CreateObject(*this, fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
+    return mSceneEntryIterators.CreateObject(*this, endpoint, fabric, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
 }
 
-DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabric_index,
-                                                                      uint8_t maxScenesPerFabric, uint8_t maxScenesGlobal) :
+DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, EndpointId endpoint,
+                                                                      FabricIndex fabricIdx, uint8_t maxScenesPerFabric,
+                                                                      uint8_t maxScenesEndpoint) :
     mProvider(provider),
-    mFabric(fabric_index), mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesGlobal(maxScenesGlobal)
+    mFabric(fabricIdx), mEndpointId(endpoint), mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesPerEndpoint(maxScenesEndpoint)
 {
-    FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
+    FabricSceneData fabric(endpoint, fabricIdx, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     ReturnOnFailure(fabric.Load(provider.mStorage));
     mTotalScenes = fabric.scene_count;
     mSceneIndex  = 0;
@@ -839,7 +846,7 @@ size_t DefaultSceneTableImpl::SceneEntryIteratorImpl::Count()
 
 bool DefaultSceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & output)
 {
-    FabricSceneData fabric(mFabric);
+    FabricSceneData fabric(mEndpointId, mFabric);
     SceneTableData scene(mFabric);
 
     VerifyOrReturnError(fabric.Load(mProvider.mStorage) == CHIP_NO_ERROR, false);

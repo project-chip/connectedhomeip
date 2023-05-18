@@ -177,12 +177,12 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     }
 
     // Create scene from data and ID
-    SceneTableEntry scene(SceneStorageId(ctx.mRequestPath.mEndpointId, req.sceneID, req.groupID), storageData);
+    SceneTableEntry scene(SceneStorageId(req.sceneID, req.groupID), storageData);
 
     // Get Capacity
     VerifyOrReturn(nullptr != sceneTable);
     uint8_t capacity = 0;
-    err              = sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity);
+    err = sceneTable->GetRemainingCapacity(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), capacity);
     if (err != CHIP_NO_ERROR)
     {
         response.status = to_underlying(StatusIB(err).mStatus);
@@ -198,7 +198,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     }
 
     //  Insert in table
-    err = sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene);
+    err = sceneTable->SetSceneTableEntry(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), scene);
     if (err != CHIP_NO_ERROR)
     {
         response.status = to_underlying(StatusIB(err).mStatus);
@@ -236,8 +236,8 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, SceneTable * 
 
     //  Gets the scene form the table
     VerifyOrReturn(nullptr != sceneTable);
-    CHIP_ERROR err = sceneTable->GetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(),
-                                                    SceneStorageId(ctx.mRequestPath.mEndpointId, req.sceneID, req.groupID), scene);
+    CHIP_ERROR err = sceneTable->GetSceneTableEntry(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                                    SceneStorageId(req.sceneID, req.groupID), scene);
     if (err != CHIP_NO_ERROR)
     {
         if (err == CHIP_ERROR_NOT_FOUND)
@@ -320,10 +320,10 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     }
 
     // Scene Table interface data
-    SceneTableEntry scene(SceneStorageId(endpointID, sceneID, groupID));
+    SceneTableEntry scene(SceneStorageId(sceneID, groupID));
 
     VerifyOrReturnError(nullptr != sceneTable, CHIP_ERROR_INTERNAL);
-    CHIP_ERROR err = sceneTable->GetSceneTableEntry(fabricIdx, scene.mStorageId, scene);
+    CHIP_ERROR err = sceneTable->GetSceneTableEntry(endpointID, fabricIdx, scene.mStorageId, scene);
     if (err != CHIP_NO_ERROR && err != CHIP_ERROR_NOT_FOUND)
     {
         return err;
@@ -340,9 +340,9 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     }
 
     // Gets the EFS
-    ReturnErrorOnFailure(sceneTable->SceneSaveEFS(scene));
+    ReturnErrorOnFailure(sceneTable->SceneSaveEFS(endpointID, scene));
     // Insert in Scene Table
-    return sceneTable->SetSceneTableEntry(fabricIdx, scene);
+    return sceneTable->SetSceneTableEntry(endpointID, fabricIdx, scene);
 }
 
 CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & endpointID, const GroupId & groupID,
@@ -357,10 +357,10 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
     }
 
     // Scene Table interface data
-    SceneTableEntry scene(SceneStorageId(endpointID, sceneID, groupID));
+    SceneTableEntry scene(SceneStorageId(sceneID, groupID));
 
     VerifyOrReturnError(nullptr != sceneTable, CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(sceneTable->GetSceneTableEntry(fabricIdx, scene.mStorageId, scene));
+    ReturnErrorOnFailure(sceneTable->GetSceneTableEntry(endpointID, fabricIdx, scene.mStorageId, scene));
 
     // Check for optional
     if (transitionTime.HasValue())
@@ -372,7 +372,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
         }
     }
 
-    return sceneTable->SceneApplyEFS(scene);
+    return sceneTable->SceneApplyEFS(endpointID, scene);
 }
 
 // CommandHanlerInterface
@@ -433,7 +433,7 @@ CHIP_ERROR ScenesServer::Read(const ConcreteReadAttributePath & aPath, Attribute
     switch (aPath.mAttributeId)
     {
     case Attributes::SceneCount::Id:
-        ReturnErrorOnFailure(mSceneTable->GetGlobalSceneCount(value));
+        ReturnErrorOnFailure(mSceneTable->GetEndpointSceneCount(aPath.mEndpointId, value));
         return aEncoder.Encode(value);
     case Attributes::CurrentScene::Id:
         return aEncoder.Encode(mCurrentScene);
@@ -448,9 +448,9 @@ CHIP_ERROR ScenesServer::Read(const ConcreteReadAttributePath & aPath, Attribute
     case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mFeatureFlags);
     case Attributes::SceneTableSize::Id:
-        return aEncoder.Encode(scenes::kMaxScenesGlobal);
+        return aEncoder.Encode(scenes::kMaxScenesPerEndpoint);
     case Attributes::RemainingCapacity::Id:
-        ReturnErrorOnFailure(mSceneTable->GetRemainingCapacity(aEncoder.AccessingFabricIndex(), value));
+        ReturnErrorOnFailure(mSceneTable->GetRemainingCapacity(aPath.mEndpointId, aEncoder.AccessingFabricIndex(), value));
         return aEncoder.Encode(value);
     default:
         return CHIP_NO_ERROR;
@@ -465,7 +465,7 @@ void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpoin
         return;
     }
 
-    mSceneTable->DeleteAllScenesInGroup(aFabricIx, aGroupId);
+    mSceneTable->DeleteAllScenesInGroup(aEndpointId, aFabricIx, aGroupId);
 }
 
 void ScenesServer::MakeSceneInvalid()
@@ -513,7 +513,7 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
     response.sceneID = req.sceneID;
 
     // Scene Table interface data
-    SceneTableEntry scene(SceneStorageId(ctx.mRequestPath.mEndpointId, req.sceneID, req.groupID));
+    SceneTableEntry scene(SceneStorageId(req.sceneID, req.groupID));
 
     // Verify Endpoint in group
     VerifyOrReturn(nullptr != mGroupProvider);
@@ -526,7 +526,8 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
     }
 
     //  Gets the scene from the table
-    err = mSceneTable->GetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene.mStorageId, scene);
+    err = mSceneTable->GetSceneTableEntry(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                          scene.mStorageId, scene);
     if (err != CHIP_NO_ERROR)
     {
         response.status = to_underlying(StatusIB(err).mStatus);
@@ -535,7 +536,8 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
     }
 
     // Remove the scene from the scene table
-    err = mSceneTable->RemoveSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene.mStorageId);
+    err = mSceneTable->RemoveSceneTableEntry(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                             scene.mStorageId);
     if (err != CHIP_NO_ERROR)
     {
         response.status = to_underlying(StatusIB(err).mStatus);
@@ -566,7 +568,8 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
         return;
     }
 
-    err = mSceneTable->DeleteAllScenesInGroup(ctx.mCommandHandler.GetAccessingFabricIndex(), req.groupID);
+    err = mSceneTable->DeleteAllScenesInGroup(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                              req.groupID);
     if (err != CHIP_NO_ERROR)
     {
         response.status = to_underlying(StatusIB(err).mStatus);
@@ -651,7 +654,7 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
     }
 
     // Get Capacity
-    err = mSceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity);
+    err = mSceneTable->GetRemainingCapacity(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), capacity);
     if (err != CHIP_NO_ERROR)
     {
         response.status = to_underlying(StatusIB(err).mStatus);
@@ -661,7 +664,8 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
     response.capacity.SetNonNull(capacity);
 
     // populate scene list
-    err = mSceneTable->GetAllSceneIdsInGroup(ctx.mCommandHandler.GetAccessingFabricIndex(), req.groupID, sceneList);
+    err = mSceneTable->GetAllSceneIdsInGroup(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                             req.groupID, sceneList);
     if (err != CHIP_NO_ERROR)
     {
         response.status = to_underlying(StatusIB(err).mStatus);
@@ -710,7 +714,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
     }
 
     // Get Capacity
-    err = mSceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity);
+    err = mSceneTable->GetRemainingCapacity(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), capacity);
     if (err != CHIP_NO_ERROR)
     {
         response.status = to_underlying(StatusIB(err).mStatus);
@@ -726,7 +730,8 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
         Span<SceneId> sceneList = Span<SceneId>(scenesInGroup);
 
         // populate scene list
-        err = mSceneTable->GetAllSceneIdsInGroup(ctx.mCommandHandler.GetAccessingFabricIndex(), req.groupIdentifierFrom, sceneList);
+        err = mSceneTable->GetAllSceneIdsInGroup(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                                 req.groupIdentifierFrom, sceneList);
         if (err != CHIP_NO_ERROR)
         {
             response.status = to_underlying(StatusIB(err).mStatus);
@@ -743,9 +748,10 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
 
         for (auto & sceneId : sceneList)
         {
-            SceneTableEntry scene(SceneStorageId(mPath.mEndpointId, sceneId, req.groupIdentifierFrom));
+            SceneTableEntry scene(SceneStorageId(sceneId, req.groupIdentifierFrom));
             //  Insert in table
-            err = mSceneTable->GetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene.mStorageId, scene);
+            err = mSceneTable->GetSceneTableEntry(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                                  scene.mStorageId, scene);
             if (err != CHIP_NO_ERROR)
             {
                 response.status = to_underlying(StatusIB(err).mStatus);
@@ -753,9 +759,9 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                 return;
             }
 
-            scene.mStorageId = SceneStorageId(mPath.mEndpointId, sceneId, req.groupIdentifierTo);
+            scene.mStorageId = SceneStorageId(sceneId, req.groupIdentifierTo);
 
-            err = mSceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene);
+            err = mSceneTable->SetSceneTableEntry(mPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), scene);
             if (err != CHIP_NO_ERROR)
             {
                 if (err == CHIP_ERROR_NO_MEMORY)
@@ -777,8 +783,9 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
         return;
     }
 
-    SceneTableEntry scene(SceneStorageId(mPath.mEndpointId, req.sceneIdentifierFrom, req.groupIdentifierFrom));
-    err = mSceneTable->GetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene.mStorageId, scene);
+    SceneTableEntry scene(SceneStorageId(req.sceneIdentifierFrom, req.groupIdentifierFrom));
+    err = mSceneTable->GetSceneTableEntry(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                          scene.mStorageId, scene);
     if (err != CHIP_NO_ERROR)
     {
         if (err == CHIP_ERROR_NOT_FOUND)
@@ -794,9 +801,9 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
         return;
     }
 
-    scene.mStorageId = SceneStorageId(mPath.mEndpointId, req.sceneIdentifierTo, req.groupIdentifierTo);
+    scene.mStorageId = SceneStorageId(req.sceneIdentifierTo, req.groupIdentifierTo);
 
-    err = mSceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene);
+    err = mSceneTable->SetSceneTableEntry(mPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), scene);
     if (err != CHIP_NO_ERROR)
     {
         if (err == CHIP_ERROR_NO_MEMORY)

@@ -61,7 +61,7 @@ EndpointId endpoints[]    = { kMockEndpoint1, kMockEndpoint2, kMockEndpoint3 };
 uint16_t clusterIndex[]   = { 0, 2, 5 };
 uint8_t clusterCount[]    = { 2, 3, 4 };
 ClusterId clusters[]      = { MockClusterId(1), MockClusterId(2), MockClusterId(1), MockClusterId(2), MockClusterId(3),
-                         MockClusterId(1), MockClusterId(2), MockClusterId(3), MockClusterId(4) };
+                              MockClusterId(1), MockClusterId(2), MockClusterId(3), MockClusterId(4) };
 uint16_t attributeIndex[] = { 0, 2, 5, 7, 11, 16, 19, 25, 27 };
 uint16_t attributeCount[] = { 2, 3, 2, 4, 5, 3, 6, 2, 2 };
 AttributeId attributes[]  = {
@@ -272,10 +272,39 @@ uint16_t emberAfLongStringLength(const uint8_t * buffer)
 
 namespace chip {
 namespace app {
+
 AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId)
 {
     return nullptr;
 }
+
+EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
+{
+    EnsureMatchingEndpoint();
+}
+EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
+{
+    ++mEndpointIndex;
+    EnsureMatchingEndpoint();
+    return *this;
+}
+
+void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
+{
+    for (; mEndpointIndex < mEndpointCount; ++mEndpointIndex)
+    {
+        if (!emberAfEndpointIndexIsEnabled(mEndpointIndex))
+        {
+            continue;
+        }
+
+        if (emberAfContainsServerFromIndex(mEndpointIndex, mClusterId))
+        {
+            break;
+        }
+    }
+}
+
 } // namespace app
 namespace Test {
 

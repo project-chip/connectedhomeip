@@ -18,6 +18,7 @@
 #pragma once
 #include <app/clusters/scenes-server/ExtensionFieldSetsImpl.h>
 #include <app/clusters/scenes-server/SceneTable.h>
+#include <app/util/attribute-storage.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
@@ -25,6 +26,11 @@
 
 namespace chip {
 namespace scenes {
+
+static constexpr uint8_t kMaxScenesPerFabric   = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
+static constexpr uint8_t kMaxScenesPerEndpoint = CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT;
+// TODO: confirm if needed
+// static constexpr uint8_t kMaxScenesGlobal      = CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT * MAX_ENDPOINT_COUNT;
 
 using clusterId = chip::ClusterId;
 
@@ -154,18 +160,20 @@ public:
     void Finish() override;
 
     // Global scene count
-    CHIP_ERROR GetGlobalSceneCount(uint8_t & scene_count) override;
+    CHIP_ERROR GetEndpointSceneCount(EndpointId endpoint, uint8_t & scene_count) override;
 
     // Data
-    CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity) override;
-    CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry) override;
-    CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry) override;
-    CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id) override;
-    CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scene_idx) override;
+    CHIP_ERROR GetRemainingCapacity(EndpointId endpoint, FabricIndex fabric_index, uint8_t & capacity) override;
+    CHIP_ERROR SetSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, const SceneTableEntry & entry) override;
+    CHIP_ERROR GetSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id,
+                                  SceneTableEntry & entry) override;
+    CHIP_ERROR RemoveSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id) override;
+    CHIP_ERROR RemoveSceneTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, SceneIndex scene_idx) override;
 
     // Groups
-    CHIP_ERROR GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list) override;
-    CHIP_ERROR DeleteAllScenesInGroup(FabricIndex fabric_index, GroupId group_id) override;
+    CHIP_ERROR GetAllSceneIdsInGroup(EndpointId endpoint, FabricIndex fabric_index, GroupId group_id,
+                                     Span<SceneId> & scene_list) override;
+    CHIP_ERROR DeleteAllScenesInGroup(EndpointId endpoint, FabricIndex fabric_index, GroupId group_id) override;
 
     // SceneHandlers
     void RegisterHandler(SceneHandler * handler) override;
@@ -174,24 +182,24 @@ public:
 
     // Extension field sets operation
 
-    CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene) override;
-    CHIP_ERROR SceneApplyEFS(const SceneTableEntry & scene) override;
+    CHIP_ERROR SceneSaveEFS(EndpointId endpoint, SceneTableEntry & scene) override;
+    CHIP_ERROR SceneApplyEFS(EndpointId endpoint, const SceneTableEntry & scene) override;
 
     // Fabrics
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
 
     // Iterators
-    SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) override;
+    SceneEntryIterator * IterateSceneEntries(EndpointId endpoint, FabricIndex fabric_index) override;
 
 protected:
     // This constructor is meant for test purposes, it allows to change the defined max for scenes per fabric and global, which
     // allows to simulate OTA where this value was changed
-    DefaultSceneTableImpl(uint8_t maxScenesPerFabric, uint8_t maxScenesGlobal) :
-        mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesGlobal(maxScenesGlobal)
+    DefaultSceneTableImpl(uint8_t maxScenesPerFabric, uint8_t maxScenesPerEndpoint) :
+        mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesPerEndpoint(maxScenesPerEndpoint)
     {}
 
     // Global scene count
-    CHIP_ERROR SetGlobalSceneCount(const uint8_t & scene_count);
+    CHIP_ERROR SetEndpointSceneCount(EndpointId endpoint, const uint8_t & scene_count);
 
     // wrapper function around emberAfGetClustersFromEndpoint to allow override when testing
     virtual uint8_t GetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen);
@@ -199,25 +207,26 @@ protected:
     class SceneEntryIteratorImpl : public SceneEntryIterator
     {
     public:
-        SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabric_index, uint8_t maxScenesPerFabric,
-                               uint8_t maxScenesGlobal);
+        SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, EndpointId endpoint, FabricIndex fabricIdx,
+                               uint8_t maxScenesPerFabric, uint8_t maxScenesPerEndpoint);
         size_t Count() override;
         bool Next(SceneTableEntry & output) override;
         void Release() override;
 
     protected:
         DefaultSceneTableImpl & mProvider;
-        FabricIndex mFabric = kUndefinedFabricIndex;
+        FabricIndex mFabric    = kUndefinedFabricIndex;
+        EndpointId mEndpointId = kInvalidEndpointId;
         SceneIndex mNextSceneIdx;
         SceneIndex mSceneIndex = 0;
         uint8_t mTotalScenes   = 0;
         uint8_t mMaxScenesPerFabric;
-        uint8_t mMaxScenesGlobal;
+        uint8_t mMaxScenesPerEndpoint;
     };
     bool IsInitialized() { return (mStorage != nullptr); }
 
     const uint8_t mMaxScenesPerFabric          = kMaxScenesPerFabric;
-    const uint8_t mMaxScenesGlobal             = kMaxScenesGlobal;
+    const uint8_t mMaxScenesPerEndpoint        = kMaxScenesPerEndpoint;
     chip::PersistentStorageDelegate * mStorage = nullptr;
     ObjectPool<SceneEntryIteratorImpl, kIteratorsMax> mSceneEntryIterators;
 }; // class DefaultSceneTableImpl
