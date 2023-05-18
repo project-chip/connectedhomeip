@@ -258,6 +258,37 @@ class ChipClusters:
                     "groupID": "int",
                 },
             },
+            0x00000040: {
+                "commandId": 0x00000040,
+                "commandName": "EnhancedAddScene",
+                "args": {
+                    "groupID": "int",
+                    "sceneID": "int",
+                    "transitionTime": "int",
+                    "sceneName": "str",
+                    "clusterID": "int",
+                    "attributeValueList": "",
+                },
+            },
+            0x00000041: {
+                "commandId": 0x00000041,
+                "commandName": "EnhancedViewScene",
+                "args": {
+                    "groupID": "int",
+                    "sceneID": "int",
+                },
+            },
+            0x00000042: {
+                "commandId": 0x00000042,
+                "commandName": "CopyScene",
+                "args": {
+                    "mode": "int",
+                    "groupIdentifierFrom": "int",
+                    "sceneIdentifierFrom": "int",
+                    "groupIdentifierTo": "int",
+                    "sceneIdentifierTo": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -589,6 +620,13 @@ class ChipClusters:
                 "args": {
                     "optionsMask": "int",
                     "optionsOverride": "int",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "MoveToClosestFrequency",
+                "args": {
+                    "frequency": "int",
                 },
             },
         },
@@ -1232,6 +1270,12 @@ class ChipClusters:
         "clusterName": "BasicInformation",
         "clusterId": 0x00000028,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "MfgSpecificPing",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -3145,6 +3189,48 @@ class ChipClusters:
         "clusterName": "TimeSynchronization",
         "clusterId": 0x00000038,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "SetUTCTime",
+                "args": {
+                    "UTCTime": "int",
+                    "granularity": "int",
+                    "timeSource": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "SetTrustedTimeSource",
+                "args": {
+                    "nodeID": "int",
+                    "endpoint": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "SetTimeZone",
+                "args": {
+                    "offset": "int",
+                    "validAt": "int",
+                    "name": "str",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "SetDSTOffset",
+                "args": {
+                    "offset": "int",
+                    "validStarting": "int",
+                    "validUntil": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "SetDefaultNTP",
+                "args": {
+                    "defaultNTP": "str",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4451,6 +4537,12 @@ class ChipClusters:
         "clusterName": "HepaFilterMonitoring",
         "clusterId": 0x00000071,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4519,6 +4611,12 @@ class ChipClusters:
         "clusterName": "ActivatedCarbonFilterMonitoring",
         "clusterId": 0x00000072,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4587,6 +4685,12 @@ class ChipClusters:
         "clusterName": "CeramicFilterMonitoring",
         "clusterId": 0x00000073,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4655,6 +4759,12 @@ class ChipClusters:
         "clusterName": "ElectrostaticFilterMonitoring",
         "clusterId": 0x00000074,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4723,6 +4833,12 @@ class ChipClusters:
         "clusterName": "UvFilterMonitoring",
         "clusterId": 0x00000075,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4791,6 +4907,12 @@ class ChipClusters:
         "clusterName": "IonizingFilterMonitoring",
         "clusterId": 0x00000076,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4859,6 +4981,12 @@ class ChipClusters:
         "clusterName": "ZeoliteFilterMonitoring",
         "clusterId": 0x00000077,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4927,6 +5055,12 @@ class ChipClusters:
         "clusterName": "OzoneFilterMonitoring",
         "clusterId": 0x00000078,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4995,6 +5129,12 @@ class ChipClusters:
         "clusterName": "WaterTankMonitoring",
         "clusterId": 0x00000079,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -5063,6 +5203,12 @@ class ChipClusters:
         "clusterName": "FuelTankMonitoring",
         "clusterId": 0x0000007A,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -5131,6 +5277,12 @@ class ChipClusters:
         "clusterName": "InkCartridgeMonitoring",
         "clusterId": 0x0000007B,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -5199,6 +5351,12 @@ class ChipClusters:
         "clusterName": "TonerCartridgeMonitoring",
         "clusterId": 0x0000007C,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -5422,6 +5580,13 @@ class ChipClusters:
                 "args": {
                     "credentialType": "int",
                     "credentialIndex": "int",
+                },
+            },
+            0x00000027: {
+                "commandId": 0x00000027,
+                "commandName": "UnboltDoor",
+                "args": {
+                    "PINCode": "bytes",
                 },
             },
         },
@@ -8954,6 +9119,21 @@ class ChipClusters:
         "clusterName": "ElectricalMeasurement",
         "clusterId": 0x00000B04,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "GetProfileInfoCommand",
+                "args": {
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "GetMeasurementProfileCommand",
+                "args": {
+                    "attributeId": "int",
+                    "startTime": "int",
+                    "numberOfIntervals": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -9806,6 +9986,38 @@ class ChipClusters:
                     "arg2": "int",
                 },
             },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "TestSimpleArgumentRequest",
+                "args": {
+                    "arg1": "bool",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "TestStructArrayArgumentRequest",
+                "args": {
+                    "a": "int",
+                    "b": "bool",
+                    "c": "",
+                    "d": "",
+                    "e": "int",
+                    "f": "bytes",
+                    "g": "int",
+                    "a": "int",
+                    "b": "bool",
+                    "c": "int",
+                    "d": "bytes",
+                    "e": "str",
+                    "f": "int",
+                    "g": "",
+                    "h": "",
+                    "arg3": "int",
+                    "arg4": "bool",
+                    "arg5": "int",
+                    "arg6": "bool",
+                },
+            },
             0x00000007: {
                 "commandId": 0x00000007,
                 "commandName": "TestStructArgumentRequest",
@@ -9898,6 +10110,45 @@ class ChipClusters:
                     "arg1": "int",
                 },
             },
+            0x00000010: {
+                "commandId": 0x00000010,
+                "commandName": "TestComplexNullableOptionalRequest",
+                "args": {
+                    "nullableInt": "int",
+                    "optionalInt": "int",
+                    "nullableOptionalInt": "int",
+                    "nullableString": "str",
+                    "optionalString": "str",
+                    "nullableOptionalString": "str",
+                    "a": "int",
+                    "b": "bool",
+                    "c": "int",
+                    "d": "bytes",
+                    "e": "str",
+                    "f": "int",
+                    "g": "",
+                    "h": "",
+                    "a": "int",
+                    "b": "bool",
+                    "c": "int",
+                    "d": "bytes",
+                    "e": "str",
+                    "f": "int",
+                    "g": "",
+                    "h": "",
+                    "a": "int",
+                    "b": "bool",
+                    "c": "int",
+                    "d": "bytes",
+                    "e": "str",
+                    "f": "int",
+                    "g": "",
+                    "h": "",
+                    "nullableList": "int",
+                    "optionalList": "int",
+                    "nullableOptionalList": "int",
+                },
+            },
             0x00000011: {
                 "commandId": 0x00000011,
                 "commandName": "SimpleStructEchoRequest",
@@ -9932,6 +10183,13 @@ class ChipClusters:
                     "arg1": "int",
                     "arg2": "int",
                     "arg3": "bool",
+                },
+            },
+            0x00000015: {
+                "commandId": 0x00000015,
+                "commandName": "TestEmitTestFabricScopedEventRequest",
+                "args": {
+                    "arg1": "int",
                 },
             },
         },
@@ -10552,6 +10810,26 @@ class ChipClusters:
         "clusterName": "FaultInjection",
         "clusterId": 0xFFF1FC06,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "FailAtFault",
+                "args": {
+                    "type": "int",
+                    "id": "int",
+                    "numCallsToSkip": "int",
+                    "numCallsToFail": "int",
+                    "takeMutex": "bool",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "FailRandomlyAtFault",
+                "args": {
+                    "type": "int",
+                    "id": "int",
+                    "percentage": "int",
+                },
+            },
         },
         "attributes": {
             0x0000FFF8: {
@@ -10690,6 +10968,7 @@ class ChipClusters:
         "OnOffSwitchConfiguration": _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         "LevelControl": _LEVEL_CONTROL_CLUSTER_INFO,
         "BinaryInputBasic": _BINARY_INPUT_BASIC_CLUSTER_INFO,
+        "PulseWidthModulation": _PULSE_WIDTH_MODULATION_CLUSTER_INFO,
         "Descriptor": _DESCRIPTOR_CLUSTER_INFO,
         "Binding": _BINDING_CLUSTER_INFO,
         "AccessControl": _ACCESS_CONTROL_CLUSTER_INFO,
@@ -10710,6 +10989,7 @@ class ChipClusters:
         "ThreadNetworkDiagnostics": _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "WiFiNetworkDiagnostics": _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "EthernetNetworkDiagnostics": _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+        "TimeSynchronization": _TIME_SYNCHRONIZATION_CLUSTER_INFO,
         "BridgedDeviceBasicInformation": _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
         "Switch": _SWITCH_CLUSTER_INFO,
         "AdministratorCommissioning": _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
@@ -10717,6 +10997,9 @@ class ChipClusters:
         "GroupKeyManagement": _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
         "FixedLabel": _FIXED_LABEL_CLUSTER_INFO,
         "UserLabel": _USER_LABEL_CLUSTER_INFO,
+        "ProxyConfiguration": _PROXY_CONFIGURATION_CLUSTER_INFO,
+        "ProxyDiscovery": _PROXY_DISCOVERY_CLUSTER_INFO,
+        "ProxyValid": _PROXY_VALID_CLUSTER_INFO,
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "IcdManagement": _ICD_MANAGEMENT_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
@@ -10763,6 +11046,7 @@ class ChipClusters:
         "AccountLogin": _ACCOUNT_LOGIN_CLUSTER_INFO,
         "ElectricalMeasurement": _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
+        "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
     }
 
     def __init__(self, chipstack):
