@@ -86,11 +86,9 @@ private:
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout durationMS);
     std::atomic<bool> mShouldRunEventLoop;
     bool mChipTimerActive;
-    bool mRunningEventActive;
-    lega_thread_t mThread;
-    lega_queue_t mEventQueue;
-    lega_mutex_t mChipMutex;
-    lega_mutex_t mEventMutex;
+    lega_thread_t mThread    = NULL;
+    lega_queue_t mEventQueue = NULL;
+    lega_mutex_t mChipMutex  = NULL;
     lega_timeout_t mNextTimerBaseTime;
     lega_tick_t mNextTimerDurationTicks;
     static void EventLoopTaskMain(uint32_t arg);

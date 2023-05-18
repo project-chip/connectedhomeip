@@ -51,19 +51,22 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::InitLwIPCoreLock();
     SuccessOrExit(err);
 
-    /* Initialize the event queue. */
-    result = lega_rtos_init_queue(&mEventQueue, "EventQueue", sizeof(ChipDeviceEvent), CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
-    VerifyOrExit(result == kNoErr, err = CHIP_ERROR_NO_MEMORY);
+    if (mEventQueue == NULL)
+    {
+        /* Initialize the event queue. */
+        result = lega_rtos_init_queue(&mEventQueue, "EventQueue", sizeof(ChipDeviceEvent), CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
+        VerifyOrExit(result == kNoErr, err = CHIP_ERROR_NO_MEMORY);
+    }
 
     /* Initialize the timeout. */
     lega_rtos_set_timeout(&mNextTimerBaseTime);
 
-    /* Initialize the mutex. */
-    result = lega_rtos_init_mutex(&mChipMutex);
-    VerifyOrExit(result == kNoErr, err = CHIP_ERROR_INTERNAL);
-
-    result = lega_rtos_init_mutex(&mEventMutex);
-    VerifyOrExit(result == kNoErr, err = CHIP_ERROR_INTERNAL);
+    if (mChipMutex == NULL)
+    {
+        /* Initialize the mutex. */
+        result = lega_rtos_init_mutex(&mChipMutex);
+        VerifyOrExit(result == kNoErr, err = CHIP_ERROR_INTERNAL);
+    }
 
     mChipTimerActive = false;
     mShouldRunEventLoop.store(false);
@@ -91,7 +94,6 @@ exit:
 
 void PlatformManagerImpl::_RunEventLoop()
 {
-    mRunningEventActive = true;
     RunEventLoopInternal();
 }
 
@@ -169,53 +171,28 @@ void PlatformManagerImpl::RunEventLoopInternal(void)
             result = lega_rtos_pop_from_queue(&mEventQueue, &event, LEGA_NO_WAIT);
         }
     }
-
-    mRunningEventActive = false;
 }
 
 CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask(void)
 {
     lega_task_config_t cfg;
 
-    lega_rtos_lock_mutex(&mEventMutex, LEGA_WAIT_FOREVER);
-
-    if (mRunningEventActive)
-    {
-        lega_rtos_unlock_mutex(&mEventMutex);
-        return CHIP_ERROR_BUSY;
-    }
-
     MatterInitializer::Matter_Task_Config(&cfg);
-
-    mRunningEventActive = true;
 
     OSStatus result = lega_rtos_create_thread(&mThread, cfg.task_priority, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME,
                                               (lega_thread_function_t) EventLoopTaskMain, cfg.stack_size, (lega_thread_arg_t) this);
 
     if (result != kNoErr)
     {
-        lega_rtos_unlock_mutex(&mEventMutex);
         return CHIP_ERROR_INTERNAL;
     }
-
-    lega_rtos_unlock_mutex(&mEventMutex);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 {
-    lega_rtos_lock_mutex(&mEventMutex, LEGA_WAIT_FOREVER);
-
-    if (mRunningEventActive == false)
-    {
-        lega_rtos_unlock_mutex(&mEventMutex);
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
     mShouldRunEventLoop.store(false);
-
-    lega_rtos_unlock_mutex(&mEventMutex);
 
     return CHIP_NO_ERROR;
 }
@@ -312,25 +289,6 @@ void PlatformManagerImpl::_Shutdown()
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
-
-    (void) _StopEventLoopTask();
-
-    // the task thread is self terminating, we might have to wait if it's still processing
-    while (true)
-    {
-        if (mRunningEventActive == false)
-        {
-            break;
-        }
-        lega_rtos_delay_milliseconds(1);
-    }
-
-    ChipLogError(DeviceLayer, "StopEventLoopTask done.");
-
-    lega_rtos_deinit_queue(&mEventQueue);
-    lega_rtos_deinit_mutex(&mChipMutex);
-    lega_rtos_deinit_mutex(&mEventMutex);
-
     Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_Shutdown();
 #else
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
