@@ -186,21 +186,54 @@ tests:
               type: list
               contains: [18]
 
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    #- label:
-    #      "Read EventList attribute from the DUT and Verify that the DUT
-    #      response provides a list of supported events."
-    #  verification: |
-    #      Not implemented in chip-tool
-    #  cluster: "LogCommands"
-    #  command: "UserPrompt"
-    #  PICS: PICS_USER_PROMPT
-    #  arguments:
-    #      values:
-    #          - name: "message"
-    #            value: "Please enter 'y' for success"
-    #          - name: "expectedValue"
-    #            value: "y"
+    - label: "TH reads optional event(StartUp) in EventList"
+      PICS: BRBINFO.S.E00
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "TH reads optional attribute(ShutDown) in EventList"
+      PICS: BRBINFO.S.E01
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "TH reads optional attribute(Leave) in EventList"
+      PICS: BRBINFO.S.E02
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    #EventList failure Mandatory event ReachableChanged(0x3) not in list
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          ./chip-tool bridgeddevicebasicinformation read event-list 1 3
+
+          On TH(chip-tool), Verify that DUT response contains list of supported events, for this cluster the list is empty(0 enties)
+
+          1676439985.362352][22002:22004] CHIP:DMG: }
+          [1676439985.362396][22002:22004] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_FFFA DataVersion: 266846256
+          [1676439985.362407][22002:22004] CHIP:TOO:   EventList: 0 entries
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH1 reads AcceptedCommandList from DUT"
       command: "readAttribute"

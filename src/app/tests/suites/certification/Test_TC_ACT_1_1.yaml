@@ -53,7 +53,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
+              contains: [0, 1, 65528, 65529, 65530, 65531, 65532, 65533]
 
     - label: "Read the optional attribute(SetupURL) in AttributeList"
       PICS: ACT.S.A0002
@@ -63,6 +63,26 @@ tests:
           constraints:
               type: list
               contains: [2]
+
+    #EventList failure https://github.com/project-chip/connectedhomeip/issues/26571
+    - label: "TH reads EventList attribute from DUT"
+      verification: |
+          ./chip-tool actions read event-list 1 1
+
+          On TH(chip-tool), verify that DUT responds with list of supported events as 1 entry.
+
+          [1676460741.103254][37023:37025] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_FFFA DataVersion: 928273128
+          [1676460741.103303][37023:37025] CHIP:TOO:   EventList: 1 entries
+          [1676460741.103320][37023:37025] CHIP:TOO:     [1]: 0
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     # Checking only type check all commands are optional
     - label: "Read the global attribute: AcceptedCommandList"
@@ -80,18 +100,3 @@ tests:
           value: []
           constraints:
               type: list
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    #- label:
-    #      "Read EventList attribute from the DUT and Verify that the DUT
-    #      response provides a list of supported events."
-    #  verification: |
-    #      Not implemented in chip-tool
-    #  cluster: "LogCommands"
-    #  command: "UserPrompt"
-    #  PICS: PICS_USER_PROMPT
-    #  arguments:
-    #      values:
-    #          - name: "message"
-    #            value: "Please enter 'y' for success"
-    #          - name: "expectedValue"
-    #            value: "y"

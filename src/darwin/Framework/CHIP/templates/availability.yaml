@@ -6812,9 +6812,56 @@
           PumpConfigurationAndControl:
               PumpFeature:
                   - Local
-  provisional:
-      global attributes:
-          - EventList
+  renames:
+      attributes:
+          TimeSynchronization:
+              DSTOffset: DstOffset
+      structs:
+          TimeSynchronization:
+              DSTOffsetStruct: DstOffsetType
+              TimeZoneStruct: TimeZoneType
+      enums:
+          DiagnosticLogs:
+              IntentEnum: LogsIntent
+              StatusEnum: LogsStatus
+              TransferProtocolEnum: LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum: WiFiConnectionStatus
+              WiFiVersionEnum: WiFiVersionType
+          PumpConfigurationAndControl:
+              ControlModeEnum: PumpControlMode
+              OperationModeEnum: PumpOperationMode
+      enum values:
+          PowerSource:
+              WiredFaultEnum:
+                  Unspecified: Unspecfied
+              BatFaultEnum:
+                  Unspecified: Unspecfied
+      bitmaps:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap: PumpStatus
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  LocalOperation: Local
+
+- release: "TBD"
+  versions: "future"
+  introduced:
+      clusters:
+          - AirQuality
+          - HEPAFilterMonitoring
+          - ActivatedCarbonFilterMonitoring
+          - CeramicFilterMonitoring
+          - ElectrostaticFilterMonitoring
+          - UVFilterMonitoring
+          - IonizingFilterMonitoring
+          - ZeoliteFilterMonitoring
+          - OzoneFilterMonitoring
+          - WaterTankMonitoring
+          - FuelTankMonitoring
+          - InkCartridgeMonitoring
+          - TonerCartridgeMonitoring
       attributes:
           Scenes:
               - EventList
@@ -6837,8 +6884,6 @@
           AccessControl:
               - EventList
           Actions:
-              - EventList
-          BasicInformation:
               - EventList
           OTASoftwareUpdateProvider:
               - EventList
@@ -6871,8 +6916,6 @@
           EthernetNetworkDiagnostics:
               - EventList
           TimeSynchronization:
-              - EventList
-          BridgedDeviceBasicInformation:
               - EventList
           Switch:
               - EventList
@@ -6958,67 +7001,19 @@
               - EventList
           FaultInjection:
               - EventList
-  renames:
-      attributes:
-          TimeSynchronization:
-              DSTOffset: DstOffset
-      structs:
-          TimeSynchronization:
-              DSTOffsetStruct: DstOffsetType
-              TimeZoneStruct: TimeZoneType
-      enums:
-          DiagnosticLogs:
-              IntentEnum: LogsIntent
-              StatusEnum: LogsStatus
-              TransferProtocolEnum: LogsTransferProtocol
-          WiFiNetworkDiagnostics:
-              ConnectionStatusEnum: WiFiConnectionStatus
-              WiFiVersionEnum: WiFiVersionType
-          PumpConfigurationAndControl:
-              ControlModeEnum: PumpControlMode
-              OperationModeEnum: PumpOperationMode
-      enum values:
-          PowerSource:
-              WiredFaultEnum:
-                  Unspecified: Unspecfied
-              BatFaultEnum:
-                  Unspecified: Unspecfied
-      bitmaps:
-          PumpConfigurationAndControl:
-              PumpStatusBitmap: PumpStatus
-      bitmap values:
-          PumpConfigurationAndControl:
-              PumpFeature:
-                  LocalOperation: Local
-
-- release: "TBD"
-  versions: "future"
-  introduced:
-      clusters:
-          - AirQuality
-          - HEPAFilterMonitoring
-          - ActivatedCarbonFilterMonitoring
-          - CeramicFilterMonitoring
-          - ElectrostaticFilterMonitoring
-          - UVFilterMonitoring
-          - IonizingFilterMonitoring
-          - ZeoliteFilterMonitoring
-          - OzoneFilterMonitoring
-          - WaterTankMonitoring
-          - FuelTankMonitoring
-          - InkCartridgeMonitoring
-          - TonerCartridgeMonitoring
-      attributes:
           AirQuality:
               - AirQuality
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           BasicInformation:
+              - EventList
               - ProductAppearance
           BridgedDeviceBasicInformation:
+              - EventList
               - ProductAppearance
           HEPAFilterMonitoring:
               - Condition
@@ -7028,6 +7023,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           ActivatedCarbonFilterMonitoring:
@@ -7038,6 +7034,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           CeramicFilterMonitoring:
@@ -7048,6 +7045,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           ElectrostaticFilterMonitoring:
@@ -7058,6 +7056,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           UVFilterMonitoring:
@@ -7068,6 +7067,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           IonizingFilterMonitoring:
@@ -7078,6 +7078,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           ZeoliteFilterMonitoring:
@@ -7088,6 +7089,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           OzoneFilterMonitoring:
@@ -7098,6 +7100,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           WaterTankMonitoring:
@@ -7108,6 +7111,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           FuelTankMonitoring:
@@ -7118,6 +7122,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           InkCartridgeMonitoring:
@@ -7128,6 +7133,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           TonerCartridgeMonitoring:
@@ -7138,6 +7144,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
       commands:
@@ -7504,6 +7511,8 @@
                   - TrustedTimeSource
                   - DefaultNTP
                   - NTPServerAvailable
+      global attributes:
+          - EventList
   deprecated:
       clusters:
           # We apparently forgot to deprecate BridgedDeviceBasic when we
@@ -7553,33 +7562,6 @@
           - ICDManagement
       # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
-      attributes:
-          AirQuality:
-              - EventList
-          HEPAFilterMonitoring:
-              - EventList
-          ActivatedCarbonFilterMonitoring:
-              - EventList
-          CeramicFilterMonitoring:
-              - EventList
-          ElectrostaticFilterMonitoring:
-              - EventList
-          UVFilterMonitoring:
-              - EventList
-          IonizingFilterMonitoring:
-              - EventList
-          ZeoliteFilterMonitoring:
-              - EventList
-          OzoneFilterMonitoring:
-              - EventList
-          WaterTankMonitoring:
-              - EventList
-          FuelTankMonitoring:
-              - EventList
-          InkCartridgeMonitoring:
-              - EventList
-          TonerCartridgeMonitoring:
-              - EventList
       ids:
           attributes:
               TimeSynchronization:
