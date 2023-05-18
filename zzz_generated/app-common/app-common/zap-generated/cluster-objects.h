@@ -13175,7 +13175,18 @@ struct TypeInfo
 } // namespace GroupKeyManagement
 namespace FixedLabel {
 namespace Structs {
-namespace LabelStruct = Clusters::detail::Structs::LabelStruct;
+namespace LabelStruct {
+
+using Fields = Clusters::detail::Structs::LabelStruct::Fields;
+
+struct Type : public Clusters::detail::Structs::LabelStruct::Type
+{
+};
+
+using DecodableType = Type;
+
+} // namespace LabelStruct
+
 } // namespace Structs
 
 namespace Attributes {
@@ -13251,7 +13262,18 @@ struct TypeInfo
 } // namespace FixedLabel
 namespace UserLabel {
 namespace Structs {
-namespace LabelStruct = Clusters::detail::Structs::LabelStruct;
+namespace LabelStruct {
+
+using Fields = Clusters::detail::Structs::LabelStruct::Fields;
+
+struct Type : public Clusters::detail::Structs::LabelStruct::Type
+{
+};
+
+using DecodableType = Type;
+
+} // namespace LabelStruct
+
 } // namespace Structs
 
 namespace Attributes {
@@ -16263,6 +16285,11 @@ struct Type;
 struct DecodableType;
 } // namespace ClearCredential
 
+namespace UnboltDoor {
+struct Type;
+struct DecodableType;
+} // namespace UnboltDoor
+
 } // namespace Commands
 
 namespace Commands {
@@ -17208,6 +17235,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearCredential
+namespace UnboltDoor {
+enum class Fields : uint8_t
+{
+    kPINCode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UnboltDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    Optional<chip::ByteSpan> PINCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UnboltDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    Optional<chip::ByteSpan> PINCode;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UnboltDoor
 } // namespace Commands
 
 namespace Attributes {
@@ -25969,7 +26028,18 @@ struct TypeInfo
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 namespace Structs {
-namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
+namespace ApplicationStruct {
+
+using Fields = Clusters::detail::Structs::ApplicationStruct::Fields;
+
+struct Type : public Clusters::detail::Structs::ApplicationStruct::Type
+{
+};
+
+using DecodableType = Type;
+
+} // namespace ApplicationStruct
+
 namespace ApplicationEPStruct {
 enum class Fields : uint8_t
 {
@@ -26244,7 +26314,18 @@ struct TypeInfo
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
 namespace Structs {
-namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
+namespace ApplicationStruct {
+
+using Fields = Clusters::detail::Structs::ApplicationStruct::Fields;
+
+struct Type : public Clusters::detail::Structs::ApplicationStruct::Type
+{
+};
+
+using DecodableType = Type;
+
+} // namespace ApplicationStruct
+
 } // namespace Structs
 
 namespace Attributes {
