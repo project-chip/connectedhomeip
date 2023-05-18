@@ -97,7 +97,7 @@ if (wifi_soc) {
 }
 
 silabs_executable("window_app") {
-  output_name = "chip-silabs-window-example.out"
+  output_name = "matter-silabs-window-example.out"
   output_dir = root_out_dir
   include_dirs = [
     "include",

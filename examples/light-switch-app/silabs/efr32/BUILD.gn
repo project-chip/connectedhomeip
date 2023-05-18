@@ -113,7 +113,7 @@ if (wifi_soc) {
 }
 
 silabs_executable("light_switch_app") {
-  output_name = "chip-silabs-light-switch-example.out"
+  output_name = "matter-silabs-light-switch-example.out"
   include_dirs = [
     "include",
     "${chip_root}/examples/light-switch-app/silabs/common/",

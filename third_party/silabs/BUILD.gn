@@ -27,7 +27,6 @@ if (silabs_board == "BRD4325B") {  # CCP board
 declare_args() {
   # Build target to use for efr32 SDK. Use this to set global SDK defines.
   silabs_sdk_target = ""
-  silabs_sdk_target = ""
 
   use_thread_coap_lib = false
   sl_matter_version_str = ""
