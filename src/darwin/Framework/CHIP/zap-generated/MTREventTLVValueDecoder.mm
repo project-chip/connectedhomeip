@@ -1575,69 +1575,6 @@ static id _Nullable DecodeEventPayloadForAirQualityCluster(EventId aEventId, TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::OperationalState;
-    switch (aEventId) {
-    case Events::OperationalError::Id: {
-        Events::OperationalError::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTROperationalStateClusterOperationalErrorEvent new];
-
-        do {
-            MTROperationalStateClusterErrorStateStruct * _Nonnull memberValue;
-            memberValue = [MTROperationalStateClusterErrorStateStruct new];
-            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
-            memberValue.errorStateLabel = [[NSString alloc] initWithBytes:cppValue.errorState.errorStateLabel.data()
-                                                                   length:cppValue.errorState.errorStateLabel.size()
-                                                                 encoding:NSUTF8StringEncoding];
-            memberValue.errorStateDetails = [[NSString alloc] initWithBytes:cppValue.errorState.errorStateDetails.data()
-                                                                     length:cppValue.errorState.errorStateDetails.size()
-                                                                   encoding:NSUTF8StringEncoding];
-            value.errorState = memberValue;
-        } while (0);
-
-        return value;
-    }
-    case Events::OperationCompletion::Id: {
-        Events::OperationCompletion::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTROperationalStateClusterOperationCompletionEvent new];
-
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.completionErrorCode)];
-            value.completionErrorCode = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithInt:cppValue.totalOperationalTime];
-            value.totalOperationalTime = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithInt:cppValue.pausedTime];
-            value.pausedTime = memberValue;
-        } while (0);
-
-        return value;
-    }
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForWasherControlsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WasherControls;
@@ -2884,9 +2821,6 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::AirQuality::Id: {
         return DecodeEventPayloadForAirQualityCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::OperationalState::Id: {
-        return DecodeEventPayloadForOperationalStateCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WasherControls::Id: {
         return DecodeEventPayloadForWasherControlsCluster(aPath.mEventId, aReader, aError);

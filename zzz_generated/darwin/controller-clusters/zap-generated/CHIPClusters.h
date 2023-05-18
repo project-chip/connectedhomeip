@@ -384,15 +384,6 @@ public:
     ~AirQualityCluster() {}
 };
 
-class DLL_EXPORT OperationalStateCluster : public ClusterBase
-{
-public:
-    OperationalStateCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
-    ~OperationalStateCluster() {}
-};
-
 class DLL_EXPORT WasherControlsCluster : public ClusterBase
 {
 public:

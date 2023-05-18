@@ -61,7 +61,6 @@
         "onoff-cluster.xml",
         "onoff-switch-configuration-cluster.xml",
         "operational-credentials-cluster.xml",
-        "operationstate.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",
@@ -184,7 +183,6 @@
             "CommissionedFabrics",
             "CurrentFabricIndex"
         ],
-        "Operational State": ["OperationalState", "OperationalError"],
         "Software Diagnostics": [
             "CurrentHeapFree",
             "CurrentHeapHighWatermark",

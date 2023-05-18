@@ -212,11 +212,6 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
-@interface MTRBaseClusterOperationalState ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
 @interface MTRBaseClusterWasherControls ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;

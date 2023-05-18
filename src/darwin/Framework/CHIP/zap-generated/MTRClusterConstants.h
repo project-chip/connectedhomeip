@@ -278,7 +278,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeICDManagementID MTR_NEWLY_AVAILABLE = 0x00000046,
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
     MTRClusterIDTypeAirQualityID MTR_NEWLY_AVAILABLE = 0x0000005B,
-    MTRClusterIDTypeOperationalStateID MTR_NEWLY_AVAILABLE = 0x00000060,
     MTRClusterIDTypeWasherControlsID MTR_NEWLY_AVAILABLE = 0x00000061,
     MTRClusterIDTypeHEPAFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000071,
     MTRClusterIDTypeActivatedCarbonFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000072,
@@ -3691,24 +3690,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterAirQualityAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterAirQualityAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster OperationalState attributes
-    MTRAttributeIDTypeClusterOperationalStateAttributePhaseListID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterOperationalStateAttributeCurrentPhaseID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterOperationalStateAttributeCountdownTimeID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterOperationalStateAttributeOperationalStateListID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterOperationalStateAttributeOperationalStateID MTR_NEWLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterOperationalStateAttributeOperationalErrorID MTR_NEWLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterOperationalStateAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterOperationalStateAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterOperationalStateAttributeAttributeListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterOperationalStateAttributeFeatureMapID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterOperationalStateAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster WasherControls attributes
@@ -9011,13 +8992,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterModeSelectCommandChangeToModeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000000,
 
-    // Cluster OperationalState commands
-    MTRCommandIDTypeClusterOperationalStateCommandPauseID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterOperationalStateCommandStopID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterOperationalStateCommandStartID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterOperationalStateCommandResumeID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRCommandIDTypeClusterOperationalStateCommandOperationalCommandResponseID MTR_NEWLY_AVAILABLE = 0x00000004,
-
     // Cluster WasherControls commands
     MTRCommandIDTypeClusterWasherControlsCommandSetSpinSpeedID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterWasherControlsCommandSetNumberOfRinsesID MTR_NEWLY_AVAILABLE = 0x00000001,
@@ -10175,10 +10149,6 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster BooleanState events
     MTREventIDTypeClusterBooleanStateEventStateChangeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000000,
-
-    // Cluster OperationalState events
-    MTREventIDTypeClusterOperationalStateEventOperationalErrorID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterOperationalStateEventOperationCompletionID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster WasherControls events
     MTREventIDTypeClusterWasherControlsEventOperationalErrorID MTR_NEWLY_AVAILABLE = 0x00000000,

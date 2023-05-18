@@ -298,12 +298,6 @@
 #define CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER
 #endif
 
-#if defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER { chip::app::Clusters::OperationalState::Id, "Operational State" },
-#else
-#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER
-#endif
-
 #if defined(ZCL_USING_WASHER_CONTROLS_CLUSTER_SERVER) || defined(ZCL_USING_WASHER_CONTROLS_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_WASHER_CONTROLS_CLUSTER { chip::app::Clusters::WasherControls::Id, "Washer Controls" },
 #else
@@ -625,7 +619,6 @@
     CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
-    CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_WASHER_CONTROLS_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
