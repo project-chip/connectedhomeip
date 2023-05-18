@@ -503,7 +503,7 @@ class SubscriptionTransaction:
             lambda: handle.pychip_ReadClient_OverrideLivenessTimeout(self._readTransaction._pReadClient, timeoutMs)
         )
 
-    def GetReportingIntervals(self) -> Tuple[int, int]:
+    def GetReportingIntervalsSeconds(self) -> Tuple[int, int]:
         '''
         Retrieve the reporting intervals associated with an active subscription. 
         This should only be called if we're of subscription interaction type and after a subscription has been established.
