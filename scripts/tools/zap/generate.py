@@ -33,7 +33,7 @@ from zap_execution import ZapTool
 
 @dataclass
 class CmdLineArgs:
-    zapFile: str
+    zapFile: Optional[str]
     zclFile: str
     templateFile: str
     outputDir: str
@@ -117,7 +117,7 @@ def runArgumentsParser() -> CmdLineArgs:
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
-    parser.add_argument('zap', help='Path to the application .zap file')
+    parser.add_argument('zap', nargs="?", default=None, help='Path to the application .zap file')
     parser.add_argument('-t', '--templates', default=default_templates,
                         help='Path to the .zapt templates records to use for generating artifacts (default: "' + default_templates + '")')
     parser.add_argument('-z', '--zcl',
@@ -153,7 +153,10 @@ def runArgumentsParser() -> CmdLineArgs:
     else:
         output_dir = ''
 
-    zap_file = getFilePath(args.zap)
+    if args.zap:
+        zap_file = getFilePath(args.zap)
+    else:
+        zap_file = None
 
     if args.zcl:
         zcl_file = getFilePath(args.zcl)
@@ -204,8 +207,11 @@ def runGeneration(cmdLineArgs):
     if cmdLineArgs.version_check:
         tool.version_check()
 
-    args = ['-z', zcl_file, '-g', templates_file,
-            '-i', zap_file, '-o', output_dir]
+    args = ['-z', zcl_file, '-g', templates_file, '-o', output_dir]
+
+    if zap_file:
+        args.append('-i')
+        args.append(zap_file)
 
     if parallel:
         # Parallel-compatible runs will need separate state
@@ -213,7 +219,13 @@ def runGeneration(cmdLineArgs):
 
     tool.run('generate', *args)
 
-    extractGeneratedIdl(output_dir, zap_file)
+    if zap_file:
+        extractGeneratedIdl(output_dir, zap_file)
+    else:
+        # without a zap file, assume we process controller-clusters
+        # TODO: this hardcoding maybe can be extracted in some other way
+        #       like taking it as an argument where to process the IDL
+        extractGeneratedIdl(output_dir, 'src/controller/data_model/controller-clusters.zap')
 
 
 def runClangPrettifier(templates_file, output_dir):
