@@ -22,6 +22,7 @@
  */
 
 #include <access/AccessControl.h>
+#include <app/att-storage.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/GlobalAttributes.h>
@@ -45,7 +46,6 @@
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
 
 #include <zap-generated/endpoint_config.h>

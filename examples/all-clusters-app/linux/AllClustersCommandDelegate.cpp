@@ -18,7 +18,7 @@
 
 #include "AllClustersCommandDelegate.h"
 
-#include <app-common/zap-generated/att-storage.h>
+#include <app/att-storage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>

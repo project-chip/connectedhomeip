@@ -18,7 +18,7 @@
 
 #include <app/AttributePathExpandIterator.h>
 
-#include <app-common/zap-generated/att-storage.h>
+#include <app/att-storage.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
