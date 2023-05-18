@@ -179,7 +179,8 @@ void SlWiFiDriver::UpdateNetworkingStatus()
     ByteSpan networkId = ByteSpan((const unsigned char *) mStagingNetwork.ssid, mStagingNetwork.ssidLen);
     if (!wfx_is_sta_connected())
     {
-        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId), NullOptional);
+        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId),
+                                                         MakeOptional((int32_t) SL_STATUS_FAIL));
         return;
     }
     mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(networkId), NullOptional);
