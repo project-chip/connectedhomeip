@@ -120,7 +120,9 @@ sl_status_t sl_wfx_host_init_bus(void)
 sl_status_t sl_wfx_host_deinit_bus(void)
 {
     vSemaphoreDelete(spi_sem);
+    #if defined(EFR32MG24)
     vSemaphoreDelete(spi_sem_sync_hdl);
+    #endif /* EFR32MG24 */
     // Stop DMAs.
     DMADRV_StopTransfer(rx_dma_channel);
     DMADRV_StopTransfer(tx_dma_channel);
@@ -133,12 +135,12 @@ sl_status_t sl_wfx_host_deinit_bus(void)
 
 sl_status_t sl_wfx_host_spi_cs_assert()
 {
+#if defined(EFR32MG24)
     configASSERT(spi_sem_sync_hdl);
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
         return SL_STATUS_TIMEOUT;
     }
-#if defined(EFR32MG24)
     SPIDRV_ReInit(SL_BIT_RATE_EXP_HDR);
 #endif /* EFR32MG24 */
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
