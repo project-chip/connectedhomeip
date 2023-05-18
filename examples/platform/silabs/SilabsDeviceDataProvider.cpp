@@ -18,6 +18,7 @@
 #include "SilabsDeviceDataProvider.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
+#include <lib/support/CHIPMemString.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <setup_payload/Base38Encode.h>
 #include <setup_payload/SetupPayload.h>
@@ -391,6 +392,8 @@ CHIP_ERROR SilabsDeviceDataProvider::GetHardwareVersionString(char * buf, size_t
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         VerifyOrReturnError(buf != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(bufSize > strlen(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING),
+                            CHIP_ERROR_BUFFER_TOO_SMALL);
         Platform::CopyString(buf, bufSize, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
         err = CHIP_NO_ERROR;
     }
