@@ -513,15 +513,15 @@ class SubscriptionTransaction:
             ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint16), ctypes.POINTER(ctypes.c_uint16)]
         handle.pychip_ReadClient_GetReportingIntervals.restype = PyChipError
 
-        minInterval = ctypes.c_uint16(0)
-        maxInterval = ctypes.c_uint16(0)
+        minIntervalSec = ctypes.c_uint16(0)
+        maxIntervalSec = ctypes.c_uint16(0)
 
         builtins.chipStack.Call(
             lambda: handle.pychip_ReadClient_GetReportingIntervals(
-                self._readTransaction._pReadClient, ctypes.pointer(minInterval), ctypes.pointer(maxInterval))
+                self._readTransaction._pReadClient, ctypes.pointer(minIntervalSec), ctypes.pointer(maxIntervalSec))
         ).raise_on_error()
 
-        return minInterval.value, maxInterval.value
+        return minIntervalSec.value, maxIntervalSec.value
 
     def SetResubscriptionAttemptedCallback(self, callback: Callable[[SubscriptionTransaction, int, int], None], isAsync=False):
         '''
