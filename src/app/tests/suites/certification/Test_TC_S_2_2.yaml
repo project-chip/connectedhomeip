@@ -786,35 +786,40 @@ tests:
       response:
           values:
               - name: "Status"
-                saveAs: StoreStatus
-                constraints:
-                    anyOf: [0x00, 0x89]
+                value: 0x00
               - name: "GroupID"
                 value: 0x0001
               - name: "SceneID"
                 value: 0x02
+              # TODO: For status, replace "- value: 0x00" by following lines when new backend for test is used in CI
+              #  saveAs: StoreStatus
+              #  constraints:
+              #      anyOf: [0x00, 0x89]
 
-    - label:
-          "Verify that the status of previous command was either 0x00 (SUCCESS)
-          or 0x89 (INSUFFICIENT_SPACE)"
-      cluster: "EqualityCommands"
-      command: "UnsignedNumberEquals"
-      arguments:
-          values:
-              - name: "Value1"
-                value: 0x00
-              - name: "Value2"
-                value: StoreStatus
-      response:
-          - values:
-                - name: "Equals"
-                  value: true
-                  saveAs: ContinueTest
+
+    # TODO: Uncomment once the new backend is implemented, allowing the use of EqualityCommands pseudo cluster
+    #- label:
+    #      "Verify that the status of previous command was either 0x00 (SUCCESS)
+    #      or 0x89 (INSUFFICIENT_SPACE)"
+    #  cluster: "EqualityCommands"
+    #  command: "UnsignedNumberEquals"
+    #  arguments:
+    #      values:
+    #          - name: "Value1"
+    #            value: 0x00
+    #          - name: "Value2"
+    #            value: StoreStatus
+    #  response:
+    #      - values:
+    #            - name: "Equals"
+    #              value: true
+    #              saveAs: ContinueTest
 
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0001."
-      runIf: ContinueTest
+      # TODO : Uncomment runIf statement once new test backend is implemented
+      #runIf: ContinueTest
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
@@ -835,7 +840,8 @@ tests:
     - label:
           "If capacity allows, TH sends a AddGroup command to DUT with the
           GroupID field set to 0x0002."
-      runIf: ContinueTest
+      # TODO : Uncomment runIf statement once new test backend is implemented
+      #runIf: ContinueTest
       PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
@@ -855,7 +861,8 @@ tests:
     - label:
           "TH sends a RemoveAllScenes command to DUT with the GroupID field set
           to 0x0002."
-      runIf: ContinueTest
+      # TODO : Uncomment runIf statement once new test backend is implemented
+      #runIf: ContinueTest
       PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
       arguments:
@@ -872,7 +879,8 @@ tests:
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0002."
-      runIf: ContinueTest
+      # TODO : Uncomment runIf statement once new test backend is implemented
+      #runIf: ContinueTest
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
@@ -891,7 +899,8 @@ tests:
     - label:
           "TH configures AC3 on DUT for all implemented application clusters
           supporting scenes."
-      runIf: ContinueTest
+      # TODO : Uncomment runIf statement once new test backend is implemented
+      #runIf: ContinueTest
       cluster: "Level Control"
       PICS: PICS_SDK_CI_ONLY
       command: "MoveToLevelWithOnOff"
@@ -909,7 +918,8 @@ tests:
     - label:
           "TH configures AC3 on DUT for all implemented application clusters
           supporting scenes."
-      runIf: ContinueTest
+      # TODO : Uncomment runIf statement once new test backend is implemented
+      #runIf: ContinueTest
       verification: |
           Is DUT configured with AC3?
       cluster: "LogCommands"
@@ -927,7 +937,8 @@ tests:
     - label:
           "TH sends a StoreScene command to DUT with the GroupID field set to
           0x0002 and the SceneID field set to 0x03."
-      runIf: ContinueTest
+      # TODO : Uncomment runIf statement once new test backend is implemented
+      #runIf: ContinueTest
       PICS: S.S.C04.Rsp
       command: "StoreScene"
       arguments:
@@ -939,36 +950,40 @@ tests:
       response:
           values:
               - name: "Status"
-                saveAs: StoreStatus
-                constraints:
-                    anyOf: [0x00, 0x89]
+                value: 0x00
               - name: "GroupID"
                 value: 0x0002
               - name: "SceneID"
                 value: 0x03
+              # TODO: For Status, replace "- value: 0x00"by following lines when new backend for test is used in CI
+              #  saveAs: StoreStatus
+              #  constraints:
+              #      anyOf: [0x00, 0x89]
 
-    - label:
-          "Verify that the status of previous command was either 0x00 (SUCCESS)
-          or 0x89 (INSUFFICIENT_SPACE)"
-      runIf: ContinueTest
-      cluster: "EqualityCommands"
-      command: "UnsignedNumberEquals"
-      arguments:
-          values:
-              - name: "Value1"
-                value: 0x00
-              - name: "Value2"
-                value: StoreStatus
-      response:
-          - values:
-                - name: "Equals"
-                  value: true
-                  saveAs: ContinueTest
+
+    # TODO: Uncomment once the new backend is implemented, allowing the use of EqualityCommands pseudo cluster
+    #- label:
+    #      "Verify that the status of previous command was either 0x00 (SUCCESS)
+    #      or 0x89 (INSUFFICIENT_SPACE)"
+    #  runIf: ContinueTest
+    #  cluster: "EqualityCommands"
+    #  command: "UnsignedNumberEquals"
+    #  arguments:
+    #      values:
+    #          - name: "Value1"
+    #            value: 0x00
+    #          - name: "Value2"
+    #            value: StoreStatus
+    #  response:
+    #      - values:
+    #            - name: "Equals"
+    #              value: true
+    #              saveAs: ContinueTest
 
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0002."
-      runIf: ContinueTest
+      #runIf: ContinueTest
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
