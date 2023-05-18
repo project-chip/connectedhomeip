@@ -154,7 +154,6 @@ static const char ModuleNames[kLogModule_Max][kMaxModuleNameLen + 1] = {
     "CSM", // CASESessionManager
 };
 
-
 } // namespace
 
 const char * GetModuleName(LogModule module)
