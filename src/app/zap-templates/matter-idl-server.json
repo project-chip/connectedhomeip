@@ -34,12 +34,16 @@
         {
             "name": "idl_attribute_definition",
             "path": "partials/idl/attribute_definition.zapt"
+        },
+        {
+            "name": "idl_cluster_definition",
+            "path": "partials/idl/cluster_definition.zapt"
         }
     ],
     "templates": [
         {
-            "path": "templates/app/MatterIDL.zapt",
-            "name": "Human-readable Matter IDL",
+            "path": "templates/app/MatterIDL_Server.zapt",
+            "name": "Human-readable Matter IDL (Server-side)",
             "output": "Clusters.matter"
         }
     ]

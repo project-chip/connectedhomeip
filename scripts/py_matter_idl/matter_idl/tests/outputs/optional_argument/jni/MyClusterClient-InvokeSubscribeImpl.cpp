@@ -1,10 +1,10 @@
 #include <jni/CHIPCallbackTypes.h>
 #include <jni/CHIPReadCallbacks.h>
+#include <controller/CHIPCluster.h>
 #include <controller/java/zap-generated/CHIPInvokeCallbacks.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <zap-generated/CHIPClientCallbacks.h>
-#include <zap-generated/CHIPClusters.h>
 
 #include <controller/java/AndroidCallbacks.h>
 #include <controller/java/AndroidClusterExceptions.h>
@@ -18,17 +18,19 @@
 #include <platform/PlatformManager.h>
 #include <vector>
 
+#include <jni/CHIPCallbackTypes.h>
+
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
 
 using namespace chip;
-using namespace chip::Controller;
+using chip::Controller::ClusterBase;
 
 JNI_METHOD(jlong, MyClusterCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
     DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
-    MyClusterCluster * cppCluster = new MyClusterCluster(*device->GetExchangeManager(), device->GetSecureSession().Value(), endpointId);
+    ClusterBase * cppCluster = new ClusterBase(*device->GetExchangeManager(), device->GetSecureSession().Value(), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 
@@ -37,8 +39,8 @@ JNI_METHOD(void, MyClusterCluster,
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    MyClusterCluster * cppCluster;
-    
+    ClusterBase * cppCluster;
+
     ListFreer listFreer;
     chip::app::Clusters::MyCluster::Commands::Foo::Type request;
 
@@ -60,7 +62,7 @@ JNI_METHOD(void, MyClusterCluster,
     VerifyOrReturn(onSuccess.get() != nullptr, AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
     VerifyOrReturn(onFailure.get() != nullptr, AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
 
-    cppCluster = reinterpret_cast<MyClusterCluster *>(clusterPtr);
+    cppCluster = reinterpret_cast<ClusterBase *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
