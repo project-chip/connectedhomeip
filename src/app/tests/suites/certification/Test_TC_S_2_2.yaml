@@ -364,12 +364,7 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0000,
-                                        AttributeValue: 0x01,
-                                    },
-                                ],
+                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
@@ -485,12 +480,7 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0000,
-                                        AttributeValue: 0x01,
-                                    },
-                                ],
+                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
@@ -796,7 +786,6 @@ tests:
               #  constraints:
               #      anyOf: [0x00, 0x89]
 
-
     # TODO: Uncomment once the new backend is implemented, allowing the use of EqualityCommands pseudo cluster
     #- label:
     #      "Verify that the status of previous command was either 0x00 (SUCCESS)
@@ -959,7 +948,6 @@ tests:
               #  saveAs: StoreStatus
               #  constraints:
               #      anyOf: [0x00, 0x89]
-
 
     # TODO: Uncomment once the new backend is implemented, allowing the use of EqualityCommands pseudo cluster
     #- label:

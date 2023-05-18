@@ -93,12 +93,7 @@ tests:
                         {
                             ClusterID: 0x0006,
                             AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0000,
-                                        AttributeValue: 0x01,
-                                    },
-                                ],
+                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
                         },
                         {
                             ClusterID: 0x0008,
