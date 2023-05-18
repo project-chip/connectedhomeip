@@ -109,8 +109,11 @@ function build_with_cmake() {
     fi
 
     BUILD_OPTIONS=(-DCMAKE_SYSTEM_PROCESSOR=cortex-m55)
+
     if "$DEBUG"; then
         BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Debug)
+    else
+        BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Release)
     fi
 
     if "$LWIP_DEBUG"; then
