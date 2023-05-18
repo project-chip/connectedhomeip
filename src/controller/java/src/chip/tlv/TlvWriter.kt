@@ -15,10 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
+
 package chip.tlv
 
-import com.google.protobuf.ByteString
 import java.io.ByteArrayOutputStream
 
 /**
@@ -224,7 +223,7 @@ class TlvWriter(initialCapacity: Int = 32) {
    *
    * @throws TlvEncodingException if the data was invalid
    */
-  fun put(tag: Tag, value: ByteString): TlvWriter {
+  fun put(tag: Tag, value: ByteArray): TlvWriter {
     return put(Element(tag, ByteStringValue(value)))
   }
 
@@ -261,7 +260,7 @@ class TlvWriter(initialCapacity: Int = 32) {
    *
    * @throws TlvEncodingException if the data was invalid
    */
-  fun putByteStringArray(tag: Tag, array: List<ByteString>): TlvWriter {
+  fun putByteStringArray(tag: Tag, array: List<ByteArray>): TlvWriter {
     startArray(tag)
     array.forEach { put(AnonymousTag, it) }
     return endArray()

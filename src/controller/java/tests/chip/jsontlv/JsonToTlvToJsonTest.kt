@@ -20,7 +20,6 @@ package chip.jsontlv
 
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonParser
-import com.google.protobuf.ByteString
 import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,8 +33,6 @@ class JsonToTlvToJsonTest {
 
   private fun String.octetsToByteArray(): ByteArray =
     replace(" ", "").chunked(2).map { it.toInt(16) and 0xFF }.map { it.toByte() }.toByteArray()
-
-  private fun String.toByteString(): ByteString = ByteString.copyFrom(this.toByteArray())
 
   private fun checkValidConversion(
     jsonOriginal: String,
@@ -283,7 +280,7 @@ class JsonToTlvToJsonTest {
   @Test
   fun convertOctetString() {
     // Octet String, 1-octet length, octets 00 01 02 03 04
-    val value = ByteString.fromHex("0001020304")
+    val value = "0001020304".octetsToByteArray()
     val encoding =
       TlvWriter()
         .startStructure(AnonymousTag)
@@ -1207,12 +1204,12 @@ class JsonToTlvToJsonTest {
 
   @Test
   fun convertByteStringArray() {
-    // Anonymous Array of ByteString, [{00 01 02 03 04}, {FF}, {4A EF 88}]
+    // Anonymous Array of ByteArray, [{00 01 02 03 04}, {FF}, {4A EF 88}]
     val values =
-      listOf<ByteString>(
-        ByteString.fromHex("0001020304"),
-        ByteString.fromHex("FF"),
-        ByteString.fromHex("4AEF88")
+      listOf<ByteArray>(
+        "0001020304".octetsToByteArray(),
+        "FF".octetsToByteArray(),
+        "4AEF88".octetsToByteArray()
       )
     val encoding =
       TlvWriter()
@@ -1245,7 +1242,7 @@ class JsonToTlvToJsonTest {
         .put(ContextSpecificTag(0), 20.toLong())
         .put(ContextSpecificTag(1), true)
         .put(ContextSpecificTag(2), 0.toULong())
-        .put(ContextSpecificTag(3), "Test ByteString Value".toByteString())
+        .put(ContextSpecificTag(3), "Test ByteString Value".toByteArray())
         .put(ContextSpecificTag(4), "hello")
         .put(ContextSpecificTag(5), -500000)
         .put(ContextSpecificTag(6), 17.9)
@@ -1284,7 +1281,7 @@ class JsonToTlvToJsonTest {
         .put(ContextSpecificTag(0), 20)
         .put(ContextSpecificTag(1), true)
         .put(ContextSpecificTag(2), 0.toULong())
-        .put(ContextSpecificTag(3), "Test ByteString Value 1".toByteString())
+        .put(ContextSpecificTag(3), "Test ByteString Value 1".toByteArray())
         .put(ContextSpecificTag(4), "hello1")
         .put(ContextSpecificTag(5), -500000)
         .put(ContextSpecificTag(6), 17.9)
@@ -1294,7 +1291,7 @@ class JsonToTlvToJsonTest {
         .put(ContextSpecificTag(0), -10)
         .put(ContextSpecificTag(1), false)
         .put(ContextSpecificTag(2), 128.toULong())
-        .put(ContextSpecificTag(3), "Test ByteString Value 2".toByteString())
+        .put(ContextSpecificTag(3), "Test ByteString Value 2".toByteArray())
         .put(ContextSpecificTag(4), "hello2")
         .put(ContextSpecificTag(5), 40000000000)
         .put(ContextSpecificTag(6), -1754.923)
@@ -1350,7 +1347,7 @@ class JsonToTlvToJsonTest {
         .put(ContextSpecificTag(1), 17.4f)
         .startStructure(ContextSpecificTag(2))
         .put(ContextSpecificTag(0), "Test String Element #2")
-        .put(ContextSpecificTag(3), "Test ByteString Element #3".toByteString())
+        .put(ContextSpecificTag(3), "Test ByteString Element #3".toByteArray())
         .endStructure()
         .endStructure()
         .endStructure()
@@ -1426,13 +1423,13 @@ class JsonToTlvToJsonTest {
 
   @Test
   fun convertArrayOfByteStrings() {
-    // Array of ByteString elements
+    // Array of ByteArray elements
     val values =
-      listOf<ByteString>(
-        "Test array member 0".toByteString(),
-        "Test array member 1".toByteString(),
-        "Test array member 2".toByteString(),
-        "Test array member 3".toByteString(),
+      listOf<ByteArray>(
+        "Test array member 0".toByteArray(),
+        "Test array member 1".toByteArray(),
+        "Test array member 2".toByteArray(),
+        "Test array member 3".toByteArray(),
       )
     val encoding =
       TlvWriter()
@@ -1463,7 +1460,7 @@ class JsonToTlvToJsonTest {
       TlvWriter()
         .startStructure(AnonymousTag)
         .put(ContextSpecificTag(0), 42)
-        .put(ContextSpecificTag(1), "Test array member 0".toByteString())
+        .put(ContextSpecificTag(1), "Test array member 0".toByteArray())
         .put(ContextSpecificTag(2), 156.398)
         .put(ContextSpecificTag(3), 73709551615U)
         .put(ContextSpecificTag(4), true)
