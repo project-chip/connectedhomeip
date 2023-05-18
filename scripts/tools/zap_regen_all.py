@@ -386,7 +386,7 @@ def getGlobalTemplatesTargets():
             'zzz_generated', generate_subdir, 'zap-generated')
         targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
-    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap('src/controller/data_model/controller-clusters.zap'), client_side=True))
+    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZcl('src/app/zap-templates/zcl/zcl.json'), client_side=True))
 
     # This generates app headers for darwin only, for easier/clearer include
     # in .pbxproj files.
@@ -394,7 +394,7 @@ def getGlobalTemplatesTargets():
     # TODO: These files can be code generated at compile time, we should figure
     #       out a path for this codegen to not be required.
     targets.append(ZAPGenerateTarget(
-        ZapInput.FromZap('src/controller/data_model/controller-clusters.zap'),
+        ZapInput.FromZcl('src/app/zap-templates/zcl/zcl.json'),
         template="src/app/zap-templates/app-templates.json",
         output_dir='zzz_generated/darwin/controller-clusters/zap-generated'))
 
@@ -413,14 +413,13 @@ def getCodegenTemplates():
 
 
 def getTestsTemplatesTargets(test_target):
+    zap_input = ZapInput.FromZcl('src/app/zap-templates/zcl/zcl.json')
     templates = {
         'chip-tool': {
-            'zap': 'src/controller/data_model/controller-clusters.zap',
             'template': 'examples/chip-tool/templates/tests/templates.json',
             'output_dir': 'zzz_generated/chip-tool/zap-generated'
         },
         'darwin-framework-tool': {
-            'zap': 'src/controller/data_model/controller-clusters.zap',
             'template': 'examples/darwin-framework-tool/templates/tests/templates.json',
             'output_dir': 'zzz_generated/darwin-framework-tool/zap-generated'
         }
@@ -431,7 +430,7 @@ def getTestsTemplatesTargets(test_target):
         if test_target == 'all' or test_target == key:
             logging.info("Found test target %s (via %s)" %
                          (key, target['template']))
-            targets.append(ZAPGenerateTarget(ZapInput.FromZap(target['zap']), template=target['template'], output_dir=target['output_dir']))
+            targets.append(ZAPGenerateTarget(zap_input, template=target['template'], output_dir=target['output_dir']))
 
     return targets
 
@@ -441,7 +440,7 @@ def getGoldenTestImageTargets():
 
 
 def getSpecificTemplatesTargets():
-    zap_filepath = 'src/controller/data_model/controller-clusters.zap'
+    zap_input = ZapInput.FromZcl('src/app/zap-templates/zcl/zcl.json')
 
     # Mapping of required template and output directory
     templates = {
@@ -457,8 +456,7 @@ def getSpecificTemplatesTargets():
     targets = []
     for template, output_dir in templates.items():
         logging.info("Found specific template %s" % template)
-        targets.append(ZAPGenerateTarget(
-            ZapInput.FromZap(zap_filepath), template=template, output_dir=output_dir))
+        targets.append(ZAPGenerateTarget(zap_input, template=template, output_dir=output_dir))
 
     return targets
 
