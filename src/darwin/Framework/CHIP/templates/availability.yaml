@@ -6862,6 +6862,7 @@
           - FuelTankMonitoring
           - InkCartridgeMonitoring
           - TonerCartridgeMonitoring
+          - SmokeCOAlarm
       attributes:
           Scenes:
               - EventList
@@ -7147,6 +7148,25 @@
               - EventList
               - FeatureMap
               - ClusterRevision
+          SmokeCOAlarm:
+              - ExpressedState
+              - SmokeState
+              - COState
+              - BatteryAlert
+              - DeviceMuted
+              - TestInProgress
+              - HardwareFaultAlert
+              - EndOfServiceAlert
+              - InterconnectSmokeAlarm
+              - InterconnectCOAlarm
+              - ContaminationState
+              - SensitivityLevel
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
       commands:
           HEPAFilterMonitoring:
               - ResetCondition
@@ -7172,6 +7192,14 @@
               - ResetCondition
           TonerCartridgeMonitoring:
               - ResetCondition
+          DoorLock:
+              - UnboltDoor
+          SmokeCOAlarm:
+              - SelfTestRequest
+      command fields:
+          DoorLock:
+              UnboltDoor:
+                  - pinCode
       structs:
           BasicInformation:
               - ProductAppearanceStruct
@@ -7186,6 +7214,19 @@
               ProductAppearanceStruct:
                   - finish
                   - primaryColor
+      events:
+          SmokeCOAlarm:
+              - SmokeAlarm
+              - COAlarm
+              - LowBattery
+              - HardwareFault
+              - EndOfService
+              - SelfTestComplete
+              - AlarmMuted
+              - MuteEnded
+              - InterconnectSmokeAlarm
+              - InterconnectCOAlarm
+              - AllClear
       enums:
           AirQuality:
               - AirQualityEnum
@@ -7231,6 +7272,13 @@
           TonerCartridgeMonitoring:
               - ChangeIndicationEnum
               - DegradationDirectionEnum
+          SmokeCOAlarm:
+              - AlarmStateEnum
+              - ContaminationStateEnum
+              - EndOfServiceEnum
+              - ExpressedStateEnum
+              - MuteStateEnum
+              - SensitivityEnum
       enum values:
           AirQuality:
               AirQualityEnum:
@@ -7397,6 +7445,47 @@
               DegradationDirectionEnum:
                   - Up
                   - Down
+          DoorLock:
+              DlLockState:
+                  - Unlatched
+              DlLockType:
+                  - Eurocylinder
+              LockOperationTypeEnum:
+                  - Unlatch
+          SmokeCOAlarm:
+              AlarmStateEnum:
+                  - Unknown
+                  - Normal
+                  - Warning
+                  - Critical
+              ContaminationStateEnum:
+                  - Unknown
+                  - Normal
+                  - Low
+                  - Warning
+                  - Critical
+              EndOfServiceEnum:
+                  - Unknown
+                  - Expired
+                  - Normal
+              ExpressedStateEnum:
+                  - Normal
+                  - SmokeAlarm
+                  - COAlarm
+                  - BatteryAlert
+                  - Testing
+                  - HardwareFault
+                  - EndOfService
+                  - InterconnectSmoke
+                  - InterconnectCO
+              MuteStateEnum:
+                  - Unknown
+                  - NotMuted
+                  - Muted
+              SensitivityEnum:
+                  - High
+                  - Standard
+                  - Low
       bitmaps:
           AirQuality:
               - Feature
@@ -7432,6 +7521,8 @@
               - Feature
           TonerCartridgeMonitoring:
               - Feature
+          SmokeCOAlarm:
+              - SmokeCOAlarmFeature
       bitmap values:
           AirQuality:
               Feature:
@@ -7505,6 +7596,13 @@
               Feature:
                   - Condition
                   - Warning
+          DoorLock:
+              DoorLockFeature:
+                  - Unbolt
+          SmokeCOAlarm:
+              SmokeCOAlarmFeature:
+                  - SmokeAlarm
+                  - COAlarm
       ids:
           attributes:
               TimeSynchronization:
