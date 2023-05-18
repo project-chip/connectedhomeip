@@ -453,17 +453,19 @@ static void wfx_rsi_save_ap_info() // translation
         break;
     case SME_WPA2:
     case SME_WPA2_ENTERPRISE:
+//#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
         wfx_rsi.sec.security = WFX_SEC_WPA2;
+//#endif
         break;
     case SME_WEP:
         wfx_rsi.sec.security = WFX_SEC_WEP;
         break;
-#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
+//#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
     case SME_WPA3:
     case SME_WPA3_TRANSITION:
         wfx_rsi.sec.security = WFX_SEC_WPA3;
         break;
-#endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
+//#endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
     default:
         wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
         break;
@@ -493,7 +495,7 @@ static void wfx_rsi_do_join(void)
     else
     {
 
-      //  for (int i = 0; i < scan_results_array->num; i++) {
+       for (int i = 0; i < scan_results_array->num; i++) {
         switch (wfx_rsi.sec.security)
         {
         case WFX_SEC_WEP:
@@ -503,15 +505,20 @@ static void wfx_rsi_do_join(void)
             connect_security_mode = RSI_WPA_WPA2_MIXED;
             break;
         case WFX_SEC_WPA2:
-//#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
-    //        connect_security_mode = RSI_WPA3_TRANSITION;
+            connect_security_mode = RSI_WPA_WPA2_MIXED;
+#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
+            //connect_security_mode = RSI_WPA3_TRANSITION;
 //#else
             connect_security_mode = RSI_WPA3_TRANSITION;
-//#endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
+#endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
             break;
-#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
+
         case WFX_SEC_WPA3:
+            connect_security_mode = RSI_WPA3;
+#ifdef WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION
             connect_security_mode = RSI_WPA3_TRANSITION;
+#else
+            connect_security_mode = RSI_WPA3;
 #endif /* WIFI_ENABLE_SECURITY_MODE_WPA3_TRANSITION */
             break;
         case WFX_SEC_NONE:
@@ -521,6 +528,8 @@ static void wfx_rsi_do_join(void)
             SILABS_LOG("%s: error: unknown security type.", __func__);
             return;
         }
+       }
+
     }
 
         //connect_security_mode = 2;
