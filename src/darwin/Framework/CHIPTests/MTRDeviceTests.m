@@ -1506,6 +1506,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // nonexistent attribute
     [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
 
+    // Test if errors are properly received
+    XCTestExpectation * attributeReportErrorExpectation = [self expectationWithDescription:@"Attribute read error"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
+            if (attributeReponseValue[MTRErrorKey]) {
+                [attributeReportErrorExpectation fulfill];
+            }
+        }
+    };
+    // use the nonexistent attribute and expect read error
+    [device readAttributeWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID params:nil];
+    [self waitForExpectations:@[ attributeReportErrorExpectation ] timeout:10];
+
     // reset the onAttributeDataReceived to validate the following resubscribe test
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
         attributeReportsReceived += data.count;
