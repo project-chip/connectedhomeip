@@ -7489,6 +7489,102 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedRefrigeratorAlarmClusterGeneratedCommandListAttributeCallback
+      implements ChipClusters.RefrigeratorAlarmCluster.GeneratedCommandListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedRefrigeratorAlarmClusterAcceptedCommandListAttributeCallback
+      implements ChipClusters.RefrigeratorAlarmCluster.AcceptedCommandListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedRefrigeratorAlarmClusterEventListAttributeCallback
+      implements ChipClusters.RefrigeratorAlarmCluster.EventListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedRefrigeratorAlarmClusterAttributeListAttributeCallback
+      implements ChipClusters.RefrigeratorAlarmCluster.AttributeListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedAirQualityClusterGeneratedCommandListAttributeCallback
       implements ChipClusters.AirQualityCluster.GeneratedCommandListAttributeCallback,
           DelegatedClusterCallback {
@@ -15674,6 +15770,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.TemperatureControlCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("temperatureControl", temperatureControlClusterInfo);
+    ClusterInfo refrigeratorAlarmClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.RefrigeratorAlarmCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("refrigeratorAlarm", refrigeratorAlarmClusterInfo);
     ClusterInfo airQualityClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.AirQualityCluster(ptr, endpointId),
@@ -15965,6 +16066,7 @@ public class ClusterInfoMapping {
     destination.get("icdManagement").combineCommands(source.get("icdManagement"));
     destination.get("modeSelect").combineCommands(source.get("modeSelect"));
     destination.get("temperatureControl").combineCommands(source.get("temperatureControl"));
+    destination.get("refrigeratorAlarm").combineCommands(source.get("refrigeratorAlarm"));
     destination.get("airQuality").combineCommands(source.get("airQuality"));
     destination.get("smokeCoAlarm").combineCommands(source.get("smokeCoAlarm"));
     destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
@@ -18127,6 +18229,8 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> temperatureControlClusterInteractionInfoMap =
         new LinkedHashMap<>();
     commandMap.put("temperatureControl", temperatureControlClusterInteractionInfoMap);
+    Map<String, InteractionInfo> refrigeratorAlarmClusterInteractionInfoMap = new LinkedHashMap<>();
+    commandMap.put("refrigeratorAlarm", refrigeratorAlarmClusterInteractionInfoMap);
     Map<String, InteractionInfo> airQualityClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("airQuality", airQualityClusterInteractionInfoMap);
     Map<String, InteractionInfo> smokeCoAlarmClusterInteractionInfoMap = new LinkedHashMap<>();

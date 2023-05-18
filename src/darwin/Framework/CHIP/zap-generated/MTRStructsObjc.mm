@@ -2698,6 +2698,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRRefrigeratorAlarmClusterNotifyEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _active = @(0);
+
+        _inactive = @(0);
+
+        _state = @(0);
+
+        _mask = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRRefrigeratorAlarmClusterNotifyEvent alloc] init];
+
+    other.active = self.active;
+    other.inactive = self.inactive;
+    other.state = self.state;
+    other.mask = self.mask;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: active:%@; inactive:%@; state:%@; mask:%@; >",
+                                             NSStringFromClass([self class]), _active, _inactive, _state, _mask];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRSmokeCOAlarmClusterSmokeAlarmEvent
 - (instancetype)init
 {

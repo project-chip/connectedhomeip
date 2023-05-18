@@ -2842,6 +2842,50 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
+ * Cluster Refrigerator Alarm
+ *    Attributes and commands for configuring the Refrigerator alarm.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterRefrigeratorAlarm : MTRCluster
+
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+
+- (void)resetWithParams:(MTRRefrigeratorAlarmClusterResetParams *)params
+           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeMaskWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+              expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                             params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeLatchWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeStateWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
  * Cluster Air Quality
  *    Attributes for reporting air quality classification
  */
