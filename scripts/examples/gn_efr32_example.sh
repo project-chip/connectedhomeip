@@ -305,7 +305,8 @@ else
         DOTFILE="$ROOT/openthread.gn"
     fi
 
-    if [ "$USE_DOCKER" == true ]; then
+    if [ "$USE_DOCKER" == true ] && [ "$USE_WIFI" == false ]; then
+        echo "Switching OpenThread ROOT"
         optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
     fi
 
