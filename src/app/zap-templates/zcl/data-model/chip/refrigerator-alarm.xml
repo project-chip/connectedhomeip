@@ -22,7 +22,7 @@ limitations under the License.
   </bitmap>
   <cluster>
     <name>Refrigerator Alarm</name>
-    <domain>Home &amp; Appliances</domain>
+    <domain>Appliances</domain>
     <description>Attributes and commands for configuring the Refrigerator alarm.</description>
     <code>0x0057</code>
     <define>REFRIGERATOR_ALARM</define>
