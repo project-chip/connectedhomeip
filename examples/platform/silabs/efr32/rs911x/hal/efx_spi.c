@@ -62,8 +62,10 @@
 #define CONCAT(A, B) (A##B)
 #define SPI_CLOCK(N) CONCAT(cmuClock_USART, N)
 
+#if defined(EFR32MG24)
 StaticSemaphore_t spi_sem_peripheral;
 SemaphoreHandle_t spi_sem_sync_hdl;
+#endif /* EFR32MG24 */
 
 StaticSemaphore_t xEfxSpiIntfSemaBuffer;
 static SemaphoreHandle_t spiTransferLock;

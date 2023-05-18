@@ -60,8 +60,10 @@ extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 
 #define USART SL_WFX_HOST_PINOUT_SPI_PERIPHERAL
 
+#if defined(EFR32MG24)
 StaticSemaphore_t spi_sem_peripheral;
 SemaphoreHandle_t spi_sem_sync_hdl;
+#endif /* EFR32MG24 */
 
 StaticSemaphore_t xEfrSpiSemaBuffer;
 static SemaphoreHandle_t spi_sem;
@@ -150,7 +152,9 @@ sl_status_t sl_wfx_host_spi_cs_assert()
 sl_status_t sl_wfx_host_spi_cs_deassert()
 {
     GPIO_PinOutSet(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
+#if defined(EFR32MG24)
     xSemaphoreGive(spi_sem_sync_hdl);
+#endif /* EFR32MG24 */
     return SL_STATUS_OK;
 }
 
