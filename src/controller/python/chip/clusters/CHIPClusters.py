@@ -826,6 +826,50 @@ class ChipClusters:
             },
         },
     }
+    _PULSE_WIDTH_MODULATION_CLUSTER_INFO = {
+        "clusterName": "PulseWidthModulation",
+        "clusterId": 0x0000001C,
+        "commands": {
+        },
+        "attributes": {
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _DESCRIPTOR_CLUSTER_INFO = {
         "clusterName": "Descriptor",
         "clusterId": 0x0000001D,
@@ -3097,6 +3141,128 @@ class ChipClusters:
             },
         },
     }
+    _TIME_SYNCHRONIZATION_CLUSTER_INFO = {
+        "clusterName": "TimeSynchronization",
+        "clusterId": 0x00000038,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "UTCTime",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "Granularity",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "TimeSource",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "TrustedTimeSource",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "DefaultNTP",
+                "attributeId": 0x00000004,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "TimeZone",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "DSTOffset",
+                "attributeId": 0x00000006,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "LocalTime",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "TimeZoneDatabase",
+                "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "NTPServerAvailable",
+                "attributeId": 0x00000009,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x0000000A: {
+                "attributeName": "TimeZoneListMaxSize",
+                "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "DSTOffsetListMaxSize",
+                "attributeId": 0x0000000B,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000C: {
+                "attributeName": "SupportsDNSResolve",
+                "attributeId": 0x0000000C,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO = {
         "clusterName": "BridgedDeviceBasicInformation",
         "clusterId": 0x00000039,
@@ -3695,6 +3861,138 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _PROXY_CONFIGURATION_CLUSTER_INFO = {
+        "clusterName": "ProxyConfiguration",
+        "clusterId": 0x00000042,
+        "commands": {
+        },
+        "attributes": {
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _PROXY_DISCOVERY_CLUSTER_INFO = {
+        "clusterName": "ProxyDiscovery",
+        "clusterId": 0x00000043,
+        "commands": {
+        },
+        "attributes": {
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _PROXY_VALID_CLUSTER_INFO = {
+        "clusterName": "ProxyValid",
+        "clusterId": 0x00000044,
+        "commands": {
+        },
+        "attributes": {
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -10250,6 +10548,50 @@ class ChipClusters:
             },
         },
     }
+    _FAULT_INJECTION_CLUSTER_INFO = {
+        "clusterName": "FaultInjection",
+        "clusterId": 0xFFF1FC06,
+        "commands": {
+        },
+        "attributes": {
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
 
     _CLUSTER_ID_DICT = {
         0x00000003: _IDENTIFY_CLUSTER_INFO,
@@ -10259,6 +10601,7 @@ class ChipClusters:
         0x00000007: _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         0x00000008: _LEVEL_CONTROL_CLUSTER_INFO,
         0x0000000F: _BINARY_INPUT_BASIC_CLUSTER_INFO,
+        0x0000001C: _PULSE_WIDTH_MODULATION_CLUSTER_INFO,
         0x0000001D: _DESCRIPTOR_CLUSTER_INFO,
         0x0000001E: _BINDING_CLUSTER_INFO,
         0x0000001F: _ACCESS_CONTROL_CLUSTER_INFO,
@@ -10279,6 +10622,7 @@ class ChipClusters:
         0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         0x00000036: _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         0x00000037: _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+        0x00000038: _TIME_SYNCHRONIZATION_CLUSTER_INFO,
         0x00000039: _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
         0x0000003B: _SWITCH_CLUSTER_INFO,
         0x0000003C: _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
@@ -10286,6 +10630,9 @@ class ChipClusters:
         0x0000003F: _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
         0x00000040: _FIXED_LABEL_CLUSTER_INFO,
         0x00000041: _USER_LABEL_CLUSTER_INFO,
+        0x00000042: _PROXY_CONFIGURATION_CLUSTER_INFO,
+        0x00000043: _PROXY_DISCOVERY_CLUSTER_INFO,
+        0x00000044: _PROXY_VALID_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000046: _ICD_MANAGEMENT_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
@@ -10332,6 +10679,7 @@ class ChipClusters:
         0x0000050E: _ACCOUNT_LOGIN_CLUSTER_INFO,
         0x00000B04: _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
+        0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
     }
 
     _CLUSTER_NAME_DICT = {
