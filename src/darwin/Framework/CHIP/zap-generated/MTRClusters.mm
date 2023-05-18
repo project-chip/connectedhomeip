@@ -12937,80 +12937,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 @end
 
-@implementation MTRClusterAirQuality
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAirQualityWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeAirQualityID)
-                                        attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeAirQualityID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeAirQualityID)
-                                        attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeAirQualityID)
-                                        attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeAirQualityID)
-                                        attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeEventListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeAirQualityID)
-                                        attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeAirQualityID)
-                                        attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeAirQualityID)
-                                        attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
-@implementation MTRClusterSmokeCOAlarm
 @implementation MTRClusterTemperatureControl
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
@@ -13169,6 +13095,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
+- (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeEventListID)
+                                             params:params];
+}
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
@@ -13231,6 +13165,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeAirQualityID)
                                         attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeAcceptedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeAirQualityID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAirQualityAttributeEventListID)
                                              params:params];
 }
 

@@ -25,7 +25,7 @@ limitations under the License.
 
   <cluster>
     <name>Temperature Control</name>
-    <domain>Home &amp; Appliances</domain>
+    <domain>Appliances</domain>
     <description>Attributes and commands for configuring the temperature control, and reporting temperature.</description>
     <code>0x0056</code>
     <define>TEMPERATURE_CONTROL_CLUSTER</define>
