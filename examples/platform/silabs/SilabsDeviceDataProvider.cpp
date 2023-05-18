@@ -318,7 +318,8 @@ CHIP_ERROR SilabsDeviceDataProvider::GetVendorName(char * buf, size_t bufSize)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         VerifyOrReturnError(buf != nullptr, CHIP_ERROR_NO_MEMORY);
-        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME, bufSize);
+        VerifyOrReturnError(bufSize > strlen(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        Platform::CopyString(buf, bufSize, CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME);
         err = CHIP_NO_ERROR;
     }
 #endif
@@ -353,7 +354,8 @@ CHIP_ERROR SilabsDeviceDataProvider::GetProductName(char * buf, size_t bufSize)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         VerifyOrReturnError(buf != nullptr, CHIP_ERROR_NO_MEMORY);
-        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME, bufSize);
+        VerifyOrReturnError(bufSize > strlen(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        Platform::CopyString(buf, bufSize, CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME);
         err = CHIP_NO_ERROR;
     }
 #endif
@@ -389,7 +391,7 @@ CHIP_ERROR SilabsDeviceDataProvider::GetHardwareVersionString(char * buf, size_t
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         VerifyOrReturnError(buf != nullptr, CHIP_ERROR_NO_MEMORY);
-        memcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING, bufSize);
+        Platform::CopyString(buf, bufSize, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
         err = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING
