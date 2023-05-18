@@ -19,13 +19,13 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <platform/ESP32/ESP32CHIPCryptoPAL.h>
 
+#include <ecdsa/ecdsa_alt.h>
 #include <mbedtls/bignum.h>
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
 #include <mbedtls/ecp.h>
 #include <mbedtls/error.h>
-#include <ecdsa/ecdsa_alt.h>
 
 // In mbedTLS 3.0.0 direct access to structure fields was replaced with using MBEDTLS_PRIVATE macro.
 #if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
@@ -84,7 +84,7 @@ CHIP_ERROR ESP32P256Keypair::Initialize(ECPKeyTarget keyTarget, int efuseBlock)
     VerifyOrExit(status == 0, error = CHIP_ERROR_INTERNAL);
 
     mInitialized = true;
-    ecdsa_ctx = nullptr;
+    ecdsa_ctx    = nullptr;
     return error;
 
 exit:
