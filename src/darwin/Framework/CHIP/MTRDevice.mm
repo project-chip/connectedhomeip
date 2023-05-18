@@ -156,6 +156,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 
 @property (nonatomic) BOOL expirationCheckScheduled;
 
+@property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
+
 /**
  * If currentReadClient is non-null, that means that we successfully
  * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
@@ -260,7 +262,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     _state = state;
     if (lastState != state) {
         if (state != MTRDeviceStateReachable) {
+            MTR_LOG_INFO("%@ Set estimated start time to nil due to state change", self);
             _estimatedStartTime = nil;
+            _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
         }
         id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
         if (delegate) {
@@ -412,8 +416,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
         MTREventPath * eventPath = eventDict[MTREventPathKey];
         BOOL isStartUpEvent = (eventPath.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID)
             && (eventPath.event.unsignedLongValue == MTREventIDTypeClusterBasicInformationEventStartUpID);
-        if (isStartUpEvent) {
-            _estimatedStartTime = nil;
+        if (isStartUpEvent && (_state == MTRDeviceStateReachable)) {
+            // StartUp event received when server resumes subscription
+            if (_estimatedStartTimeFromGeneralDiagnosticsUpTime) {
+                // If UpTime was received, make use of it as mark of system start time
+                MTR_LOG_INFO("%@ StartUp event: set estimated start time forward to %@", self,
+                    _estimatedStartTimeFromGeneralDiagnosticsUpTime);
+                _estimatedStartTime = _estimatedStartTimeFromGeneralDiagnosticsUpTime;
+            } else {
+                // If UpTime was not received, reset estimated start time in case of reboot
+                MTR_LOG_INFO("%@ StartUp event: set estimated start time to nil", self);
+                _estimatedStartTime = nil;
+            }
         }
 
         // If event time is of MTREventTimeTypeSystemUpTime type, then update estimated start time as needed
@@ -948,6 +962,26 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                     MTR_LOG_INFO("%@ report %@ value filtered - same as expected values", self, attributePath);
                 } else {
                     MTR_LOG_INFO("%@ report %@ value filtered - same values as cache", self, attributePath);
+                }
+            }
+
+            // If General Diagnostics UpTime attribute, update the estimated start time as needed.
+            if ((attributePath.cluster.unsignedLongValue == MTRClusterGeneralDiagnosticsID)
+                && (attributePath.attribute.unsignedLongValue == MTRClusterGeneralDiagnosticsAttributeUpTimeID)) {
+                // verify that the uptime is indeed the data type we want
+                if ([attributeDataValue[MTRTypeKey] isEqual:MTRUnsignedIntegerValueType]) {
+                    NSNumber * upTimeNumber = attributeDataValue[MTRValueKey];
+                    NSTimeInterval upTime = upTimeNumber.unsignedLongLongValue; // UpTime unit is defined as seconds in the spec
+                    NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-upTime];
+                    NSDate * oldSystemStartTime = _estimatedStartTime;
+                    if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
+                        MTR_LOG_INFO("%@ General Diagnostics UpTime %.3lf: estimated start time %@ => %@", self, upTime,
+                            oldSystemStartTime, potentialSystemStartTime);
+                        _estimatedStartTime = potentialSystemStartTime;
+                    }
+
+                    // Save estimate in the subscription resumption case, for when StartUp event uses it
+                    _estimatedStartTimeFromGeneralDiagnosticsUpTime = potentialSystemStartTime;
                 }
             }
         }

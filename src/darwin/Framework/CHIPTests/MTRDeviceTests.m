@@ -1543,7 +1543,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                          subscriptionEstablished:^() {
                          }];
 
-    [self waitForExpectations:@[ subscriptionDroppedExpectation, resubscriptionExpectation ] timeout:60 enforceOrder:YES];
+    [self waitForExpectations:@[ subscriptionDroppedExpectation ] timeout:60];
+
+    // Check that device resets start time on subscription drop
+    XCTAssertNil(device.estimatedStartTime);
+
+    [self waitForExpectations:@[ resubscriptionExpectation ] timeout:60];
 
     // Now make sure we ignore later tests.  Ideally we would just unsubscribe
     // or remove the delegate, but there's no good way to do that.
@@ -1557,9 +1562,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // with data versions) during the resubscribe.
     XCTAssertEqual(attributeReportsReceived, 0);
     XCTAssertEqual(eventReportsReceived, 0);
-
-    // Check that device resets start time on subscription drop
-    XCTAssertNil(device.estimatedStartTime);
 }
 
 - (void)test018_SubscriptionErrorWhenNotResubscribing
