@@ -32,6 +32,7 @@
 #include <platform/ESP32/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <platform/ESP32/ESP32BasicPacketFilters.h>
 
 #include "esp_event.h"
 #include "esp_heap_caps_init.h"
@@ -53,6 +54,7 @@ extern CHIP_ERROR InitLwIPCoreLock(void);
 }
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
+ESP32PacketFilter espfilter;
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -81,6 +83,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
+    espfilter.Init();
+    chip::Inet::UDPEndPointImplLwIP::SetQueueFilter(&espfilter);
     return CHIP_NO_ERROR;
 }
 
