@@ -29,10 +29,10 @@ import urllib.request
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
+from typing import List, Optional
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
-
 
 # Type of targets that can be re-generated
 class TargetType(Flag):
@@ -66,6 +66,42 @@ __TARGET_TYPES__ = {
     'all': TargetType.ALL,
 }
 
+class ZapInput:
+    """ZAP may be run from a .zap configuration or from zcl properties.
+
+    Running from a '.zap' configuration will load the zcl properties from
+    the '.zap' file, however it will also load cluster enabling and settings.
+
+    For `client-side` code generation, CHIP wants to explicitly not depend
+    on zap enabling/disabling as everything should be enabled.
+    """
+
+    @staticmethod
+    def FromZap(f):
+        return ZapInput(zap_file=str(f))
+
+    @staticmethod
+    def FromZcl(f):
+        return ZapInput(zcl_file=str(f))
+
+    def __init__(self, zap_file = None,  zcl_file = None):
+        if zap_file and zcl_file:
+            raise Exception("only one of zap/zcl should be specified")
+        self.zap_file = zap_file
+        self.zcl_file = zcl_file
+
+    @property
+    def value(self) -> str:
+        if self.zap_file:
+            return f"ZAP:{self.zap_file}"
+        return f"ZCL:{self.zcl_file}"
+
+    def build_command(self, script: str) -> List[str]:
+        """What command to execute for this zap input. """
+        if self.zap_file:
+            return [script, self.zap_file]
+        return [script, '-z', self.zcl_file]
+
 
 @dataclass
 class TargetRunStats:
@@ -90,7 +126,7 @@ class ZapDistinctOutput:
 class ZAPGenerateTarget:
 
     @staticmethod
-    def MatterIdlTarget(zap_config, client_side=False):
+    def MatterIdlTarget(zap_config: ZapInput, client_side=False):
         if client_side:
             return ZAPGenerateTarget(zap_config, template="src/app/zap-templates/matter-idl-client.json", output_dir=None)
         else:
@@ -98,9 +134,9 @@ class ZAPGenerateTarget:
             #       DEFAULT generation target and it needs no output_dir
             return ZAPGenerateTarget(zap_config, template=None, output_dir=None)
 
-    def __init__(self, zap_config, template, output_dir=None):
+    def __init__(self, zap_config: ZapInput, template,  output_dir=None):
         self.script = './scripts/tools/zap/generate.py'
-        self.zap_config = str(zap_config)
+        self.zap_config = zap_config
         self.template = template
 
         if output_dir:
@@ -117,7 +153,7 @@ class ZAPGenerateTarget:
             # output_directory is MIS-USED here because zap files may reside in the same
             # directory (e.g. chef) so we claim the zap config is an output directory
             # for uniqueness
-            return ZapDistinctOutput(input_template=None, output_directory=self.zap_config)
+            return ZapDistinctOutput(input_template=None, output_directory=self.zap_config.value)
         else:
             return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
 
@@ -129,7 +165,7 @@ class ZAPGenerateTarget:
     def build_cmd(self):
         """Builds the command line we would run to generate this target.
         """
-        cmd = [self.script, self.zap_config]
+        cmd = self.zap_config.build_command(self.script)
 
         if self.template:
             cmd.append('-t')
@@ -153,8 +189,8 @@ class ZAPGenerateTarget:
         subprocess.check_call(cmd)
         generate_end = time.time()
 
-        if "chef" in self.zap_config:
-            idl_path = self.zap_config.replace(".zap", ".matter")
+        if "chef" in self.zap_config.zap_file:
+            idl_path = self.zap_config.zap_file.replace(".zap", ".matter")
             target_path = os.path.join("examples",
                                        "chef",
                                        "devices",
@@ -162,7 +198,7 @@ class ZAPGenerateTarget:
             os.rename(idl_path, target_path)
         return TargetRunStats(
             generate_time=generate_end - generate_start,
-            config=self.zap_config,
+            config=self.zap_config.value,
             template=self.template,
         )
 
@@ -325,8 +361,8 @@ def getGlobalTemplatesTargets():
             template = os.path.join(
                 'examples', 'placeholder', 'linux', 'apps', example_name, 'templates', 'templates.json')
 
-            targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
-            targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
+            targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
+            targets.append(ZAPGenerateTarget(ZapInput.FromZap(filepath), output_dir=output_dir, template=template))
             continue
 
         if example_name == "chef":
@@ -348,9 +384,9 @@ def getGlobalTemplatesTargets():
         # a name like <zap-generated/foo.h>
         output_dir = os.path.join(
             'zzz_generated', generate_subdir, 'zap-generated')
-        targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
+        targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
-    targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/data_model/controller-clusters.zap', client_side=True))
+    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap('src/controller/data_model/controller-clusters.zap'), client_side=True))
 
     # This generates app headers for darwin only, for easier/clearer include
     # in .pbxproj files.
@@ -358,7 +394,7 @@ def getGlobalTemplatesTargets():
     # TODO: These files can be code generated at compile time, we should figure
     #       out a path for this codegen to not be required.
     targets.append(ZAPGenerateTarget(
-        'src/controller/data_model/controller-clusters.zap',
+        ZapInput.FromZap('src/controller/data_model/controller-clusters.zap'),
         template="src/app/zap-templates/app-templates.json",
         output_dir='zzz_generated/darwin/controller-clusters/zap-generated'))
 
@@ -395,8 +431,7 @@ def getTestsTemplatesTargets(test_target):
         if test_target == 'all' or test_target == key:
             logging.info("Found test target %s (via %s)" %
                          (key, target['template']))
-            targets.append(ZAPGenerateTarget(
-                target['zap'], template=target['template'], output_dir=target['output_dir']))
+            targets.append(ZAPGenerateTarget(ZapInput.FromZap(target['zap']), template=target['template'], output_dir=target['output_dir']))
 
     return targets
 
@@ -423,7 +458,7 @@ def getSpecificTemplatesTargets():
     for template, output_dir in templates.items():
         logging.info("Found specific template %s" % template)
         targets.append(ZAPGenerateTarget(
-            zap_filepath, template=template, output_dir=output_dir))
+            ZapInput.FromZap(zap_filepath), template=template, output_dir=output_dir))
 
     return targets
 
