@@ -1533,6 +1533,103 @@ enum class Feature : uint32_t
 };
 } // namespace AirQuality
 
+namespace SmokeCoAlarm {
+
+// Enum for AlarmStateEnum
+enum class AlarmStateEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kNormal   = 0x01,
+    kWarning  = 0x02,
+    kCritical = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for ContaminationStateEnum
+enum class ContaminationStateEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kNormal   = 0x01,
+    kLow      = 0x02,
+    kWarning  = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for EndOfServiceEnum
+enum class EndOfServiceEnum : uint8_t
+{
+    kUnknown = 0x00,
+    kExpired = 0x01,
+    kNormal  = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for ExpressedStateEnum
+enum class ExpressedStateEnum : uint8_t
+{
+    kNormal            = 0x00,
+    kSmokeAlarm        = 0x01,
+    kCOAlarm           = 0x02,
+    kBatteryAlert      = 0x03,
+    kTesting           = 0x04,
+    kHardwareFault     = 0x05,
+    kEndOfService      = 0x06,
+    kInterconnectSmoke = 0x07,
+    kInterconnectCO    = 0x08,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 9,
+};
+
+// Enum for MuteStateEnum
+enum class MuteStateEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kNotMuted = 0x01,
+    kMuted    = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for SensitivityEnum
+enum class SensitivityEnum : uint8_t
+{
+    kHigh     = 0x00,
+    kStandard = 0x01,
+    kLow      = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Bitmap for SmokeCOAlarmFeature
+enum class SmokeCOAlarmFeature : uint32_t
+{
+    kSmokeAlarm = 0x1,
+    kCoAlarm    = 0x2,
+};
+} // namespace SmokeCoAlarm
+
 namespace HepaFilterMonitoring {
 
 // Enum for ChangeIndicationEnum

@@ -641,6 +641,16 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace ModeSelect
 
+namespace SmokeCoAlarm {
+namespace Commands {
+
+namespace SelfTestRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SelfTestRequest
+
+} // namespace Commands
+} // namespace SmokeCoAlarm
+
 namespace HepaFilterMonitoring {
 namespace Commands {
 

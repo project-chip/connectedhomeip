@@ -639,6 +639,26 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
     Map<String, InteractionInfo> writeAirQualityInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("airQuality", writeAirQualityInteractionInfo);
+    Map<String, InteractionInfo> writeSmokeCoAlarmInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeSmokeCoAlarmSensitivityLevelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo smokeCoAlarmsensitivityLevelCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeSmokeCoAlarmSensitivityLevelCommandParams.put(
+        "value", smokeCoAlarmsensitivityLevelCommandParameterInfo);
+    InteractionInfo writeSmokeCoAlarmSensitivityLevelAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .writeSensitivityLevelAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeSmokeCoAlarmSensitivityLevelCommandParams);
+    writeSmokeCoAlarmInteractionInfo.put(
+        "writeSensitivityLevelAttribute",
+        writeSmokeCoAlarmSensitivityLevelAttributeInteractionInfo);
+    writeAttributeMap.put("smokeCoAlarm", writeSmokeCoAlarmInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("hepaFilterMonitoring", writeHepaFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeActivatedCarbonFilterMonitoringInteractionInfo =

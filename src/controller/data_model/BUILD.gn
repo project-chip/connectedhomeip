@@ -176,6 +176,8 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/RelativeHumidityMeasurementClient-ReadImpl.cpp",
       "jni/ScenesClient-InvokeSubscribeImpl.cpp",
       "jni/ScenesClient-ReadImpl.cpp",
+      "jni/SmokeCoAlarmClient-ReadImpl.cpp",
+      "jni/SmokeCoAlarmClient-InvokeSubscribeImpl.cpp",
       "jni/SoftwareDiagnosticsClient-InvokeSubscribeImpl.cpp",
       "jni/SoftwareDiagnosticsClient-ReadImpl.cpp",
       "jni/SwitchClient-InvokeSubscribeImpl.cpp",

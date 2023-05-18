@@ -14287,6 +14287,581 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace AirQuality
+namespace SmokeCoAlarm {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SelfTestRequest {
+struct Type;
+struct DecodableType;
+} // namespace SelfTestRequest
+
+} // namespace Commands
+
+namespace Commands {
+namespace SelfTestRequest {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SelfTestRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SelfTestRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SelfTestRequest
+} // namespace Commands
+
+namespace Attributes {
+
+namespace ExpressedState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ExpressedState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ExpressedState
+namespace SmokeState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SmokeState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SmokeState
+namespace COState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::COState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace COState
+namespace BatteryAlert {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlert::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace BatteryAlert
+namespace DeviceMuted {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::MuteStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::MuteStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::MuteStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceMuted::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DeviceMuted
+namespace TestInProgress {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TestInProgress::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TestInProgress
+namespace HardwareFaultAlert {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HardwareFaultAlert::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HardwareFaultAlert
+namespace EndOfServiceAlert {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EndOfServiceAlert::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EndOfServiceAlert
+namespace InterconnectSmokeAlarm {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InterconnectSmokeAlarm::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InterconnectSmokeAlarm
+namespace InterconnectCOAlarm {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InterconnectCOAlarm::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InterconnectCOAlarm
+namespace ContaminationState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ContaminationState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ContaminationState
+namespace SensitivityLevel {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SensitivityLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SensitivityLevel
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::ExpressedState::TypeInfo::DecodableType expressedState =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum>(0);
+        Attributes::SmokeState::TypeInfo::DecodableType smokeState =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
+        Attributes::COState::TypeInfo::DecodableType COState = static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
+        Attributes::BatteryAlert::TypeInfo::DecodableType batteryAlert =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
+        Attributes::DeviceMuted::TypeInfo::DecodableType deviceMuted =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum>(0);
+        Attributes::TestInProgress::TypeInfo::DecodableType testInProgress         = static_cast<bool>(0);
+        Attributes::HardwareFaultAlert::TypeInfo::DecodableType hardwareFaultAlert = static_cast<bool>(0);
+        Attributes::EndOfServiceAlert::TypeInfo::DecodableType endOfServiceAlert =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum>(0);
+        Attributes::InterconnectSmokeAlarm::TypeInfo::DecodableType interconnectSmokeAlarm =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
+        Attributes::InterconnectCOAlarm::TypeInfo::DecodableType interconnectCOAlarm =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
+        Attributes::ContaminationState::TypeInfo::DecodableType contaminationState =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>(0);
+        Attributes::SensitivityLevel::TypeInfo::DecodableType sensitivityLevel =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace SmokeAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SmokeAlarm
+namespace COAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::COAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::COAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace COAlarm
+namespace LowBattery {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::LowBattery::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::LowBattery::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace LowBattery
+namespace HardwareFault {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::HardwareFault::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::HardwareFault::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace HardwareFault
+namespace EndOfService {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EndOfService::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EndOfService::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace EndOfService
+namespace SelfTestComplete {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SelfTestComplete::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SelfTestComplete::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SelfTestComplete
+namespace AlarmMuted {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AlarmMuted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AlarmMuted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AlarmMuted
+namespace MuteEnded {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MuteEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MuteEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace MuteEnded
+namespace InterconnectSmokeAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectSmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectSmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace InterconnectSmokeAlarm
+namespace InterconnectCOAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectCOAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectCOAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace InterconnectCOAlarm
+namespace AllClear {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AllClear::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AllClear::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AllClear
+} // namespace Events
+} // namespace SmokeCoAlarm
 namespace HepaFilterMonitoring {
 
 namespace Commands {

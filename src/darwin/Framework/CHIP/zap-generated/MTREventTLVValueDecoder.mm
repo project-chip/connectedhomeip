@@ -1563,6 +1563,139 @@ static id _Nullable DecodeEventPayloadForAirQualityCluster(EventId aEventId, TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::SmokeCoAlarm;
+    switch (aEventId) {
+    case Events::SmokeAlarm::Id: {
+        Events::SmokeAlarm::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterSmokeAlarmEvent new];
+
+        return value;
+    }
+    case Events::COAlarm::Id: {
+        Events::COAlarm::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterCOAlarmEvent new];
+
+        return value;
+    }
+    case Events::LowBattery::Id: {
+        Events::LowBattery::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterLowBatteryEvent new];
+
+        return value;
+    }
+    case Events::HardwareFault::Id: {
+        Events::HardwareFault::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterHardwareFaultEvent new];
+
+        return value;
+    }
+    case Events::EndOfService::Id: {
+        Events::EndOfService::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterEndOfServiceEvent new];
+
+        return value;
+    }
+    case Events::SelfTestComplete::Id: {
+        Events::SelfTestComplete::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterSelfTestCompleteEvent new];
+
+        return value;
+    }
+    case Events::AlarmMuted::Id: {
+        Events::AlarmMuted::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterAlarmMutedEvent new];
+
+        return value;
+    }
+    case Events::MuteEnded::Id: {
+        Events::MuteEnded::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterMuteEndedEvent new];
+
+        return value;
+    }
+    case Events::InterconnectSmokeAlarm::Id: {
+        Events::InterconnectSmokeAlarm::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent new];
+
+        return value;
+    }
+    case Events::InterconnectCOAlarm::Id: {
+        Events::InterconnectCOAlarm::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent new];
+
+        return value;
+    }
+    case Events::AllClear::Id: {
+        Events::AllClear::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSmokeCOAlarmClusterAllClearEvent new];
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(
     EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -2743,6 +2876,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::AirQuality::Id: {
         return DecodeEventPayloadForAirQualityCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::SmokeCoAlarm::Id: {
+        return DecodeEventPayloadForSmokeCOAlarmCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);

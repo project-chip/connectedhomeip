@@ -384,6 +384,26 @@ typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttrib
 typedef void (*AirQualityClusterAirQualityEnumAttributeCallback)(void *, chip::app::Clusters::AirQuality::AirQualityEnum);
 typedef void (*NullableAirQualityClusterAirQualityEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AirQuality::AirQualityEnum> &);
+typedef void (*SmokeCOAlarmClusterAlarmStateEnumAttributeCallback)(void *, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum);
+typedef void (*NullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum> &);
+typedef void (*SmokeCOAlarmClusterContaminationStateEnumAttributeCallback)(
+    void *, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum);
+typedef void (*NullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum> &);
+typedef void (*SmokeCOAlarmClusterEndOfServiceEnumAttributeCallback)(void *, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum);
+typedef void (*NullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum> &);
+typedef void (*SmokeCOAlarmClusterExpressedStateEnumAttributeCallback)(void *,
+                                                                       chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum);
+typedef void (*NullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum> &);
+typedef void (*SmokeCOAlarmClusterMuteStateEnumAttributeCallback)(void *, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum);
+typedef void (*NullableSmokeCOAlarmClusterMuteStateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum> &);
+typedef void (*SmokeCOAlarmClusterSensitivityEnumAttributeCallback)(void *, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum);
+typedef void (*NullableSmokeCOAlarmClusterSensitivityEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum> &);
 typedef void (*HEPAFilterMonitoringClusterChangeIndicationEnumAttributeCallback)(
     void *, chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum);
 typedef void (*NullableHEPAFilterMonitoringClusterChangeIndicationEnumAttributeCallback)(
@@ -999,6 +1019,14 @@ typedef void (*AirQualityAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AirQualityAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*SmokeCOAlarmGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*SmokeCOAlarmAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*SmokeCOAlarmEventListListAttributeCallback)(void * context,
+                                                           const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*SmokeCOAlarmAttributeListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*HEPAFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*HEPAFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -7166,6 +7194,135 @@ public:
     void OnSubscriptionEstablished();
     using MTRAirQualityAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAirQualityAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SmokeCOAlarmGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SmokeCOAlarmGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<SmokeCOAlarmGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SmokeCOAlarmAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SmokeCOAlarmAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<SmokeCOAlarmAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSmokeCOAlarmEventListListAttributeCallbackBridge : public MTRCallbackBridge<SmokeCOAlarmEventListListAttributeCallback>
+{
+public:
+    MTRSmokeCOAlarmEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SmokeCOAlarmEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSmokeCOAlarmEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<SmokeCOAlarmEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRSmokeCOAlarmEventListListAttributeCallbackSubscriptionBridge : public MTRSmokeCOAlarmEventListListAttributeCallbackBridge
+{
+public:
+    MTRSmokeCOAlarmEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action,
+                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSmokeCOAlarmEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSmokeCOAlarmEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSmokeCOAlarmEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSmokeCOAlarmAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<SmokeCOAlarmAttributeListListAttributeCallback>
+{
+public:
+    MTRSmokeCOAlarmAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SmokeCOAlarmAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSmokeCOAlarmAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                            MTRActionBlock action) :
+        MTRCallbackBridge<SmokeCOAlarmAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRSmokeCOAlarmAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRSmokeCOAlarmAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRSmokeCOAlarmAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action,
+                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSmokeCOAlarmAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSmokeCOAlarmAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSmokeCOAlarmAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17935,6 +18092,410 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<SmokeCOAlarmClusterAlarmStateEnumAttributeCallback>
+{
+public:
+    MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SmokeCOAlarmClusterAlarmStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<SmokeCOAlarmClusterAlarmStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value);
+};
+
+class MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge
+{
+public:
+    MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallback>
+{
+public:
+    MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum> & value);
+};
+
+class MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<SmokeCOAlarmClusterContaminationStateEnumAttributeCallback>
+{
+public:
+    MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SmokeCOAlarmClusterContaminationStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<SmokeCOAlarmClusterContaminationStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum value);
+};
+
+class MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge
+{
+public:
+    MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallback>
+{
+public:
+    MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum> & value);
+};
+
+class MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<SmokeCOAlarmClusterEndOfServiceEnumAttributeCallback>
+{
+public:
+    MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SmokeCOAlarmClusterEndOfServiceEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<SmokeCOAlarmClusterEndOfServiceEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum value);
+};
+
+class MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackSubscriptionBridge
+    : public MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge
+{
+public:
+    MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallback>
+{
+public:
+    MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum> & value);
+};
+
+class MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<SmokeCOAlarmClusterExpressedStateEnumAttributeCallback>
+{
+public:
+    MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SmokeCOAlarmClusterExpressedStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<SmokeCOAlarmClusterExpressedStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum value);
+};
+
+class MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge
+{
+public:
+    MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallback>
+{
+public:
+    MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum> & value);
+};
+
+class MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<SmokeCOAlarmClusterMuteStateEnumAttributeCallback>
+{
+public:
+    MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SmokeCOAlarmClusterMuteStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action) :
+        MTRCallbackBridge<SmokeCOAlarmClusterMuteStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum value);
+};
+
+class MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge
+{
+public:
+    MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action,
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSmokeCOAlarmClusterMuteStateEnumAttributeCallback>
+{
+public:
+    MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterMuteStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterMuteStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum> & value);
+};
+
+class MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<SmokeCOAlarmClusterSensitivityEnumAttributeCallback>
+{
+public:
+    MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<SmokeCOAlarmClusterSensitivityEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<SmokeCOAlarmClusterSensitivityEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value);
+};
+
+class MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackSubscriptionBridge
+    : public MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge
+{
+public:
+    MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableSmokeCOAlarmClusterSensitivityEnumAttributeCallback>
+{
+public:
+    MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterSensitivityEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<NullableSmokeCOAlarmClusterSensitivityEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum> & value);
+};
+
+class MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

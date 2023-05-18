@@ -72,6 +72,7 @@
         "relative-humidity-measurement-cluster.xml",
         "replacable-monitoring-cluster.xml",
         "scene.xml",
+        "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",
         "switch-cluster.xml",
         "target-navigator-cluster.xml",

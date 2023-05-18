@@ -14040,6 +14040,357 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
+  public static class SmokeCoAlarmCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 92L;
+
+    public SmokeCoAlarmCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void selfTestRequest(DefaultClusterCallback callback) {
+      selfTestRequest(chipClusterPtr, callback, null);
+    }
+
+    public void selfTestRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+
+      selfTestRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
+    }
+
+    private native void selfTestRequest(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readExpressedStateAttribute(IntegerAttributeCallback callback) {
+      readExpressedStateAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeExpressedStateAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeExpressedStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readSmokeStateAttribute(IntegerAttributeCallback callback) {
+      readSmokeStateAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSmokeStateAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSmokeStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readCOStateAttribute(IntegerAttributeCallback callback) {
+      readCOStateAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeCOStateAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeCOStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readBatteryAlertAttribute(IntegerAttributeCallback callback) {
+      readBatteryAlertAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeBatteryAlertAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeBatteryAlertAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readDeviceMutedAttribute(IntegerAttributeCallback callback) {
+      readDeviceMutedAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeDeviceMutedAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeDeviceMutedAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readTestInProgressAttribute(BooleanAttributeCallback callback) {
+      readTestInProgressAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeTestInProgressAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTestInProgressAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readHardwareFaultAlertAttribute(BooleanAttributeCallback callback) {
+      readHardwareFaultAlertAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeHardwareFaultAlertAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeHardwareFaultAlertAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEndOfServiceAlertAttribute(IntegerAttributeCallback callback) {
+      readEndOfServiceAlertAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEndOfServiceAlertAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEndOfServiceAlertAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readInterconnectSmokeAlarmAttribute(IntegerAttributeCallback callback) {
+      readInterconnectSmokeAlarmAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeInterconnectSmokeAlarmAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeInterconnectSmokeAlarmAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readInterconnectCOAlarmAttribute(IntegerAttributeCallback callback) {
+      readInterconnectCOAlarmAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeInterconnectCOAlarmAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeInterconnectCOAlarmAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readContaminationStateAttribute(IntegerAttributeCallback callback) {
+      readContaminationStateAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeContaminationStateAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeContaminationStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readSensitivityLevelAttribute(IntegerAttributeCallback callback) {
+      readSensitivityLevelAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeSensitivityLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeSensitivityLevelAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeSensitivityLevelAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeSensitivityLevelAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeSensitivityLevelAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSensitivityLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readExpressedStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeExpressedStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSmokeStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeSmokeStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readCOStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeCOStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readBatteryAlertAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeBatteryAlertAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readDeviceMutedAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeDeviceMutedAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readTestInProgressAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void subscribeTestInProgressAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readHardwareFaultAlertAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void subscribeHardwareFaultAlertAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readEndOfServiceAlertAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeEndOfServiceAlertAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readInterconnectSmokeAlarmAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeInterconnectSmokeAlarmAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readInterconnectCOAlarmAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeInterconnectCOAlarmAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readContaminationStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeContaminationStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSensitivityLevelAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeSensitivityLevelAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeSensitivityLevelAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
   public static class HepaFilterMonitoringCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 113L;
 

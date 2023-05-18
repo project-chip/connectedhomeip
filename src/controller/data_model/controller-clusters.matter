@@ -2800,6 +2800,114 @@ client cluster AirQuality = 91 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
+client cluster SmokeCoAlarm = 92 {
+  enum AlarmStateEnum : ENUM8 {
+    kUnknown = 0;
+    kNormal = 1;
+    kWarning = 2;
+    kCritical = 3;
+  }
+
+  enum ContaminationStateEnum : ENUM8 {
+    kUnknown = 0;
+    kNormal = 1;
+    kLow = 2;
+    kWarning = 3;
+    kCritical = 4;
+  }
+
+  enum EndOfServiceEnum : ENUM8 {
+    kUnknown = 0;
+    kExpired = 1;
+    kNormal = 2;
+  }
+
+  enum ExpressedStateEnum : ENUM8 {
+    kNormal = 0;
+    kSmokeAlarm = 1;
+    kCOAlarm = 2;
+    kBatteryAlert = 3;
+    kTesting = 4;
+    kHardwareFault = 5;
+    kEndOfService = 6;
+    kInterconnectSmoke = 7;
+    kInterconnectCO = 8;
+  }
+
+  enum MuteStateEnum : ENUM8 {
+    kUnknown = 0;
+    kNotMuted = 1;
+    kMuted = 2;
+  }
+
+  enum SensitivityEnum : ENUM8 {
+    kHigh = 0;
+    kStandard = 1;
+    kLow = 2;
+  }
+
+  bitmap SmokeCOAlarmFeature : BITMAP32 {
+    kSmokeAlarm = 0x1;
+    kCoAlarm = 0x2;
+  }
+
+  info event SmokeAlarm = 0 {
+  }
+
+  info event COAlarm = 1 {
+  }
+
+  info event LowBattery = 2 {
+  }
+
+  info event HardwareFault = 3 {
+  }
+
+  info event EndOfService = 4 {
+  }
+
+  info event SelfTestComplete = 5 {
+  }
+
+  info event AlarmMuted = 6 {
+  }
+
+  info event MuteEnded = 7 {
+  }
+
+  info event InterconnectSmokeAlarm = 8 {
+  }
+
+  info event InterconnectCOAlarm = 9 {
+  }
+
+  info event AllClear = 10 {
+  }
+
+  readonly attribute ExpressedStateEnum expressedState = 0;
+  readonly attribute optional AlarmStateEnum smokeState = 1;
+  readonly attribute optional AlarmStateEnum COState = 2;
+  readonly attribute AlarmStateEnum batteryAlert = 3;
+  readonly attribute optional MuteStateEnum deviceMuted = 4;
+  readonly attribute boolean testInProgress = 5;
+  readonly attribute boolean hardwareFaultAlert = 6;
+  readonly attribute EndOfServiceEnum endOfServiceAlert = 7;
+  readonly attribute optional AlarmStateEnum interconnectSmokeAlarm = 8;
+  readonly attribute optional AlarmStateEnum interconnectCOAlarm = 9;
+  readonly attribute optional ContaminationStateEnum contaminationState = 10;
+  attribute optional SensitivityEnum sensitivityLevel = 11;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  /** This command SHALL initiate a device self-test. */
+  command SelfTestRequest(): DefaultSuccess = 0;
+}
+
 /** Attributes and commands for monitoring HEPA filters in a device */
 client cluster HepaFilterMonitoring = 113 {
   enum ChangeIndicationEnum : ENUM8 {

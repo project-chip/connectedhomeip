@@ -963,6 +963,149 @@ public class ChipEventStructs {
     }
   }
 
+  public static class SmokeCoAlarmClusterSmokeAlarmEvent {
+
+    public SmokeCoAlarmClusterSmokeAlarmEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterSmokeAlarmEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SmokeCoAlarmClusterCOAlarmEvent {
+
+    public SmokeCoAlarmClusterCOAlarmEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterCOAlarmEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SmokeCoAlarmClusterLowBatteryEvent {
+
+    public SmokeCoAlarmClusterLowBatteryEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterLowBatteryEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SmokeCoAlarmClusterHardwareFaultEvent {
+
+    public SmokeCoAlarmClusterHardwareFaultEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterHardwareFaultEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SmokeCoAlarmClusterEndOfServiceEvent {
+
+    public SmokeCoAlarmClusterEndOfServiceEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterEndOfServiceEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SmokeCoAlarmClusterSelfTestCompleteEvent {
+
+    public SmokeCoAlarmClusterSelfTestCompleteEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterSelfTestCompleteEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SmokeCoAlarmClusterAlarmMutedEvent {
+
+    public SmokeCoAlarmClusterAlarmMutedEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterAlarmMutedEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SmokeCoAlarmClusterMuteEndedEvent {
+
+    public SmokeCoAlarmClusterMuteEndedEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterMuteEndedEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SmokeCoAlarmClusterInterconnectSmokeAlarmEvent {
+
+    public SmokeCoAlarmClusterInterconnectSmokeAlarmEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterInterconnectSmokeAlarmEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SmokeCoAlarmClusterInterconnectCOAlarmEvent {
+
+    public SmokeCoAlarmClusterInterconnectCOAlarmEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterInterconnectCOAlarmEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class SmokeCoAlarmClusterAllClearEvent {
+
+    public SmokeCoAlarmClusterAllClearEvent() {}
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("SmokeCoAlarmClusterAllClearEvent {\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class DoorLockClusterDoorLockAlarmEvent {
     public Integer alarmCode;
 

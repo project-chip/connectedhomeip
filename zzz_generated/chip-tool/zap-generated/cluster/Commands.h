@@ -75,6 +75,7 @@
 | IcdManagement                                                       | 0x0046 |
 | ModeSelect                                                          | 0x0050 |
 | AirQuality                                                          | 0x005B |
+| SmokeCoAlarm                                                        | 0x005C |
 | HepaFilterMonitoring                                                | 0x0071 |
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
 | CeramicFilterMonitoring                                             | 0x0073 |
@@ -4052,6 +4053,76 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster SmokeCoAlarm                                                | 0x005C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * SelfTestRequest                                                   |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ExpressedState                                                    | 0x0000 |
+| * SmokeState                                                        | 0x0001 |
+| * COState                                                           | 0x0002 |
+| * BatteryAlert                                                      | 0x0003 |
+| * DeviceMuted                                                       | 0x0004 |
+| * TestInProgress                                                    | 0x0005 |
+| * HardwareFaultAlert                                                | 0x0006 |
+| * EndOfServiceAlert                                                 | 0x0007 |
+| * InterconnectSmokeAlarm                                            | 0x0008 |
+| * InterconnectCOAlarm                                               | 0x0009 |
+| * ContaminationState                                                | 0x000A |
+| * SensitivityLevel                                                  | 0x000B |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * SmokeAlarm                                                        | 0x0000 |
+| * COAlarm                                                           | 0x0001 |
+| * LowBattery                                                        | 0x0002 |
+| * HardwareFault                                                     | 0x0003 |
+| * EndOfService                                                      | 0x0004 |
+| * SelfTestComplete                                                  | 0x0005 |
+| * AlarmMuted                                                        | 0x0006 |
+| * MuteEnded                                                         | 0x0007 |
+| * InterconnectSmokeAlarm                                            | 0x0008 |
+| * InterconnectCOAlarm                                               | 0x0009 |
+| * AllClear                                                          | 0x000A |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command SelfTestRequest
+ */
+class SmokeCoAlarmSelfTestRequest : public ClusterCommand
+{
+public:
+    SmokeCoAlarmSelfTestRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("self-test-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000005C) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x0000005C, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000005C) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x0000005C, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster HepaFilterMonitoring                                        | 0x0071 |
@@ -12906,6 +12977,135 @@ void registerClusterAirQuality(Commands & commands, CredentialIssuerCommands * c
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterSmokeCoAlarm(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::SmokeCoAlarm;
+
+    const char * clusterName = "SmokeCoAlarm";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),          //
+        make_unique<SmokeCoAlarmSelfTestRequest>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "expressed-state", Attributes::ExpressedState::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "smoke-state", Attributes::SmokeState::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "costate", Attributes::COState::Id, credsIssuerConfig),                                 //
+        make_unique<ReadAttribute>(Id, "battery-alert", Attributes::BatteryAlert::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "device-muted", Attributes::DeviceMuted::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "test-in-progress", Attributes::TestInProgress::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "hardware-fault-alert", Attributes::HardwareFaultAlert::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "end-of-service-alert", Attributes::EndOfServiceAlert::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "interconnect-smoke-alarm", Attributes::InterconnectSmokeAlarm::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "interconnect-coalarm", Attributes::InterconnectCOAlarm::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "contamination-state", Attributes::ContaminationState::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "sensitivity-level", Attributes::SensitivityLevel::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum>>(
+            Id, "expressed-state", 0, UINT8_MAX, Attributes::ExpressedState::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>>(
+            Id, "smoke-state", 0, UINT8_MAX, Attributes::SmokeState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>>(
+            Id, "costate", 0, UINT8_MAX, Attributes::COState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>>(
+            Id, "battery-alert", 0, UINT8_MAX, Attributes::BatteryAlert::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum>>(
+            Id, "device-muted", 0, UINT8_MAX, Attributes::DeviceMuted::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "test-in-progress", 0, 1, Attributes::TestInProgress::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "hardware-fault-alert", 0, 1, Attributes::HardwareFaultAlert::Id,
+                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum>>(
+            Id, "end-of-service-alert", 0, UINT8_MAX, Attributes::EndOfServiceAlert::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>>(
+            Id, "interconnect-smoke-alarm", 0, UINT8_MAX, Attributes::InterconnectSmokeAlarm::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>>(
+            Id, "interconnect-coalarm", 0, UINT8_MAX, Attributes::InterconnectCOAlarm::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>>(
+            Id, "contamination-state", 0, UINT8_MAX, Attributes::ContaminationState::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>>(
+            Id, "sensitivity-level", 0, UINT8_MAX, Attributes::SensitivityLevel::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                             //
+        make_unique<SubscribeAttribute>(Id, "expressed-state", Attributes::ExpressedState::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "smoke-state", Attributes::SmokeState::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "costate", Attributes::COState::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "battery-alert", Attributes::BatteryAlert::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "device-muted", Attributes::DeviceMuted::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "test-in-progress", Attributes::TestInProgress::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "hardware-fault-alert", Attributes::HardwareFaultAlert::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "end-of-service-alert", Attributes::EndOfServiceAlert::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "interconnect-smoke-alarm", Attributes::InterconnectSmokeAlarm::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "interconnect-coalarm", Attributes::InterconnectCOAlarm::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "contamination-state", Attributes::ContaminationState::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "sensitivity-level", Attributes::SensitivityLevel::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                      //
+        make_unique<ReadEvent>(Id, "smoke-alarm", Events::SmokeAlarm::Id, credsIssuerConfig),                               //
+        make_unique<ReadEvent>(Id, "coalarm", Events::COAlarm::Id, credsIssuerConfig),                                      //
+        make_unique<ReadEvent>(Id, "low-battery", Events::LowBattery::Id, credsIssuerConfig),                               //
+        make_unique<ReadEvent>(Id, "hardware-fault", Events::HardwareFault::Id, credsIssuerConfig),                         //
+        make_unique<ReadEvent>(Id, "end-of-service", Events::EndOfService::Id, credsIssuerConfig),                          //
+        make_unique<ReadEvent>(Id, "self-test-complete", Events::SelfTestComplete::Id, credsIssuerConfig),                  //
+        make_unique<ReadEvent>(Id, "alarm-muted", Events::AlarmMuted::Id, credsIssuerConfig),                               //
+        make_unique<ReadEvent>(Id, "mute-ended", Events::MuteEnded::Id, credsIssuerConfig),                                 //
+        make_unique<ReadEvent>(Id, "interconnect-smoke-alarm", Events::InterconnectSmokeAlarm::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "interconnect-coalarm", Events::InterconnectCOAlarm::Id, credsIssuerConfig),             //
+        make_unique<ReadEvent>(Id, "all-clear", Events::AllClear::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeEvent>(Id, "smoke-alarm", Events::SmokeAlarm::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeEvent>(Id, "coalarm", Events::COAlarm::Id, credsIssuerConfig),                                 //
+        make_unique<SubscribeEvent>(Id, "low-battery", Events::LowBattery::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeEvent>(Id, "hardware-fault", Events::HardwareFault::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeEvent>(Id, "end-of-service", Events::EndOfService::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeEvent>(Id, "self-test-complete", Events::SelfTestComplete::Id, credsIssuerConfig),             //
+        make_unique<SubscribeEvent>(Id, "alarm-muted", Events::AlarmMuted::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeEvent>(Id, "mute-ended", Events::MuteEnded::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeEvent>(Id, "interconnect-smoke-alarm", Events::InterconnectSmokeAlarm::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "interconnect-coalarm", Events::InterconnectCOAlarm::Id, credsIssuerConfig),        //
+        make_unique<SubscribeEvent>(Id, "all-clear", Events::AllClear::Id, credsIssuerConfig),                              //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterHepaFilterMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::HepaFilterMonitoring;
@@ -17917,6 +18117,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterIcdManagement(commands, credsIssuerConfig);
     registerClusterModeSelect(commands, credsIssuerConfig);
     registerClusterAirQuality(commands, credsIssuerConfig);
+    registerClusterSmokeCoAlarm(commands, credsIssuerConfig);
     registerClusterHepaFilterMonitoring(commands, credsIssuerConfig);
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
     registerClusterCeramicFilterMonitoring(commands, credsIssuerConfig);

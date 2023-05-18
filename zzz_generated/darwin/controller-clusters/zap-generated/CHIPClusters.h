@@ -384,6 +384,15 @@ public:
     ~AirQualityCluster() {}
 };
 
+class DLL_EXPORT SmokeCoAlarmCluster : public ClusterBase
+{
+public:
+    SmokeCoAlarmCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~SmokeCoAlarmCluster() {}
+};
+
 class DLL_EXPORT HepaFilterMonitoringCluster : public ClusterBase
 {
 public:

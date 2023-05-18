@@ -679,6 +679,50 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSArray * _Nonnull semanticTags API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterSmokeAlarmEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterCOAlarmEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterLowBatteryEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterHardwareFaultEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterEndOfServiceEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterSelfTestCompleteEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterAlarmMutedEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterMuteEndedEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterAllClearEvent : NSObject <NSCopying>
+@end
+
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDoorLockClusterCredentialStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull credentialType API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));

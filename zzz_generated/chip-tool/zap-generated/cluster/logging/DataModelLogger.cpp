@@ -3522,6 +3522,92 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::SmokeAlarm::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const SmokeCoAlarm::Events::COAlarm::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::LowBattery::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::HardwareFault::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::EndOfService::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::SelfTestComplete::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::AlarmMuted::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::MuteEnded::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::InterconnectSmokeAlarm::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SmokeCoAlarm::Events::InterconnectCOAlarm::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const SmokeCoAlarm::Events::AllClear::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DoorLock::Events::DoorLockAlarm::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -7565,6 +7651,102 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case AirQuality::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case SmokeCoAlarm::Id: {
+        switch (path.mAttributeId)
+        {
+        case SmokeCoAlarm::Attributes::ExpressedState::Id: {
+            chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ExpressedState", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::SmokeState::Id: {
+            chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SmokeState", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::COState::Id: {
+            chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("COState", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::BatteryAlert::Id: {
+            chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BatteryAlert", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::DeviceMuted::Id: {
+            chip::app::Clusters::SmokeCoAlarm::MuteStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DeviceMuted", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::TestInProgress::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestInProgress", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::HardwareFaultAlert::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HardwareFaultAlert", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::EndOfServiceAlert::Id: {
+            chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EndOfServiceAlert", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id: {
+            chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InterconnectSmokeAlarm", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id: {
+            chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InterconnectCOAlarm", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::ContaminationState::Id: {
+            chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ContaminationState", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::SensitivityLevel::Id: {
+            chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SensitivityLevel", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case SmokeCoAlarm::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -12559,6 +12741,67 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StateChange", 1, value);
+        }
+        }
+        break;
+    }
+    case SmokeCoAlarm::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case SmokeCoAlarm::Events::SmokeAlarm::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::SmokeAlarm::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SmokeAlarm", 1, value);
+        }
+        case SmokeCoAlarm::Events::COAlarm::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::COAlarm::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("COAlarm", 1, value);
+        }
+        case SmokeCoAlarm::Events::LowBattery::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::LowBattery::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LowBattery", 1, value);
+        }
+        case SmokeCoAlarm::Events::HardwareFault::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::HardwareFault::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HardwareFault", 1, value);
+        }
+        case SmokeCoAlarm::Events::EndOfService::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::EndOfService::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EndOfService", 1, value);
+        }
+        case SmokeCoAlarm::Events::SelfTestComplete::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::SelfTestComplete::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SelfTestComplete", 1, value);
+        }
+        case SmokeCoAlarm::Events::AlarmMuted::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::AlarmMuted::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AlarmMuted", 1, value);
+        }
+        case SmokeCoAlarm::Events::MuteEnded::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::MuteEnded::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MuteEnded", 1, value);
+        }
+        case SmokeCoAlarm::Events::InterconnectSmokeAlarm::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::InterconnectSmokeAlarm::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InterconnectSmokeAlarm", 1, value);
+        }
+        case SmokeCoAlarm::Events::InterconnectCOAlarm::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::InterconnectCOAlarm::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("InterconnectCOAlarm", 1, value);
+        }
+        case SmokeCoAlarm::Events::AllClear::Id: {
+            chip::app::Clusters::SmokeCoAlarm::Events::AllClear::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AllClear", 1, value);
         }
         }
         break;

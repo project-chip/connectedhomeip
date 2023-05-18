@@ -7877,6 +7877,243 @@ public class ClusterReadMapping {
     return result;
   }
 
+  private static Map<String, InteractionInfo> readSmokeCoAlarmInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readSmokeCoAlarmExpressedStateCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmExpressedStateAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readExpressedStateAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmExpressedStateCommandParams);
+    result.put(
+        "readExpressedStateAttribute", readSmokeCoAlarmExpressedStateAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmSmokeStateCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmSmokeStateAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readSmokeStateAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmSmokeStateCommandParams);
+    result.put("readSmokeStateAttribute", readSmokeCoAlarmSmokeStateAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmCOStateCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmCOStateAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readCOStateAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmCOStateCommandParams);
+    result.put("readCOStateAttribute", readSmokeCoAlarmCOStateAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmBatteryAlertCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmBatteryAlertAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readBatteryAlertAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmBatteryAlertCommandParams);
+    result.put("readBatteryAlertAttribute", readSmokeCoAlarmBatteryAlertAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmDeviceMutedCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmDeviceMutedAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readDeviceMutedAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmDeviceMutedCommandParams);
+    result.put("readDeviceMutedAttribute", readSmokeCoAlarmDeviceMutedAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmTestInProgressCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmTestInProgressAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readTestInProgressAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readSmokeCoAlarmTestInProgressCommandParams);
+    result.put(
+        "readTestInProgressAttribute", readSmokeCoAlarmTestInProgressAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmHardwareFaultAlertCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmHardwareFaultAlertAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readHardwareFaultAlertAttribute(
+                      (ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readSmokeCoAlarmHardwareFaultAlertCommandParams);
+    result.put(
+        "readHardwareFaultAlertAttribute",
+        readSmokeCoAlarmHardwareFaultAlertAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmEndOfServiceAlertCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmEndOfServiceAlertAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readEndOfServiceAlertAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmEndOfServiceAlertCommandParams);
+    result.put(
+        "readEndOfServiceAlertAttribute",
+        readSmokeCoAlarmEndOfServiceAlertAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmInterconnectSmokeAlarmCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmInterconnectSmokeAlarmAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readInterconnectSmokeAlarmAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmInterconnectSmokeAlarmCommandParams);
+    result.put(
+        "readInterconnectSmokeAlarmAttribute",
+        readSmokeCoAlarmInterconnectSmokeAlarmAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmInterconnectCOAlarmCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmInterconnectCOAlarmAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readInterconnectCOAlarmAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmInterconnectCOAlarmCommandParams);
+    result.put(
+        "readInterconnectCOAlarmAttribute",
+        readSmokeCoAlarmInterconnectCOAlarmAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmContaminationStateCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmContaminationStateAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readContaminationStateAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmContaminationStateCommandParams);
+    result.put(
+        "readContaminationStateAttribute",
+        readSmokeCoAlarmContaminationStateAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmSensitivityLevelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmSensitivityLevelAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readSensitivityLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmSensitivityLevelCommandParams);
+    result.put(
+        "readSensitivityLevelAttribute", readSmokeCoAlarmSensitivityLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.SmokeCoAlarmCluster.GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedSmokeCoAlarmClusterGeneratedCommandListAttributeCallback(),
+            readSmokeCoAlarmGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readSmokeCoAlarmGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.SmokeCoAlarmCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedSmokeCoAlarmClusterAcceptedCommandListAttributeCallback(),
+            readSmokeCoAlarmAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readSmokeCoAlarmAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.SmokeCoAlarmCluster.EventListAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedSmokeCoAlarmClusterEventListAttributeCallback(),
+            readSmokeCoAlarmEventListCommandParams);
+    result.put("readEventListAttribute", readSmokeCoAlarmEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.SmokeCoAlarmCluster.AttributeListAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping.DelegatedSmokeCoAlarmClusterAttributeListAttributeCallback(),
+            readSmokeCoAlarmAttributeListCommandParams);
+    result.put("readAttributeListAttribute", readSmokeCoAlarmAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readSmokeCoAlarmFeatureMapCommandParams);
+    result.put("readFeatureMapAttribute", readSmokeCoAlarmFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSmokeCoAlarmClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSmokeCoAlarmClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readSmokeCoAlarmClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute", readSmokeCoAlarmClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
   private static Map<String, InteractionInfo> readHepaFilterMonitoringInteractionInfo() {
     Map<String, InteractionInfo> result = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readHepaFilterMonitoringConditionCommandParams =
@@ -19288,6 +19525,7 @@ public class ClusterReadMapping {
         put("icdManagement", readIcdManagementInteractionInfo());
         put("modeSelect", readModeSelectInteractionInfo());
         put("airQuality", readAirQualityInteractionInfo());
+        put("smokeCoAlarm", readSmokeCoAlarmInteractionInfo());
         put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());
         put(
             "activatedCarbonFilterMonitoring",
