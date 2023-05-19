@@ -1890,17 +1890,17 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("TemperatureLevelStruct.label", "label", value.isMember("label")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("TemperatureLevelStruct.tempLevel", "tempLevel", value.isMember("tempLevel")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TemperatureLevelStruct.temperatureLevel", "temperatureLevel",
+                                                                  value.isMember("temperatureLevel")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "label");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
     valueCopy.removeMember("label");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tempLevel");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tempLevel, value["tempLevel"]));
-    valueCopy.removeMember("tempLevel");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "temperatureLevel");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.temperatureLevel, value["temperatureLevel"]));
+    valueCopy.removeMember("temperatureLevel");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -1908,7 +1908,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.label);
-    ComplexArgumentParser::Finalize(request.tempLevel);
+    ComplexArgumentParser::Finalize(request.temperatureLevel);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

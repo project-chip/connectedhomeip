@@ -12271,12 +12271,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jobject newElement_0;
                 jobject newElement_0_label;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.label, newElement_0_label));
-                jobject newElement_0_tempLevel;
-                std::string newElement_0_tempLevelClassName     = "java/lang/Integer";
-                std::string newElement_0_tempLevelCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_tempLevelClassName.c_str(),
-                                                                              newElement_0_tempLevelCtorSignature.c_str(),
-                                                                              entry_0.tempLevel, newElement_0_tempLevel);
+                jobject newElement_0_temperatureLevel;
+                std::string newElement_0_temperatureLevelClassName     = "java/lang/Integer";
+                std::string newElement_0_temperatureLevelCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_temperatureLevelClassName.c_str(), newElement_0_temperatureLevelCtorSignature.c_str(),
+                    entry_0.temperatureLevel, newElement_0_temperatureLevel);
 
                 jclass temperatureLevelStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -12296,7 +12296,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 newElement_0 = env->NewObject(temperatureLevelStructStructClass_1, temperatureLevelStructStructCtor_1,
-                                              newElement_0_label, newElement_0_tempLevel);
+                                              newElement_0_label, newElement_0_temperatureLevel);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

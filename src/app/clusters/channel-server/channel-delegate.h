@@ -44,7 +44,7 @@ public:
     virtual bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) = 0;
     virtual bool HandleSkipChannel(const int16_t & count)                                                = 0;
 
-    bool HasFeature(chip::EndpointId endpoint, ChannelFeature feature);
+    bool HasFeature(chip::EndpointId endpoint, Feature feature);
     virtual uint32_t GetFeatureMap(chip::EndpointId endpoint) = 0;
 
     virtual ~Delegate() = default;

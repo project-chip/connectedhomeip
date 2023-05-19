@@ -1223,7 +1223,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
     Attributes::MinLevel::Get(endpoint, &state->minLevel);
     Attributes::MaxLevel::Get(endpoint, &state->maxLevel);
 
-    if (LevelControlHasFeature(endpoint, LevelControlFeature::kLighting))
+    if (LevelControlHasFeature(endpoint, Feature::kLighting))
     {
         if (state->minLevel < LEVEL_CONTROL_LIGHTING_MIN_LEVEL)
         {
@@ -1322,7 +1322,7 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 
 void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {}
 
-bool LevelControlHasFeature(EndpointId endpoint, LevelControlFeature feature)
+bool LevelControlHasFeature(EndpointId endpoint, Feature feature)
 {
     bool success;
     uint32_t featureMap;

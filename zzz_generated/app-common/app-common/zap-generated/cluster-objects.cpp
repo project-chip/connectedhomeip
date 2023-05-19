@@ -11432,7 +11432,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kLabel), label));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kTempLevel), tempLevel));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kTemperatureLevel), temperatureLevel));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -11455,8 +11455,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kLabel):
             ReturnErrorOnFailure(DataModel::Decode(reader, label));
             break;
-        case to_underlying(Fields::kTempLevel):
-            ReturnErrorOnFailure(DataModel::Decode(reader, tempLevel));
+        case to_underlying(Fields::kTemperatureLevel):
+            ReturnErrorOnFailure(DataModel::Decode(reader, temperatureLevel));
             break;
         default:
             break;

@@ -14219,15 +14219,15 @@ namespace Structs {
 namespace TemperatureLevelStruct {
 enum class Fields : uint8_t
 {
-    kLabel     = 0,
-    kTempLevel = 1,
+    kLabel            = 0,
+    kTemperatureLevel = 1,
 };
 
 struct Type
 {
 public:
     chip::CharSpan label;
-    uint8_t tempLevel = static_cast<uint8_t>(0);
+    uint8_t temperatureLevel = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
