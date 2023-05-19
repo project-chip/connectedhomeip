@@ -16692,75 +16692,10 @@ void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterViewSceneResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
-    }
-    {
-        if (data.transitionTime.HasValue()) {
-            response.transitionTime = [NSNumber numberWithUnsignedShort:data.transitionTime.Value()];
-        } else {
-            response.transitionTime = nil;
-        }
-    }
-    {
-        if (data.sceneName.HasValue()) {
-            response.sceneName = [[NSString alloc] initWithBytes:data.sceneName.Value().data()
-                                                          length:data.sceneName.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.sceneName = nil;
-        }
-    }
-    {
-        if (data.extensionFieldSets.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.extensionFieldSets.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRScenesClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRScenesClusterExtensionFieldSet new];
-                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
-                    { // Scope for our temporary variables
-                        auto * array_3 = [NSMutableArray new];
-                        auto iter_3 = entry_1.attributeValueList.begin();
-                        while (iter_3.Next()) {
-                            auto & entry_3 = iter_3.GetValue();
-                            MTRScenesClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
-                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
-                            [array_3 addObject:newElement_3];
-                        }
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            OnFailureFn(context, err);
-                            return;
-                        }
-                        newElement_1.attributeValueList = array_3;
-                    }
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.extensionFieldSets = array_1;
-            }
-        } else {
-            response.extensionFieldSets = nil;
-        }
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
     DispatchSuccess(context, response);
 };
@@ -16829,82 +16764,10 @@ void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType & data)
 {
     auto * response = [MTRScenesClusterEnhancedViewSceneResponseParams new];
-<<<<<<< HEAD
     CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
     if (err != CHIP_NO_ERROR) {
         OnFailureFn(context, err);
         return;
-=======
-    {
-        response.status = [NSNumber numberWithUnsignedChar:data.status];
-    }
-    {
-        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
-    }
-    {
-        response.sceneID = [NSNumber numberWithUnsignedChar:data.sceneID];
-    }
-    {
-        if (data.transitionTime.HasValue()) {
-            response.transitionTime = [NSNumber numberWithUnsignedShort:data.transitionTime.Value()];
-        } else {
-            response.transitionTime = nil;
-        }
-    }
-    {
-        if (data.sceneName.HasValue()) {
-            response.sceneName = [[NSString alloc] initWithBytes:data.sceneName.Value().data()
-                                                          length:data.sceneName.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
-        } else {
-            response.sceneName = nil;
-        }
-    }
-    {
-        if (data.extensionFieldSets.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = data.extensionFieldSets.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRScenesClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRScenesClusterExtensionFieldSet new];
-                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
-                    { // Scope for our temporary variables
-                        auto * array_3 = [NSMutableArray new];
-                        auto iter_3 = entry_1.attributeValueList.begin();
-                        while (iter_3.Next()) {
-                            auto & entry_3 = iter_3.GetValue();
-                            MTRScenesClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
-                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
-                            [array_3 addObject:newElement_3];
-                        }
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            OnFailureFn(context, err);
-                            return;
-                        }
-                        newElement_1.attributeValueList = array_3;
-                    }
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    OnFailureFn(context, err);
-                    return;
-                }
-                response.extensionFieldSets = array_1;
-            }
-        } else {
-            response.extensionFieldSets = nil;
-        }
->>>>>>> 21c7fc5fc4 (Modified AttribueValue in Scenes::AttributeValuePair to now be a uint32_t according to upcoming spec change)
     }
     DispatchSuccess(context, response);
 };
