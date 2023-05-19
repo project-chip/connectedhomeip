@@ -1,6 +1,4 @@
 {{> header}}
-{{#if_enabled_clusters side='client'}}
-
 package chip.devicecontroller;
 
 import javax.annotation.Nullable;
@@ -247,4 +245,4 @@ public class ChipClusters {
   {{/not_last}}
   {{/zcl_clusters}}
 }
-{{/if_enabled_clusters}}
+
