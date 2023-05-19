@@ -2781,7 +2781,7 @@ client cluster TemperatureControl = 86 {
 
   struct TemperatureLevelStruct {
     char_string<64> label = 0;
-    int8u tempLevel = 1;
+    int8u temperatureLevel = 1;
   }
 
   readonly attribute optional int16s temperatureSetpoint = 0;

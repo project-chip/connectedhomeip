@@ -15149,11 +15149,11 @@ class TemperatureControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="label", Tag=0, Type=str),
-                        ClusterObjectFieldDescriptor(Label="tempLevel", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="temperatureLevel", Tag=1, Type=uint),
                     ])
 
             label: 'str' = ""
-            tempLevel: 'uint' = 0
+            temperatureLevel: 'uint' = 0
 
     class Commands:
         @dataclass
