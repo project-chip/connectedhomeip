@@ -15,19 +15,16 @@
 
 3. Flash Tools
 
-    - [Flash tool for EFR32 Device](../general/FLASH_SILABS_DEVICE.md)
+    - [Flash tool for EFR32 and SiWx917 Devices](../general/FLASH_SILABS_DEVICE.md)
 
-    Simplicity Commander standalone or Simplicity Studio is used to flash
-    Silicon Labs hardware with firmware images for the RCP and the Matter
-    Accessory Device.
+        Simplicity Commander standalone or Simplicity Studio can be used to flash Silicon Labs hardware with firmware images for the RCP and the Matter Accessory Device.
 
-    - [Flash tool for SiWx917 SoC Device](../general/FLASH_SILABS_SiWx917_SOC_DEVICE.md)
+    - [Additional Flash tools for SiWx917 SoC Device](../general/FLASH_SILABS_SiWx917_SOC_DEVICE.md)
 
-    The Ozone Debugger can be configured to flash the application for the SiWx917 SoC device.
+        The Ozone Debugger can be configured to flash the application for the SiWx917 SoC device.
 	
-    > **Note:** 
-    >    1. Simplicity Studio and Commander tools support is not yet added for the SiWx917 SoC device.
-    >    2. The SiWx917 SoC device is not yet officially added in Ozone, but it can be configured in Ozone.
+        > **Note:** 
+        > The SiWx917 SoC device is not yet officially added in Ozone, but it can be configured in Ozone by following the [SiWx917 Ozone Configuration Guide](../wifi/SiWx917_Enablement_For_Ozone.md).
 
 4. [Git Version Control ](https://git-scm.com/downloads)[only required for
    building images and development]

@@ -1,7 +1,18 @@
 # How to Flash a SiWx917 SoC Device
 
-Once you have an image built, you can flash it onto your SiWx917 SoC device over USB connected to your development machine. This can be done using the Simplicity Commander or Ozone Debugger.
+Once you have an image built, you can flash it onto your SiWx917 SoC device over USB connected to your development machine. This can be done using Simplicity Studio, Simplicity Commander or Ozone Debugger.
 
+
+## Simplicity Commander
+Links to download Simplicity Commander's standalone versions are included below. Full documentation on Simplicity Commander is included in the [Simplicity Commander Reference Guide](https://www.silabs.com/documents/public/user-guides/ug162-simplicity-commander-reference-guide.pdf)
+ - Linux: https://www.silabs.com/documents/public/software/SimplicityCommander-Linux.zip
+ - Mac: https://www.silabs.com/documents/public/software/SimplicityCommander-Mac.zip
+ - Windows: https://www.silabs.com/documents/public/software/SimplicityCommander-Windows.zip
+
+## Simplicity Studio: 
+Simplicity Studio is a complete development environment and tool suite. It has the ability to discover USB-connected development boards and flash them.
+- [Download Simplicity Studio](https://www.silabs.com/developers/simplicity-studio)
+- [Simplicity Studio Reference Guide](https://docs.silabs.com/simplicity-studio-5-users-guide/latest/ss-5-users-guide-building-and-flashing/flashing)
 ## Ozone J-Link Debugger:
 
 - Multi-platform debugger and performance analyzer for J-Link and J-Trace
