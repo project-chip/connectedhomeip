@@ -233,6 +233,12 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Str
 
 static void Finalize(chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);
 

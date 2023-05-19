@@ -20,9 +20,9 @@
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
 #include "include/tv-callbacks.h"
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
+#include <app/att-storage.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>

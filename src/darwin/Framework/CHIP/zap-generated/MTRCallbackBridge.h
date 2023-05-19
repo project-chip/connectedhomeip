@@ -1095,6 +1095,29 @@ typedef void (*ModeSelectEventListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TemperatureControlSupportedTemperatureLevelsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType> & data);
+typedef void (*TemperatureControlGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TemperatureControlAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TemperatureControlEventListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*TemperatureControlAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*RefrigeratorAlarmMaskAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
+typedef void (*RefrigeratorAlarmLatchAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
+typedef void (*RefrigeratorAlarmStateAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
+typedef void (*RefrigeratorAlarmGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*RefrigeratorAlarmAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*RefrigeratorAlarmEventListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*RefrigeratorAlarmAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*AirQualityGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AirQualityAcceptedCommandListListAttributeCallback)(
@@ -8565,6 +8588,395 @@ public:
     void OnSubscriptionEstablished();
     using MTRModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRModeSelectAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge
+    : public MTRCallbackBridge<TemperatureControlSupportedTemperatureLevelsListAttributeCallback>
+{
+public:
+    MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TemperatureControlSupportedTemperatureLevelsListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<TemperatureControlSupportedTemperatureLevelsListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType> & value);
+};
+
+class MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackSubscriptionBridge
+    : public MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge
+{
+public:
+    MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TemperatureControlGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TemperatureControlGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<TemperatureControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTemperatureControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTemperatureControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TemperatureControlAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TemperatureControlAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<TemperatureControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTemperatureControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTemperatureControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTemperatureControlEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TemperatureControlEventListListAttributeCallback>
+{
+public:
+    MTRTemperatureControlEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TemperatureControlEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTemperatureControlEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRActionBlock action) :
+        MTRCallbackBridge<TemperatureControlEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRTemperatureControlEventListListAttributeCallbackSubscriptionBridge
+    : public MTRTemperatureControlEventListListAttributeCallbackBridge
+{
+public:
+    MTRTemperatureControlEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTemperatureControlEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTemperatureControlEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureControlEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTemperatureControlAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TemperatureControlAttributeListListAttributeCallback>
+{
+public:
+    MTRTemperatureControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TemperatureControlAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTemperatureControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<TemperatureControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRTemperatureControlAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRTemperatureControlAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRTemperatureControlAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTemperatureControlAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTemperatureControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureControlAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRefrigeratorAlarmMaskAttributeCallbackBridge : public MTRCallbackBridge<RefrigeratorAlarmMaskAttributeCallback>
+{
+public:
+    MTRRefrigeratorAlarmMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmMaskAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRefrigeratorAlarmMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmMaskAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+};
+
+class MTRRefrigeratorAlarmMaskAttributeCallbackSubscriptionBridge : public MTRRefrigeratorAlarmMaskAttributeCallbackBridge
+{
+public:
+    MTRRefrigeratorAlarmMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action,
+                                                                MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmMaskAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRefrigeratorAlarmMaskAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmMaskAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRefrigeratorAlarmLatchAttributeCallbackBridge : public MTRCallbackBridge<RefrigeratorAlarmLatchAttributeCallback>
+{
+public:
+    MTRRefrigeratorAlarmLatchAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmLatchAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRefrigeratorAlarmLatchAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmLatchAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+};
+
+class MTRRefrigeratorAlarmLatchAttributeCallbackSubscriptionBridge : public MTRRefrigeratorAlarmLatchAttributeCallbackBridge
+{
+public:
+    MTRRefrigeratorAlarmLatchAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action,
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmLatchAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRefrigeratorAlarmLatchAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmLatchAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRefrigeratorAlarmStateAttributeCallbackBridge : public MTRCallbackBridge<RefrigeratorAlarmStateAttributeCallback>
+{
+public:
+    MTRRefrigeratorAlarmStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmStateAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRefrigeratorAlarmStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmStateAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+};
+
+class MTRRefrigeratorAlarmStateAttributeCallbackSubscriptionBridge : public MTRRefrigeratorAlarmStateAttributeCallbackBridge
+{
+public:
+    MTRRefrigeratorAlarmStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action,
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmStateAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRefrigeratorAlarmStateAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmStateAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RefrigeratorAlarmGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RefrigeratorAlarmAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRefrigeratorAlarmEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RefrigeratorAlarmEventListListAttributeCallback>
+{
+public:
+    MTRRefrigeratorAlarmEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRefrigeratorAlarmEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRRefrigeratorAlarmEventListListAttributeCallbackSubscriptionBridge
+    : public MTRRefrigeratorAlarmEventListListAttributeCallbackBridge
+{
+public:
+    MTRRefrigeratorAlarmEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action,
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRefrigeratorAlarmEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RefrigeratorAlarmAttributeListListAttributeCallback>
+{
+public:
+    MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRRefrigeratorAlarmAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRRefrigeratorAlarmAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

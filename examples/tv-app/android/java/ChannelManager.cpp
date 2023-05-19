@@ -330,7 +330,7 @@ exit:
     return static_cast<bool>(ret);
 }
 
-bool ChannelManager::HandleSkipChannel(const uint16_t & count)
+bool ChannelManager::HandleSkipChannel(const int16_t & count)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

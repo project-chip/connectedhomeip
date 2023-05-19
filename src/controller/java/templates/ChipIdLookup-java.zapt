@@ -1,6 +1,4 @@
 {{> header}}
-{{#if_enabled_clusters side='client'}}
-
 package chip.devicecontroller;
 
 public final class ChipIdLookup {
@@ -53,4 +51,4 @@ public final class ChipIdLookup {
     return "";
   }
 }
-{{/if_enabled_clusters}}
+

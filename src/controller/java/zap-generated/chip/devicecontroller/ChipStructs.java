@@ -1518,6 +1518,30 @@ public class ChipStructs {
     }
   }
 
+  public static class TemperatureControlClusterTemperatureLevelStruct {
+    public String label;
+    public Integer temperatureLevel;
+
+    public TemperatureControlClusterTemperatureLevelStruct(String label, Integer temperatureLevel) {
+      this.label = label;
+      this.temperatureLevel = temperatureLevel;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TemperatureControlClusterTemperatureLevelStruct {\n");
+      output.append("\tlabel: ");
+      output.append(label);
+      output.append("\n");
+      output.append("\ttemperatureLevel: ");
+      output.append(temperatureLevel);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class DoorLockClusterCredentialStruct {
     public Integer credentialType;
     public Integer credentialIndex;

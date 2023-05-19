@@ -77,8 +77,10 @@
         {%-   endfor -%}
     {%- elif encodable.is_enum -%}
         {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().IntegerToPrimitive({{source}}));
-    {%- elif encodable.is_bitmap -%}
+    {%- elif encodable.is_untyped_bitmap -%}
         {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{encodable.boxed_java_type}}ToPrimitive({{source}}));
+    {%- elif encodable.is_bitmap -%}
+        {{target}}.SetRaw(static_cast<std::remove_reference_t<decltype({{target}})>::IntegerType>(chip::JniReferences::GetInstance().{{encodable.boxed_java_type}}ToPrimitive({{source}})));
     {% else -%}
         {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{encodable.boxed_java_type}}ToPrimitive({{source}}));
     {% endif -%}
