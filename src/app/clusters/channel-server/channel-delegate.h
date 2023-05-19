@@ -42,7 +42,7 @@ public:
     virtual void HandleChangeChannel(CommandResponseHelper<Commands::ChangeChannelResponse::Type> & helper,
                                      const chip::CharSpan & match)                                       = 0;
     virtual bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) = 0;
-    virtual bool HandleSkipChannel(const uint16_t & count)                                               = 0;
+    virtual bool HandleSkipChannel(const int16_t & count)                                                = 0;
 
     bool HasFeature(chip::EndpointId endpoint, ChannelFeature feature);
     virtual uint32_t GetFeatureMap(chip::EndpointId endpoint) = 0;
