@@ -42,7 +42,7 @@ tests:
                 saveAs: maxScenes
           constraints:
               type: uint16
-      
+
     - label:
           "preparation step for using commands from Groups cluster: Add KeySet"
       cluster: "Group Key Management"

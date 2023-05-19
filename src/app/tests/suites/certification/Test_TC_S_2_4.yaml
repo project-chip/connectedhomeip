@@ -124,7 +124,7 @@ tests:
                 value: "Scene1"
               - name: "ExtensionFieldSets"
                 value: []
- 
+
       response:
           values:
               - name: "Status"
