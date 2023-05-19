@@ -7006,6 +7006,7 @@
           - FuelTankMonitoring
           - InkCartridgeMonitoring
           - TonerCartridgeMonitoring
+          - TemperatureControl
           - SmokeCOAlarm
       attributes:
           Scenes:
@@ -7292,6 +7293,19 @@
               - EventList
               - FeatureMap
               - ClusterRevision
+          TemperatureControl:
+              - TemperatureSetpoint
+              - MinTemperature
+              - MaxTemperature
+              - Step
+              - CurrentTemperatureLevelIndex
+              - SupportedTemperatureLevels
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
           SmokeCOAlarm:
               - ExpressedState
               - SmokeState
@@ -7336,6 +7350,8 @@
               - ResetCondition
           TonerCartridgeMonitoring:
               - ResetCondition
+          TemperatureControl:
+              - SetTemperature
           DoorLock:
               - UnboltDoor
           SmokeCOAlarm:
@@ -7344,11 +7360,17 @@
           DoorLock:
               UnboltDoor:
                   - pinCode
+          TemperatureControl:
+              SetTemperature:
+                  - targetTemperature
+                  - targetTemperatureLevel
       structs:
           BasicInformation:
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
               - ProductAppearanceStruct
+          TemperatureControl:
+              - TemperatureLevelStruct
       struct fields:
           BasicInformation:
               ProductAppearanceStruct:
@@ -7358,6 +7380,10 @@
               ProductAppearanceStruct:
                   - finish
                   - primaryColor
+          TemperatureControl:
+              TemperatureLevelStruct:
+                  - label
+                  - temperatureLevel
       events:
           SmokeCOAlarm:
               - SmokeAlarm
@@ -7665,6 +7691,8 @@
               - Feature
           TonerCartridgeMonitoring:
               - Feature
+          TemperatureControl:
+              - Feature
           SmokeCOAlarm:
               - Feature
       bitmap values:
@@ -7746,6 +7774,10 @@
               # here.
               Feature:
                   - Unbolt
+          TemperatureControl:
+              Feature:
+                  - TemperatureNumber
+                  - TemperatureLevel
           SmokeCOAlarm:
               Feature:
                   - SmokeAlarm

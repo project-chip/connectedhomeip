@@ -1723,10 +1723,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("TempLevel", indent + 1, value.tempLevel);
+        CHIP_ERROR err = LogValue("TemperatureLevel", indent + 1, value.temperatureLevel);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TempLevel'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TemperatureLevel'");
             return err;
         }
     }

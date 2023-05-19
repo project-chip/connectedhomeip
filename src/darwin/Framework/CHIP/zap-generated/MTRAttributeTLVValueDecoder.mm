@@ -9100,7 +9100,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(
                 newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                               length:entry_0.label.size()
                                                             encoding:NSUTF8StringEncoding];
-                newElement_0.tempLevel = [NSNumber numberWithUnsignedChar:entry_0.tempLevel];
+                newElement_0.temperatureLevel = [NSNumber numberWithUnsignedChar:entry_0.temperatureLevel];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

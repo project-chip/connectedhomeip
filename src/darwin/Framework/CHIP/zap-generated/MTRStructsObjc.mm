@@ -2674,7 +2674,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _label = @"";
 
-        _tempLevel = @(0);
+        _temperatureLevel = @(0);
     }
     return self;
 }
@@ -2684,15 +2684,15 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
 
     other.label = self.label;
-    other.tempLevel = self.tempLevel;
+    other.temperatureLevel = self.temperatureLevel;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: label:%@; tempLevel:%@; >", NSStringFromClass([self class]), _label, _tempLevel];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: label:%@; temperatureLevel:%@; >", NSStringFromClass([self class]), _label, _temperatureLevel];
     return descriptionString;
 }
 

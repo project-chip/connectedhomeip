@@ -1520,11 +1520,11 @@ public class ChipStructs {
 
   public static class TemperatureControlClusterTemperatureLevelStruct {
     public String label;
-    public Integer tempLevel;
+    public Integer temperatureLevel;
 
-    public TemperatureControlClusterTemperatureLevelStruct(String label, Integer tempLevel) {
+    public TemperatureControlClusterTemperatureLevelStruct(String label, Integer temperatureLevel) {
       this.label = label;
-      this.tempLevel = tempLevel;
+      this.temperatureLevel = temperatureLevel;
     }
 
     @Override
@@ -1534,8 +1534,8 @@ public class ChipStructs {
       output.append("\tlabel: ");
       output.append(label);
       output.append("\n");
-      output.append("\ttempLevel: ");
-      output.append(tempLevel);
+      output.append("\ttemperatureLevel: ");
+      output.append(temperatureLevel);
       output.append("\n");
       output.append("}\n");
       return output.toString();
