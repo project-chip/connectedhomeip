@@ -2774,7 +2774,7 @@ client cluster ModeSelect = 80 {
 
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
 client cluster TemperatureControl = 86 {
-  bitmap TemperatureControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kTemperatureNumber = 0x1;
     kTemperatureLevel = 0x2;
   }

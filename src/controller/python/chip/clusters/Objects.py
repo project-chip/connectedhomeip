@@ -15137,7 +15137,7 @@ class TemperatureControl(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class TemperatureControlFeature(IntFlag):
+        class Feature(IntFlag):
             kTemperatureNumber = 0x1
             kTemperatureLevel = 0x2
 

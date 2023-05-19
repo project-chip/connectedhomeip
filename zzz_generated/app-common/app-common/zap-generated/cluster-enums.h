@@ -1506,8 +1506,8 @@ enum class ModeSelectFeature : uint32_t
 
 namespace TemperatureControl {
 
-// Bitmap for TemperatureControlFeature
-enum class TemperatureControlFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kTemperatureNumber = 0x1,
     kTemperatureLevel  = 0x2,
