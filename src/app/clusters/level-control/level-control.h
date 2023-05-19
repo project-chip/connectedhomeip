@@ -44,7 +44,7 @@ void emberAfPluginLevelControlClusterServerPostInitCallback(chip::EndpointId end
  * has the given feature.  The implementation is allowed to assume there is in
  * fact an instance of Level Control on the given endpoint.
  */
-bool LevelControlHasFeature(chip::EndpointId endpoint, chip::app::Clusters::LevelControl::LevelControlFeature feature);
+bool LevelControlHasFeature(chip::EndpointId endpoint, chip::app::Clusters::LevelControl::Feature feature);
 
 namespace LevelControlServer {
 

@@ -99,7 +99,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-bool Delegate::HasFeature(chip::EndpointId endpoint, ContentLauncherFeature feature)
+bool Delegate::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     uint32_t featureMap = GetFeatureMap(endpoint);
     return (featureMap & chip::to_underlying(feature));
@@ -207,8 +207,7 @@ bool emberAfContentLauncherClusterLaunchContentCallback(CommandHandler * command
 
     Delegate * delegate = GetDelegate(endpoint);
 
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true &&
-                     delegate->HasFeature(endpoint, ContentLauncherFeature::kContentSearch),
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && delegate->HasFeature(endpoint, Feature::kContentSearch),
                  err = CHIP_ERROR_INCORRECT_STATE);
 
     delegate->HandleLaunchContent(responder, decodableParameterList, autoplay, data.HasValue() ? data.Value() : CharSpan());
@@ -241,7 +240,7 @@ bool emberAfContentLauncherClusterLaunchURLCallback(CommandHandler * commandObj,
     app::CommandResponseHelper<Commands::LauncherResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && delegate->HasFeature(endpoint, ContentLauncherFeature::kURLPlayback),
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && delegate->HasFeature(endpoint, Feature::kURLPlayback),
                  err = CHIP_ERROR_INCORRECT_STATE);
     {
         delegate->HandleLaunchUrl(responder, contentUrl, displayString.HasValue() ? displayString.Value() : CharSpan(),

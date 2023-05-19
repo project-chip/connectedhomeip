@@ -4101,24 +4101,48 @@
               - ScenesCopyMode
           OnOff:
               - OnOffControl
-              - OnOffFeature
+              # Feature was originally named OnOffFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           LevelControl:
-              - LevelControlFeature
+              # Feature was originally named LevelControlFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           Actions:
               - CommandBits
           UnitLocalization:
-              - UnitLocalizationFeature
+              # Feature was originally named UnitLocalizationFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           PowerSource:
-              - PowerSourceFeature
+              # Feature was originally named PowerSourceFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           NetworkCommissioning:
-              - NetworkCommissioningFeature
+              # Feature was originally named NetworkCommissioningFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
               - WiFiSecurity
           SoftwareDiagnostics:
-              - SoftwareDiagnosticsFeature
+              # Feature was originally named SoftwareDiagnosticsFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           ThreadNetworkDiagnostics:
-              - ThreadNetworkDiagnosticsFeature
+              # Feature was originally named ThreadNetworkDiagnosticsFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           ModeSelect:
-              - ModeSelectFeature
+              # Feature was originally named ModeSelectFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           DoorLock:
               - DlCredentialRuleMask
               - DlCredentialRulesSupport
@@ -4134,13 +4158,13 @@
               - DlRemoteProgrammingEventMask
               - DlSupportedOperatingModes
               - DoorLockDayOfWeek
-              - DoorLockFeature
+              # Feature was originally named DoorLockFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           WindowCovering:
               - ConfigStatus
-              # WindowCoveringFeature was originally just named Feature, but we
-              # generate the same API for both of those names, so the name can
-              # just change here.
-              - WindowCoveringFeature
+              - Feature
               - Mode
               - OperationalStatus
               - SafetyStatus
@@ -4149,31 +4173,58 @@
           Thermostat:
               - DayOfWeek
               - ModeForSequence
-              - ThermostatFeature
+              # Feature was originally named ThermostatFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           FanControl:
-              - FanControlFeature
+              # Feature was originally named FanControlFeature, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              - Feature
               - RockSupportMask
               - WindSettingMask
               - WindSupportMask
           ColorControl:
               - ColorCapabilities
-              - ColorControlFeature
+              # Feature was originally named ColorControlFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
               - ColorLoopUpdateFlags
           PressureMeasurement:
               - PressureFeature
           Channel:
-              - ChannelFeature
+              # Feature was originally named ChannelFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           MediaInput:
-              - MediaInputFeature
+              # Feature was originally named MediaInputFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           KeypadInput:
-              - KeypadInputFeature
+              # Feature was originally named KeypadInputFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           ContentLauncher:
-              - ContentLauncherFeature
+              # Feature was originally named ContentLauncherFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
               - SupportedStreamingProtocol
           AudioOutput:
-              - AudioOutputFeature
+              # Feature was originally named AudioOutputFeature, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              - Feature
           ApplicationLauncher:
-              - ApplicationLauncherFeature
+              # Feature was originally named ApplicationLauncherFeature, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              - Feature
           TestCluster:
               - Bitmap16MaskMap
               - Bitmap32MaskMap
@@ -4190,10 +4241,16 @@
           OnOff:
               OnOffControl:
                   - AcceptOnlyWhenOn
-              OnOffFeature:
+              # Feature was originally named OnOffFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - Lighting
           LevelControl:
-              LevelControlFeature:
+              # Feature was originally named LevelControlFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - OnOff
                   - Lighting
                   - Frequency
@@ -4212,16 +4269,25 @@
                   - DisableAction
                   - DisableActionWithDuration
           UnitLocalization:
-              UnitLocalizationFeature:
+              # Feature was originally named UnitLocalizationFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - TemperatureUnit
           PowerSource:
-              PowerSourceFeature:
+              # Feature was originally named PowerSourceFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - Wired
                   - Battery
                   - Rechargeable
                   - Replaceable
           NetworkCommissioning:
-              NetworkCommissioningFeature:
+              # Feature was originally named NetworkCommissioningFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - WiFiNetworkInterface
                   - ThreadNetworkInterface
                   - EthernetNetworkInterface
@@ -4232,16 +4298,25 @@
                   - Wpa2Personal
                   - Wpa3Personal
           SoftwareDiagnostics:
-              SoftwareDiagnosticsFeature:
+              # Feature was originally named SoftwareDiagnosticsFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - WaterMarks
           ThreadNetworkDiagnostics:
-              ThreadNetworkDiagnosticsFeature:
+              # Feature was originally named ThreadNetworkDiagnosticsFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - PacketCounts
                   - ErrorCounts
                   - MLECounts
                   - MACCounts
           ModeSelect:
-              ModeSelectFeature:
+              # Feature was originally named ModeSelectFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - DEPONOFF
           DoorLock:
               DlCredentialRuleMask:
@@ -4341,7 +4416,10 @@
                   - Thursday
                   - Friday
                   - Saturday
-              DoorLockFeature:
+              # Feature was originally named DoorLockFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - PINCredentials
                   - RFIDCredentials
                   - FingerCredentials
@@ -4363,10 +4441,7 @@
                   - TiltPositionAware
                   - LiftEncoderControlled
                   - TiltEncoderControlled
-              # WindowCoveringFeature was originally just named Feature, but we
-              # generate the same API for both of those names, so the name can
-              # just change here.
-              WindowCoveringFeature:
+              Feature:
                   - Lift
                   - Tilt
                   - PositionAwareLift
@@ -4418,7 +4493,10 @@
               ModeForSequence:
                   - HeatSetpointFieldPresent
                   - CoolSetpointFieldPresent
-              ThermostatFeature:
+              # Feature was originally named ThermostatFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - Heating
                   - Cooling
                   - Occupancy
@@ -4426,7 +4504,10 @@
                   - Setback
                   - Automode
           FanControl:
-              FanControlFeature:
+              # Feature was originally named FanControlFeature, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              Feature:
                   - MultiSpeed
                   - Auto
                   - Rocking
@@ -4448,7 +4529,10 @@
                   - ColorLoopSupported
                   - XYAttributesSupported
                   - ColorTemperatureSupported
-              ColorControlFeature:
+              # Feature was originally named ColorControlFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - HueAndSaturation
                   - EnhancedHue
                   - ColorLoop
@@ -4463,29 +4547,47 @@
               PressureFeature:
                   - EXT
           Channel:
-              ChannelFeature:
+              # Feature was originally named ChannelFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - ChannelList
                   - LineupInfo
           MediaInput:
-              MediaInputFeature:
+              # Feature was originally named MediaInputFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - NameUpdates
           KeypadInput:
-              KeypadInputFeature:
+              # Feature was originally named KeypadInputFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - NavigationKeyCodes
                   - LocationKeys
                   - NumberKeys
           ContentLauncher:
-              ContentLauncherFeature:
+              # Feature was originally named ContentLauncherFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - ContentSearch
                   - URLPlayback
               SupportedStreamingProtocol:
                   - DASH
                   - HLS
           AudioOutput:
-              AudioOutputFeature:
+              # Feature was originally named AudioOutputFeature, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              Feature:
                   - NameUpdates
           ApplicationLauncher:
-              ApplicationLauncherFeature:
+              # Feature was originally named ApplicationLauncherFeature, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              Feature:
                   - ApplicationPlatform
           TestCluster:
               Bitmap16MaskMap:
@@ -4617,19 +4719,31 @@
                   - revision
       bitmaps:
           Switch:
-              - SwitchFeature
+              # Feature was originally named SwitchFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
           MediaPlayback:
-              - MediaPlaybackFeature
+              # Feature was originally named MediaPlaybackFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              - Feature
       bitmap values:
           Switch:
-              SwitchFeature:
+              # Feature was originally named SwitchFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - LatchingSwitch
                   - MomentarySwitch
                   - MomentarySwitchRelease
                   - MomentarySwitchLongPress
                   - MomentarySwitchMultiPress
           MediaPlayback:
-              MediaPlaybackFeature:
+              # Feature was originally named MediaPlaybackFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - AdvancedSeek
                   - VariableSpeed
       ids:
@@ -5744,9 +5858,15 @@
           PumpConfigurationAndControl:
               - PumpFeature
           WiFiNetworkDiagnostics:
-              - WiFiNetworkDiagnosticsFeature
+              # Feature was originally named WiFiNetworkDiagnosticsFeature, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              - Feature
           EthernetNetworkDiagnostics:
-              - EthernetNetworkDiagnosticsFeature
+              # Feature was originally named EthernetNetworkDiagnosticsFeature, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              - Feature
       bitmap values:
           UnitTesting:
               Bitmap8MaskMap:
@@ -5795,7 +5915,10 @@
                   - Thursday
                   - Friday
                   - Saturday
-              DoorLockFeature:
+              # Feature was originally named DoorLockFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - PINCredential
                   - RFIDCredential
                   - WeekDayAccessSchedules
@@ -5813,7 +5936,10 @@
                   - Automatic
                   - Local
           Thermostat:
-              ThermostatFeature:
+              # Feature was originally named ThermostatFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - ScheduleConfiguration
                   - AutoMode
               DayOfWeek:
@@ -5822,11 +5948,17 @@
                   - HeatSetpointPresent
                   - CoolSetpointPresent
           WiFiNetworkDiagnostics:
-              WiFiNetworkDiagnosticsFeature:
+              # Feature was originally named WiFiNetworkDiagnosticsFeature, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              Feature:
                   - PacketCounts
                   - ErrorCounts
           EthernetNetworkDiagnostics:
-              EthernetNetworkDiagnosticsFeature:
+              # Feature was originally named EthernetNetworkDiagnosticsFeature, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              Feature:
                   - PacketCounts
                   - ErrorCounts
   deprecated:
@@ -6140,7 +6272,10 @@
               PressureFeature:
                   - EXT
           DoorLock:
-              DoorLockFeature:
+              # Feature was originally named DoorLockFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - PINCredentials
                   - RFIDCredentials
                   - WeekDaySchedules
@@ -6149,7 +6284,10 @@
                   - Notifications
                   - YearDaySchedules
           Thermostat:
-              ThermostatFeature:
+              # Feature was originally named ThermostatFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - Schedule
                   - Automode
               DayOfWeek:
@@ -6519,7 +6657,10 @@
               PressureFeature:
                   Extended: EXT
           DoorLock:
-              DoorLockFeature:
+              # Feature was originally named DoorLockFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   PINCredential: PINCredentials
                   RFIDCredential: RFIDCredentials
                   WeekDayAccessSchedules: WeekDaySchedules
@@ -6528,7 +6669,10 @@
                   Notification: Notifications
                   YearDayAccessSchedules: YearDaySchedules
           Thermostat:
-              ThermostatFeature:
+              # Feature was originally named ThermostatFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   ScheduleConfiguration: Schedule
                   AutoMode: Automode
               DayOfWeek:
@@ -7490,13 +7634,13 @@
           AirQuality:
               - Feature
           Groups:
-              - GroupsFeature
+              - Feature
           PressureMeasurement:
-              - PressureMeasurementFeature
+              - Feature
           PumpConfigurationAndControl:
-              - PumpConfigurationAndControlFeature
+              - Feature
           Scenes:
-              - ScenesFeature
+              - Feature
           HEPAFilterMonitoring:
               - Feature
           ActivatedCarbonFilterMonitoring:
@@ -7522,7 +7666,7 @@
           TonerCartridgeMonitoring:
               - Feature
           SmokeCOAlarm:
-              - SmokeCOAlarmFeature
+              - Feature
       bitmap values:
           AirQuality:
               Feature:
@@ -7531,13 +7675,13 @@
                   - VeryPoor
                   - ExtremelyPoor
           Groups:
-              GroupsFeature:
+              Feature:
                   - GroupNames
           PressureMeasurement:
-              PressureMeasurementFeature:
+              Feature:
                   - Extended
           PumpConfigurationAndControl:
-              PumpConfigurationAndControlFeature:
+              Feature:
                   - ConstantPressure
                   - CompensatedPressure
                   - ConstantFlow
@@ -7546,7 +7690,7 @@
                   - Automatic
                   - LocalOperation
           Scenes:
-              ScenesFeature:
+              Feature:
                   - SceneNames
           HEPAFilterMonitoring:
               Feature:
@@ -7597,10 +7741,13 @@
                   - Condition
                   - Warning
           DoorLock:
-              DoorLockFeature:
+              # Feature was originally named DoorLockFeature, but we generate the
+              # same API for both of those names, so the name can just change
+              # here.
+              Feature:
                   - Unbolt
           SmokeCOAlarm:
-              SmokeCOAlarmFeature:
+              Feature:
                   - SmokeAlarm
                   - COAlarm
       ids:
@@ -7649,11 +7796,11 @@
                   GNSS: Gnss
       bitmaps:
           Groups:
-              GroupsFeature: GroupClusterFeature
+              Feature: GroupClusterFeature
           PressureMeasurement:
-              PressureMeasurementFeature: PressureFeature
+              Feature: PressureFeature
           PumpConfigurationAndControl:
-              PumpConfigurationAndControlFeature: PumpFeature
+              Feature: PumpFeature
   provisional:
       clusters:
           # Not ready to be public API yet.

@@ -140,7 +140,7 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
         uint32_t ourFeatureMap;
         if (FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS)
         {
-            if (ourFeatureMap & to_underlying(FanControlFeature::kMultiSpeed))
+            if (ourFeatureMap & to_underlying(Feature::kMultiSpeed))
                 multiSpeedSupported = true;
         }
     }
