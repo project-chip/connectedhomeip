@@ -13883,6 +13883,251 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
+  public static class TemperatureControlCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 86L;
+
+    public TemperatureControlCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface SupportedTemperatureLevelsAttributeCallback {
+      void onSuccess(List<ChipStructs.TemperatureControlClusterTemperatureLevelStruct> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readTemperatureSetpointAttribute(IntegerAttributeCallback callback) {
+      readTemperatureSetpointAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeTemperatureSetpointAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTemperatureSetpointAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinTemperatureAttribute(IntegerAttributeCallback callback) {
+      readMinTemperatureAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinTemperatureAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinTemperatureAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxTemperatureAttribute(IntegerAttributeCallback callback) {
+      readMaxTemperatureAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxTemperatureAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxTemperatureAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readStepAttribute(IntegerAttributeCallback callback) {
+      readStepAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeStepAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeStepAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readCurrentTemperatureLevelIndexAttribute(IntegerAttributeCallback callback) {
+      readCurrentTemperatureLevelIndexAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeCurrentTemperatureLevelIndexAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeCurrentTemperatureLevelIndexAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readSupportedTemperatureLevelsAttribute(
+        SupportedTemperatureLevelsAttributeCallback callback) {
+      readSupportedTemperatureLevelsAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSupportedTemperatureLevelsAttribute(
+        SupportedTemperatureLevelsAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSupportedTemperatureLevelsAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readTemperatureSetpointAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeTemperatureSetpointAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMinTemperatureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMinTemperatureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readMaxTemperatureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeMaxTemperatureAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readStepAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeStepAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readCurrentTemperatureLevelIndexAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeCurrentTemperatureLevelIndexAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSupportedTemperatureLevelsAttribute(
+        long chipClusterPtr, SupportedTemperatureLevelsAttributeCallback callback);
+
+    private native void subscribeSupportedTemperatureLevelsAttribute(
+        long chipClusterPtr,
+        SupportedTemperatureLevelsAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
   public static class AirQualityCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 91L;
 

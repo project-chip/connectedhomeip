@@ -97,6 +97,7 @@
         "WATER_TANK_MONITORING_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": [],
+        "TEMPERATURE_CONTROL_CLUSTER": [],
         "ZEOLITE_FILTER_MONITORING_CLUSTER": [],
         "ZLL_COMMISSIONING_CLUSTER": []
     },
@@ -199,6 +200,7 @@
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
+        "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
         "ZLL_COMMISSIONING_CLUSTER": []
     }
 }

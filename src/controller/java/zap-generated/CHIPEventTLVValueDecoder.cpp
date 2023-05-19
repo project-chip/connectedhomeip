@@ -2422,6 +2422,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::TemperatureControl::Id: {
+        using namespace app::Clusters::TemperatureControl;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::AirQuality::Id: {
         using namespace app::Clusters::AirQuality;
         switch (aPath.mEventId)

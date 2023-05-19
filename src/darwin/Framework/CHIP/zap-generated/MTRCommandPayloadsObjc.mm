@@ -6459,6 +6459,40 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRTemperatureControlClusterSetTemperatureParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _targetTemperature = nil;
+
+        _targetTemperatureLevel = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTemperatureControlClusterSetTemperatureParams alloc] init];
+
+    other.targetTemperature = self.targetTemperature;
+    other.targetTemperatureLevel = self.targetTemperatureLevel;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: targetTemperature:%@; targetTemperatureLevel:%@; >",
+                                             NSStringFromClass([self class]), _targetTemperature, _targetTemperatureLevel];
+    return descriptionString;
+}
+
+@end
 @implementation MTRSmokeCOAlarmClusterSelfTestRequestParams
 - (instancetype)init
 {

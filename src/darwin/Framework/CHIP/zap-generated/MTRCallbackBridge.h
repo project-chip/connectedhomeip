@@ -1095,6 +1095,18 @@ typedef void (*ModeSelectEventListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TemperatureControlSupportedTemperatureLevelsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType> & data);
+typedef void (*TemperatureControlGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TemperatureControlAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TemperatureControlEventListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*TemperatureControlAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*AirQualityGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AirQualityAcceptedCommandListListAttributeCallback)(
@@ -8565,6 +8577,173 @@ public:
     void OnSubscriptionEstablished();
     using MTRModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRModeSelectAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge
+    : public MTRCallbackBridge<TemperatureControlSupportedTemperatureLevelsListAttributeCallback>
+{
+public:
+    MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TemperatureControlSupportedTemperatureLevelsListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<TemperatureControlSupportedTemperatureLevelsListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType> & value);
+};
+
+class MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackSubscriptionBridge
+    : public MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge
+{
+public:
+    MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TemperatureControlGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TemperatureControlGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<TemperatureControlGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTemperatureControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTemperatureControlGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TemperatureControlAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TemperatureControlAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<TemperatureControlAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRTemperatureControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRTemperatureControlAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTemperatureControlEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TemperatureControlEventListListAttributeCallback>
+{
+public:
+    MTRTemperatureControlEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TemperatureControlEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTemperatureControlEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRActionBlock action) :
+        MTRCallbackBridge<TemperatureControlEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRTemperatureControlEventListListAttributeCallbackSubscriptionBridge
+    : public MTRTemperatureControlEventListListAttributeCallbackBridge
+{
+public:
+    MTRTemperatureControlEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTemperatureControlEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTemperatureControlEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureControlEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRTemperatureControlAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<TemperatureControlAttributeListListAttributeCallback>
+{
+public:
+    MTRTemperatureControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<TemperatureControlAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRTemperatureControlAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<TemperatureControlAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRTemperatureControlAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRTemperatureControlAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRTemperatureControlAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRTemperatureControlAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRTemperatureControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRTemperatureControlAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

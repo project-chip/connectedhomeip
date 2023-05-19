@@ -1504,6 +1504,16 @@ enum class ModeSelectFeature : uint32_t
 };
 } // namespace ModeSelect
 
+namespace TemperatureControl {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kTemperatureNumber = 0x1,
+    kTemperatureLevel  = 0x2,
+};
+} // namespace TemperatureControl
+
 namespace AirQuality {
 
 // Enum for AirQualityEnum

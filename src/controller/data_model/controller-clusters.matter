@@ -2772,6 +2772,40 @@ client cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** Attributes and commands for configuring the temperature control, and reporting temperature. */
+client cluster TemperatureControl = 86 {
+  bitmap Feature : BITMAP32 {
+    kTemperatureNumber = 0x1;
+    kTemperatureLevel = 0x2;
+  }
+
+  struct TemperatureLevelStruct {
+    char_string<64> label = 0;
+    int8u tempLevel = 1;
+  }
+
+  readonly attribute optional int16s temperatureSetpoint = 0;
+  readonly attribute optional int16s minTemperature = 1;
+  readonly attribute optional int16s maxTemperature = 2;
+  readonly attribute optional int16s step = 3;
+  readonly attribute optional int8u currentTemperatureLevelIndex = 4;
+  readonly attribute optional TemperatureLevelStruct supportedTemperatureLevels[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTemperatureRequest {
+    optional INT16S targetTemperature = 0;
+    optional INT8U targetTemperatureLevel = 1;
+  }
+
+  /** Set Temperature */
+  command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
+}
+
 /** Attributes for reporting air quality classification */
 client cluster AirQuality = 91 {
   enum AirQualityEnum : ENUM8 {
