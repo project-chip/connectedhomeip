@@ -71,12 +71,13 @@ limitations under the License.
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
     <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false" isNullable="false" length="64">Description</attribute>
+    <attribute side="server" code="0x0000" define="MODE_DESCRIPTION" type="CHAR_STRING"                       writable="false" optional="false" isNullable="false" length="64">Description</attribute>
     <!-- STANDARD_NAMESPACE has been deprecated -->
-    <attribute side="server" code="0x0002" define="SUPPORTED_MODES" type="ARRAY" entryType="ModeOptionStruct"               writable="false" optional="false" isNullable="false">SupportedModes</attribute>
-    <attribute side="server" code="0x0003" define="CURRENT_MODE"    type="INT8U"                                            writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
-    <attribute side="server" code="0x0004" define="START_UP_MODE"   type="INT8U"                                            writable="true" optional="true"  isNullable="true">StartUpMode</attribute>
-    <attribute side="server" code="0x0005" define="ON_MODE"         type="INT8U"                                            writable="true"  optional="true" isNullable="true">OnMode</attribute>
+    <attribute side="server" code="0x0001" define="STANDARD_NAMESPACE" type="ENUM16"                          writable="false" optional="true" isNullable="true">StandardNamespace</attribute>
+    <attribute side="server" code="0x0002" define="SUPPORTED_MODES" type="ARRAY" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false">SupportedModes</attribute>
+    <attribute side="server" code="0x0003" define="CURRENT_MODE"    type="INT8U"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
+    <attribute side="server" code="0x0004" define="START_UP_MODE"   type="INT8U"                              writable="true" optional="true"  isNullable="true">StartUpMode</attribute>
+    <attribute side="server" code="0x0005" define="ON_MODE"         type="INT8U"                              writable="true"  optional="true" isNullable="true">OnMode</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ChangeToMode" optional="false">
