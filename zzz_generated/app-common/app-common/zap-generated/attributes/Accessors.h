@@ -973,11 +973,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace TimeSynchronization {
 namespace Attributes {
 
-namespace Granularity {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::GranularityEnum * value); // GranularityEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::GranularityEnum value);
-} // namespace Granularity
-
 namespace TimeSource {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeSourceEnum * value); // TimeSourceEnum
 EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value);

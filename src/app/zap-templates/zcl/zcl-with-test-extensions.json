@@ -282,7 +282,8 @@
             "TimeZone",
             "DSTOffset",
             "UTCTime",
-            "LocalTime"
+            "LocalTime",
+            "Granularity"
         ]
     },
     "defaultReportingPolicy": "mandatory",

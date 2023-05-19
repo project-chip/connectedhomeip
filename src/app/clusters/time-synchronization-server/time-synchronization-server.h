@@ -82,6 +82,7 @@ public:
     CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
                           TimeSynchronization::TimeSourceEnum source);
     CHIP_ERROR GetLocalTime(chip::EndpointId ep, uint64_t & localTime);
+    TimeSynchronization::GranularityEnum GetGranularity(void) { return mGranularity; }
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 
@@ -94,6 +95,7 @@ private:
         DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type>(mTz);
     DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> mDstOffsetList =
         DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDst);
+    TimeSynchronization::GranularityEnum mGranularity;
 
     uint8_t mTimeZoneListSize  = 0;
     uint8_t mDstOffsetListSize = 0;

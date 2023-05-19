@@ -2485,7 +2485,7 @@ endpoint 0 {
     emits event TimeFailure;
     emits event MissingTrustedTimeSource;
     callback attribute UTCTime;
-    ram      attribute granularity default = 0x00;
+    callback attribute granularity default = 0x00;
     ram      attribute timeSource default = 0x00;
     callback attribute trustedTimeSource;
     callback attribute defaultNTP;

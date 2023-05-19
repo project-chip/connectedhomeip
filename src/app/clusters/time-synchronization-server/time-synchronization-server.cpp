@@ -133,6 +133,15 @@ void TimeSynchronizationServer::Init()
     if (!mTrustedTimeSource.IsNull())
     {
     }
+    System::Clock::Microseconds64 utcTime;
+    if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR)
+    {
+        mGranularity = TimeSynchronization::GranularityEnum::kMinutesGranularity;
+    }
+    else
+    {
+        mGranularity = TimeSynchronization::GranularityEnum::kNoTimeGranularity;
+    }
 }
 
 CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(
@@ -326,7 +335,7 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(chip::EndpointId ep, uint64_t u
                                                  TimeSynchronization::TimeSourceEnum source)
 {
     ReturnErrorOnFailure(utcTimeChanged(utcTime));
-    Granularity::Set(ep, granularity);
+    mGranularity = granularity;
     TimeSource::Set(ep, source);
     return CHIP_NO_ERROR;
 }
@@ -516,6 +525,9 @@ CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath &
         VerifyOrReturnError(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, aEncoder.EncodeNull());
         return aEncoder.Encode(utcTime.count());
     }
+    case Granularity::Id: {
+        return aEncoder.Encode(TimeSynchronizationServer::Instance().GetGranularity());
+    }
     case TrustedTimeSource::Id: {
         return ReadTrustedTimeSource(aPath.mEndpointId, aEncoder);
     }
@@ -651,8 +663,7 @@ bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
     const auto & utcTime     = commandData.UTCTime;
     const auto & granularity = commandData.granularity;
 
-    TimeSynchronization::GranularityEnum currentGranularity;
-    Granularity::Get(commandPath.mEndpointId, &currentGranularity);
+    auto currentGranularity = TimeSynchronizationServer::Instance().GetGranularity();
 
     if ((currentGranularity == TimeSynchronization::GranularityEnum::kNoTimeGranularity || granularity >= currentGranularity) &&
         CHIP_NO_ERROR ==
@@ -828,8 +839,6 @@ void MatterTimeSynchronizationPluginServerInitCallback()
         attrAccessRegistered = true;
         registerAttributeAccessOverride(&gAttrAccess);
 #if 0
-        TimeSynchronization::GranularityEnum granularity = TimeSynchronization::GranularityEnum::kNoTimeGranularity;
-        TimeSynchronization::Attributes::Granularity::Set(0, granularity);
         // System::SystemClock().SetClock_RealTime(System::Clock::Microseconds64(1679668000000000));
 #endif
     }
