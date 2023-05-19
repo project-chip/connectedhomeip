@@ -2422,8 +2422,58 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::LaundryWasherModeSelect::Id: {
+        using namespace app::Clusters::LaundryWasherModeSelect;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Id: {
+        using namespace app::Clusters::RefrigeratorAndTemperatureControlledCabinet;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::RvcRun::Id: {
+        using namespace app::Clusters::RvcRun;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::RvcClean::Id: {
+        using namespace app::Clusters::RvcClean;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::TemperatureControl::Id: {
         using namespace app::Clusters::TemperatureControl;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::DishwasherModeSelect::Id: {
+        using namespace app::Clusters::DishwasherModeSelect;
         switch (aPath.mEventId)
         {
         default:
