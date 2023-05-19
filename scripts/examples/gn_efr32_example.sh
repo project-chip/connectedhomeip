@@ -37,6 +37,8 @@ USE_SLC=false
 GN_PATH=gn
 GN_PATH_PROVIDED=false
 
+DOTFILE=".gn"
+
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
 
@@ -169,6 +171,7 @@ else
                     exit 1
                 fi
                 USE_WIFI=true
+                optArgs+="chip_device_platform =\"efr32\" "
                 shift
                 shift
                 ;;
@@ -181,7 +184,7 @@ else
                 shift
                 ;;
             --chip_enable_wifi_ipv4)
-                ipArgs="chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true "
+                optArgs="chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true "
                 shift
                 ;;
             --additional_data_advertising)
@@ -248,6 +251,8 @@ else
             *)
                 if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
+                    # NCP Mode so base MCU is an EFR32
+                    optArgs+="chip_device_platform =\"efr32\" "
                 fi
                 optArgs+=$1" "
                 shift
@@ -258,6 +263,13 @@ else
     if [ -z "$SILABS_BOARD" ]; then
         echo "SILABS_BOARD not defined"
         exit 1
+    fi
+
+    # 917 exception. TODO find a more generic way
+    if [ "$SILABS_BOARD" == "BRD4325B" ]; then
+        echo "Compiling for 917 WiFi SOC"
+        USE_WIFI=true
+        optArgs+="chip_device_platform =\"SiWx917\" "
     fi
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
@@ -288,23 +300,17 @@ else
     fi
 
     if [ "$USE_WIFI" == true ]; then
-        # wifi build
-        # NCP mode EFR32 + wifi module
-        optArgs+="$ipArgs"
-        "$GN_PATH" gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
+        DOTFILE="$ROOT/build_for_wifi_gnfile.gn"
     else
-        # OpenThread/SoC build
-        #
-        if [ "$USE_DOCKER" == true ]; then
-            optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
-        fi
-
-        if [ -z "$optArgs" ]; then
-            "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
-        else
-            "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
-        fi
+        DOTFILE="$ROOT/openthread.gn"
     fi
+
+    if [ "$USE_DOCKER" == true ] && [ "$USE_WIFI" == false ]; then
+        echo "Switching OpenThread ROOT"
+        optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
+    fi
+
+    "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
 
     if [ "$USE_SLC" == true ]; then
         # Activation needs to be after SLC generation which is done in gn gen.
