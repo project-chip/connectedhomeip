@@ -324,8 +324,8 @@ JNI_METHOD(void, LevelControlCluster, writeOptionsAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2353,7 +2353,8 @@ JNI_METHOD(void, RefrigeratorAlarmCluster, writeMaskAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().LongToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3077,8 +3078,8 @@ JNI_METHOD(void, DoorLockCluster, writeLocalProgrammingFeaturesAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3389,8 +3390,8 @@ JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3977,8 +3978,8 @@ JNI_METHOD(void, ThermostatCluster, writeHVACSystemTypeConfigurationAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4549,8 +4550,8 @@ JNI_METHOD(void, ThermostatCluster, writeRemoteSensingAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4817,8 +4818,8 @@ JNI_METHOD(void, ThermostatCluster, writeThermostatProgrammingOperationModeAttri
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5249,7 +5250,8 @@ JNI_METHOD(void, ThermostatCluster, writeACErrorCodeAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().LongToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5628,8 +5630,8 @@ JNI_METHOD(void, FanControlCluster, writeRockSettingAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5680,8 +5682,8 @@ JNI_METHOD(void, FanControlCluster, writeWindSettingAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -5891,8 +5893,8 @@ JNI_METHOD(void, ColorControlCluster, writeOptionsAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -7047,8 +7049,8 @@ JNI_METHOD(void, BallastConfigurationCluster, writeLampAlarmModeAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -7627,7 +7629,8 @@ JNI_METHOD(void, ContentLauncherCluster, writeSupportedStreamingProtocolsAttribu
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().LongToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -7990,8 +7993,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, writeOverloadAlarmsMaskAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -8042,8 +8045,8 @@ JNI_METHOD(void, ElectricalMeasurementCluster, writeAcOverloadAlarmsMaskAttribut
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -8146,8 +8149,8 @@ JNI_METHOD(void, UnitTestingCluster, writeBitmap8Attribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -8198,8 +8201,8 @@ JNI_METHOD(void, UnitTestingCluster, writeBitmap16Attribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -8250,7 +8253,8 @@ JNI_METHOD(void, UnitTestingCluster, writeBitmap32Attribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().LongToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -8301,7 +8305,8 @@ JNI_METHOD(void, UnitTestingCluster, writeBitmap64Attribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().LongToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -10128,8 +10133,8 @@ JNI_METHOD(void, UnitTestingCluster, writeListNullablesAndOptionalsStructAttribu
                     jobject element_0_nullableStructItem_1_fItem_3;
                     chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "f", "Ljava/lang/Integer;",
                                                                       element_0_nullableStructItem_1_fItem_3);
-                    nonNullValue_2.f = static_cast<std::remove_reference_t<decltype(nonNullValue_2.f)>>(
-                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_nullableStructItem_1_fItem_3));
+                    nonNullValue_2.f.SetRaw(static_cast<std::remove_reference_t<decltype(nonNullValue_2.f)>::IntegerType>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_nullableStructItem_1_fItem_3)));
                     jobject element_0_nullableStructItem_1_gItem_3;
                     chip::JniReferences::GetInstance().GetObjectField(element_0_nullableStructItem_1, "g", "Ljava/lang/Float;",
                                                                       element_0_nullableStructItem_1_gItem_3);
@@ -10180,8 +10185,8 @@ JNI_METHOD(void, UnitTestingCluster, writeListNullablesAndOptionalsStructAttribu
                         jobject optionalValue_2_fItem_3;
                         chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "f", "Ljava/lang/Integer;",
                                                                           optionalValue_2_fItem_3);
-                        definedValue_2.f = static_cast<std::remove_reference_t<decltype(definedValue_2.f)>>(
-                            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_fItem_3));
+                        definedValue_2.f.SetRaw(static_cast<std::remove_reference_t<decltype(definedValue_2.f)>::IntegerType>(
+                            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_fItem_3)));
                         jobject optionalValue_2_gItem_3;
                         chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "g", "Ljava/lang/Float;",
                                                                           optionalValue_2_gItem_3);
@@ -10240,8 +10245,8 @@ JNI_METHOD(void, UnitTestingCluster, writeListNullablesAndOptionalsStructAttribu
                             jobject optionalValue_2_fItem_4;
                             chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "f", "Ljava/lang/Integer;",
                                                                               optionalValue_2_fItem_4);
-                            nonNullValue_3.f = static_cast<std::remove_reference_t<decltype(nonNullValue_3.f)>>(
-                                chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_fItem_4));
+                            nonNullValue_3.f.SetRaw(static_cast<std::remove_reference_t<decltype(nonNullValue_3.f)>::IntegerType>(
+                                chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2_fItem_4)));
                             jobject optionalValue_2_gItem_4;
                             chip::JniReferences::GetInstance().GetObjectField(optionalValue_2, "g", "Ljava/lang/Float;",
                                                                               optionalValue_2_gItem_4);
@@ -10881,9 +10886,9 @@ JNI_METHOD(void, UnitTestingCluster, writeListFabricScopedAttribute)
                 jobject element_0_fabricSensitiveStructItem_1_fItem_2;
                 chip::JniReferences::GetInstance().GetObjectField(element_0_fabricSensitiveStructItem_1, "f", "Ljava/lang/Integer;",
                                                                   element_0_fabricSensitiveStructItem_1_fItem_2);
-                listHolder_0->mList[i_0].fabricSensitiveStruct.f =
-                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveStruct.f)>>(
-                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_fabricSensitiveStructItem_1_fItem_2));
+                listHolder_0->mList[i_0].fabricSensitiveStruct.f.SetRaw(
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].fabricSensitiveStruct.f)>::IntegerType>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_fabricSensitiveStructItem_1_fItem_2)));
                 jobject element_0_fabricSensitiveStructItem_1_gItem_2;
                 chip::JniReferences::GetInstance().GetObjectField(element_0_fabricSensitiveStructItem_1, "g", "Ljava/lang/Float;",
                                                                   element_0_fabricSensitiveStructItem_1_gItem_2);
@@ -11258,8 +11263,8 @@ JNI_METHOD(void, UnitTestingCluster, writeNullableBitmap8Attribute)
     else
     {
         auto & nonNullValue_0 = cppValue.SetNonNull();
-        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
-            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+        nonNullValue_0.SetRaw(static_cast<std::remove_reference_t<decltype(nonNullValue_0)>::IntegerType>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
     }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -11318,8 +11323,8 @@ JNI_METHOD(void, UnitTestingCluster, writeNullableBitmap16Attribute)
     else
     {
         auto & nonNullValue_0 = cppValue.SetNonNull();
-        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
-            chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+        nonNullValue_0.SetRaw(static_cast<std::remove_reference_t<decltype(nonNullValue_0)>::IntegerType>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
     }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -11378,8 +11383,8 @@ JNI_METHOD(void, UnitTestingCluster, writeNullableBitmap32Attribute)
     else
     {
         auto & nonNullValue_0 = cppValue.SetNonNull();
-        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
-            chip::JniReferences::GetInstance().LongToPrimitive(value));
+        nonNullValue_0.SetRaw(static_cast<std::remove_reference_t<decltype(nonNullValue_0)>::IntegerType>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value)));
     }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -11438,8 +11443,8 @@ JNI_METHOD(void, UnitTestingCluster, writeNullableBitmap64Attribute)
     else
     {
         auto & nonNullValue_0 = cppValue.SetNonNull();
-        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
-            chip::JniReferences::GetInstance().LongToPrimitive(value));
+        nonNullValue_0.SetRaw(static_cast<std::remove_reference_t<decltype(nonNullValue_0)>::IntegerType>(
+            chip::JniReferences::GetInstance().LongToPrimitive(value)));
     }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
