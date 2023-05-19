@@ -1514,6 +1514,15 @@ enum class Feature : uint32_t
 };
 } // namespace TemperatureControl
 
+namespace RefrigeratorAlarm {
+
+// Bitmap for AlarmMap
+enum class AlarmMap : uint32_t
+{
+    kDoorOpen = 0x1,
+};
+} // namespace RefrigeratorAlarm
+
 namespace AirQuality {
 
 // Enum for AirQualityEnum

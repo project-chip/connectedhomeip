@@ -206,6 +206,11 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
+@interface MTRClusterRefrigeratorAlarm ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
 @interface MTRClusterAirQuality ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
