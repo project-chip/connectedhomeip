@@ -290,7 +290,7 @@ class Groups(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class GroupsFeature(IntFlag):
+        class Feature(IntFlag):
             kGroupNames = 0x1
 
     class Commands:
@@ -615,11 +615,11 @@ class Scenes(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
+        class Feature(IntFlag):
+            kSceneNames = 0x1
+
         class ScenesCopyMode(IntFlag):
             kCopyAllScenes = 0x1
-
-        class ScenesFeature(IntFlag):
-            kSceneNames = 0x1
 
     class Structs:
         @dataclass
@@ -1303,11 +1303,11 @@ class OnOff(Cluster):
             kUnknownEnumValue = 3,
 
     class Bitmaps:
+        class Feature(IntFlag):
+            kLighting = 0x1
+
         class OnOffControl(IntFlag):
             kAcceptOnlyWhenOn = 0x1
-
-        class OnOffFeature(IntFlag):
-            kLighting = 0x1
 
     class Commands:
         @dataclass
@@ -1806,7 +1806,7 @@ class LevelControl(Cluster):
             kUnknownEnumValue = 2,
 
     class Bitmaps:
-        class LevelControlFeature(IntFlag):
+        class Feature(IntFlag):
             kOnOff = 0x1
             kLighting = 0x2
             kFrequency = 0x4
@@ -5661,7 +5661,7 @@ class UnitLocalization(Cluster):
             kUnknownEnumValue = 3,
 
     class Bitmaps:
-        class UnitLocalizationFeature(IntFlag):
+        class Feature(IntFlag):
             kTemperatureUnit = 0x1
 
     class Attributes:
@@ -6222,7 +6222,7 @@ class PowerSource(Cluster):
             kUnknownEnumValue = 3,
 
     class Bitmaps:
-        class PowerSourceFeature(IntFlag):
+        class Feature(IntFlag):
             kWired = 0x1
             kBattery = 0x2
             kRechargeable = 0x4
@@ -7353,7 +7353,7 @@ class NetworkCommissioning(Cluster):
             kUnknownEnumValue = 5,
 
     class Bitmaps:
-        class NetworkCommissioningFeature(IntFlag):
+        class Feature(IntFlag):
             kWiFiNetworkInterface = 0x1
             kThreadNetworkInterface = 0x2
             kEthernetNetworkInterface = 0x4
@@ -8535,7 +8535,7 @@ class SoftwareDiagnostics(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class SoftwareDiagnosticsFeature(IntFlag):
+        class Feature(IntFlag):
             kWaterMarks = 0x1
 
     class Structs:
@@ -8943,7 +8943,7 @@ class ThreadNetworkDiagnostics(Cluster):
             kUnknownEnumValue = 7,
 
     class Bitmaps:
-        class ThreadNetworkDiagnosticsFeature(IntFlag):
+        class Feature(IntFlag):
             kPacketCounts = 0x1
             kErrorCounts = 0x2
             kMLECounts = 0x4
@@ -10320,7 +10320,7 @@ class WiFiNetworkDiagnostics(Cluster):
             kUnknownEnumValue = 6,
 
     class Bitmaps:
-        class WiFiNetworkDiagnosticsFeature(IntFlag):
+        class Feature(IntFlag):
             kPacketCounts = 0x1
             kErrorCounts = 0x2
 
@@ -10764,7 +10764,7 @@ class EthernetNetworkDiagnostics(Cluster):
             kUnknownEnumValue = 10,
 
     class Bitmaps:
-        class EthernetNetworkDiagnosticsFeature(IntFlag):
+        class Feature(IntFlag):
             kPacketCounts = 0x1
             kErrorCounts = 0x2
 
@@ -11129,7 +11129,7 @@ class TimeSynchronization(Cluster):
             kUnknownEnumValue = 3,
 
     class Bitmaps:
-        class TimeSynchronizationFeature(IntFlag):
+        class Feature(IntFlag):
             kTimeZone = 0x1
             kNTPClient = 0x2
             kNTPServer = 0x4
@@ -12256,7 +12256,7 @@ class Switch(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class SwitchFeature(IntFlag):
+        class Feature(IntFlag):
             kLatchingSwitch = 0x1
             kMomentarySwitch = 0x2
             kMomentarySwitchRelease = 0x4
@@ -14537,7 +14537,7 @@ class IcdManagement(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class ICDManagementFeature(IntFlag):
+        class Feature(IntFlag):
             kCheckInProtocolSupport = 0x1
 
     class Structs:
@@ -14858,7 +14858,7 @@ class ModeSelect(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class ModeSelectFeature(IntFlag):
+        class Feature(IntFlag):
             kDeponoff = 0x1
 
     class Structs:
@@ -15647,7 +15647,7 @@ class SmokeCoAlarm(Cluster):
             kUnknownEnumValue = 3,
 
     class Bitmaps:
-        class SmokeCOAlarmFeature(IntFlag):
+        class Feature(IntFlag):
             kSmokeAlarm = 0x1
             kCoAlarm = 0x2
 
@@ -19398,7 +19398,7 @@ class DoorLock(Cluster):
             kFriday = 0x20
             kSaturday = 0x40
 
-        class DoorLockFeature(IntFlag):
+        class Feature(IntFlag):
             kPinCredential = 0x1
             kRfidCredential = 0x2
             kFingerCredentials = 0x4
@@ -20908,6 +20908,13 @@ class WindowCovering(Cluster):
             kLiftEncoderControlled = 0x20
             kTiltEncoderControlled = 0x40
 
+        class Feature(IntFlag):
+            kLift = 0x1
+            kTilt = 0x2
+            kPositionAwareLift = 0x4
+            kAbsolutePosition = 0x8
+            kPositionAwareTilt = 0x10
+
         class Mode(IntFlag):
             kMotorDirectionReversed = 0x1
             kCalibrationMode = 0x2
@@ -20932,13 +20939,6 @@ class WindowCovering(Cluster):
             kHardwareFailure = 0x200
             kManualOperation = 0x400
             kProtection = 0x800
-
-        class WindowCoveringFeature(IntFlag):
-            kLift = 0x1
-            kTilt = 0x2
-            kPositionAwareLift = 0x4
-            kAbsolutePosition = 0x8
-            kPositionAwareTilt = 0x10
 
     class Commands:
         @dataclass
@@ -21920,7 +21920,7 @@ class PumpConfigurationAndControl(Cluster):
             kUnknownEnumValue = 4,
 
     class Bitmaps:
-        class PumpConfigurationAndControlFeature(IntFlag):
+        class Feature(IntFlag):
             kConstantPressure = 0x1
             kCompensatedPressure = 0x2
             kConstantFlow = 0x4
@@ -22861,17 +22861,17 @@ class Thermostat(Cluster):
             kSaturday = 0x40
             kAway = 0x80
 
-        class ModeForSequence(IntFlag):
-            kHeatSetpointPresent = 0x1
-            kCoolSetpointPresent = 0x2
-
-        class ThermostatFeature(IntFlag):
+        class Feature(IntFlag):
             kHeating = 0x1
             kCooling = 0x2
             kOccupancy = 0x4
             kScheduleConfiguration = 0x8
             kSetback = 0x10
             kAutoMode = 0x20
+
+        class ModeForSequence(IntFlag):
+            kHeatSetpointPresent = 0x1
+            kCoolSetpointPresent = 0x2
 
     class Structs:
         @dataclass
@@ -23939,7 +23939,7 @@ class FanControl(Cluster):
             kUnknownEnumValue = 7,
 
     class Bitmaps:
-        class FanControlFeature(IntFlag):
+        class Feature(IntFlag):
             kMultiSpeed = 0x1
             kAuto = 0x2
             kRocking = 0x4
@@ -24621,18 +24621,18 @@ class ColorControl(Cluster):
             kXYAttributesSupported = 0x8
             kColorTemperatureSupported = 0x10
 
-        class ColorControlFeature(IntFlag):
-            kHueAndSaturation = 0x1
-            kEnhancedHue = 0x2
-            kColorLoop = 0x4
-            kXy = 0x8
-            kColorTemperature = 0x10
-
         class ColorLoopUpdateFlags(IntFlag):
             kUpdateAction = 0x1
             kUpdateDirection = 0x2
             kUpdateTime = 0x4
             kUpdateStartHue = 0x8
+
+        class Feature(IntFlag):
+            kHueAndSaturation = 0x1
+            kEnhancedHue = 0x2
+            kColorLoop = 0x4
+            kXy = 0x8
+            kColorTemperature = 0x10
 
     class Commands:
         @dataclass
@@ -26842,7 +26842,7 @@ class PressureMeasurement(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class PressureMeasurementFeature(IntFlag):
+        class Feature(IntFlag):
             kExtended = 0x1
 
     class Attributes:
@@ -28019,7 +28019,7 @@ class Channel(Cluster):
             kUnknownEnumValue = 1,
 
     class Bitmaps:
-        class ChannelFeature(IntFlag):
+        class Feature(IntFlag):
             kChannelList = 0x1
             kLineupInfo = 0x2
 
@@ -28557,7 +28557,7 @@ class MediaPlayback(Cluster):
             kUnknownEnumValue = 4,
 
     class Bitmaps:
-        class MediaPlaybackFeature(IntFlag):
+        class Feature(IntFlag):
             kAdvancedSeek = 0x1
             kVariableSpeed = 0x2
 
@@ -29004,7 +29004,7 @@ class MediaInput(Cluster):
             kUnknownEnumValue = 12,
 
     class Bitmaps:
-        class MediaInputFeature(IntFlag):
+        class Feature(IntFlag):
             kNameUpdates = 0x1
 
     class Structs:
@@ -29479,7 +29479,7 @@ class KeypadInput(Cluster):
             kUnknownEnumValue = 3,
 
     class Bitmaps:
-        class KeypadInputFeature(IntFlag):
+        class Feature(IntFlag):
             kNavigationKeyCodes = 0x1
             kLocationKeys = 0x2
             kNumberKeys = 0x4
@@ -29684,7 +29684,7 @@ class ContentLauncher(Cluster):
             kUnknownEnumValue = 14,
 
     class Bitmaps:
-        class ContentLauncherFeature(IntFlag):
+        class Feature(IntFlag):
             kContentSearch = 0x1
             kURLPlayback = 0x2
 
@@ -30014,7 +30014,7 @@ class AudioOutput(Cluster):
             kUnknownEnumValue = 6,
 
     class Bitmaps:
-        class AudioOutputFeature(IntFlag):
+        class Feature(IntFlag):
             kNameUpdates = 0x1
 
     class Structs:
@@ -30237,7 +30237,7 @@ class ApplicationLauncher(Cluster):
             kUnknownEnumValue = 3,
 
     class Bitmaps:
-        class ApplicationLauncherFeature(IntFlag):
+        class Feature(IntFlag):
             kApplicationPlatform = 0x1
 
     class Structs:
