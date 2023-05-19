@@ -7006,6 +7006,7 @@
           - FuelTankMonitoring
           - InkCartridgeMonitoring
           - TonerCartridgeMonitoring
+          - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
       attributes:
@@ -7293,6 +7294,16 @@
               - EventList
               - FeatureMap
               - ClusterRevision
+          RefrigeratorAlarm:
+              - Mask
+              - Latch
+              - State
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
           TemperatureControl:
               - TemperatureSetpoint
               - MinTemperature
@@ -7350,6 +7361,8 @@
               - ResetCondition
           TonerCartridgeMonitoring:
               - ResetCondition
+          RefrigeratorAlarm:
+              - Reset
           TemperatureControl:
               - SetTemperature
           DoorLock:
@@ -7360,6 +7373,10 @@
           DoorLock:
               UnboltDoor:
                   - pinCode
+          RefrigeratorAlarm:
+              Reset:
+                  - alarms
+                  - mask
           TemperatureControl:
               SetTemperature:
                   - targetTemperature
@@ -7385,6 +7402,8 @@
                   - label
                   - temperatureLevel
       events:
+          RefrigeratorAlarm:
+              - Notify
           SmokeCOAlarm:
               - SmokeAlarm
               - COAlarm
@@ -7397,6 +7416,13 @@
               - InterconnectSmokeAlarm
               - InterconnectCOAlarm
               - AllClear
+      event fields:
+          RefrigeratorAlarm:
+              Notify:
+                  - active
+                  - inactive
+                  - state
+                  - mask
       enums:
           AirQuality:
               - AirQualityEnum
@@ -7691,6 +7717,8 @@
               - Feature
           TonerCartridgeMonitoring:
               - Feature
+          RefrigeratorAlarm:
+              - AlarmMap
           TemperatureControl:
               - Feature
           SmokeCOAlarm:
@@ -7774,6 +7802,9 @@
               # here.
               Feature:
                   - Unbolt
+          RefrigeratorAlarm:
+              AlarmMap:
+                  - DoorOpen
           TemperatureControl:
               Feature:
                   - TemperatureNumber
