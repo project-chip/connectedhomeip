@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 123.2.4. [TC-S-2.4] Secondary functionality with server as DUT
+name: 123.2.4. [TC-S-2.4] Recall scene with transition time functionality
 
 PICS:
     - S.S
@@ -37,6 +37,39 @@ tests:
       cluster: "Groups"
       endpoint: "1"
       command: "RemoveAllGroups"
+
+    - label:
+          "preparation step for using commands from Groups cluster: Add KeySet"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 1,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 0,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 0,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 0,
+                    }
+
+    - label:
+          "Preparation step for using commands from Groups cluster: Write Group
+          Keys"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0001, GroupKeySetID: 0x01a1 },
+              ]
 
     - label:
           "TH sends a AddGroup command to DUT with the GroupID field set to
@@ -70,6 +103,8 @@ tests:
           values:
               - name: "Status"
                 value: 0
+              - name: "GroupID"
+                value: 0x0001
 
     - label:
           "TH sends a AddScene command to DUT with the GroupID field set to
@@ -88,28 +123,8 @@ tests:
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
-                value:
-                    [
-                        {
-                            ClusterID: 0x0006,
-                            AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
-                        },
-                        {
-                            ClusterID: 0x0008,
-                            AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0000,
-                                        AttributeValue: 0x64,
-                                    },
-                                    {
-                                        AttributeID: 0x0001,
-                                        AttributeValue: 0x00,
-                                    },
-                                ],
-                        },
-                    ]
+                value: []
+ 
       response:
           values:
               - name: "Status"
@@ -118,68 +133,6 @@ tests:
                 value: 0x0001
               - name: "SceneID"
                 value: 0x01
-
-    - label:
-          "TH sends a AddScene command to DUT with the GroupID field set to
-          0x0001, the SceneID field set to 0x01, the TransitionTime field set to
-          0x0001 and a set of extension fields appropriate to AC1."
-      verification: |
-          Execute the following command in TH to generate the pre-condition to execute this test case:
-
-          ./chip-tool scenes add-scene 0x0001 1 1 "Test Name" '[{"clusterId": value, "attributeValueList":[{"attributeId": value, "attributeValue": [value]}]}' nodeId endpointId
-
-          Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
-
-          Verify the "status is success" on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
-          [1670970505.887060][5742:5744] CHIP:DMG: InvokeResponseMessage =
-          [1670970505.887118][5742:5744] CHIP:DMG: {
-          [1670970505.887172][5742:5744] CHIP:DMG: 	suppressResponse = false,
-          [1670970505.887231][5742:5744] CHIP:DMG: 	InvokeResponseIBs =
-          [1670970505.887307][5742:5744] CHIP:DMG: 	[
-          [1670970505.887366][5742:5744] CHIP:DMG: 		InvokeResponseIB =
-          [1670970505.887444][5742:5744] CHIP:DMG: 		{
-          [1670970505.887507][5742:5744] CHIP:DMG: 			CommandDataIB =
-          [1670970505.887576][5742:5744] CHIP:DMG: 			{
-          [1670970505.887713][5742:5744] CHIP:DMG: 				CommandPathIB =
-          [1670970505.887804][5742:5744] CHIP:DMG: 				{
-          [1670970505.887940][5742:5744] CHIP:DMG: 					EndpointId = 0x1,
-          [1670970505.888093][5742:5744] CHIP:DMG: 					ClusterId = 0x5,
-          [1670970505.888242][5742:5744] CHIP:DMG: 					CommandId = 0x0,
-          [1670970505.888385][5742:5744] CHIP:DMG: 				},
-          [1670970505.888692][5742:5744] CHIP:DMG:
-          [1670970505.888769][5742:5744] CHIP:DMG: 				CommandFields =
-          [1670970505.888852][5742:5744] CHIP:DMG: 				{
-          [1670970505.889030][5742:5744] CHIP:DMG: 					0x0 = 0,
-          [1670970505.889183][5742:5744] CHIP:DMG: 					0x1 = 1,
-          [1670970505.889406][5742:5744] CHIP:DMG: 					0x2 = 1,
-          [1670970505.889515][5742:5744] CHIP:DMG: 				},
-          [1670970505.889603][5742:5744] CHIP:DMG: 			},
-          [1670970505.889684][5742:5744] CHIP:DMG:
-          [1670970505.889745][5742:5744] CHIP:DMG: 		},
-          [1670970505.889821][5742:5744] CHIP:DMG:
-          [1670970505.889878][5742:5744] CHIP:DMG: 	],
-          [1670970505.889953][5742:5744] CHIP:DMG:
-          [1670970505.890009][5742:5744] CHIP:DMG: 	InteractionModelRevision = 1
-          [1670970505.890066][5742:5744] CHIP:DMG: },
-          [1670970505.890212][5742:5744] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0005 Command=0x0000_0000
-          [1670970505.890328][5742:5744] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
-          [1670970505.890458][5742:5744] CHIP:TOO:   AddSceneResponse: {
-          [1670970505.890551][5742:5744] CHIP:TOO:     status: 0
-          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 1
-          [1670970505.890717][5742:5744] CHIP:TOO:     sceneId: 1
-          [1670970505.890774][5742:5744] CHIP:TOO:    }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: S.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Please execute the add scene command with
-                    extensionfieldsets in accordance with AC1 on DUT and enter
-                    'y' if the command is successful"
-              - name: "expectedValue"
-                value: "y"
 
     - label:
           "TH configures AC1 on DUT for all implemented application clusters
@@ -281,8 +234,21 @@ tests:
                 value: 0x0001
               - name: "SceneID"
                 value: 0x01
-      response:
-          error: 0x00
+
+    - label:
+          "DUT transitions to AC1 over 20s."
+      verification: |
+          Is the transition done over 20s?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please confirm that transition to AC1 was made over 20s"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH configures AC2 on DUT for all implemented application clusters
@@ -331,9 +297,22 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: null
-      response:
-          error: 0x00
+                value: 0x0032
+
+    - label:
+          "DUT transitions to AC1 over 5."
+      verification: |
+          Is the transition done over 5s?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Please confirm that transition to AC1 was made over 5s"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH configures AC2 on DUT for all implemented application clusters

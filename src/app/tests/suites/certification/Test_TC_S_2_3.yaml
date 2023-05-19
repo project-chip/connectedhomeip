@@ -42,6 +42,7 @@ tests:
                 saveAs: maxScenes
           constraints:
               type: uint16
+      
     - label:
           "preparation step for using commands from Groups cluster: Add KeySet"
       cluster: "Group Key Management"
@@ -598,30 +599,3 @@ tests:
                 value: 0x0001
               - name: "SceneList"
                 value: [0x01, 0x02]
-
-    - label:
-          "TH sends a AddScene command to DUT with the GroupID field set to
-          0x0001, the SceneID field set to 0x01, the TransitionTime field set to
-          0x0014 (20s) and no extension field sets."
-      PICS: S.S.C40.Rsp
-      command: "AddScene"
-      arguments:
-          values:
-              - name: "GroupID"
-                value: 0x0001
-              - name: "SceneID"
-                value: 0x0001
-              - name: "TransitionTime"
-                value: 0x0014
-              - name: "SceneName"
-                value: "Scene1"
-              - name: "ExtensionFieldSets"
-                value: []
-      response:
-          values:
-              - name: "Status"
-                value: 0x00
-              - name: "GroupID"
-                value: 0x0001
-              - name: "SceneID"
-                value: 0x01
