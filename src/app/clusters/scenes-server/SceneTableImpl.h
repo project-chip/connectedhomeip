@@ -159,8 +159,9 @@ public:
     CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
     void Finish() override;
 
-    // Global scene count
+    // Scene count
     CHIP_ERROR GetEndpointSceneCount(EndpointId endpoint, uint8_t & scene_count) override;
+    CHIP_ERROR GetFabricSceneCount(EndpointId endpoint, FabricIndex fabric_index, uint8_t & scene_count) override;
 
     // Data
     CHIP_ERROR GetRemainingCapacity(EndpointId endpoint, FabricIndex fabric_index, uint8_t & capacity) override;

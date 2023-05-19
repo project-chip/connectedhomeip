@@ -198,15 +198,12 @@ public:
     }
     static StorageKeyName SubscriptionResumptionMaxCount() { return StorageKeyName::Formatted("g/sum"); }
 
-    static StorageKeyName EndpointSceneCountKey(chip::EndpointId endpoint)
-    {
-        return StorageKeyName::Formatted("g/scc/e/%x", endpoint);
-    }
-    static StorageKeyName FabricSceneDataKey(chip::FabricIndex fabric, chip::EndpointId endpoint)
+    static StorageKeyName EndpointSceneCountKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/scc/e/%x", endpoint); }
+    static StorageKeyName FabricSceneDataKey(FabricIndex fabric, EndpointId endpoint)
     {
         return StorageKeyName::Formatted("f/%x/e/%x/sc", fabric, endpoint);
     }
-    static StorageKeyName FabricSceneKey(chip::FabricIndex fabric, chip::EndpointId endpoint, uint8_t id)
+    static StorageKeyName FabricSceneKey(FabricIndex fabric, EndpointId endpoint, uint8_t id)
     {
         return StorageKeyName::Formatted("f/%x/e/%x/sc/%x", fabric, endpoint, id);
     }

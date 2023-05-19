@@ -261,7 +261,8 @@ public:
     virtual void Finish()                                        = 0;
 
     // Global scene count
-    virtual CHIP_ERROR GetEndpointSceneCount(EndpointId endpoint, uint8_t & scene_count) = 0;
+    virtual CHIP_ERROR GetEndpointSceneCount(EndpointId endpoint, uint8_t & scene_count)                         = 0;
+    virtual CHIP_ERROR GetFabricSceneCount(EndpointId endpoint, FabricIndex fabric_index, uint8_t & scene_count) = 0;
 
     // Data
     virtual CHIP_ERROR GetRemainingCapacity(EndpointId endpoint, FabricIndex fabric_index, uint8_t & capacity)              = 0;

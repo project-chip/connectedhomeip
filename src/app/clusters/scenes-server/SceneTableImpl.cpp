@@ -126,7 +126,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         VerifyOrReturnError(kInvalidEndpointId != endpoint_id, CHIP_ERROR_INVALID_ARGUMENT);
-        key = DefaultStorageKeyAllocator::FabricSceneKey(fabric_index, kInvalidEndpointId, index);
+        key = DefaultStorageKeyAllocator::FabricSceneKey(fabric_index, endpoint_id, index);
         return CHIP_NO_ERROR;
     }
 
@@ -485,7 +485,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         err = Deserialize(reader, storage, deleted_scenes_count);
 
         // If Deserialize sets the "deleted_scenes" variable, the table in flash memory held too many scenes (can happen
-        // if max_scenes_per_fabric was reduced during an OTA) and was adjusted during deserailizing . The fabric data must then
+        // if max_scenes_per_fabric was reduced during an OTA) and was adjusted during deserializing . The fabric data must then
         // be updated
         if (deleted_scenes_count)
         {
@@ -519,6 +519,18 @@ void DefaultSceneTableImpl::Finish()
     UnregisterAllHandlers();
     mSceneEntryIterators.ReleaseAll();
 }
+CHIP_ERROR DefaultSceneTableImpl::GetFabricSceneCount(EndpointId endpoint, FabricIndex fabric_index, uint8_t & scene_count)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
+    FabricSceneData fabric(endpoint, fabric_index);
+    CHIP_ERROR err = fabric.Load(mStorage);
+    VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+
+    scene_count = (CHIP_ERROR_NOT_FOUND == err) ? 0 : fabric.scene_count;
+
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR DefaultSceneTableImpl::GetEndpointSceneCount(EndpointId endpoint, uint8_t & scene_count)
 {
@@ -531,6 +543,7 @@ CHIP_ERROR DefaultSceneTableImpl::GetEndpointSceneCount(EndpointId endpoint, uin
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DefaultSceneTableImpl::SetEndpointSceneCount(EndpointId endpoint, const uint8_t & scene_count)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
@@ -589,7 +602,7 @@ CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(EndpointId endpoint, Fabric
 CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id,
                                                      SceneTableEntry & entry)
 {
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnLogError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     SceneTableData scene(endpoint, fabric_index);
@@ -616,7 +629,6 @@ CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(EndpointId endpoint, Fabric
 CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
-
     FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));

@@ -47,7 +47,7 @@ public:
 
     // Callbacks
     void GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId);
-    void MakeSceneInvalid();
+    void MakeSceneInvalid(EndpointId aEndpointId);
     void StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId);
     void RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId);
 

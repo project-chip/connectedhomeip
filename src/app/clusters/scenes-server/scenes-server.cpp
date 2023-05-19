@@ -39,6 +39,7 @@ using HandlerContext    = chip::app::CommandHandlerInterface::HandlerContext;
 using ExtensionFieldSet = chip::scenes::ExtensionFieldSet;
 using GroupDataProvider = chip::Credentials::GroupDataProvider;
 using SceneTable        = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
+using AuthMode          = chip::Access::AuthMode;
 
 namespace chip {
 namespace app {
@@ -51,13 +52,7 @@ ScenesServer & ScenesServer::Instance()
 {
     return mInstance;
 }
-void ReportAttributeOnAllEndpoints(AttributeId attribute)
-{
-    for (auto endpoint : EnabledEndpointsWithServerCluster(Id))
-    {
-        MatterReportingAttributeChangeCallback(endpoint, Id, attribute);
-    }
-}
+void ReportAttributeOnAllEndpoints(AttributeId attribute) {}
 
 CHIP_ERROR ScenesServer::Init()
 {
@@ -78,7 +73,11 @@ CHIP_ERROR ScenesServer::Init()
     // According to spec, bit 7 (Scene Names) MUST match feature bit 0 (Scene Names)
     mNameSupport = 0x80;
 
-    mLastConfiguredBy.SetNull();
+    for (auto endpoint : EnabledEndpointsWithServerCluster(Id))
+    {
+        Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
+    }
+
     mIsInitialized = true;
     return CHIP_NO_ERROR;
 }
@@ -206,11 +205,39 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         return;
     }
 
+    // Update Attributes
+    uint8_t scene_count = 0;
+    err = sceneTable->GetFabricSceneCount(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), scene_count);
+    if (err != CHIP_NO_ERROR)
+    {
+        response.status = to_underlying(StatusIB(err).mStatus);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+    Attributes::SceneCount::Set(ctx.mRequestPath.mEndpointId, scene_count);
+
+    err = sceneTable->GetRemainingCapacity(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), capacity);
+    if (err != CHIP_NO_ERROR)
+    {
+        response.status = to_underlying(StatusIB(err).mStatus);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+    Attributes::RemainingCapacity::Set(ctx.mRequestPath.mEndpointId, capacity);
+
+    Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+    if (descriptor.authMode == AuthMode::kCase)
+    {
+        Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
+    }
+    else
+    {
+        Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
+    }
+
     // Write response
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-
-    // TODO : Handle dirty marking of attributes
 }
 
 template <typename CommandData, typename ResponseType>
@@ -305,6 +332,16 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, SceneTable * 
     Span<Structs::ExtensionFieldSet::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
     response.extensionFieldSets.SetValue(responseEFSSpan);
 
+    Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+    if (descriptor.authMode == AuthMode::kCase)
+    {
+        Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
+    }
+    else
+    {
+        Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
+    }
+
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -342,7 +379,28 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     // Gets the EFS
     ReturnErrorOnFailure(sceneTable->SceneSaveEFS(endpointID, scene));
     // Insert in Scene Table
-    return sceneTable->SetSceneTableEntry(endpointID, fabricIdx, scene);
+    ReturnErrorOnFailure(sceneTable->SetSceneTableEntry(endpointID, fabricIdx, scene));
+
+    // Update size attributes
+    uint8_t scene_count = 0;
+    err                 = sceneTable->GetFabricSceneCount(endpointID, fabricIdx, scene_count);
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+    Attributes::SceneCount::Set(endpointID, scene_count);
+
+    uint8_t capacity;
+    err = sceneTable->GetRemainingCapacity(endpointID, fabricIdx, capacity);
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+    Attributes::RemainingCapacity::Set(endpointID, capacity);
+    Attributes::CurrentScene::Set(endpointID, sceneID);
+    Attributes::CurrentGroup::Set(endpointID, groupID);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & endpointID, const GroupId & groupID,
@@ -372,7 +430,12 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
         }
     }
 
-    return sceneTable->SceneApplyEFS(endpointID, scene);
+    ReturnErrorOnFailure(sceneTable->SceneApplyEFS(endpointID, scene));
+
+    Attributes::CurrentScene::Set(endpointID, sceneID);
+    Attributes::CurrentGroup::Set(endpointID, groupID);
+
+    return CHIP_NO_ERROR;
 }
 
 // CommandHanlerInterface
@@ -425,38 +488,6 @@ void ScenesServer::InvokeCommand(HandlerContext & ctxt)
     }
 }
 
-// AttributeAccessInterface
-CHIP_ERROR ScenesServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    uint8_t value = 0;
-    // TODO: handle endpoint attribute scoping and refactor scene table implementation for a per endpoint scope.
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::SceneCount::Id:
-        ReturnErrorOnFailure(mSceneTable->GetEndpointSceneCount(aPath.mEndpointId, value));
-        return aEncoder.Encode(value);
-    case Attributes::CurrentScene::Id:
-        return aEncoder.Encode(mCurrentScene);
-    case Attributes::CurrentGroup::Id:
-        return aEncoder.Encode(mCurrentGroup);
-    case Attributes::SceneValid::Id:
-        return aEncoder.Encode(mSceneValid);
-    case Attributes::NameSupport::Id:
-        return aEncoder.Encode(mNameSupport);
-    case Attributes::LastConfiguredBy::Id:
-        return aEncoder.Encode(mLastConfiguredBy);
-    case Attributes::FeatureMap::Id:
-        return aEncoder.Encode(mFeatureFlags);
-    case Attributes::SceneTableSize::Id:
-        return aEncoder.Encode(scenes::kMaxScenesPerEndpoint);
-    case Attributes::RemainingCapacity::Id:
-        ReturnErrorOnFailure(mSceneTable->GetRemainingCapacity(aPath.mEndpointId, aEncoder.AccessingFabricIndex(), value));
-        return aEncoder.Encode(value);
-    default:
-        return CHIP_NO_ERROR;
-    }
-}
-
 void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId)
 {
     VerifyOrReturn(nullptr != mGroupProvider);
@@ -468,28 +499,28 @@ void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpoin
     mSceneTable->DeleteAllScenesInGroup(aEndpointId, aFabricIx, aGroupId);
 }
 
-void ScenesServer::MakeSceneInvalid()
+void ScenesServer::MakeSceneInvalid(EndpointId aEndpointId)
 {
-    mSceneValid = false;
+    Attributes::SceneValid::Set(aEndpointId, false);
 }
 
 void ScenesServer::StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)
 {
-    mSceneValid = false;
+    Attributes::SceneValid::Set(aEndpointId, false);
 
     if (CHIP_NO_ERROR == StoreSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, mSceneTable, mGroupProvider))
     {
-        mSceneValid = true;
+        Attributes::SceneValid::Set(aEndpointId, true);
     }
 }
 void ScenesServer::RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)
 {
-    mSceneValid = false;
+    Attributes::SceneValid::Set(aEndpointId, false);
     Optional<DataModel::Nullable<uint16_t>> transitionTime;
 
     if (CHIP_NO_ERROR == RecallSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, transitionTime, mSceneTable, mGroupProvider))
     {
-        mSceneValid = true;
+        Attributes::SceneValid::Set(aEndpointId, true);
     }
 }
 
@@ -545,6 +576,38 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
         return;
     }
 
+    // Update Attributes
+    uint8_t scene_count = 0;
+    err =
+        mSceneTable->GetFabricSceneCount(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), scene_count);
+    if (err != CHIP_NO_ERROR)
+    {
+        response.status = to_underlying(StatusIB(err).mStatus);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+    Attributes::SceneCount::Set(ctx.mRequestPath.mEndpointId, scene_count);
+
+    uint8_t capacity = 0;
+    err = mSceneTable->GetRemainingCapacity(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), capacity);
+    if (err != CHIP_NO_ERROR)
+    {
+        response.status = to_underlying(StatusIB(err).mStatus);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+    Attributes::RemainingCapacity::Set(ctx.mRequestPath.mEndpointId, capacity);
+
+    Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+    if (descriptor.authMode == AuthMode::kCase)
+    {
+        Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
+    }
+    else
+    {
+        Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
+    }
+
     // Write response
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(mPath, response);
@@ -577,6 +640,20 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
         return;
     }
 
+    // Update Attributes
+    Attributes::SceneCount::Set(ctx.mRequestPath.mEndpointId, 0);
+    Attributes::RemainingCapacity::Set(ctx.mRequestPath.mEndpointId, 0);
+
+    Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+    if (descriptor.authMode == AuthMode::kCase)
+    {
+        Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
+    }
+    else
+    {
+        Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
+    }
+
     // Write response
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(mPath, response);
@@ -585,7 +662,7 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
 void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreScene::DecodableType & req)
 {
     // Scene Valid is false when this command begins
-    mSceneValid = false;
+    Attributes::SceneValid::Set(mPath.mEndpointId, false);
 
     Commands::StoreSceneResponse::Type response;
 
@@ -602,7 +679,16 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
 
     if (err == CHIP_NO_ERROR)
     {
-        mSceneValid = true;
+        Attributes::SceneValid::Set(mPath.mEndpointId, true);
+        Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+        if (descriptor.authMode == AuthMode::kCase)
+        {
+            Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
+        }
+        else
+        {
+            Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
+        }
     }
 
     response.status = to_underlying(StatusIB(err).mStatus);
@@ -612,7 +698,7 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
 void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::RecallScene::DecodableType & req)
 {
     // Scene Valid is false when this command begins
-    mSceneValid = false;
+    Attributes::SceneValid::Set(mPath.mEndpointId, false);
 
     // Update Attributes
     mCurrentScene = req.sceneID;
@@ -623,7 +709,16 @@ void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::Recal
 
     if (err == CHIP_NO_ERROR)
     {
-        mSceneValid = true;
+        Attributes::SceneValid::Set(mPath.mEndpointId, true);
+        Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+        if (descriptor.authMode == AuthMode::kCase)
+        {
+            Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
+        }
+        else
+        {
+            Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
+        }
     }
 
     ctx.mCommandHandler.AddStatus(mPath, StatusIB(err).mStatus);
@@ -674,6 +769,16 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
     }
 
     response.sceneList.SetValue(sceneList);
+
+    Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+    if (descriptor.authMode == AuthMode::kCase)
+    {
+        Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
+    }
+    else
+    {
+        Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
+    }
 
     // Write response
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
@@ -817,6 +922,37 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
             ctx.mCommandHandler.AddResponse(mPath, response);
         }
         return;
+    }
+
+    // Update Attributes
+    uint8_t scene_count = 0;
+    err =
+        mSceneTable->GetFabricSceneCount(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), scene_count);
+    if (err != CHIP_NO_ERROR)
+    {
+        response.status = to_underlying(StatusIB(err).mStatus);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+    Attributes::SceneCount::Set(ctx.mRequestPath.mEndpointId, scene_count);
+
+    err = mSceneTable->GetRemainingCapacity(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), capacity);
+    if (err != CHIP_NO_ERROR)
+    {
+        response.status = to_underlying(StatusIB(err).mStatus);
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        return;
+    }
+    Attributes::RemainingCapacity::Set(ctx.mRequestPath.mEndpointId, capacity);
+
+    Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
+    if (descriptor.authMode == AuthMode::kCase)
+    {
+        Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
+    }
+    else
+    {
+        Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
     }
 
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
