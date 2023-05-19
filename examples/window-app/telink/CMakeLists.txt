@@ -88,10 +88,6 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
 endif()
 
-if(CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING)
-    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/ICDUtil.cpp)
-endif()
-
 # Fix for unused swap parameter in: zephyr/include/zephyr/arch/riscv/irq.h:70
 add_compile_options(-Wno-error=unused-parameter)
 
