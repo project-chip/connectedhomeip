@@ -85,22 +85,24 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     bool LTNESupported = false;
     uint32_t OurFeatureMap;
 
-    if (FeatureMap::Get(aPath.mEndpointId, &OurFeatureMap) == EMBER_ZCL_STATUS_SUCCESS && OurFeatureMap & 1 << 6)  // Bit 6 is LTNE supported
+    if (FeatureMap::Get(aPath.mEndpointId, &OurFeatureMap) == EMBER_ZCL_STATUS_SUCCESS &&
+        OurFeatureMap & 1 << 6) // Bit 6 is LTNE supported
         LTNESupported = true;
 
     switch (aPath.mAttributeId)
     {
     case LocalTemperature::Id: {
-        if(LTNESupported)
+        if (LTNESupported)
             return aEncoder.EncodeNull();
         break;
     }
     case RemoteSensing::Id: {
-        if(LTNESupported)
+        if (LTNESupported)
         {
             uint8_t valueRemoteSensing;
-            VerifyOrReturnValue(RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing) == EMBER_ZCL_STATUS_SUCCESS, CHIP_NO_ERROR);
-            valueRemoteSensing &= 0xFE;     // clear bit 1 (LocalTemperature RemoteSensing bit)
+            VerifyOrReturnValue(RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing) == EMBER_ZCL_STATUS_SUCCESS,
+                                CHIP_NO_ERROR);
+            valueRemoteSensing &= 0xFE; // clear bit 1 (LocalTemperature RemoteSensing bit)
             return aEncoder.Encode(valueRemoteSensing);
         }
         break;
@@ -119,17 +121,18 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     bool LTNESupported = false;
     uint32_t OurFeatureMap;
 
-    if (FeatureMap::Get(aPath.mEndpointId, &OurFeatureMap) == EMBER_ZCL_STATUS_SUCCESS && OurFeatureMap & 1 << 6)  // Bit 6 is LTNE supported
+    if (FeatureMap::Get(aPath.mEndpointId, &OurFeatureMap) == EMBER_ZCL_STATUS_SUCCESS &&
+        OurFeatureMap & 1 << 6) // Bit 6 is LTNE supported
         LTNESupported = true;
 
     switch (aPath.mAttributeId)
     {
     case RemoteSensing::Id: {
-        if(LTNESupported)
+        if (LTNESupported)
         {
             uint8_t valueRemoteSensing;
             ReturnErrorOnFailure(aDecoder.Decode(valueRemoteSensing));
-            if(valueRemoteSensing & 0x01)    // If setting bit 1 (LocalTemperature RemoteSensing bit)
+            if (valueRemoteSensing & 0x01) // If setting bit 1 (LocalTemperature RemoteSensing bit)
             {
                 return StatusIB(imcode::ConstraintError).ToChipError();
             }
