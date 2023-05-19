@@ -651,6 +651,16 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace TemperatureControl
 
+namespace RefrigeratorAlarm {
+namespace Commands {
+
+namespace Reset {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Reset
+
+} // namespace Commands
+} // namespace RefrigeratorAlarm
+
 namespace SmokeCoAlarm {
 namespace Commands {
 

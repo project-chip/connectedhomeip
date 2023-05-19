@@ -298,6 +298,12 @@
 #define CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_REFRIGERATOR_ALARM_SERVER) || defined(ZCL_USING_REFRIGERATOR_ALARM_CLIENT)
+#define CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM { chip::app::Clusters::RefrigeratorAlarm::Id, "Refrigerator Alarm" },
+#else
+#define CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM
+#endif
+
 #if defined(ZCL_USING_AIR_QUALITY_CLUSTER_SERVER) || defined(ZCL_USING_AIR_QUALITY_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER { chip::app::Clusters::AirQuality::Id, "Air Quality" },
 #else
@@ -626,6 +632,7 @@
     CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM                                                                                           \
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \

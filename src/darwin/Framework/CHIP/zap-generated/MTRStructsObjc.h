@@ -686,6 +686,14 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
+@interface MTRRefrigeratorAlarmClusterNotifyEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull active MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull inactive MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull state MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull mask MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterSmokeAlarmEvent : NSObject <NSCopying>
 @end
 

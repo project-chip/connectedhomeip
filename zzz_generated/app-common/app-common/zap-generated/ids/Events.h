@@ -267,6 +267,16 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace BooleanState
 
+namespace RefrigeratorAlarm {
+namespace Events {
+
+namespace Notify {
+static constexpr EventId Id = 0x00000000;
+} // namespace Notify
+
+} // namespace Events
+} // namespace RefrigeratorAlarm
+
 namespace SmokeCoAlarm {
 namespace Events {
 
