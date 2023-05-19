@@ -375,6 +375,15 @@ public:
     ~ModeSelectCluster() {}
 };
 
+class DLL_EXPORT RefrigeratorAlarmCluster : public ClusterBase
+{
+public:
+    RefrigeratorAlarmCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~RefrigeratorAlarmCluster() {}
+};
+
 class DLL_EXPORT AirQualityCluster : public ClusterBase
 {
 public:

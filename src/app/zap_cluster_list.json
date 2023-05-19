@@ -74,7 +74,7 @@
             "pump-configuration-and-control-client"
         ],
         "PWM_CLUSTER": [],
-        "REFRIGERATOR_ALARM_CLUSTER": [],
+        "REFRIGERATOR_ALARM": [],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
         "SCENES_CLUSTER": [],
         "SMOKE_CO_ALARM_CLUSTER": [],

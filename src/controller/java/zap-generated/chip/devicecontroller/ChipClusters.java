@@ -14138,6 +14138,25 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public void reset(DefaultClusterCallback callback, Long alarms, Optional<Long> mask) {
+      reset(chipClusterPtr, callback, alarms, mask, null);
+    }
+
+    public void reset(
+        DefaultClusterCallback callback,
+        Long alarms,
+        Optional<Long> mask,
+        int timedInvokeTimeoutMs) {
+      reset(chipClusterPtr, callback, alarms, mask, timedInvokeTimeoutMs);
+    }
+
+    private native void reset(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Long alarms,
+        Optional<Long> mask,
+        @Nullable Integer timedInvokeTimeoutMs);
+
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
