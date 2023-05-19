@@ -144,8 +144,8 @@ class TestRunner(TestRunnerBase):
                 continue
 
             loop = asyncio.get_event_loop()
-            result = loop.run_until_complete(asyncio.wait_for(
-                self._run(parser, runner_config), parser.timeout))
+            result = loop.run_until_complete(
+                self._run_with_timeout(parser, runner_config))
             if isinstance(result, Exception):
                 raise (result)
             elif not result:
@@ -157,11 +157,20 @@ class TestRunner(TestRunnerBase):
 
         return parser_builder.done
 
-    async def _run(self, parser: TestParser, config: TestRunnerConfig):
+    async def _run_with_timeout(self, parser: TestParser, config: TestRunnerConfig):
         status = True
         try:
             await self.start()
+            status = await asyncio.wait_for(self._run(parser, config), parser.timeout)
+        except Exception as exception:
+            status = exception
+        finally:
+            await self.stop()
+            return status
 
+    async def _run(self, parser: TestParser, config: TestRunnerConfig):
+        status = True
+        try:
             hooks = config.hooks
             hooks.test_start(parser.filename, parser.name, parser.tests.count)
 
@@ -214,5 +223,4 @@ class TestRunner(TestRunnerBase):
         except Exception as exception:
             status = exception
         finally:
-            await self.stop()
             return status
