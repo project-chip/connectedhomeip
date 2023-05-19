@@ -30,9 +30,9 @@ char spake2Verifier[]       = "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/ire
 char genSpake2Path[]   = "";
 uint32_t productId     = 32773;
 uint32_t vendorId      = 65521;
-char productName[]     = "";
-char vendorName[]      = "";
-char hwVersionString[] = "";
+char productName[]     = "silabs_product";
+char vendorName[]      = "silabs_vendor";
+char hwVersionString[] = "1.0";
 uint32_t rotatingId;
 uint32_t commissionableFlow = 1;
 uint8_t rendezvousFlag      = 2;
