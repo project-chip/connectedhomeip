@@ -31,8 +31,12 @@
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Attributes;
+
+using imcode = Protocols::InteractionModel::Status;
 
 constexpr int16_t kDefaultAbsMinHeatSetpointLimit = 700;  // 7C (44.5 F) is the default
 constexpr int16_t kDefaultAbsMaxHeatSetpointLimit = 3000; // 30C (86 F) is the default
@@ -59,8 +63,89 @@ constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
 #define FEATURE_MAP_SCH 0x08
 #define FEATURE_MAP_SB 0x10
 #define FEATURE_MAP_AUTO 0x20
+#define FEATURE_MAP_LTNE 0x40
 
 #define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
+
+class ThermostatAttrAccess : public AttributeAccessInterface
+{
+public:
+    ThermostatAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Thermostat::Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+};
+
+ThermostatAttrAccess gThermostatAttrAccess;
+
+CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    VerifyOrDie(aPath.mClusterId == Thermostat::Id);
+
+    bool LTNESupported = false;
+    uint32_t OurFeatureMap;
+
+    if (FeatureMap::Get(aPath.mEndpointId, &OurFeatureMap) == EMBER_ZCL_STATUS_SUCCESS && OurFeatureMap & 1 << 6)  // Bit 6 is LTNE supported
+        LTNESupported = true;
+
+    switch (aPath.mAttributeId)
+    {
+    case LocalTemperature::Id: {
+        if(LTNESupported)
+            return aEncoder.EncodeNull();
+        break;
+    }
+    case RemoteSensing::Id: {
+        if(LTNESupported)
+        {
+            uint8_t valueRemoteSensing;
+            VerifyOrReturnValue(RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing) == EMBER_ZCL_STATUS_SUCCESS, CHIP_NO_ERROR);
+            valueRemoteSensing &= 0xFE;     // clear bit 1 (LocalTemperature RemoteSensing bit)
+            return aEncoder.Encode(valueRemoteSensing);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    VerifyOrDie(aPath.mClusterId == Thermostat::Id);
+
+    bool LTNESupported = false;
+    uint32_t OurFeatureMap;
+
+    if (FeatureMap::Get(aPath.mEndpointId, &OurFeatureMap) == EMBER_ZCL_STATUS_SUCCESS && OurFeatureMap & 1 << 6)  // Bit 6 is LTNE supported
+        LTNESupported = true;
+
+    switch (aPath.mAttributeId)
+    {
+    case RemoteSensing::Id: {
+        if(LTNESupported)
+        {
+            uint8_t valueRemoteSensing;
+            ReturnErrorOnFailure(aDecoder.Decode(valueRemoteSensing));
+            if(valueRemoteSensing & 0x01)    // If setting bit 1 (LocalTemperature RemoteSensing bit)
+            {
+                return StatusIB(imcode::ConstraintError).ToChipError();
+            }
+            else
+            {
+                RemoteSensing::Set(aPath.mEndpointId, valueRemoteSensing);
+            }
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
 {
@@ -77,8 +162,6 @@ void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
     // can get the values.
     // or should this just be the responsibility of the thermostat application?
 }
-
-using imcode = Protocols::InteractionModel::Status;
 
 Protocols::InteractionModel::Status
 MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
@@ -754,4 +837,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     return true;
 }
 
-void MatterThermostatPluginServerInitCallback() {}
+void MatterThermostatPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gThermostatAttrAccess);
+}
