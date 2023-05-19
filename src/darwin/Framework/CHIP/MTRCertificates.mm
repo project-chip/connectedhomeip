@@ -62,9 +62,7 @@ using namespace chip::Credentials;
                                                  fabricID:(NSNumber * _Nullable)fabricID
                                                     error:(NSError * __autoreleasing *)error
 {
-    auto * validityPeriod =
-        [[NSDateInterval alloc] initWithStartDate:[NSDate now]
-                                         duration:MTROperationalCredentialsDelegate::kCertificateDefaultValiditySecs];
+    auto * validityPeriod = [[NSDateInterval alloc] initWithStartDate:[NSDate now] endDate:[NSDate distantFuture]];
     return [self createRootCertificate:keypair issuerID:issuerID fabricID:fabricID validityPeriod:validityPeriod error:error];
 }
 
@@ -98,9 +96,7 @@ using namespace chip::Credentials;
                                                          fabricID:(NSNumber * _Nullable)fabricID
                                                             error:(NSError * __autoreleasing *)error
 {
-    auto * validityPeriod =
-        [[NSDateInterval alloc] initWithStartDate:[NSDate now]
-                                         duration:MTROperationalCredentialsDelegate::kCertificateDefaultValiditySecs];
+    auto * validityPeriod = [[NSDateInterval alloc] initWithStartDate:[NSDate now] endDate:[NSDate distantFuture]];
     return [self createIntermediateCertificate:rootKeypair
                                rootCertificate:rootCertificate
                          intermediatePublicKey:intermediatePublicKey
@@ -142,9 +138,7 @@ using namespace chip::Credentials;
                                            caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
-    auto * validityPeriod =
-        [[NSDateInterval alloc] initWithStartDate:[NSDate now]
-                                         duration:MTROperationalCredentialsDelegate::kCertificateDefaultValiditySecs];
+    auto * validityPeriod = [[NSDateInterval alloc] initWithStartDate:[NSDate now] endDate:[NSDate distantFuture]];
     return [self createOperationalCertificate:signingKeypair
                            signingCertificate:signingCertificate
                          operationalPublicKey:operationalPublicKey

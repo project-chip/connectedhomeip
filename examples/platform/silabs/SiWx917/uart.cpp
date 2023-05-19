@@ -19,7 +19,7 @@
 #include "USART.h"
 #include "matter_shell.h"
 #include "rsi_rom_egpio.h"
-#include "siwx917_utils.h"
+#include "silabs_utils.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

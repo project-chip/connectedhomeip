@@ -82,7 +82,7 @@ efr32_sdk("sdk") {
 }
 
 silabs_executable("chef_app") {
-  output_name = "chip-efr32-chef-example.out"
+  output_name = "matter-silabs-chef-example.out"
   include_dirs = [ "include" ]
   defines = []
 

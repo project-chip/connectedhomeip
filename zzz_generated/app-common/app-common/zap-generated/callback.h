@@ -353,6 +353,14 @@ void emberAfProxyValidClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief ICD Management Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfIcdManagementClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Mode Select Cluster Init
  *
  * Cluster Init
@@ -360,6 +368,126 @@ void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfModeSelectClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Temperature Control Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTemperatureControlClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Air Quality Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAirQualityClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Smoke CO Alarm Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief HEPA Filter Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Activated Carbon Filter Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ceramic Filter Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCeramicFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Electrostatic Filter Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectrostaticFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief UV Filter Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUvFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ionizing Filter Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfIonizingFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Zeolite Filter Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfZeoliteFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ozone Filter Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOzoneFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Water Tank Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfWaterTankMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Fuel Tank Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfFuelTankMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ink Cartridge Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfInkCartridgeMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Toner Cartridge Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTonerCartridgeMonitoringClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Door Lock Cluster Init
  *
@@ -584,14 +712,6 @@ void emberAfAccountLoginClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfElectricalMeasurementClusterInitCallback(chip::EndpointId endpoint);
-
-/** @brief Client Monitoring Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfClientMonitoringClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Unit Testing Cluster Init
  *
@@ -3693,6 +3813,84 @@ void emberAfBooleanStateClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfBooleanStateClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+// ICD Management Cluster
+//
+
+/** @brief ICD Management Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfIcdManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief ICD Management Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterIcdManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief ICD Management Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfIcdManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief ICD Management Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterIcdManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief ICD Management Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterIcdManagementClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                            EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief ICD Management Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterIcdManagementClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                            EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief ICD Management Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfIcdManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief ICD Management Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfIcdManagementClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
 // Mode Select Cluster
 //
 
@@ -3769,6 +3967,1152 @@ void emberAfModeSelectClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Temperature Control Cluster
+//
+
+/** @brief Temperature Control Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTemperatureControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Temperature Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTemperatureControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Temperature Control Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTemperatureControlClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Temperature Control Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTemperatureControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Temperature Control Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTemperatureControlClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Temperature Control Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTemperatureControlClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Temperature Control Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTemperatureControlClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Temperature Control Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTemperatureControlClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Air Quality Cluster
+//
+
+/** @brief Air Quality Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAirQualityClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Air Quality Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterAirQualityClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Air Quality Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAirQualityClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Air Quality Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterAirQualityClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Air Quality Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterAirQualityClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Air Quality Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterAirQualityClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Air Quality Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfAirQualityClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Air Quality Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfAirQualityClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Smoke CO Alarm Cluster
+//
+
+/** @brief Smoke CO Alarm Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSmokeCoAlarmClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Smoke CO Alarm Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterSmokeCoAlarmClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Smoke CO Alarm Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSmokeCoAlarmClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Smoke CO Alarm Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterSmokeCoAlarmClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Smoke CO Alarm Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterSmokeCoAlarmClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Smoke CO Alarm Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterSmokeCoAlarmClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Smoke CO Alarm Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfSmokeCoAlarmClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Smoke CO Alarm Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfSmokeCoAlarmClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// HEPA Filter Monitoring Cluster
+//
+
+/** @brief HEPA Filter Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfHepaFilterMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief HEPA Filter Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterHepaFilterMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief HEPA Filter Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfHepaFilterMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief HEPA Filter Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterHepaFilterMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief HEPA Filter Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterHepaFilterMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief HEPA Filter Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterHepaFilterMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief HEPA Filter Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfHepaFilterMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief HEPA Filter Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfHepaFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Activated Carbon Filter Monitoring Cluster
+//
+
+/** @brief Activated Carbon Filter Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfActivatedCarbonFilterMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Activated Carbon Filter Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterActivatedCarbonFilterMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Activated Carbon Filter Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfActivatedCarbonFilterMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Activated Carbon Filter Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterActivatedCarbonFilterMonitoringClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Activated Carbon Filter Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterActivatedCarbonFilterMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Activated Carbon Filter Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterActivatedCarbonFilterMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Activated Carbon Filter Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfActivatedCarbonFilterMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Activated Carbon Filter Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfActivatedCarbonFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Ceramic Filter Monitoring Cluster
+//
+
+/** @brief Ceramic Filter Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCeramicFilterMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ceramic Filter Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterCeramicFilterMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Ceramic Filter Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCeramicFilterMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ceramic Filter Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterCeramicFilterMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Ceramic Filter Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterCeramicFilterMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Ceramic Filter Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterCeramicFilterMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Ceramic Filter Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfCeramicFilterMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Ceramic Filter Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfCeramicFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Electrostatic Filter Monitoring Cluster
+//
+
+/** @brief Electrostatic Filter Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectrostaticFilterMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Electrostatic Filter Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterElectrostaticFilterMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Electrostatic Filter Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectrostaticFilterMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Electrostatic Filter Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterElectrostaticFilterMonitoringClusterServerAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Electrostatic Filter Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterElectrostaticFilterMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Electrostatic Filter Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterElectrostaticFilterMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Electrostatic Filter Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfElectrostaticFilterMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Electrostatic Filter Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfElectrostaticFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// UV Filter Monitoring Cluster
+//
+
+/** @brief UV Filter Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUvFilterMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief UV Filter Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterUvFilterMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief UV Filter Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUvFilterMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief UV Filter Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterUvFilterMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief UV Filter Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterUvFilterMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief UV Filter Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterUvFilterMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief UV Filter Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfUvFilterMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief UV Filter Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfUvFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Ionizing Filter Monitoring Cluster
+//
+
+/** @brief Ionizing Filter Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfIonizingFilterMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ionizing Filter Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterIonizingFilterMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Ionizing Filter Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfIonizingFilterMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ionizing Filter Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterIonizingFilterMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Ionizing Filter Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterIonizingFilterMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Ionizing Filter Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterIonizingFilterMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Ionizing Filter Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfIonizingFilterMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Ionizing Filter Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfIonizingFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Zeolite Filter Monitoring Cluster
+//
+
+/** @brief Zeolite Filter Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfZeoliteFilterMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Zeolite Filter Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterZeoliteFilterMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Zeolite Filter Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfZeoliteFilterMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Zeolite Filter Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterZeoliteFilterMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Zeolite Filter Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterZeoliteFilterMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Zeolite Filter Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterZeoliteFilterMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Zeolite Filter Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfZeoliteFilterMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Zeolite Filter Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfZeoliteFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Ozone Filter Monitoring Cluster
+//
+
+/** @brief Ozone Filter Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOzoneFilterMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ozone Filter Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOzoneFilterMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Ozone Filter Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOzoneFilterMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ozone Filter Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterOzoneFilterMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Ozone Filter Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterOzoneFilterMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Ozone Filter Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterOzoneFilterMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Ozone Filter Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOzoneFilterMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Ozone Filter Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOzoneFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Water Tank Monitoring Cluster
+//
+
+/** @brief Water Tank Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfWaterTankMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Water Tank Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterWaterTankMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Water Tank Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfWaterTankMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Water Tank Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterWaterTankMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Water Tank Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterWaterTankMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Water Tank Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterWaterTankMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Water Tank Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfWaterTankMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Water Tank Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfWaterTankMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Fuel Tank Monitoring Cluster
+//
+
+/** @brief Fuel Tank Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfFuelTankMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Fuel Tank Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterFuelTankMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Fuel Tank Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfFuelTankMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Fuel Tank Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterFuelTankMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Fuel Tank Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterFuelTankMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Fuel Tank Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterFuelTankMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Fuel Tank Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfFuelTankMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Fuel Tank Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfFuelTankMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Ink Cartridge Monitoring Cluster
+//
+
+/** @brief Ink Cartridge Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfInkCartridgeMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ink Cartridge Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterInkCartridgeMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Ink Cartridge Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfInkCartridgeMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Ink Cartridge Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterInkCartridgeMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Ink Cartridge Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterInkCartridgeMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Ink Cartridge Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterInkCartridgeMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Ink Cartridge Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfInkCartridgeMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Ink Cartridge Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfInkCartridgeMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Toner Cartridge Monitoring Cluster
+//
+
+/** @brief Toner Cartridge Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTonerCartridgeMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Toner Cartridge Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTonerCartridgeMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Toner Cartridge Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTonerCartridgeMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Toner Cartridge Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTonerCartridgeMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Toner Cartridge Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTonerCartridgeMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Toner Cartridge Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTonerCartridgeMonitoringClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Toner Cartridge Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTonerCartridgeMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Toner Cartridge Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTonerCartridgeMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Door Lock Cluster
@@ -5938,84 +7282,6 @@ void emberAfElectricalMeasurementClusterServerTickCallback(chip::EndpointId endp
 void emberAfElectricalMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Client Monitoring Cluster
-//
-
-/** @brief Client Monitoring Cluster Server Init
- *
- * Server Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfClientMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Client Monitoring Cluster Server Shutdown
- *
- * Server Shutdown
- *
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterClientMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/** @brief Client Monitoring Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfClientMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Client Monitoring Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterClientMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Client Monitoring Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterClientMonitoringClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Client Monitoring Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterClientMonitoringClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Client Monitoring Cluster Server Tick
- *
- * Server Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfClientMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Client Monitoring Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfClientMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
-
-//
 // Unit Testing Cluster
 //
 
@@ -6645,11 +7911,113 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData);
 /**
+ * @brief ICD Management Cluster RegisterClient Command callback (from client)
+ */
+bool emberAfIcdManagementClusterRegisterClientCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData);
+/**
+ * @brief ICD Management Cluster UnregisterClient Command callback (from client)
+ */
+bool emberAfIcdManagementClusterUnregisterClientCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
+/**
+ * @brief ICD Management Cluster StayActiveRequest Command callback (from client)
+ */
+bool emberAfIcdManagementClusterStayActiveRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::DecodableType & commandData);
+/**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */
 bool emberAfModeSelectClusterChangeToModeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::DecodableType & commandData);
+/**
+ * @brief Temperature Control Cluster SetTemperature Command callback (from client)
+ */
+bool emberAfTemperatureControlClusterSetTemperatureCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TemperatureControl::Commands::SetTemperature::DecodableType & commandData);
+/**
+ * @brief Smoke CO Alarm Cluster SelfTestRequest Command callback (from client)
+ */
+bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
+/**
+ * @brief HEPA Filter Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfHepaFilterMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::HepaFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Activated Carbon Filter Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfActivatedCarbonFilterMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ActivatedCarbonFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Ceramic Filter Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfCeramicFilterMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CeramicFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Electrostatic Filter Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfElectrostaticFilterMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ElectrostaticFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief UV Filter Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfUvFilterMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::UvFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Ionizing Filter Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfIonizingFilterMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::IonizingFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Zeolite Filter Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfZeoliteFilterMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ZeoliteFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Ozone Filter Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfOzoneFilterMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OzoneFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Water Tank Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfWaterTankMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::WaterTankMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Fuel Tank Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfFuelTankMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::FuelTankMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Ink Cartridge Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfInkCartridgeMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::InkCartridgeMonitoring::Commands::ResetCondition::DecodableType & commandData);
+/**
+ * @brief Toner Cartridge Monitoring Cluster ResetCondition Command callback (from client)
+ */
+bool emberAfTonerCartridgeMonitoringClusterResetConditionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TonerCartridgeMonitoring::Commands::ResetCondition::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
@@ -6758,6 +8126,12 @@ bool emberAfDoorLockClusterGetCredentialStatusCallback(
 bool emberAfDoorLockClusterClearCredentialCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
+/**
+ * @brief Door Lock Cluster UnboltDoor Command callback (from client)
+ */
+bool emberAfDoorLockClusterUnboltDoorCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::UnboltDoor::DecodableType & commandData);
 /**
  * @brief Window Covering Cluster UpOrOpen Command callback (from client)
  */
@@ -7147,24 +8521,6 @@ bool emberAfElectricalMeasurementClusterGetProfileInfoCommandCallback(
 bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::DecodableType & commandData);
-/**
- * @brief Client Monitoring Cluster RegisterClientMonitoring Command callback (from client)
- */
-bool emberAfClientMonitoringClusterRegisterClientMonitoringCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoring::DecodableType & commandData);
-/**
- * @brief Client Monitoring Cluster UnregisterClientMonitoring Command callback (from client)
- */
-bool emberAfClientMonitoringClusterUnregisterClientMonitoringCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::DecodableType & commandData);
-/**
- * @brief Client Monitoring Cluster StayAwakeRequest Command callback (from client)
- */
-bool emberAfClientMonitoringClusterStayAwakeRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClientMonitoring::Commands::StayAwakeRequest::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */

@@ -2667,6 +2667,290 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRTemperatureControlClusterTemperatureLevelStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _tempLevel = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
+
+    other.label = self.label;
+    other.tempLevel = self.tempLevel;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: label:%@; tempLevel:%@; >", NSStringFromClass([self class]), _label, _tempLevel];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterSmokeAlarmEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterSmokeAlarmEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterCOAlarmEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterCOAlarmEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterLowBatteryEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterLowBatteryEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterHardwareFaultEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterHardwareFaultEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterEndOfServiceEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterEndOfServiceEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterSelfTestCompleteEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterSelfTestCompleteEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterAlarmMutedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterAlarmMutedEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterMuteEndedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterMuteEndedEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRSmokeCOAlarmClusterAllClearEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSmokeCOAlarmClusterAllClearEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {

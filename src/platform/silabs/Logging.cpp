@@ -192,7 +192,7 @@ extern "C" void silabsInitLog(void)
 /**
  * General-purpose logging function
  */
-extern "C" void efr32Log(const char * aFormat, ...)
+extern "C" void silabsLog(const char * aFormat, ...)
 {
     va_list v;
 

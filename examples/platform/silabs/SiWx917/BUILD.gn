@@ -45,11 +45,12 @@ declare_args() {
   chip_default_wifi_psk = ""
 }
 
-import("${silabs_common_plat_dir}/SiWx917/args.gni")
+import("${chip_root}/src/platform/silabs/wifi_args.gni")
+import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check
 assert(chip_enable_wifi)
-import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
+
 wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
@@ -240,6 +241,7 @@ source_set("siwx917-common") {
   sources = [
     "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/heap_4_silabs.c",
+    "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "${wifi_sdk_dir}/dhcp_client.cpp",
     "${wifi_sdk_dir}/ethernetif.cpp",
@@ -249,7 +251,6 @@ source_set("siwx917-common") {
     "SiWx917/wfx_rsi_host.c",
     "init_ccpPlatform.cpp",
     "matter_config.cpp",
-    "siwx917_utils.cpp",
   ]
 
   if (use_base_app) {

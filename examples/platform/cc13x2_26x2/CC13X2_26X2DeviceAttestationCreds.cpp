@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 #include "CC13X2_26X2DeviceAttestationCreds.h"
-#include <credentials/examples/ExampleDACs.h>
-#include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
@@ -29,6 +27,10 @@ namespace Credentials {
 namespace CC13X2_26X2 {
 
 namespace {
+
+extern "C" {
+
+extern void cc13x2_26x2Log(const char * aFormat, ...);
 
 typedef struct
 {
@@ -126,6 +128,8 @@ const factoryData gFactoryData = {
         .data = gPaiCert,
     },
 };
+
+} // extern "C"
 
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {

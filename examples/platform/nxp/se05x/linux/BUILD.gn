@@ -108,8 +108,6 @@ source_set("commissioner-main") {
     "${chip_root}/src/app/server",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/shell",
-    "${chip_root}/src/lib/shell:shell_core",
   ]
 
   if (chip_enable_transport_trace) {

@@ -21,8 +21,6 @@
 #import "MTRDevice.h"
 #import "MTRDevice_Internal.h"
 
-#include <zap-generated/CHIPClusters.h>
-
 @interface MTRClusterIdentify ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
@@ -199,6 +197,81 @@
 @end
 
 @interface MTRClusterModeSelect ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterTemperatureControl ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterAirQuality ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterSmokeCOAlarm ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterHEPAFilterMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterActivatedCarbonFilterMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterCeramicFilterMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterElectrostaticFilterMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterUVFilterMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterIonizingFilterMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterZeoliteFilterMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterOzoneFilterMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterWaterTankMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterFuelTankMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterInkCartridgeMonitoring ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterTonerCartridgeMonitoring ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end

@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Door Lock"
     endpoint: 1
-    timeout: 15
+    timeout: 25
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"

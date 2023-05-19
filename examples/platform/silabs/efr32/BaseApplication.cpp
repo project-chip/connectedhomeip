@@ -53,6 +53,8 @@
 #include <platform/silabs/ThreadStackManagerImpl.h>
 #endif // CHIP_ENABLE_OPENTHREAD
 
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -75,12 +77,11 @@
 #if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
 #define SYSTEM_STATE_LED 0
 #endif // ENABLE_WSTK_LEDS
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #define APP_FUNCTION_BUTTON 0
-#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 
@@ -397,7 +398,7 @@ void BaseApplication::LightEventHandler()
     sStatusLED.Animate();
 #endif // ENABLE_WSTK_LEDS
 }
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
 void BaseApplication::ButtonHandler(AppEvent * aEvent)
 {
     // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
@@ -407,7 +408,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
     // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
+    if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         if (!mFunctionTimerActive && mFunction == kFunction_NoneSelected)
         {
@@ -444,10 +445,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
                     SILABS_LOG("Failed to open the Basic Commissioning Window");
                 }
             }
-            else
-            {
-                SILABS_LOG("Network is already provisioned, Ble advertissement not enabled");
-            }
+            else { SILABS_LOG("Network is already provisioned, Ble advertissement not enabled"); }
         }
         else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
         {
@@ -464,7 +462,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
         }
     }
 }
-#endif
+
 void BaseApplication::CancelFunctionTimer()
 {
     if (xTimerStop(sFunctionTimer, pdMS_TO_TICKS(0)) == pdFAIL)

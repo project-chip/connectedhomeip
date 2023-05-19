@@ -267,6 +267,56 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace BooleanState
 
+namespace SmokeCoAlarm {
+namespace Events {
+
+namespace SmokeAlarm {
+static constexpr EventId Id = 0x00000000;
+} // namespace SmokeAlarm
+
+namespace COAlarm {
+static constexpr EventId Id = 0x00000001;
+} // namespace COAlarm
+
+namespace LowBattery {
+static constexpr EventId Id = 0x00000002;
+} // namespace LowBattery
+
+namespace HardwareFault {
+static constexpr EventId Id = 0x00000003;
+} // namespace HardwareFault
+
+namespace EndOfService {
+static constexpr EventId Id = 0x00000004;
+} // namespace EndOfService
+
+namespace SelfTestComplete {
+static constexpr EventId Id = 0x00000005;
+} // namespace SelfTestComplete
+
+namespace AlarmMuted {
+static constexpr EventId Id = 0x00000006;
+} // namespace AlarmMuted
+
+namespace MuteEnded {
+static constexpr EventId Id = 0x00000007;
+} // namespace MuteEnded
+
+namespace InterconnectSmokeAlarm {
+static constexpr EventId Id = 0x00000008;
+} // namespace InterconnectSmokeAlarm
+
+namespace InterconnectCOAlarm {
+static constexpr EventId Id = 0x00000009;
+} // namespace InterconnectCOAlarm
+
+namespace AllClear {
+static constexpr EventId Id = 0x0000000A;
+} // namespace AllClear
+
+} // namespace Events
+} // namespace SmokeCoAlarm
+
 namespace DoorLock {
 namespace Events {
 

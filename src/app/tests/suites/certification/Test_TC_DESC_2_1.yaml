@@ -42,7 +42,7 @@ tests:
       PICS: DESC.S.A0000 && DESC.S.A0003
       verification: |
           Send a read request to the DUT using chip-tool to read the partsList attribute in the descriptor cluster on Endpoint 0.
-          Make a note of all the items(Endpoint id’s) in the list. In the below example there are 2 endpoint id"s listed [1,2]
+          Make a note of all the items(Endpoint id’s) in the list. In the below example there are 2 endpoint id's listed [1,2]
 
           ./chip-tool descriptor read  parts-list 1 0
 

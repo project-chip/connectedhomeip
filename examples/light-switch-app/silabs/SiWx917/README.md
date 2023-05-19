@@ -1,6 +1,8 @@
 # Matter SiWx917 Light Switch Example
 
-An example showing the use of CHIP on the Silicon Labs SiWx917 SoC device.
+An example showing the use of CHIP on the
+[Silicon Labs SiWx917](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs)
+SoC device.
 
 <hr>
 
@@ -31,15 +33,17 @@ An example showing the use of CHIP on the Silicon Labs SiWx917 SoC device.
 
 ## Introduction
 
-The SiWx917 light switch example provides a baseline demonstration of an on-off
-light switch device, built using Matter, the Silicon Labs Gecko SDK, and the
-Silicon Labs WiseMCU SDK. It can be controlled by a Chip controller over a Wi-Fi
-network.
+The [SiWx917](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs) light
+switch example provides a baseline demonstration of an on-off light switch
+device, built using Matter, the Silicon Labs Gecko SDK, and the Silicon Labs
+WiseMCU SDK. It can be controlled by a Chip controller over a Wi-Fi network.
 
-The SiWx917 device can be commissioned over Bluetooth Low Energy where the
-device and the Chip controller will exchange security information with the
-rendezvous procedure. Wi-Fi Network credentials are then provided to the SiWx917
-device which will then join the Wi-Fi network.
+The [SiWx917](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs)
+device can be commissioned over Bluetooth Low Energy where the device and the
+Chip controller will exchange security information with the rendezvous
+procedure. Wi-Fi Network credentials are then provided to the
+[SiWx917](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs) device
+which will then join the Wi-Fi network.
 
 If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
@@ -90,8 +94,10 @@ Silicon Labs platform.
 
 ## Flashing the Application
 
--   Flashing requires the SiWx917 SoC device to be configured in the Ozone
-    Debugger.
+-   Flashing requires the
+    [SiWx917](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs) SoC
+    device to be configured in the Ozone Debugger.
+
 -   Once it's configured, it can be run with the Ozone Debugger by loading the
     .out file.
     -   > For detailed instructions, please refer to
@@ -104,10 +110,11 @@ The example application's logging output can be viewed in the Ozone Debugger.
 
 ## Running the Complete Example
 
--   For this example to work, it is necessary to have a second SiWx917 device
-    running the
+-   For this example to work, it is necessary to have a second
+    [SiWx917](https://www.silabs.com/wireless/wi-fi/siwx917-wireless-socs)
+    device running the
     [lighting app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/lighting-app/silabs/SiWx917/README.md)
-    commissioned on the same Wi-Fi network
+    commissioned on the same Wi-Fi network.
 
 *   You can provision and control the Chip device using the
     [chip-tool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
