@@ -40,7 +40,7 @@ GN_PATH_PROVIDED=false
 DOTFILE=".gn"
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
-USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
+USAGE="./scripts/examples/gn_silabs_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
 
 if [ "$#" == "0" ]; then
     echo "Build script for EFR32 Matter apps

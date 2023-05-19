@@ -102,7 +102,7 @@ Silicon Labs platform.
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32/ ./out/lighting-app BRD4187C
+          ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/efr32/ ./out/lighting-app BRD4187C
 
 -   To delete generated executable, libraries and object files use:
 
@@ -125,7 +125,7 @@ Silicon Labs platform.
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32/ ./out/lighting-app_SED BRD4187C --sed
+          $ ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/efr32/ ./out/lighting-app_SED BRD4187C --sed
 
     or use gn as previously mentioned but adding the following arguments:
 
@@ -133,7 +133,7 @@ Silicon Labs platform.
 
 *   Build the example with pigweed RPC
 
-          $ ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
@@ -149,7 +149,7 @@ Silicon Labs platform.
 For more build options, help is provided when running the build script without
 arguments
 
-         ./scripts/examples/gn_efr32_example.sh
+         ./scripts/examples/gn_silabs_example.sh
 
 ## Flashing the Application
 
@@ -369,19 +369,19 @@ passed to the build scripts.
 
 `chip_progress_logging, chip_detail_logging, chip_automation_logging`
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
 
 ### Debug build / release build
 
 `is_debug`
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/efr32 ./out/lighting-app BRD4164A "is_debug=false"
 
 ### Disabling LCD
 
 `show_qr_code`
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
 
 ### KVS maximum entry count
 
@@ -390,4 +390,4 @@ passed to the build scripts.
     Set the maximum Kvs entries that can be stored in NVM (Default 75)
     Thresholds: 30 <= kvs_max_entries <= 255
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/lighting-app/silabs/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50
