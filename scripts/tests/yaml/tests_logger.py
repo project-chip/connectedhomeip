@@ -186,11 +186,12 @@ class TestRunnerLogger(TestRunnerHooks):
     def step_skipped(self, name: str, expression: str):
         print(self.__strings.step_skipped.format(index=self.__index, name=_strikethrough(name)))
 
+        if self.__use_test_harness_log_format:
+            print(self.__strings.test_harness_step_start.format(index=self.__index, name=name))
+            print(self.__strings.test_harness_step_skipped.format(expression=expression))
+
         self.__index += 1
         self.__skipped += 1
-
-        if self.__use_test_harness_log_format:
-            print(self.__strings.test_harness_step_skipped.format(expression=expression))
 
     def step_start(self, name: str):
         if self.__use_test_harness_log_format:
