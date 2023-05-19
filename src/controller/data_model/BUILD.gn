@@ -184,6 +184,8 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/SwitchClient-ReadImpl.cpp",
       "jni/TargetNavigatorClient-InvokeSubscribeImpl.cpp",
       "jni/TargetNavigatorClient-ReadImpl.cpp",
+      "jni/TemperatureControlClient-InvokeSubscribeImpl.cpp",
+      "jni/TemperatureControlClient-ReadImpl.cpp",
       "jni/TemperatureMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/TemperatureMeasurementClient-ReadImpl.cpp",
       "jni/ThermostatClient-InvokeSubscribeImpl.cpp",
