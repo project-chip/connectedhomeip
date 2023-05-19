@@ -107,17 +107,19 @@ static constexpr size_t kPersistentSceneBufferMax = 256;
 
 struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneBufferMax>
 {
-    FabricIndex fabric_index = kUndefinedFabricIndex;
     EndpointId endpoint_id   = kInvalidEndpointId;
+    FabricIndex fabric_index = kUndefinedFabricIndex;
     SceneIndex index         = 0;
     bool first               = true;
 
-    SceneTableData() : SceneTableEntry() {}
-    SceneTableData(FabricIndex fabric) : fabric_index(fabric) {}
-    SceneTableData(FabricIndex fabric, SceneIndex idx) : fabric_index(fabric), index(idx) {}
-    SceneTableData(FabricIndex fabric, SceneStorageId storageId) : SceneTableEntry(storageId), fabric_index(fabric) {}
-    SceneTableData(FabricIndex fabric, SceneStorageId storageId, SceneData data) :
-        SceneTableEntry(storageId, data), fabric_index(fabric)
+    SceneTableData(EndpointId endpoint, FabricIndex fabric, SceneIndex idx = 0) :
+        endpoint_id(endpoint), fabric_index(fabric), index(idx)
+    {}
+    SceneTableData(EndpointId endpoint, FabricIndex fabric, SceneStorageId storageId) :
+        SceneTableEntry(storageId), endpoint_id(endpoint), fabric_index(fabric)
+    {}
+    SceneTableData(EndpointId endpoint, FabricIndex fabric, SceneStorageId storageId, SceneData data) :
+        SceneTableEntry(storageId, data), endpoint_id(endpoint), fabric_index(fabric)
     {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
@@ -300,7 +302,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             }
             else
             {
-                SceneTableData scene(fabric_index, i);
+                SceneTableData scene(endpoint_id, fabric_index, i);
                 ReturnErrorOnFailure(reader.EnterContainer(sceneIdContainer));
                 ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGroupID)));
                 ReturnErrorOnFailure(reader.Get(scene.mStorageId.mGroupId));
@@ -356,7 +358,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     CHIP_ERROR SaveScene(PersistentStorageDelegate * storage, const SceneTableEntry & entry)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        SceneTableData scene(fabric_index, entry.mStorageId, entry.mStorageData);
+        SceneTableData scene(endpoint_id, fabric_index, entry.mStorageId, entry.mStorageData);
         // Look for empty storage space
 
         err = this->Find(entry.mStorageId, scene.index);
@@ -413,7 +415,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     CHIP_ERROR RemoveScene(PersistentStorageDelegate * storage, const SceneStorageId & scene_id)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        SceneTableData scene(fabric_index, scene_id);
+        SceneTableData scene(endpoint_id, fabric_index, scene_id);
 
         // Empty Scene Fabric Data returns CHIP_NO_ERROR on remove
         if (scene_count > 0)
@@ -580,7 +582,8 @@ CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(EndpointId endpoint, Fabric
     CHIP_ERROR err = fabric.Load(mStorage);
     VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
 
-    return fabric.SaveScene(mStorage, entry);
+    err = fabric.SaveScene(mStorage, entry);
+    return err;
 }
 
 CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id,
@@ -589,7 +592,7 @@ CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(EndpointId endpoint, Fabric
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
-    SceneTableData scene(fabric_index);
+    SceneTableData scene(endpoint, fabric_index);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(fabric.Find(scene_id, scene.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
@@ -633,7 +636,7 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(EndpointId end
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
-    SceneTableData scene(fabric_index, scene_idx);
+    SceneTableData scene(endpoint, fabric_index, scene_idx);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
     err = scene.Load(mStorage);
@@ -647,7 +650,7 @@ CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(EndpointId endpoint, Fab
                                                         Span<SceneId> & scene_list)
 {
     FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
-    SceneTableData scene(fabric_index);
+    SceneTableData scene(endpoint, fabric_index);
 
     auto * iterator = this->IterateSceneEntries(endpoint, fabric_index);
     VerifyOrReturnError(nullptr != iterator, CHIP_ERROR_INTERNAL);
@@ -677,7 +680,7 @@ CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(EndpointId endpoint, Fa
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
-    SceneTableData scene(fabric_index);
+    SceneTableData scene(endpoint, fabric_index);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
 
@@ -799,11 +802,15 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
         SceneIndex idx = 0;
         CHIP_ERROR err = fabric.Load(mStorage);
         VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+        if (CHIP_ERROR_NOT_FOUND == err)
+        {
+            continue;
+        }
 
         while (idx < mMaxScenesPerFabric)
         {
             err = RemoveSceneTableEntryAtPosition(endpoint, fabric_index, idx);
-            VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == err, err);
+            VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
             idx++;
         }
 
@@ -847,7 +854,7 @@ size_t DefaultSceneTableImpl::SceneEntryIteratorImpl::Count()
 bool DefaultSceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & output)
 {
     FabricSceneData fabric(mEndpointId, mFabric);
-    SceneTableData scene(mFabric);
+    SceneTableData scene(mEndpointId, mFabric);
 
     VerifyOrReturnError(fabric.Load(mProvider.mStorage) == CHIP_NO_ERROR, false);
 

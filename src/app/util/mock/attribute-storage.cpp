@@ -34,6 +34,7 @@
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
 #include <app/att-storage.h>
+#include <app/util/af.h>
 #include <app/util/mock/Constants.h>
 
 #include <app/AttributeAccessInterface.h>
@@ -268,6 +269,17 @@ uint16_t emberAfLongStringLength(const uint8_t * buffer)
     // 0xFFFF means the string is invalid and there is no character data.
     uint16_t length = Encoding::LittleEndian::Get16(buffer);
     return (length == 0xFFFF ? 0 : length);
+}
+
+// This will find the first server that has the clusterId given from the index of endpoint.
+bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
+{
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return false;
+    }
+
+    return clusterId; // Mock version return true as long as the endpoint is valid
 }
 
 namespace chip {
