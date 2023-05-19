@@ -18,6 +18,7 @@
 #include "SilabsDeviceDataProvider.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
+#include <lib/support/CHIPMemString.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <setup_payload/Base38Encode.h>
 #include <setup_payload/SetupPayload.h>
@@ -313,7 +314,17 @@ CHIP_ERROR SilabsDeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadBu
 CHIP_ERROR SilabsDeviceDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
     size_t vendorNameLen = 0; // without counting null-terminator
-    return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
+    CHIP_ERROR err       = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
+#if defined(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        VerifyOrReturnError(buf != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(bufSize > strlen(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        Platform::CopyString(buf, bufSize, CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME);
+        err = CHIP_NO_ERROR;
+    }
+#endif
+    return err;
 }
 
 CHIP_ERROR SilabsDeviceDataProvider::GetVendorId(uint16_t & vendorId)
@@ -339,7 +350,17 @@ CHIP_ERROR SilabsDeviceDataProvider::GetVendorId(uint16_t & vendorId)
 CHIP_ERROR SilabsDeviceDataProvider::GetProductName(char * buf, size_t bufSize)
 {
     size_t productNameLen = 0; // without counting null-terminator
-    return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_ProductName, buf, bufSize, productNameLen);
+    CHIP_ERROR err        = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_ProductName, buf, bufSize, productNameLen);
+#if defined(CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        VerifyOrReturnError(buf != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(bufSize > strlen(CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        Platform::CopyString(buf, bufSize, CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME);
+        err = CHIP_NO_ERROR;
+    }
+#endif
+    return err;
 }
 
 CHIP_ERROR SilabsDeviceDataProvider::GetProductId(uint16_t & productId)
@@ -370,7 +391,10 @@ CHIP_ERROR SilabsDeviceDataProvider::GetHardwareVersionString(char * buf, size_t
 #if defined(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        memcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING, bufSize);
+        VerifyOrReturnError(buf != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(bufSize > strlen(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING),
+                            CHIP_ERROR_BUFFER_TOO_SMALL);
+        Platform::CopyString(buf, bufSize, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
         err = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING
