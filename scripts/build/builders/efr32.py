@@ -44,17 +44,17 @@ class Efr32App(Enum):
 
     def AppNamePrefix(self):
         if self == Efr32App.LIGHT:
-            return 'chip-efr32-lighting-example'
+            return 'matter-silabs-lighting-example'
         elif self == Efr32App.LOCK:
-            return 'chip-efr32-lock-example'
+            return 'matter-silabs-lock-example'
         elif self == Efr32App.SWITCH:
-            return 'chip-efr32-light-switch-example'
+            return 'matter-silabs-light-switch-example'
         elif self == Efr32App.WINDOW_COVERING:
-            return 'chip-efr32-window-example'
+            return 'matter-silabs-window-example'
         elif self == Efr32App.THERMOSTAT:
-            return 'chip-efr32-thermostat-example'
+            return 'matter-silabs-thermostat-example'
         elif self == Efr32App.UNIT_TEST:
-            return 'chip-efr32-device_tests'
+            return 'matter-silabs-device_tests'
         else:
             raise Exception('Unknown app type: %r' % self)
 

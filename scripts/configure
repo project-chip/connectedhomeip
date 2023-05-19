@@ -254,14 +254,19 @@ function finalize_build_env() {
 }
 
 function download_zap() {
-    local version platform
+    local version platform arch
     read -r version <"${CHIP_ROOT}/scripts/setup/zap.version"
     case "$OSTYPE" in
     linux*) platform=linux ;;
     darwin*) platform=mac ;;
     *) fail "Unable to determine zap platform for OSTYPE='$OSTYPE'" ;;
     esac
-    local url="https://github.com/project-chip/zap/releases/download/${version}/zap-${platform}.zip"
+    case "$(uname -m)" in
+    arm64) arch=arm64 ;;
+    x86_64) arch=x64 ;;
+    *) fail "Unable to determine zap architecture for 'uname -m'='$(uname -m)'" ;;
+    esac
+    local url="https://github.com/project-chip/zap/releases/download/${version}/zap-${platform}-${arch}.zip"
 
     progress "Installing zap-cli from $url"
     call_impl download_and_extract_zip "$url" "${BUILD_ENV_PATH}/bin" zap-cli

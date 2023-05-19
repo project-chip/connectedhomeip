@@ -21,8 +21,6 @@
 #import "MTRDevice.h"
 #import "MTRDevice_Internal.h"
 
-#include <zap-generated/CHIPClusters.h>
-
 @interface MTRClusterIdentify ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
@@ -198,17 +196,17 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterICDManagement ()
-@property (nonatomic, readonly) uint16_t endpoint;
-@property (nonatomic, readonly) MTRDevice * device;
-@end
-
 @interface MTRClusterModeSelect ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
 @interface MTRClusterAirQuality ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterSmokeCOAlarm ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end

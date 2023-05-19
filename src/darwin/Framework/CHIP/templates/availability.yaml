@@ -6174,19 +6174,7 @@
       enum values:
           EthernetNetworkDiagnostics:
               # Both the enum and the values got renamed, so don't output the
-              # new values with the old enum name or the old values with the
-              # new enum name.
-              PHYRateType:
-                  - Rate10M
-                  - Rate100M
-                  - Rate1G
-                  - Rate25G
-                  - Rate5G
-                  - Rate10G
-                  - Rate40G
-                  - Rate100G
-                  - Rate200G
-                  - Rate400G
+              # old values with the new enum name.
               PHYRateEnum:
                   - 10M
                   - 100M
@@ -6199,25 +6187,15 @@
                   - 200G
                   - 400G
           OperationalCredentials:
-              # Both the enum and the values got renamed, so don't output the
-              # new value with the old enum name or the old value with the
-              # new enum name.
+              # Both the enum and the value got renamed, so don't output the
+              # old value with the new enum name.
               NodeOperationalCertStatusEnum:
                   - SUCCESS
-              OperationalCertStatus:
-                  - OK
           DoorLock:
               # Both the enum and the values got renamed, so don't output the
-              # new values with the old enum name or the old values with the
-              # new enum name.
-              DlCredentialRule:
-                  - Dual
+              # old value with the new enum name.
               CredentialRuleEnum:
                   - Double
-  provisional:
-      clusters:
-          # Not ready to be public API yet.
-          - ClientMonitoring
   renames:
       clusters:
           UnitTesting: TestCluster
@@ -6834,9 +6812,57 @@
           PumpConfigurationAndControl:
               PumpFeature:
                   - Local
-  provisional:
-      global attributes:
-          - EventList
+  renames:
+      attributes:
+          TimeSynchronization:
+              DSTOffset: DstOffset
+      structs:
+          TimeSynchronization:
+              DSTOffsetStruct: DstOffsetType
+              TimeZoneStruct: TimeZoneType
+      enums:
+          DiagnosticLogs:
+              IntentEnum: LogsIntent
+              StatusEnum: LogsStatus
+              TransferProtocolEnum: LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum: WiFiConnectionStatus
+              WiFiVersionEnum: WiFiVersionType
+          PumpConfigurationAndControl:
+              ControlModeEnum: PumpControlMode
+              OperationModeEnum: PumpOperationMode
+      enum values:
+          PowerSource:
+              WiredFaultEnum:
+                  Unspecified: Unspecfied
+              BatFaultEnum:
+                  Unspecified: Unspecfied
+      bitmaps:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap: PumpStatus
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  LocalOperation: Local
+
+- release: "TBD"
+  versions: "future"
+  introduced:
+      clusters:
+          - AirQuality
+          - HEPAFilterMonitoring
+          - ActivatedCarbonFilterMonitoring
+          - CeramicFilterMonitoring
+          - ElectrostaticFilterMonitoring
+          - UVFilterMonitoring
+          - IonizingFilterMonitoring
+          - ZeoliteFilterMonitoring
+          - OzoneFilterMonitoring
+          - WaterTankMonitoring
+          - FuelTankMonitoring
+          - InkCartridgeMonitoring
+          - TonerCartridgeMonitoring
+          - SmokeCOAlarm
       attributes:
           Scenes:
               - EventList
@@ -6859,8 +6885,6 @@
           AccessControl:
               - EventList
           Actions:
-              - EventList
-          BasicInformation:
               - EventList
           OTASoftwareUpdateProvider:
               - EventList
@@ -6893,8 +6917,6 @@
           EthernetNetworkDiagnostics:
               - EventList
           TimeSynchronization:
-              - EventList
-          BridgedDeviceBasicInformation:
               - EventList
           Switch:
               - EventList
@@ -6980,67 +7002,19 @@
               - EventList
           FaultInjection:
               - EventList
-  removed:
-      enum values:
-          DoorLock:
-              DlLockDataType:
-                  # These values never existed for this enum name so, don't
-                  # start exposing them.  They're exposed for LockDataTypeEnum
-                  - FingerVein
-                  - Face
-  renames:
-      attributes:
-          TimeSynchronization:
-              DSTOffset: DstOffset
-      structs:
-          TimeSynchronization:
-              DSTOffsetStruct: DstOffsetType
-              TimeZoneStruct: TimeZoneType
-      enums:
-          DiagnosticLogs:
-              IntentEnum: LogsIntent
-              StatusEnum: LogsStatus
-              TransferProtocolEnum: LogsTransferProtocol
-          WiFiNetworkDiagnostics:
-              ConnectionStatusEnum: WiFiConnectionStatus
-              WiFiVersionEnum: WiFiVersionType
-          PumpConfigurationAndControl:
-              ControlModeEnum: PumpControlMode
-              OperationModeEnum: PumpOperationMode
-      enum values:
-          PowerSource:
-              WiredFaultEnum:
-                  Unspecified: Unspecfied
-              BatFaultEnum:
-                  Unspecified: Unspecfied
-      bitmaps:
-          PumpConfigurationAndControl:
-              PumpStatusBitmap: PumpStatus
-      bitmap values:
-          PumpConfigurationAndControl:
-              PumpFeature:
-                  LocalOperation: Local
-
-- release: "TBD"
-  versions: "future"
-  introduced:
-      clusters:
-          - HEPAFilterMonitoring
-          - ActivatedCarbonFilterMonitoring
-          - CeramicFilterMonitoring
-          - ElectrostaticFilterMonitoring
-          - UVFilterMonitoring
-          - IonizingFilterMonitoring
-          - ZeoliteFilterMonitoring
-          - OzoneFilterMonitoring
-          - WaterTankMonitoring
-          - FuelTankMonitoring
-          - InkCartridgeMonitoring
-          - TonerCartridgeMonitoring
-      attributes:
+          AirQuality:
+              - AirQuality
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
           BasicInformation:
+              - EventList
               - ProductAppearance
           BridgedDeviceBasicInformation:
+              - EventList
               - ProductAppearance
           HEPAFilterMonitoring:
               - Condition
@@ -7050,6 +7024,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           ActivatedCarbonFilterMonitoring:
@@ -7060,6 +7035,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           CeramicFilterMonitoring:
@@ -7070,6 +7046,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           ElectrostaticFilterMonitoring:
@@ -7080,6 +7057,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           UVFilterMonitoring:
@@ -7090,6 +7068,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           IonizingFilterMonitoring:
@@ -7100,6 +7079,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           ZeoliteFilterMonitoring:
@@ -7110,6 +7090,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           OzoneFilterMonitoring:
@@ -7120,6 +7101,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           WaterTankMonitoring:
@@ -7130,6 +7112,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           FuelTankMonitoring:
@@ -7140,6 +7123,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           InkCartridgeMonitoring:
@@ -7150,6 +7134,7 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
           TonerCartridgeMonitoring:
@@ -7160,6 +7145,26 @@
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          SmokeCOAlarm:
+              - ExpressedState
+              - SmokeState
+              - COState
+              - BatteryAlert
+              - DeviceMuted
+              - TestInProgress
+              - HardwareFaultAlert
+              - EndOfServiceAlert
+              - InterconnectSmokeAlarm
+              - InterconnectCOAlarm
+              - ContaminationState
+              - SensitivityLevel
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
               - FeatureMap
               - ClusterRevision
       commands:
@@ -7187,6 +7192,14 @@
               - ResetCondition
           TonerCartridgeMonitoring:
               - ResetCondition
+          DoorLock:
+              - UnboltDoor
+          SmokeCOAlarm:
+              - SelfTestRequest
+      command fields:
+          DoorLock:
+              UnboltDoor:
+                  - pinCode
       structs:
           BasicInformation:
               - ProductAppearanceStruct
@@ -7201,7 +7214,22 @@
               ProductAppearanceStruct:
                   - finish
                   - primaryColor
+      events:
+          SmokeCOAlarm:
+              - SmokeAlarm
+              - COAlarm
+              - LowBattery
+              - HardwareFault
+              - EndOfService
+              - SelfTestComplete
+              - AlarmMuted
+              - MuteEnded
+              - InterconnectSmokeAlarm
+              - InterconnectCOAlarm
+              - AllClear
       enums:
+          AirQuality:
+              - AirQualityEnum
           BasicInformation:
               - ColorEnum
               - ProductFinishEnum
@@ -7244,7 +7272,23 @@
           TonerCartridgeMonitoring:
               - ChangeIndicationEnum
               - DegradationDirectionEnum
+          SmokeCOAlarm:
+              - AlarmStateEnum
+              - ContaminationStateEnum
+              - EndOfServiceEnum
+              - ExpressedStateEnum
+              - MuteStateEnum
+              - SensitivityEnum
       enum values:
+          AirQuality:
+              AirQualityEnum:
+                  - Unknown
+                  - Good
+                  - Fair
+                  - Moderate
+                  - Poor
+                  - VeryPoor
+                  - ExtremelyPoor
           BasicInformation:
               ColorEnum:
                   - Black
@@ -7401,7 +7445,50 @@
               DegradationDirectionEnum:
                   - Up
                   - Down
+          DoorLock:
+              DlLockState:
+                  - Unlatched
+              DlLockType:
+                  - Eurocylinder
+              LockOperationTypeEnum:
+                  - Unlatch
+          SmokeCOAlarm:
+              AlarmStateEnum:
+                  - Unknown
+                  - Normal
+                  - Warning
+                  - Critical
+              ContaminationStateEnum:
+                  - Unknown
+                  - Normal
+                  - Low
+                  - Warning
+                  - Critical
+              EndOfServiceEnum:
+                  - Unknown
+                  - Expired
+                  - Normal
+              ExpressedStateEnum:
+                  - Normal
+                  - SmokeAlarm
+                  - COAlarm
+                  - BatteryAlert
+                  - Testing
+                  - HardwareFault
+                  - EndOfService
+                  - InterconnectSmoke
+                  - InterconnectCO
+              MuteStateEnum:
+                  - Unknown
+                  - NotMuted
+                  - Muted
+              SensitivityEnum:
+                  - High
+                  - Standard
+                  - Low
       bitmaps:
+          AirQuality:
+              - Feature
           Groups:
               - GroupsFeature
           PressureMeasurement:
@@ -7434,7 +7521,15 @@
               - Feature
           TonerCartridgeMonitoring:
               - Feature
+          SmokeCOAlarm:
+              - SmokeCOAlarmFeature
       bitmap values:
+          AirQuality:
+              Feature:
+                  - Fair
+                  - Moderate
+                  - VeryPoor
+                  - ExtremelyPoor
           Groups:
               GroupsFeature:
                   - GroupNames
@@ -7501,13 +7596,26 @@
               Feature:
                   - Condition
                   - Warning
+          DoorLock:
+              DoorLockFeature:
+                  - Unbolt
+          SmokeCOAlarm:
+              SmokeCOAlarmFeature:
+                  - SmokeAlarm
+                  - COAlarm
       ids:
           attributes:
               TimeSynchronization:
                   - TrustedTimeSource
                   - DefaultNTP
                   - NTPServerAvailable
+      global attributes:
+          - EventList
   deprecated:
+      clusters:
+          # We apparently forgot to deprecate BridgedDeviceBasic when we
+          # introduced BridgedDeviceBasicInformation.
+          - BridgedDeviceBasic
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -7515,30 +7623,6 @@
               - PressureFeature
           PumpConfigurationAndControl:
               - PumpFeature
-  removed:
-      attributes:
-          # The ProductAppearance bits never happened for the old Basic and
-          # BridgedDeviceBasic cluster names.
-          Basic:
-              - ProductAppearance
-          BridgedDeviceBasic:
-              - ProductAppearance
-      structs:
-          # The ProductAppearance bits never happened for the old Basic and
-          # BridgedDeviceBasic cluster names.
-          Basic:
-              - ProductAppearanceStruct
-          BridgedDeviceBasic:
-              - ProductAppearanceStruct
-      enums:
-          # The ProductAppearance bits never happened for the old Basic and
-          # BridgedDeviceBasic cluster names.
-          Basic:
-              - ProductFinishEnum
-              - ColorEnum
-          BridgedDeviceBasic:
-              - ProductFinishEnum
-              - ColorEnum
   renames:
       attributes:
           TimeSynchronization:
@@ -7571,33 +7655,11 @@
           PumpConfigurationAndControl:
               PumpConfigurationAndControlFeature: PumpFeature
   provisional:
+      clusters:
+          # Not ready to be public API yet.
+          - ICDManagement
       # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
-      attributes:
-          HEPAFilterMonitoring:
-              - EventList
-          ActivatedCarbonFilterMonitoring:
-              - EventList
-          CeramicFilterMonitoring:
-              - EventList
-          ElectrostaticFilterMonitoring:
-              - EventList
-          UVFilterMonitoring:
-              - EventList
-          IonizingFilterMonitoring:
-              - EventList
-          ZeoliteFilterMonitoring:
-              - EventList
-          OzoneFilterMonitoring:
-              - EventList
-          WaterTankMonitoring:
-              - EventList
-          FuelTankMonitoring:
-              - EventList
-          InkCartridgeMonitoring:
-              - EventList
-          TonerCartridgeMonitoring:
-              - EventList
       ids:
           attributes:
               TimeSynchronization:

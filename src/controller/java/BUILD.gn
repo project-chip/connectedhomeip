@@ -146,8 +146,6 @@ if (chip_link_tests) {
 kotlin_library("tlv") {
   output_name = "libCHIPTlv.jar"
 
-  deps = [ "${chip_root}/third_party/java_deps:protobuf-java" ]
-
   sources = [
     "src/chip/tlv/Element.kt",
     "src/chip/tlv/TlvReader.kt",

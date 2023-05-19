@@ -973,4 +973,142 @@
     XCTAssertNil(report.error);
 }
 
+- (void)test033_CommandResponse
+{
+    NSDictionary * input = @{
+        MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0)
+                                                            clusterID:@(MTRClusterIDTypeGroupsID)
+                                                            commandID:@(MTRCommandIDTypeClusterGroupsCommandAddGroupResponseID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[
+                @{
+                    MTRContextTagKey : @(0), // Status
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(1),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(1), // GroupID
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(0x176),
+                    },
+                },
+            ],
+        },
+    };
+
+    NSError * error;
+    __auto_type * payload = [[MTRGroupsClusterAddGroupResponseParams alloc] initWithResponseValue:input error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(payload);
+    XCTAssertEqualObjects(payload.status, @(1));
+    XCTAssertEqualObjects(payload.groupID, @(0x176));
+}
+
+- (void)test034_CommandResponseWrongCommandID
+{
+    NSDictionary * input = @{
+        MTRCommandPathKey :
+            [MTRCommandPath commandPathWithEndpointID:@(0)
+                                            clusterID:@(MTRClusterIDTypeGroupsID)
+                                            commandID:@(MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipResponseID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[
+                @{
+                    MTRContextTagKey : @(0), // Status
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(1),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(1), // GroupID
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(0x176),
+                    },
+                },
+            ],
+        },
+    };
+
+    NSError * error;
+    __auto_type * payload = [[MTRGroupsClusterAddGroupResponseParams alloc] initWithResponseValue:input error:&error];
+    XCTAssertNil(payload);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
+}
+
+- (void)test035_CommandResponseWrongClusterID
+{
+    NSDictionary * input = @{
+        MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0)
+                                                            clusterID:@(MTRClusterIDTypeOnOffID)
+                                                            commandID:@(MTRCommandIDTypeClusterGroupsCommandAddGroupResponseID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[
+                @{
+                    MTRContextTagKey : @(0), // Status
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(1),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(1), // GroupID
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(0x176),
+                    },
+                },
+            ],
+        },
+    };
+
+    NSError * error;
+    __auto_type * payload = [[MTRGroupsClusterAddGroupResponseParams alloc] initWithResponseValue:input error:&error];
+    XCTAssertNil(payload);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
+}
+
+- (void)test036_CommandResponseWrongData
+{
+    NSDictionary * input = @{
+        MTRCommandPathKey : [MTRCommandPath commandPathWithEndpointID:@(0)
+                                                            clusterID:@(MTRClusterIDTypeGroupsID)
+                                                            commandID:@(MTRCommandIDTypeClusterGroupsCommandAddGroupResponseID)],
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[
+                @{
+                    MTRContextTagKey : @(0), // Status
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRSignedIntegerValueType, // Wrong data type
+                        MTRValueKey : @(1),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(1), // GroupID
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(0x176),
+                    },
+                },
+            ],
+        },
+    };
+
+    NSError * error;
+    __auto_type * payload = [[MTRGroupsClusterAddGroupResponseParams alloc] initWithResponseValue:input error:&error];
+    XCTAssertNil(payload);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.code, MTRErrorCodeSchemaMismatch);
+}
+
 @end

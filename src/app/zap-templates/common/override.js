@@ -83,6 +83,8 @@ function atomicType(arg)
   case 'utc':
   case 'elapsed_s':
     return 'uint32_t';
+  case 'temperature':
+    return 'int16_t';
   default:
     throw 'not overriding';
   }

@@ -1,15 +1,6 @@
-// This IDL was generated automatically by ZAP.
-// It is for view/code review purposes only.
-
-{{#zcl_structs}}
-{{#if has_more_than_one_cluster}}
-{{>idl_structure_definition extraIndent=0}}
-
-{{/if}}
-{{/zcl_structs}}
-{{#all_user_clusters~}}
 /** {{description}} */
-{{side}} cluster {{asUpperCamelCase name}} = {{code}} {
+{{#if generateClientCluster}}client {{else}}server {{/if~}}
+cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
@@ -46,7 +37,7 @@
   }
 
   {{/zcl_events}}
-  {{#if (is_client side)}}
+  {{#if generateClientCluster}}
     {{#zcl_attributes_server}}
       {{#if clusterRef}}
   {{! ensure indent }}{{>idl_attribute_definition}}
@@ -71,14 +62,14 @@
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 {{!--Open:Generating command request structs for all incoming commands into server side--~}}
-  {{#if (is_server side)}}
+  {{#unless generateClientCluster}}
     {{#all_incoming_commands_for_cluster name side}}
       {{~>idl_command_request_struct}}
     {{/all_incoming_commands_for_cluster}}
-  {{/if}}
+  {{/unless}}
   {{~!--Close:Generating command request structs for all incoming commands into server side--~}}
   {{~!--Open:Generating command request structs for all outgoing commands from client side--~}}
-  {{#if (is_client side)}}
+  {{#if generateClientCluster}}
     {{#zcl_commands}}
       {{#if (isStrEqual source "client")}}
       {{~>idl_command_request_struct}}
@@ -91,69 +82,21 @@
   {{~!--Open:Generating command response structs for all incoming commands into client side--~}}
   {{~!--Close:Generating command response structs for all incoming commands into client side--~}}
   {{~!--Open:Generating command response structs for all outgoing commands from server side--~}}
-  {{#if (is_server side)}}
+  {{#unless generateClientCluster}}
     {{#all_outgoing_commands_for_cluster name side}}
       {{~>idl_command_response_struct}}
     {{/all_outgoing_commands_for_cluster}}
-  {{/if}}
+  {{/unless}}
   {{~!--Close:Generating command response structs for all outgoing commands from server side--~}}
-  {{#if (is_server side)}}
+  {{#unless generateClientCluster}}
     {{#all_incoming_commands_for_cluster name side}}
       {{~>idl_command_request_response}}{{~new_line 1~}}
     {{/all_incoming_commands_for_cluster}}
-  {{/if}}
-  {{#if (is_client side)}}
+  {{/unless}}
+  {{#if generateClientCluster}}
     {{#zcl_commands_source_client}}
       {{~>idl_command_request_response}}{{~new_line 1~}}
     {{/zcl_commands_source_client}}
   {{/if}}
 }
-
-{{/all_user_clusters}}
-{{#user_endpoints}}
-endpoint {{endpointId}} {
-  {{#if deviceIdentifier}}
-  device type {{chip_friendly_endpoint_type_name}} = {{deviceIdentifier}}, version {{endpointVersion}};
-  {{/if~}}
-
-  {{#user_clusters}}
-    {{#if enabled}}
-      {{#unless (isServer side)}}
-  binding cluster {{asUpperCamelCase name}};
-      {{/unless}}
-    {{/if}}
-  {{/user_clusters}}
-  {{#user_clusters}}
-    {{#if enabled}}
-      {{#if (isServer side)}}
-
-  server cluster {{asUpperCamelCase name}} {
-    {{#user_cluster_events}}
-      {{#if included}}
-    emits event {{name}};
-      {{/if}}
-    {{/user_cluster_events}} 
-    {{#user_cluster_attributes}}
-       {{#if included}}
-        {{~#if (is_str_equal storageOption "NVM")}}
-    persist  {{!align~}}
-        {{~else if (is_str_equal storageOption "External")}}
-    callback {{!align~}}
-        {{~else}}
-    ram      {{!align~}}
-        {{~/if~}}
-        attribute {{asLowerCamelCase name}}
-        {{~#if defaultValue~}} 
-          {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
-        {{~/if~}}
-        ;
-      {{/if}}
-    {{/user_cluster_attributes}}
-  }
-      {{/if}}
-    {{/if}}
-  {{/user_clusters}}
-}
-{{/user_endpoints}}
-
 
