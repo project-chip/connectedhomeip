@@ -28124,10 +28124,10 @@ class Channel(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="count", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="count", Tag=0, Type=int),
                     ])
 
-            count: 'uint' = 0
+            count: 'int' = 0
 
     class Attributes:
         @dataclass

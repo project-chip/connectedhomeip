@@ -5026,7 +5026,7 @@ client cluster Channel = 1284 {
   }
 
   request struct SkipChannelRequest {
-    INT16U count = 0;
+    INT16S count = 0;
   }
 
   /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */
