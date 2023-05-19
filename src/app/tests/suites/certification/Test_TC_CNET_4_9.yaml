@@ -125,7 +125,9 @@ tests:
           [1653478311.640901][30368:30373] CHIP:EM: Sending Standalone Ack for MessageCounter:8633037 on exchange 20698i
       disabled: true
 
-    - label: "TH reads the Networks attribute list from the DUT"
+    - label:
+          "TH reads Networks attribute from the DUT and saves the number of
+          entries as 'NumNetworks'"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0

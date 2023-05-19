@@ -68,7 +68,7 @@ public:
     static void AppTaskMain(void * pvParameter);
 
     CHIP_ERROR StartAppTask();
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
     /**
      * @brief Event handler when a button is pressed
      * Function posts an event for button processing
@@ -78,7 +78,7 @@ public:
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-#endif
+
     /**
      * @brief Callback called by the identify-server when an identify command is received
      *

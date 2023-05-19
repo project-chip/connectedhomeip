@@ -1029,6 +1029,121 @@ public class ChipStructs {
     }
   }
 
+  public static class TimeSynchronizationClusterDSTOffsetStruct {
+    public Long offset;
+    public Long validStarting;
+    public @Nullable Long validUntil;
+
+    public TimeSynchronizationClusterDSTOffsetStruct(
+        Long offset, Long validStarting, @Nullable Long validUntil) {
+      this.offset = offset;
+      this.validStarting = validStarting;
+      this.validUntil = validUntil;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterDSTOffsetStruct {\n");
+      output.append("\toffset: ");
+      output.append(offset);
+      output.append("\n");
+      output.append("\tvalidStarting: ");
+      output.append(validStarting);
+      output.append("\n");
+      output.append("\tvalidUntil: ");
+      output.append(validUntil);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {
+    public Long nodeID;
+    public Integer endpoint;
+
+    public TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(
+        Long nodeID, Integer endpoint) {
+      this.nodeID = nodeID;
+      this.endpoint = endpoint;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {\n");
+      output.append("\tnodeID: ");
+      output.append(nodeID);
+      output.append("\n");
+      output.append("\tendpoint: ");
+      output.append(endpoint);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TimeSynchronizationClusterTimeZoneStruct {
+    public Long offset;
+    public Long validAt;
+    public Optional<String> name;
+
+    public TimeSynchronizationClusterTimeZoneStruct(
+        Long offset, Long validAt, Optional<String> name) {
+      this.offset = offset;
+      this.validAt = validAt;
+      this.name = name;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterTimeZoneStruct {\n");
+      output.append("\toffset: ");
+      output.append(offset);
+      output.append("\n");
+      output.append("\tvalidAt: ");
+      output.append(validAt);
+      output.append("\n");
+      output.append("\tname: ");
+      output.append(name);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TimeSynchronizationClusterTrustedTimeSourceStruct {
+    public Integer fabricIndex;
+    public Long nodeID;
+    public Integer endpoint;
+
+    public TimeSynchronizationClusterTrustedTimeSourceStruct(
+        Integer fabricIndex, Long nodeID, Integer endpoint) {
+      this.fabricIndex = fabricIndex;
+      this.nodeID = nodeID;
+      this.endpoint = endpoint;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterTrustedTimeSourceStruct {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("\tnodeID: ");
+      output.append(nodeID);
+      output.append("\n");
+      output.append("\tendpoint: ");
+      output.append(endpoint);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class BridgedDeviceBasicInformationClusterProductAppearanceStruct {
     public Integer finish;
     public @Nullable Integer primaryColor;
@@ -1312,6 +1427,41 @@ public class ChipStructs {
     }
   }
 
+  public static class IcdManagementClusterMonitoringRegistrationStruct {
+    public Long checkInNodeID;
+    public Long monitoredSubject;
+    public byte[] key;
+    public Integer fabricIndex;
+
+    public IcdManagementClusterMonitoringRegistrationStruct(
+        Long checkInNodeID, Long monitoredSubject, byte[] key, Integer fabricIndex) {
+      this.checkInNodeID = checkInNodeID;
+      this.monitoredSubject = monitoredSubject;
+      this.key = key;
+      this.fabricIndex = fabricIndex;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("IcdManagementClusterMonitoringRegistrationStruct {\n");
+      output.append("\tcheckInNodeID: ");
+      output.append(checkInNodeID);
+      output.append("\n");
+      output.append("\tmonitoredSubject: ");
+      output.append(monitoredSubject);
+      output.append("\n");
+      output.append("\tkey: ");
+      output.append(Arrays.toString(key));
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class ModeSelectClusterSemanticTagStruct {
     public Integer mfgCode;
     public Integer value;
@@ -1368,284 +1518,24 @@ public class ChipStructs {
     }
   }
 
-  public static class LaundryWasherModeSelectClusterSemanticTagStruct {
-    public Integer mfgCode;
-    public Integer value;
-
-    public LaundryWasherModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
-      this.mfgCode = mfgCode;
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("LaundryWasherModeSelectClusterSemanticTagStruct {\n");
-      output.append("\tmfgCode: ");
-      output.append(mfgCode);
-      output.append("\n");
-      output.append("\tvalue: ");
-      output.append(value);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class LaundryWasherModeSelectClusterModeOptionStruct {
+  public static class TemperatureControlClusterTemperatureLevelStruct {
     public String label;
-    public Integer mode;
-    public ArrayList<ChipStructs.LaundryWasherModeSelectClusterSemanticTagStruct> semanticTags;
+    public Integer tempLevel;
 
-    public LaundryWasherModeSelectClusterModeOptionStruct(
-        String label,
-        Integer mode,
-        ArrayList<ChipStructs.LaundryWasherModeSelectClusterSemanticTagStruct> semanticTags) {
+    public TemperatureControlClusterTemperatureLevelStruct(String label, Integer tempLevel) {
       this.label = label;
-      this.mode = mode;
-      this.semanticTags = semanticTags;
+      this.tempLevel = tempLevel;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("LaundryWasherModeSelectClusterModeOptionStruct {\n");
+      output.append("TemperatureControlClusterTemperatureLevelStruct {\n");
       output.append("\tlabel: ");
       output.append(label);
       output.append("\n");
-      output.append("\tmode: ");
-      output.append(mode);
-      output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct {
-    public Integer mfgCode;
-    public Integer value;
-
-    public RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct(
-        Integer mfgCode, Integer value) {
-      this.mfgCode = mfgCode;
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct {\n");
-      output.append("\tmfgCode: ");
-      output.append(mfgCode);
-      output.append("\n");
-      output.append("\tvalue: ");
-      output.append(value);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct {
-    public String label;
-    public Integer mode;
-    public ArrayList<
-            ChipStructs.RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct>
-        semanticTags;
-
-    public RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct(
-        String label,
-        Integer mode,
-        ArrayList<ChipStructs.RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct>
-            semanticTags) {
-      this.label = label;
-      this.mode = mode;
-      this.semanticTags = semanticTags;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct {\n");
-      output.append("\tlabel: ");
-      output.append(label);
-      output.append("\n");
-      output.append("\tmode: ");
-      output.append(mode);
-      output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class RvcRunClusterSemanticTagStruct {
-    public Integer mfgCode;
-    public Integer value;
-
-    public RvcRunClusterSemanticTagStruct(Integer mfgCode, Integer value) {
-      this.mfgCode = mfgCode;
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("RvcRunClusterSemanticTagStruct {\n");
-      output.append("\tmfgCode: ");
-      output.append(mfgCode);
-      output.append("\n");
-      output.append("\tvalue: ");
-      output.append(value);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class RvcRunClusterModeOptionStruct {
-    public String label;
-    public Integer mode;
-    public ArrayList<ChipStructs.RvcRunClusterSemanticTagStruct> semanticTags;
-
-    public RvcRunClusterModeOptionStruct(
-        String label,
-        Integer mode,
-        ArrayList<ChipStructs.RvcRunClusterSemanticTagStruct> semanticTags) {
-      this.label = label;
-      this.mode = mode;
-      this.semanticTags = semanticTags;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("RvcRunClusterModeOptionStruct {\n");
-      output.append("\tlabel: ");
-      output.append(label);
-      output.append("\n");
-      output.append("\tmode: ");
-      output.append(mode);
-      output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class RvcCleanClusterSemanticTagStruct {
-    public Integer mfgCode;
-    public Integer value;
-
-    public RvcCleanClusterSemanticTagStruct(Integer mfgCode, Integer value) {
-      this.mfgCode = mfgCode;
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("RvcCleanClusterSemanticTagStruct {\n");
-      output.append("\tmfgCode: ");
-      output.append(mfgCode);
-      output.append("\n");
-      output.append("\tvalue: ");
-      output.append(value);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class RvcCleanClusterModeOptionStruct {
-    public String label;
-    public Integer mode;
-    public ArrayList<ChipStructs.RvcCleanClusterSemanticTagStruct> semanticTags;
-
-    public RvcCleanClusterModeOptionStruct(
-        String label,
-        Integer mode,
-        ArrayList<ChipStructs.RvcCleanClusterSemanticTagStruct> semanticTags) {
-      this.label = label;
-      this.mode = mode;
-      this.semanticTags = semanticTags;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("RvcCleanClusterModeOptionStruct {\n");
-      output.append("\tlabel: ");
-      output.append(label);
-      output.append("\n");
-      output.append("\tmode: ");
-      output.append(mode);
-      output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class DishwasherModeSelectClusterSemanticTagStruct {
-    public Integer mfgCode;
-    public Integer value;
-
-    public DishwasherModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
-      this.mfgCode = mfgCode;
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("DishwasherModeSelectClusterSemanticTagStruct {\n");
-      output.append("\tmfgCode: ");
-      output.append(mfgCode);
-      output.append("\n");
-      output.append("\tvalue: ");
-      output.append(value);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
-  public static class DishwasherModeSelectClusterModeOptionStruct {
-    public String label;
-    public Integer mode;
-    public ArrayList<ChipStructs.DishwasherModeSelectClusterSemanticTagStruct> semanticTags;
-
-    public DishwasherModeSelectClusterModeOptionStruct(
-        String label,
-        Integer mode,
-        ArrayList<ChipStructs.DishwasherModeSelectClusterSemanticTagStruct> semanticTags) {
-      this.label = label;
-      this.mode = mode;
-      this.semanticTags = semanticTags;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("DishwasherModeSelectClusterModeOptionStruct {\n");
-      output.append("\tlabel: ");
-      output.append(label);
-      output.append("\n");
-      output.append("\tmode: ");
-      output.append(mode);
-      output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
+      output.append("\ttempLevel: ");
+      output.append(tempLevel);
       output.append("\n");
       output.append("}\n");
       return output.toString();

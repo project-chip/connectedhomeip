@@ -111,9 +111,6 @@ public:
         SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId, NSSet<NSNumber *> * _Nullable caseAuthenticatedTags,
         NSDateInterval * validityPeriod, NSData * _Nullable __autoreleasing * _Nonnull operationalCert);
 
-    // 10 years.
-    static const uint32_t kCertificateDefaultValiditySecs = 10 * 365 * 24 * 60 * 60;
-
 private:
     // notAfter times can represent "forever".
     static bool ToChipNotAfterEpochTime(NSDate * date, uint32_t & epoch);

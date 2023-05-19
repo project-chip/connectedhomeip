@@ -15,10 +15,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
+
 package chip.tlv
 
-import com.google.protobuf.ByteString
 import java.lang.Double.doubleToLongBits
 import java.lang.Float.floatToIntBits
 
@@ -65,11 +64,10 @@ data class Utf8StringValue(val value: String) : Value() {
     value.toByteArray().size.toByteArrayLittleEndian(toType().lengthSize) + value.toByteArray()
 }
 
-/** Represents a byte string value of a TLV element. */
-data class ByteStringValue(val value: ByteString) : Value() {
-  override fun toType() = ByteStringType(unsignedIntSize(value.size().toULong()))
-  override fun encode() =
-    value.toByteArray().size.toByteArrayLittleEndian(toType().lengthSize) + value.toByteArray()
+/** Represents an octet string value of a TLV element. */
+data class ByteStringValue(val value: ByteArray) : Value() {
+  override fun toType() = ByteStringType(unsignedIntSize(value.size.toULong()))
+  override fun encode() = value.size.toByteArrayLittleEndian(toType().lengthSize) + value
 }
 
 /** Represents a null value in a TLV element. */

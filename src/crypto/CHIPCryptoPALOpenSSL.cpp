@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1968,6 +1968,88 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
 {
     return ExtractKIDFromX509Cert(false, certificate, akid);
+}
+
+CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber)
+{
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    X509 * x509certificate                = nullptr;
+    auto * pCertificate                   = Uint8::to_const_uchar(certificate.data());
+    const unsigned char ** ppCertificate  = &pCertificate;
+    const ASN1_INTEGER * serialNumberASN1 = nullptr;
+    size_t serialNumberLen                = 0;
+
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    x509certificate = d2i_X509(nullptr, ppCertificate, static_cast<long>(certificate.size()));
+    VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    serialNumberASN1 = X509_get_serialNumber(x509certificate);
+    VerifyOrExit(serialNumberASN1 != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(serialNumberASN1->data != nullptr, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<size_t>(serialNumberASN1->length), err = CHIP_ERROR_INTERNAL);
+
+    serialNumberLen = static_cast<size_t>(serialNumberASN1->length);
+    VerifyOrExit(serialNumberLen <= serialNumber.size(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(serialNumber.data(), serialNumberASN1->data, serialNumberLen);
+    serialNumber.reduce_size(serialNumberLen);
+
+exit:
+    X509_free(x509certificate);
+
+    return err;
+}
+
+namespace {
+CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certificate, MutableByteSpan & dn)
+{
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    int result                           = 1;
+    X509 * x509certificate               = nullptr;
+    auto * pCertificate                  = Uint8::to_const_uchar(certificate.data());
+    const unsigned char ** ppCertificate = &pCertificate;
+    X509_NAME * distinguishedName        = nullptr;
+    const uint8_t * pDistinguishedName   = nullptr;
+    size_t distinguishedNameLen          = 0;
+
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    x509certificate = d2i_X509(nullptr, ppCertificate, static_cast<long>(certificate.size()));
+    VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    if (extractSubject)
+    {
+        distinguishedName = X509_get_subject_name(x509certificate);
+    }
+    else
+    {
+        distinguishedName = X509_get_issuer_name(x509certificate);
+    }
+    VerifyOrExit(distinguishedName != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    result = X509_NAME_get0_der(distinguishedName, &pDistinguishedName, &distinguishedNameLen);
+    VerifyOrExit(result == 1, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(distinguishedNameLen <= dn.size(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(dn.data(), pDistinguishedName, distinguishedNameLen);
+    dn.reduce_size(distinguishedNameLen);
+
+exit:
+    X509_free(x509certificate);
+
+    return err;
+}
+} // namespace
+
+CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteSpan & subject)
+{
+    return ExtractRawDNFromX509Cert(true, certificate, subject);
+}
+
+CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer)
+{
+    return ExtractRawDNFromX509Cert(false, certificate, issuer);
 }
 
 CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCertVidPid & vidpid)

@@ -155,7 +155,7 @@ tests:
     - label: "DUT reads NeighborTable attribute value from TH."
       PICS: DGTHREAD.C.A0007
       verification: |
-          ./chip-tool threadnetworkdiagnostics read neighbor-table-list 54 0
+          ./chip-tool threadnetworkdiagnostics read neighbor-table 54 0
 
           Verify "NeighborTableList response" on the TH(All-cluster-app) Log:
 
@@ -173,7 +173,7 @@ tests:
     - label: "DUT reads RouteTable attribute value from TH."
       PICS: DGTHREAD.C.A0008
       verification: |
-          ./chip-tool threadnetworkdiagnostics read route-table-list 54 0
+          ./chip-tool threadnetworkdiagnostics read route-table 54 0
 
           Verify "RouteTableList response" on the TH(All-cluster-app) Log:
 

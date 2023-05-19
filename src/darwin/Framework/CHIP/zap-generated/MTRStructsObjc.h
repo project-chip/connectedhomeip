@@ -513,6 +513,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterStartUpEvent")
 @interface MTRBridgedDeviceBasicClusterStartUpEvent : MTRBridgedDeviceBasicInformationClusterStartUpEvent
 @end
 
@@ -521,6 +522,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterShutDownEvent")
 @interface MTRBridgedDeviceBasicClusterShutDownEvent : MTRBridgedDeviceBasicInformationClusterShutDownEvent
 @end
 
@@ -529,6 +531,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterLeaveEvent")
 @interface MTRBridgedDeviceBasicClusterLeaveEvent : MTRBridgedDeviceBasicInformationClusterLeaveEvent
 @end
 
@@ -538,6 +541,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterReachableChangedEvent")
 @interface MTRBridgedDeviceBasicClusterReachableChangedEvent : MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
 @end
 
@@ -676,68 +680,53 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRLaundryWasherModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRLaundryWasherModeSelectClusterModeOptionStruct : NSObject <NSCopying>
+@interface MTRTemperatureControlClusterTemperatureLevelStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull tempLevel MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
+@interface MTRSmokeCOAlarmClusterSmokeAlarmEvent : NSObject <NSCopying>
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
+@interface MTRSmokeCOAlarmClusterCOAlarmEvent : NSObject <NSCopying>
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCRunClusterSemanticTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
+@interface MTRSmokeCOAlarmClusterLowBatteryEvent : NSObject <NSCopying>
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCRunClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
+@interface MTRSmokeCOAlarmClusterHardwareFaultEvent : NSObject <NSCopying>
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCCleanClusterSemanticTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
+@interface MTRSmokeCOAlarmClusterEndOfServiceEvent : NSObject <NSCopying>
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCCleanClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
+@interface MTRSmokeCOAlarmClusterSelfTestCompleteEvent : NSObject <NSCopying>
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRDishwasherModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
+@interface MTRSmokeCOAlarmClusterAlarmMutedEvent : NSObject <NSCopying>
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRDishwasherModeSelectClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
+@interface MTRSmokeCOAlarmClusterMuteEndedEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterAllClearEvent : NSObject <NSCopying>
 @end
 
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))

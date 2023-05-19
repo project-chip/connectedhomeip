@@ -18,19 +18,16 @@
  */
 
 
-
 /* Modules */
 var AESCCM      = scripting.addModule("/ti/drivers/AESCCM");
 var AESECB      = scripting.addModule("/ti/drivers/AESECB");
-var ECJPAKE     = scripting.addModule("/ti/drivers/ECJPAKE");
 var NVS         = scripting.addModule("/ti/drivers/NVS");
 var RF          = scripting.addModule("/ti/drivers/RF");
 var RFDesign    = scripting.addModule("ti/devices/radioconfig/rfdesign");
-var RTOS        = scripting.addModule("/ti/drivers/RTOS");
+var RFCustom  = scripting.addModule("/ti/devices/radioconfig/custom");
 var TRNG        = scripting.addModule("/ti/drivers/TRNG");
-var Thread      = scripting.addModule("/ti/thread/thread");
 var SHA2        = scripting.addModule("/ti/drivers/SHA2");
-var UART        = scripting.addModule("/ti/drivers/UART");
+var UART2       = scripting.addModule("/ti/drivers/UART2");
 var ble         = scripting.addModule("/ti/ble5stack/ble");
 var dmm         = scripting.addModule("/ti/dmm/dmm");
 var AESCTRDRBG  = scripting.addModule("/ti/drivers/AESCTRDRBG");
@@ -40,19 +37,17 @@ var ECDH        = scripting.addModule("/ti/drivers/ECDH");
 var AESCCM1     = AESCCM.addInstance();
 var AESECB1     = AESECB.addInstance();
 var AESECB2     = AESECB.addInstance();
-var ECJPAKE     = ECJPAKE.addInstance();
 var NVS1        = NVS.addInstance();
 var NVS2        = NVS.addInstance();
 var SHA21       = SHA2.addInstance();
 var TRNG1       = TRNG.addInstance();
 var TRNG2       = TRNG.addInstance();
 var TRNG3       = TRNG.addInstance();
-var UART1       = UART.addInstance();
+var UART2      = UART2.addInstance();
 var AESCTRDRBG1 = AESCTRDRBG.addInstance();
 var ECDH1       = ECDH.addInstance();
 
 AESCTRDRBG1.$name              = "CONFIG_AESCTRDRBG_0";
-AESCTRDRBG1.aesctrObject.$name = "CONFIG_AESCTR_0";
 
 AESCCM1.$name = "CONFIG_AESCCM0";
 
@@ -92,16 +87,67 @@ for(var setting in rfDesignSettings)
     RFDesign[setting] = rfDesignSettings[setting];
 }
 
-/* Streamer UART  */
-UART1.$hardware     = system.deviceData.board.components.XDS110UART;
-UART1.$name         = "CONFIG_UART_STREAMER";
+
+/* Handling for RF frontend characterization */
+if(RFDesign.rfDesign.match(/LP_CC2652PSIP/))
+{
+    RFCustom.ieee = ["ieee154p10"];
+    var rfCodeExportConfig = RFCustom.radioConfigieee154p10.codeExportConfig
+}
+else
+{
+    RFCustom.ieee = ["ieee154"];
+    var rfCodeExportConfig = RFCustom.radioConfigieee154.codeExportConfig
+}
+
+var cmdList = [
+    "cmdIeeeTx",
+    "cmdIeeeRx",
+    "cmdIeeeCsma",
+    "cmdIeeeEdScan",
+    "cmdIeeeRxAck",
+    "cmdTxTest"
+];
+
+rfCodeExportConfig.useConst     = true;
+rfCodeExportConfig.useMulti     = true;
+rfCodeExportConfig.symGenMethod = "Custom";
+
+const deviceId = system.deviceData.deviceId;
+
+// Add high PA options if present
+if(deviceId.match(/CC(265[12]R|2674R|1352R1|1354R)/))
+{
+    cmdList.push("cmdRadioSetup");
+    rfCodeExportConfig.cmdRadioSetup = "RF_cmdIeeeRadioSetup";
+}
+else if(deviceId.match(/CC(265[12]P|2674P|1352P)/))
+{
+    cmdList.push("cmdRadioSetupPa");
+    rfCodeExportConfig.cmdRadioSetupPa = "RF_cmdIeeeRadioSetup";
+    rfCodeExportConfig.paExport = "combined";
+}
+else if(deviceId.match(/CC(265[34]|1354)P/))
+{
+    cmdList.push("cmdRadioSetupPa");
+    rfCodeExportConfig.cmdRadioSetupPa = "RF_cmdIeeeRadioSetup";
+    // currently not characterized for high PA
+}
+else
+{
+    throw new Error("Could not match platform to any known platform types");
+}
+
+rfCodeExportConfig.cmdList_ieee_15_4 = cmdList;
+
+/* Debug UART  */
+UART2.$hardware     = system.deviceData.board.components.XDS110UART;
+UART2.$name         = "CONFIG_UART_STREAMER";
 
 /* TRNG */
 TRNG1.$name     = "CONFIG_TRNG_0";
-TRNG2.$name     = "CONFIG_TRNG_1";
+TRNG2.$name     = "CONFIG_TRNG_THREAD";
 TRNG3.$name     = "CONFIG_TRNG_APP";
-
-RTOS.name = "FreeRTOS";
 
 /* BLE */
 ble.addressMode                                           = "ADDRMODE_RP_WITH_PUBLIC_ID";
@@ -110,7 +156,7 @@ ble.numOfAdvSets                                          = 1;
 ble.lockProject                                           = true;
 ble.oneLibSizeOpt                                         = true;
 ble.maxPDUSize                                            = 255;
-ble.radioConfig.codeExportConfig.$name                    = "ti_devices_radioconfig_code_export_param1";
+ble.radioConfig.codeExportConfig.$name                    = "ti_devices_radioconfig_code_export_param2";
 ble.connUpdateParamsPeripheral.$name                      = "ti_ble5stack_general_ble_conn_update_params0";
 ble.connUpdateParamsPeripheral.reqMinConnInt               = 30;
 ble.connUpdateParamsPeripheral.reqMaxConnInt               = 50;

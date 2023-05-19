@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -2133,6 +2133,176 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestSerialNumber_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct SerialNumberTestCase
+    {
+        uint8_t Cert;
+        ByteSpan mExpectedResult;
+    };
+
+    const uint8_t serialNumberRoot01[]    = { 0x53, 0x4c, 0x45, 0x82, 0x73, 0x62, 0x35, 0x14 };
+    const uint8_t serialNumberICA01[]     = { 0x69, 0xd8, 0x6a, 0x8d, 0x80, 0xfc, 0x8f, 0x5d };
+    const uint8_t serialNumberNode02_08[] = { 0x3e, 0x67, 0x94, 0x70, 0x7a, 0xec, 0xb8, 0x15 };
+
+    // clang-format off
+    static SerialNumberTestCase sSerialNumberTestCases[] = {
+        // Cert                    Expected Output
+        // ====================================================
+        {  TestCert::kRoot01,      ByteSpan(serialNumberRoot01) },
+        {  TestCert::kICA01,       ByteSpan(serialNumberICA01) },
+        {  TestCert::kNode02_08,   ByteSpan(serialNumberNode02_08) },
+    };
+    // clang-format on
+
+    for (auto & testCase : sSerialNumberTestCases)
+    {
+        ByteSpan cert;
+        err = GetTestCert(testCase.Cert, TestCertLoadFlags::kDERForm, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
+        MutableByteSpan serialNumber(serialNumberBuf);
+        err = ExtractSerialNumberFromX509Cert(cert, serialNumber);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, serialNumber.data_equal(testCase.mExpectedResult));
+    }
+}
+
+static void TestSubject_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct TestCase
+    {
+        uint8_t Cert;
+        ChipDN mExpectedDN;
+    };
+
+    ChipDN subjectDN_Root01;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Root01.AddAttribute_MatterRCACId(0xCACACACA00000001));
+    ChipDN subjectDN_ICA01;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_ICA01.AddAttribute_MatterICACId(0xCACACACA00000003));
+    ChipDN subjectDN_Node02_02;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_02.AddAttribute_MatterNodeId(0xDEDEDEDE00020002));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_02.AddAttribute_MatterFabricId(0xFAB000000000001D));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       subjectDN_Node02_02.AddAttribute_CommonName(
+                           chip::CharSpan::fromCharString("TEST CERT COMMON NAME Attr for Node02_02"), false));
+    ChipDN subjectDN_Node02_04;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCE1002));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       subjectDN_Node02_04.AddAttribute_CommonName(chip::CharSpan::fromCharString("TestCert02_04"), false));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterFabricId(0xFAB000000000001D));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCD0003));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterNodeId(0xDEDEDEDE00020004));
+    ChipDN subjectDN_Node02_08;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCF00A0));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_08.AddAttribute_MatterNodeId(0xDEDEDEDE00020008));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCD0020));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_08.AddAttribute_MatterFabricId(0xFAB000000000001D));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCE0100));
+
+    // clang-format off
+    static TestCase sTestCases[] = {
+        // Cert                    Expected Output
+        // ==============================================
+        {  TestCert::kRoot01,      subjectDN_Root01    },
+        {  TestCert::kICA01,       subjectDN_ICA01     },
+        {  TestCert::kNode02_02,   subjectDN_Node02_02 },
+        {  TestCert::kNode02_04,   subjectDN_Node02_04 },
+        {  TestCert::kNode02_08,   subjectDN_Node02_08 },
+    };
+    // clang-format on
+
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan cert;
+        err = GetTestCert(testCase.Cert, TestCertLoadFlags::kDERForm, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        uint8_t subjectBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        MutableByteSpan subject(subjectBuf);
+        err = ExtractSubjectFromX509Cert(cert, subject);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        static uint8_t expectedSubjectBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        ASN1::ASN1Writer writer;
+        writer.Init(expectedSubjectBuf);
+        err = testCase.mExpectedDN.EncodeToASN1(writer);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        size_t expectedSubjectLen = writer.GetLengthWritten();
+        NL_TEST_ASSERT(inSuite, expectedSubjectLen == subject.size());
+        NL_TEST_ASSERT(inSuite, memcmp(subject.data(), expectedSubjectBuf, expectedSubjectLen) == 0);
+    }
+}
+
+static void TestIssuer_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct TestCase
+    {
+        uint8_t Cert;
+        ChipDN mExpectedDN;
+    };
+
+    ChipDN issuerDN_Root01;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == issuerDN_Root01.AddAttribute_MatterRCACId(0xCACACACA00000001));
+    ChipDN issuerDN_ICA02;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == issuerDN_ICA02.AddAttribute_MatterRCACId(0xCACACACA00000002));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == issuerDN_ICA02.AddAttribute_MatterFabricId(0xFAB000000000001D));
+    ChipDN issuerDN_Node02_02;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == issuerDN_Node02_02.AddAttribute_MatterICACId(0xCACACACA00000004));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == issuerDN_Node02_02.AddAttribute_MatterFabricId(0xFAB000000000001D));
+
+    // clang-format off
+    static TestCase sTestCases[] = {
+        // Cert                    Expected Output
+        // ==============================================
+        {  TestCert::kRoot01,      issuerDN_Root01    },
+        {  TestCert::kICA02,       issuerDN_ICA02     },
+        {  TestCert::kNode02_02,   issuerDN_Node02_02 },
+    };
+    // clang-format on
+
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan cert;
+        err = GetTestCert(testCase.Cert, TestCertLoadFlags::kDERForm, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        uint8_t issuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        MutableByteSpan issuer(issuerBuf);
+        err = ExtractIssuerFromX509Cert(cert, issuer);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        static uint8_t expectedIssuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        ASN1::ASN1Writer writer;
+        writer.Init(expectedIssuerBuf);
+        err = testCase.mExpectedDN.EncodeToASN1(writer);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        size_t expectedIssuerLen = writer.GetLengthWritten();
+        NL_TEST_ASSERT(inSuite, expectedIssuerLen == issuer.size());
+        NL_TEST_ASSERT(inSuite, memcmp(issuer.data(), expectedIssuerBuf, expectedIssuerLen) == 0);
+    }
+}
+
 static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
@@ -2560,6 +2730,9 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test x509 Certificate Timestamp Validation", TestX509_IssuingTimestampValidation),
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
+    NL_TEST_DEF("Test Serial Number Extraction from x509 Certificate", TestSerialNumber_x509Extraction),
+    NL_TEST_DEF("Test Subject Extraction from x509 Certificate", TestSubject_x509Extraction),
+    NL_TEST_DEF("Test Issuer Extraction from x509 Certificate", TestIssuer_x509Extraction),
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from Attribute String", TestVIDPID_StringExtraction),
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from x509 Attestation Certificate", TestVIDPID_x509Extraction),
     NL_TEST_DEF("Test Replace Resigned Certificate Version if Found", TestX509_ReplaceCertIfResignedCertFound),

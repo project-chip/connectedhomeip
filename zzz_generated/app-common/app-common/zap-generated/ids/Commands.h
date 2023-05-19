@@ -609,6 +609,28 @@ static constexpr CommandId Id = 0x00000005;
 } // namespace Commands
 } // namespace GroupKeyManagement
 
+namespace IcdManagement {
+namespace Commands {
+
+namespace RegisterClient {
+static constexpr CommandId Id = 0x00000000;
+} // namespace RegisterClient
+
+namespace RegisterClientResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace RegisterClientResponse
+
+namespace UnregisterClient {
+static constexpr CommandId Id = 0x00000002;
+} // namespace UnregisterClient
+
+namespace StayActiveRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace StayActiveRequest
+
+} // namespace Commands
+} // namespace IcdManagement
+
 namespace ModeSelect {
 namespace Commands {
 
@@ -616,106 +638,148 @@ namespace ChangeToMode {
 static constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
 
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace ChangeToModeResponse
-
 } // namespace Commands
 } // namespace ModeSelect
 
-namespace LaundryWasherModeSelect {
+namespace TemperatureControl {
 namespace Commands {
 
-namespace ChangeToMode {
+namespace SetTemperature {
 static constexpr CommandId Id = 0x00000000;
-} // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace ChangeToModeResponse
+} // namespace SetTemperature
 
 } // namespace Commands
-} // namespace LaundryWasherModeSelect
+} // namespace TemperatureControl
 
-namespace RefrigeratorAndTemperatureControlledCabinet {
+namespace SmokeCoAlarm {
 namespace Commands {
 
-namespace ChangeToMode {
+namespace SelfTestRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace ChangeToModeResponse
+} // namespace SelfTestRequest
 
 } // namespace Commands
-} // namespace RefrigeratorAndTemperatureControlledCabinet
+} // namespace SmokeCoAlarm
 
-namespace RvcRun {
+namespace HepaFilterMonitoring {
 namespace Commands {
 
-namespace ChangeToMode {
+namespace ResetCondition {
 static constexpr CommandId Id = 0x00000000;
-} // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace ChangeToModeResponse
+} // namespace ResetCondition
 
 } // namespace Commands
-} // namespace RvcRun
+} // namespace HepaFilterMonitoring
 
-namespace RvcClean {
+namespace ActivatedCarbonFilterMonitoring {
 namespace Commands {
 
-namespace ChangeToMode {
+namespace ResetCondition {
 static constexpr CommandId Id = 0x00000000;
-} // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace ChangeToModeResponse
+} // namespace ResetCondition
 
 } // namespace Commands
-} // namespace RvcClean
+} // namespace ActivatedCarbonFilterMonitoring
 
-namespace DishwasherModeSelect {
+namespace CeramicFilterMonitoring {
 namespace Commands {
 
-namespace ChangeToMode {
+namespace ResetCondition {
 static constexpr CommandId Id = 0x00000000;
-} // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace ChangeToModeResponse
+} // namespace ResetCondition
 
 } // namespace Commands
-} // namespace DishwasherModeSelect
+} // namespace CeramicFilterMonitoring
+
+namespace ElectrostaticFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace ElectrostaticFilterMonitoring
+
+namespace UvFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace UvFilterMonitoring
+
+namespace IonizingFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace IonizingFilterMonitoring
+
+namespace ZeoliteFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace ZeoliteFilterMonitoring
+
+namespace OzoneFilterMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace OzoneFilterMonitoring
+
+namespace WaterTankMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace WaterTankMonitoring
+
+namespace FuelTankMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace FuelTankMonitoring
+
+namespace InkCartridgeMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace InkCartridgeMonitoring
+
+namespace TonerCartridgeMonitoring {
+namespace Commands {
+
+namespace ResetCondition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace TonerCartridgeMonitoring
 
 namespace DoorLock {
 namespace Commands {
@@ -815,6 +879,10 @@ static constexpr CommandId Id = 0x00000025;
 namespace ClearCredential {
 static constexpr CommandId Id = 0x00000026;
 } // namespace ClearCredential
+
+namespace UnboltDoor {
+static constexpr CommandId Id = 0x00000027;
+} // namespace UnboltDoor
 
 } // namespace Commands
 } // namespace DoorLock
@@ -1208,28 +1276,6 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace ElectricalMeasurement
-
-namespace ClientMonitoring {
-namespace Commands {
-
-namespace RegisterClientMonitoring {
-static constexpr CommandId Id = 0x00000000;
-} // namespace RegisterClientMonitoring
-
-namespace RegisterClientMonitoringResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace RegisterClientMonitoringResponse
-
-namespace UnregisterClientMonitoring {
-static constexpr CommandId Id = 0x00000002;
-} // namespace UnregisterClientMonitoring
-
-namespace StayAwakeRequest {
-static constexpr CommandId Id = 0x00000003;
-} // namespace StayAwakeRequest
-
-} // namespace Commands
-} // namespace ClientMonitoring
 
 namespace UnitTesting {
 namespace Commands {

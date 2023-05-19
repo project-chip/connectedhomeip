@@ -19,7 +19,6 @@
 package chip.tlv
 
 import com.google.common.truth.Truth.assertThat
-import com.google.protobuf.ByteString
 import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -484,7 +483,7 @@ class TlvReadWriteTest {
   @Test
   fun encodeOctetString() {
     // Octet String, 1-octet length, octets 00 01 02 03 04
-    val value = ByteString.fromHex("00 01 02 03 04".replace(" ", ""))
+    val value = "00 01 02 03 04".octetsToByteArray()
     val encoding = "10 05 00 01 02 03 04".octetsToByteArray()
 
     TlvWriter().apply {
@@ -1093,10 +1092,10 @@ class TlvReadWriteTest {
   fun putByteStringArray() {
     // Anonumous Array of Signed Integers, [{00 01 02 03 04}, {FF}, {4A EF 88}]
     val values =
-      listOf<ByteString>(
-        ByteString.fromHex("0001020304"),
-        ByteString.fromHex("FF"),
-        ByteString.fromHex("4AEF88")
+      listOf<ByteArray>(
+        "0001020304".octetsToByteArray(),
+        "FF".octetsToByteArray(),
+        "4AEF88".octetsToByteArray()
       )
     val encoding = "16 10 05 00 01 02 03 04 10 01 FF 10 03 4A EF 88 18".octetsToByteArray()
 

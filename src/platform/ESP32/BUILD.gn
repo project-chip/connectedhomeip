@@ -90,6 +90,10 @@ static_library("ESP32") {
     ]
   }
 
+  if (chip_enable_ble_controller) {
+    sources += [ "ChipDeviceScanner.h" ]
+  }
+
   if (chip_bt_nimble_enabled) {
     sources += [ "nimble/BLEManagerImpl.cpp" ]
     if (chip_enable_ble_controller) {

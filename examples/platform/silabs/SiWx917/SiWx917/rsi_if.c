@@ -30,6 +30,8 @@
 #include "rsi_driver.h"
 #include "rsi_wlan_non_rom.h"
 
+#include "silabs_utils.h"
+
 #include "rsi_bootup_config.h"
 #include "rsi_common_apis.h"
 #include "rsi_data_types.h"
