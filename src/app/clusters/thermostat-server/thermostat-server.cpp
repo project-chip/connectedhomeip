@@ -100,7 +100,8 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         {
             uint8_t valueRemoteSensing;
             EmberAfStatus status = RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing);
-            if (status != EMBER_ZCL_STATUS_SUCCESS) {
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            {
                 StatusIB statusIB(ToInteractionModelStatus(status));
                 return statusIB.ToChipError();
             }
