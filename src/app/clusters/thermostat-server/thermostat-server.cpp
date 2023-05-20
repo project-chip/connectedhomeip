@@ -63,7 +63,6 @@ constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
 #define FEATURE_MAP_SCH 0x08
 #define FEATURE_MAP_SB 0x10
 #define FEATURE_MAP_AUTO 0x20
-#define FEATURE_MAP_LTNE 0x40
 
 #define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
 
@@ -86,7 +85,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     uint32_t OurFeatureMap;
 
     if (FeatureMap::Get(aPath.mEndpointId, &OurFeatureMap) == EMBER_ZCL_STATUS_SUCCESS &&
-        OurFeatureMap & 1 << 6) // Bit 6 is LTNE supported
+        OurFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed))
         LTNESupported = true;
 
     switch (aPath.mAttributeId)
@@ -100,8 +99,11 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         if (LTNESupported)
         {
             uint8_t valueRemoteSensing;
-            VerifyOrReturnValue(RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing) == EMBER_ZCL_STATUS_SUCCESS,
-                                CHIP_NO_ERROR);
+            EmberAfStatus status = RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing);
+            if (status != EMBER_ZCL_STATUS_SUCCESS) {
+                StatusIB statusIB(ToInteractionModelStatus(status));
+                return statusIB.ToChipError();
+            }
             valueRemoteSensing &= 0xFE; // clear bit 1 (LocalTemperature RemoteSensing bit)
             return aEncoder.Encode(valueRemoteSensing);
         }
@@ -122,7 +124,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     uint32_t OurFeatureMap;
 
     if (FeatureMap::Get(aPath.mEndpointId, &OurFeatureMap) == EMBER_ZCL_STATUS_SUCCESS &&
-        OurFeatureMap & 1 << 6) // Bit 6 is LTNE supported
+        OurFeatureMap & to_underlying(Feature::kLocalTemperatureNotExposed))
         LTNESupported = true;
 
     switch (aPath.mAttributeId)
@@ -133,13 +135,11 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             uint8_t valueRemoteSensing;
             ReturnErrorOnFailure(aDecoder.Decode(valueRemoteSensing));
             if (valueRemoteSensing & 0x01) // If setting bit 1 (LocalTemperature RemoteSensing bit)
-            {
-                return StatusIB(imcode::ConstraintError).ToChipError();
-            }
-            else
-            {
-                RemoteSensing::Set(aPath.mEndpointId, valueRemoteSensing);
-            }
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+
+            EmberAfStatus status = RemoteSensing::Set(aPath.mEndpointId, valueRemoteSensing);
+            StatusIB statusIB(ToInteractionModelStatus(status));
+            return statusIB.ToChipError();
         }
         break;
     }
