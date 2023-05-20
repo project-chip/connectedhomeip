@@ -248,7 +248,6 @@ android_library("java") {
   data_deps = [ ":jni" ]
 
   sources = [
-    "generated/java/chip/devicecontroller/ClusterIDMapping.java",
     "generated/java/chip/devicecontroller/ClusterReadMapping.java",
     "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
     "src/chip/clusterinfo/ClusterCommandCallback.java",
