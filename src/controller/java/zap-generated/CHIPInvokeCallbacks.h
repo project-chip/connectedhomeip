@@ -342,6 +342,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback
+    : public Callback::Callback<CHIPTimeSynchronizationClusterSetTimeZoneResponseCallbackType>
+{
+public:
+    CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback(jobject javaCallback);
+
+    ~CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPOperationalCredentialsClusterAttestationResponseCallback
     : public Callback::Callback<CHIPOperationalCredentialsClusterAttestationResponseCallbackType>
 {
@@ -429,6 +444,21 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPIcdManagementClusterRegisterClientResponseCallback
+    : public Callback::Callback<CHIPIcdManagementClusterRegisterClientResponseCallbackType>
+{
+public:
+    CHIPIcdManagementClusterRegisterClientResponseCallback(jobject javaCallback);
+
+    ~CHIPIcdManagementClusterRegisterClientResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

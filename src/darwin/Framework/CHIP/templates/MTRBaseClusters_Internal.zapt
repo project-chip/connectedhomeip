@@ -5,8 +5,6 @@
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice.h"
 
-#include <zap-generated/CHIPClusters.h>
-
 {{#zcl_clusters}}
 
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}

@@ -250,6 +250,7 @@
             "args": [
                 "-Cbuild",
                 "-d${input:openiotsdkDebugMode}",
+                "-l${input:openiotsdkLwipDebug}",
                 "${input:openiotsdkExample}"
             ],
             "group": "build",
@@ -266,7 +267,12 @@
             "label": "Build Open IoT SDK unit-tests",
             "type": "shell",
             "command": "scripts/examples/openiotsdk_example.sh",
-            "args": ["-Cbuild", "-d${input:openiotsdkDebugMode}", "unit-tests"],
+            "args": [
+                "-Cbuild",
+                "-d${input:openiotsdkDebugMode}",
+                "-l${input:openiotsdkLwipDebug}",
+                "unit-tests"
+            ],
             "group": "build",
             "problemMatcher": {
                 "pattern": {
@@ -324,6 +330,21 @@
                 "-n${input:openiotsdkNetworkInterface}",
                 "${input:openiotsdkExample}"
             ],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Test Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": ["-Ctest", "unit-tests", "${input:openiotsdkUnitTest}"],
             "group": "test",
             "problemMatcher": {
                 "pattern": {
@@ -441,6 +462,13 @@
         },
         {
             "type": "pickString",
+            "id": "openiotsdkLwipDebug",
+            "description": "Do you want to use LwIP debug logs?",
+            "options": ["false", "true"],
+            "default": "false"
+        },
+        {
+            "type": "pickString",
             "id": "openiotsdkExample",
             "description": "What Open IoT SDK example application do you want to use?",
             "options": ["shell", "lock-app"],
@@ -451,7 +479,6 @@
             "id": "openiotsdkUnitTest",
             "description": "What unit test do you want to use?",
             "options": [
-                "all",
                 "accesstest",
                 "AppTests",
                 "ASN1Tests",
@@ -478,7 +505,7 @@
                 "TransportLayerTests",
                 "UserDirectedCommissioningTests"
             ],
-            "default": "all"
+            "default": "accesstest"
         },
         {
             "type": "promptString",
@@ -627,12 +654,12 @@
                 "nrf-nrf52840dk-pump",
                 "nrf-nrf52840dk-pump-controller",
                 "nrf-nrf52840dk-shell",
-                "nrf-nrf5340-light",
-                "nrf-nrf5340-light-rpc",
-                "nrf-nrf5340-lock",
-                "nrf-nrf5340-pump",
-                "nrf-nrf5340-pump-controller",
-                "nrf-nrf5340-shell",
+                "nrf-nrf5340dk-light",
+                "nrf-nrf5340dk-light-rpc",
+                "nrf-nrf5340dk-lock",
+                "nrf-nrf5340dk-pump",
+                "nrf-nrf5340dk-pump-controller",
+                "nrf-nrf5340dk-shell",
                 "openiotsdk-lock",
                 "openiotsdk-shell",
                 "qpg-qpg6100-lock",

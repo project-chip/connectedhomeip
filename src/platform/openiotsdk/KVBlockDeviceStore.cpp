@@ -300,12 +300,12 @@ CHIP_ERROR KVBlockDeviceStore::WriteConfigValue(Key key, uint64_t val)
 
 CHIP_ERROR KVBlockDeviceStore::WriteConfigValueStr(Key key, const char * str)
 {
-    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t *>(str), strlen(str));
+    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t *>(str), (str != nullptr) ? strlen(str) : 0);
 }
 
 CHIP_ERROR KVBlockDeviceStore::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t *>(str), strLen);
+    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t *>(str), (strLen > 0) ? strLen : 1);
 }
 
 CHIP_ERROR KVBlockDeviceStore::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)

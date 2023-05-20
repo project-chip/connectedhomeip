@@ -105,14 +105,10 @@ ChipDeviceScanner::~ChipDeviceScanner()
     StopScan();
 
     // mTimerExpired should only be set to true in the TimerExpiredCallback, which means we are in that callback
-    // right now so there is no need to cancel the timer. Doing so would result in deadlock trying to aquire the
-    // chip stack lock which we already currently have.
+    // right now so there is no need to cancel the timer.
     if (!mTimerExpired)
     {
-        // In case the timeout timer is still active
-        DeviceLayer::PlatformMgr().LockChipStack();
         chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
-        DeviceLayer::PlatformMgr().UnlockChipStack();
     }
 
     g_object_unref(mManager);
@@ -141,6 +137,7 @@ exit:
 
 CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 {
+    assertChipStackLockedByCurrentThread();
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     mIsScanning = true; // optimistic, to allow all callbacks to check this
@@ -157,9 +154,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
         return CHIP_ERROR_INTERNAL;
     }
 
-    DeviceLayer::PlatformMgr().LockChipStack();
     CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
-    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     if (err != CHIP_NO_ERROR)
     {

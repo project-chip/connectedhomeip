@@ -59,7 +59,7 @@ server cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 server cluster Groups = 4 {
-  bitmap GroupsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
@@ -145,12 +145,12 @@ server cluster OnOff = 6 {
     kTogglePreviousOnOff = 2;
   }
 
-  bitmap OnOffControl : BITMAP8 {
-    kAcceptOnlyWhenOn = 0x1;
+  bitmap Feature : BITMAP32 {
+    kLighting = 0x1;
   }
 
-  bitmap OnOffFeature : BITMAP32 {
-    kLighting = 0x1;
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -655,7 +655,7 @@ server cluster NetworkCommissioning = 49 {
     k60g = 4;
   }
 
-  bitmap NetworkCommissioningFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;

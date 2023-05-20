@@ -590,6 +590,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
                                           DiscoveryType discoveryType)
 {
     MATTER_TRACE_EVENT_SCOPE("PairDevice", "DeviceCommissioner");
+
     if (mDefaultCommissioner == nullptr)
     {
         ChipLogError(Controller, "No default commissioner is specified");
@@ -1979,24 +1980,22 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
             TLV::TLVReader reader;
             if (this->mAttributeCache->Get(path, reader) == CHIP_NO_ERROR)
             {
-                BitFlags<app::Clusters::NetworkCommissioning::NetworkCommissioningFeature> features;
+                BitFlags<app::Clusters::NetworkCommissioning::Feature> features;
                 if (app::DataModel::Decode(reader, features) == CHIP_NO_ERROR)
                 {
-                    if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
+                    if (features.Has(app::Clusters::NetworkCommissioning::Feature::kWiFiNetworkInterface))
                     {
                         ChipLogProgress(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %u",
                                         path.mEndpointId);
                         info.network.wifi.endpoint = path.mEndpointId;
                     }
-                    else if (features.Has(
-                                 app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
+                    else if (features.Has(app::Clusters::NetworkCommissioning::Feature::kThreadNetworkInterface))
                     {
                         ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Thread. endpointid = %u",
                                         path.mEndpointId);
                         info.network.thread.endpoint = path.mEndpointId;
                     }
-                    else if (features.Has(
-                                 app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
+                    else if (features.Has(app::Clusters::NetworkCommissioning::Feature::kEthernetNetworkInterface))
                     {
                         ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Ethernet. endpointid = %u",
                                         path.mEndpointId);

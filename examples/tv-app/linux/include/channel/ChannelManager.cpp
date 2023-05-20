@@ -111,12 +111,18 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     uint16_t index = 0;
     for (auto const & channel : mChannels)
     {
-        index++;
         // verify if CharSpan matches channel name
         // or callSign or affiliateCallSign or majorNumber.minorNumber
         if (isChannelMatched(channel, match))
         {
             matchedChannels.push_back(channel);
+        }
+        else if (matchedChannels.size() == 0)
+        {
+            // "index" is only used when we end up with matchedChannels.size() == 1.
+            // In that case, we want it to be the number of non-matching channels we saw before
+            // the matching one.
+            index++;
         }
     }
 
@@ -151,7 +157,6 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
     uint16_t index      = 0;
     for (auto const & channel : mChannels)
     {
-        index++;
         // verify if major & minor matches one of the channel from the list
         if (channel.minorNumber == minorNumber && channel.majorNumber == majorNumber)
         {
@@ -163,16 +168,26 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
                 mCurrentChannel      = channel;
             }
         }
+        index++;
     }
     return channelChanged;
 }
 
-bool ChannelManager::HandleSkipChannel(const uint16_t & count)
+bool ChannelManager::HandleSkipChannel(const int16_t & count)
 {
-    // TODO: Insert code here
-    uint16_t newChannelIndex = static_cast<uint16_t>((count + mCurrentChannelIndex) % mChannels.size());
-    mCurrentChannelIndex     = newChannelIndex;
-    mCurrentChannel          = mChannels[mCurrentChannelIndex];
+    int32_t newChannelIndex = static_cast<int32_t>(count) + static_cast<int32_t>(mCurrentChannelIndex);
+    uint16_t channelsSize   = static_cast<uint16_t>(mChannels.size());
+
+    // handle newChannelIndex out of range.
+    newChannelIndex = newChannelIndex % channelsSize;
+
+    if (newChannelIndex < 0)
+    {
+        newChannelIndex = newChannelIndex + channelsSize;
+    }
+
+    mCurrentChannelIndex = static_cast<uint16_t>(newChannelIndex);
+    mCurrentChannel      = mChannels[mCurrentChannelIndex];
     return true;
 }
 

@@ -28,12 +28,12 @@
  *    might be fixed with a mock endpoint-config.h
  */
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
+#include <app/att-storage.h>
 #include <app/util/mock/Constants.h>
 
 #include <app/AttributeAccessInterface.h>

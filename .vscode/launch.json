@@ -432,7 +432,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:openiotsdkApp}/openiotsdk",
             "executable": "./build/chip-openiotsdk-${input:openiotsdkApp}-example.elf",
-            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
             "servertype": "external",
             "gdbTarget": "${input:openiotsdkRemoteHost}:31627", //GDBserver port on FVP
             "overrideLaunchCommands": [
@@ -452,10 +452,16 @@
             "request": "launch",
             "cwd": "${workspaceRoot}/src/test_driver/openiotsdk/unit-tests",
             "executable": "./build/${input:openiotsdkUnittest}.elf",
-            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/packages/arm/bin/",
             "servertype": "external",
             "gdbTarget": ":31627", //GDBserver port on FVP
-            "overrideLaunchCommands": ["-enable-pretty-printing"],
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "add-symbol-file ./build/bl2.elf 0x10000000",
+                "add-symbol-file ./build/tfm_s.elf 0x38000400",
+                "add-symbol-file ./build/${input:openiotsdkUnittest}_ns.elf 0x28060400",
+                "break main_ns.cpp:main"
+            ],
             "runToEntryPoint": "main",
             "preLaunchTask": "Debug Open IoT SDK unit-tests",
             "showDevDebugOutput": "parsed"

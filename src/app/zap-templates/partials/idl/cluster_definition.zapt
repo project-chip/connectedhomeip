@@ -1,0 +1,102 @@
+/** {{description}} */
+{{#if generateClientCluster}}client {{else}}server {{/if~}}
+cluster {{asUpperCamelCase name}} = {{code}} {
+  {{#zcl_enums}}
+  enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
+    {{#zcl_enum_items}}
+    k{{asUpperCamelCase label}} = {{value}};
+    {{/zcl_enum_items}}
+  }
+
+  {{/zcl_enums}}
+  {{#zcl_bitmaps}}
+  bitmap {{name}} : BITMAP{{multiply size 8}} {
+    {{#zcl_bitmap_items}}
+    k{{asUpperCamelCase label}} = {{asHex mask}};
+    {{/zcl_bitmap_items}}
+  }
+
+  {{/zcl_bitmaps}}
+  {{#zcl_structs}}
+  {{~>idl_structure_definition extraIndent=1}}
+
+  {{/zcl_structs}}
+  {{#zcl_events}}
+  {{#if isFabricSensitive}}fabric_sensitive {{/if~}} {{priority}} event {{!ensure space}}
+  {{~#chip_access_elements entity="event"~}}
+      {{~#first~}}access({{~/first~}}
+      {{~#not_first~}}, {{/not_first~}}
+        {{operation}}: {{role}}
+      {{~#last}}) {{/last~}}
+  {{~/chip_access_elements~}}
+  {{asUpperCamelCase name}} = {{code}} {
+    {{#zcl_event_fields}}
+    {{>idl_structure_member label=name}}
+
+    {{/zcl_event_fields}}
+  }
+
+  {{/zcl_events}}
+  {{#if generateClientCluster}}
+    {{#zcl_attributes_server}}
+      {{#if clusterRef}}
+  {{! ensure indent }}{{>idl_attribute_definition}}
+      {{/if}}
+    {{/zcl_attributes_server}}
+
+  {{~else}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
+      {{#unless isGlobalAttribute}}
+  {{! ensure indent }}{{>idl_attribute_definition}}
+      {{/unless}}
+    {{/enabled_attributes_for_cluster_and_side~}}
+
+  {{~/if}}
+  {{~!--Global attributes: spec 7.13 describes these as mandatory --}}
+  {{~!TODO(26053): global attributes are marked as optional,
+                   hence the exclusion above and re-add here.}}
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+{{!--Open:Generating command request structs for all incoming commands into server side--~}}
+  {{#unless generateClientCluster}}
+    {{#all_incoming_commands_for_cluster name side}}
+      {{~>idl_command_request_struct}}
+    {{/all_incoming_commands_for_cluster}}
+  {{/unless}}
+  {{~!--Close:Generating command request structs for all incoming commands into server side--~}}
+  {{~!--Open:Generating command request structs for all outgoing commands from client side--~}}
+  {{#if generateClientCluster}}
+    {{#zcl_commands}}
+      {{#if (isStrEqual source "client")}}
+      {{~>idl_command_request_struct}}
+      {{else}}
+      {{~>idl_command_response_struct}}
+      {{/if}}
+    {{/zcl_commands}}
+  {{/if}}
+  {{~!--Close:Generating command request structs for all outgoing commands from client side--~}}
+  {{~!--Open:Generating command response structs for all incoming commands into client side--~}}
+  {{~!--Close:Generating command response structs for all incoming commands into client side--~}}
+  {{~!--Open:Generating command response structs for all outgoing commands from server side--~}}
+  {{#unless generateClientCluster}}
+    {{#all_outgoing_commands_for_cluster name side}}
+      {{~>idl_command_response_struct}}
+    {{/all_outgoing_commands_for_cluster}}
+  {{/unless}}
+  {{~!--Close:Generating command response structs for all outgoing commands from server side--~}}
+  {{#unless generateClientCluster}}
+    {{#all_incoming_commands_for_cluster name side}}
+      {{~>idl_command_request_response}}{{~new_line 1~}}
+    {{/all_incoming_commands_for_cluster}}
+  {{/unless}}
+  {{#if generateClientCluster}}
+    {{#zcl_commands_source_client}}
+      {{~>idl_command_request_response}}{{~new_line 1~}}
+    {{/zcl_commands_source_client}}
+  {{/if}}
+}
+

@@ -79,7 +79,7 @@ ColorControlServer & ColorControlServer::Instance()
     return instance;
 }
 
-bool ColorControlServer::HasFeature(chip::EndpointId endpoint, ColorControlFeature feature)
+bool ColorControlServer::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool success;
     uint32_t featureMap;

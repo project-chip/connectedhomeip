@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2022 Project CHIP Authors
+#   Copyright (c) 2022-2023 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ get_filename_component(OPEN_IOT_SDK_EXAMPLE_COMMON ${CHIP_ROOT}/examples/platfor
 
 list(APPEND CMAKE_MODULE_PATH ${OPEN_IOT_SDK_CONFIG}/cmake)
 
+set(TFM_SUPPORT YES)
+
 # Application CHIP build configuration 
 set(CONFIG_CHIP_LIB_TESTS YES)
 set(CONFIG_CHIP_DETAIL_LOGGING NO)
@@ -35,48 +37,44 @@ include(toolchain)
 project(chip-open-iot-sdk-unit-tests LANGUAGES C CXX ASM)
 
 include(sdk)
-include(linker)
-
-# LwIP configuration
-if(TARGET lwip-cmsis-port)
-    # lwip requires user_lwipopts.h, we use the custom settings
-    target_include_directories(lwipopts
-        INTERFACE
-            lwip-config
-    )
-endif()
-
 include(chip)
+include(linker)
 
 add_subdirectory(${OPEN_IOT_SDK_EXAMPLE_COMMON}/app ./app_build)
 
 file(STRINGS testnames.txt TEST_NAMES_FROM_FILE)
 STRING(REGEX REPLACE "\n" ";" TEST_NAMES_FROM_FILE "${TEST_NAMES_FROM_FILE}")
 
+target_compile_definitions(openiotsdk-startup
+    PRIVATE
+        IOT_SDK_APP_MAIN_STACK_SIZE=20480
+)
+
 foreach(TEST_NAME IN LISTS TEST_NAMES_FROM_FILE)
-    add_executable(${TEST_NAME})
-    target_include_directories(${TEST_NAME}
+    set(APP_TARGET ${TEST_NAME}_ns)
+    add_executable(${APP_TARGET})
+    target_include_directories(${APP_TARGET}
         PRIVATE
             main/include
             ${CHIP_ROOT}/third_party/nlunit-test/repo/src
     )
 
-    target_sources(${TEST_NAME}
+    target_sources(${APP_TARGET}
         PRIVATE
-            main/main.cpp
+            main/main_ns.cpp
     )
 
-    target_link_libraries(${TEST_NAME} 
+    target_link_libraries(${APP_TARGET}
+        openiotsdk-startup
         openiotsdk-app
     )
 
     # Link the *whole-archives* to keep the static test objects.
-    target_link_options(${TEST_NAME}
+    target_link_options(${APP_TARGET}
         PUBLIC
             -Wl,--whole-archive "${CMAKE_CURRENT_BINARY_DIR}/chip_build/lib/lib${TEST_NAME}.a"
             -Wl,--no-whole-archive)
 
-    # set_target_link requires APP_TARGET to be defined
-    set(APP_TARGET ${TEST_NAME})
-    set_target_link(${TEST_NAME})
+    set_target_link(${APP_TARGET})
+    sdk_post_build(${APP_TARGET})
 endforeach()

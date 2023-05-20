@@ -38,9 +38,9 @@
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/att-storage.h>
 #include <app/server/Dnssd.h>
 #include <app/util/af.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>

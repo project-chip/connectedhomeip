@@ -27,12 +27,12 @@ function(set_target_link target)
     if (NOT LINKER_SCRIPT)        
         set(LINKER_SCRIPT ${OPEN_IOT_SDK_CONFIG}/ld/cs300_gcc.ld)
     endif()
-    target_link_options(${APP_TARGET} PRIVATE -T ${LINKER_SCRIPT})
-    set_target_properties(${APP_TARGET} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
+    target_link_options(${target} PRIVATE -T ${LINKER_SCRIPT})
+    set_target_properties(${target} PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 
     target_link_options(${target}
         PRIVATE
-            "-Wl,-Map=${APP_TARGET}.map"
+            "-Wl,-Map=${target}.map"
     )
 endfunction()
 

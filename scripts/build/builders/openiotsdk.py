@@ -64,6 +64,7 @@ class OpenIotSdkBuilder(Builder):
                                shlex.quote(self.toolchain_path)),
                            '-DCMAKE_SYSTEM_PROCESSOR={}'.format(
                                self.system_processor),
+                           '-DCMAKE_BUILD_TYPE=Release',
                            ], title='Generating ' + self.identifier)
 
     def _build(self):

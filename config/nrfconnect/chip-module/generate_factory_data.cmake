@@ -90,6 +90,11 @@ string(APPEND script_args "--discriminator ${CONFIG_CHIP_DEVICE_DISCRIMINATOR}\n
 string(APPEND script_args "--passcode ${CONFIG_CHIP_DEVICE_SPAKE2_PASSCODE}\n")
 string(APPEND script_args "--include_passcode\n")
 string(APPEND script_args "--overwrite\n")
+string(APPEND script_args "--product_finish ${CONFIG_CHIP_DEVICE_PRODUCT_FINISH}\n")
+
+if(CONFIG_CHIP_DEVICE_PRODUCT_COLOR)
+    string(APPEND script_args "--product_color ${CONFIG_CHIP_DEVICE_PRODUCT_COLOR}\n")
+endif()
 
 if(CONFIG_CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES)
     string(APPEND script_args "--generate_onboarding\n")

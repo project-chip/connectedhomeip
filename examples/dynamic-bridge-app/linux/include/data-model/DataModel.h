@@ -201,7 +201,7 @@ CHIP_ERROR Encode(const ConcreteReadAttributePath & aPath, AttributeValueEncoder
     // CONFIG_BUILD_FOR_HOST_UNIT_TEST is true, so we can test how the other side
     // responds.
 #if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    if (!x.HasValidValue())
+    if (!x.ExistingValueInEncodableRange())
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -313,7 +313,7 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder
 
     // We have a value; decode it.
     ReturnErrorOnFailure(Decode(aPath, aDecoder, x.SetNonNull()));
-    if (!x.HasValidValue())
+    if (!x.ExistingValueInEncodableRange())
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }

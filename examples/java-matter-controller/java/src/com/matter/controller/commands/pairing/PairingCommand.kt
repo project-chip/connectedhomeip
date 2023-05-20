@@ -18,6 +18,7 @@
 package com.matter.controller.commands.pairing
 
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.NetworkCredentials
 import com.matter.controller.commands.common.CredentialsIssuer
 import com.matter.controller.commands.common.IPAddress
 import com.matter.controller.commands.common.MatterCommand
@@ -69,8 +70,8 @@ abstract class PairingCommand(
       PairingModeType.NONE -> {}
       PairingModeType.CODE, PairingModeType.CODE_PASE_ONLY -> {
         addArgument("payload", onboardingPayload, null, false)
-        addArgument("discover-once", discoverOnce, null, false)
-        addArgument("use-only-onnetwork-discovery", useOnlyOnNetworkDiscovery, null, false)
+        addArgument("discover-once", discoverOnce, null, true)
+        addArgument("use-only-onnetwork-discovery", useOnlyOnNetworkDiscovery, null, true)
       }
 
       PairingModeType.ADDRESS_PASE_ONLY -> {
@@ -226,6 +227,30 @@ abstract class PairingCommand(
   fun getTimeoutMillis(): Long {
     return timeoutMillis.get()
   }
+
+  fun getOnboardingPayload(): String {
+    return onboardingPayload.toString()
+  }
+
+  fun getWifiNetworkCredentials(): NetworkCredentials {
+    return NetworkCredentials.forWiFi(NetworkCredentials.WiFiCredentials(ssid.toString(), password.toString()))
+  }
+
+  fun getThreadNetworkCredentials(): NetworkCredentials {
+    return NetworkCredentials.forThread(NetworkCredentials.ThreadCredentials(operationalDataset.toString().hexToByteArray()))
+  }
+
+  private fun String.hexToByteArray(): ByteArray {
+    return chunked(2).map { byteStr -> byteStr.toUByte(16).toByte() }.toByteArray()
+  }
+
+  fun getDiscoverOnce(): Boolean {
+    return discoverOnce.get()
+  }
+
+  fun getUseOnlyOnNetworkDiscovery(): Boolean {
+    return useOnlyOnNetworkDiscovery.get()
+  }  
 
   companion object {
     private val logger = Logger.getLogger(PairingCommand::class.java.name)

@@ -310,7 +310,7 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool groups get-group-membership "[0002]" 1 1
+          ./chip-tool groups get-group-membership '[0002]' 1 1
 
           Verify the "GetGroupMembership command response" on the TH(Allcluster-app)  Log:
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2022-2023 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -24,3 +24,4 @@ curl --fail --location --silent --show-error https://repo1.maven.org/maven2/org/
 curl --fail --location --silent --show-error https://repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.22.0/protobuf-java-3.22.0.jar -o third_party/java_deps/artifacts/protobuf-java-3.22.0.jar
 curl --fail --location --silent --show-error https://repo1.maven.org/maven2/com/google/truth/truth/1.1.3/truth-1.1.3.jar -o third_party/java_deps/artifacts/truth-1.1.3.jar
 curl --fail --location --silent --show-error https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar -o third_party/java_deps/artifacts/junit-4.13.2.jar
+curl --fail --location --silent --show-error https://repo1.maven.org/maven2/com/google/code/gson/gson/2.9.1/gson-2.9.1.jar -o third_party/java_deps/artifacts/gson-2.9.1.jar

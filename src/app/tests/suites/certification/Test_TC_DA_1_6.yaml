@@ -40,7 +40,7 @@ tests:
       verification: |
           Veriy attestation request is sent on TH(all-clusters-app)
 
-          [1655374218.114327][35023:35028] CHIP:CTL: Performing next commissioning step "SendAttestationRequest"
+          [1655374218.114327][35023:35028] CHIP:CTL: Performing next commissioning step 'SendAttestationRequest'
           [1655374218.114378][35023:35028] CHIP:CTL: Sending Attestation Request to the device.
           [1655374218.114556][35023:35028] CHIP:CTL: Sending Attestation request to 0xffff74000b60 device
           [1655374218.114675][35023:35028] CHIP:DMG: ICR moving to [AddingComm]
@@ -275,7 +275,7 @@ tests:
           [1655374218.462118][35023:35028] CHIP:DMG: },
           [1655374218.462220][35023:35028] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
           [1655374218.462275][35023:35028] CHIP:CTL: Received Attestation Information from the device
-          [1655374218.462320][35023:35028] CHIP:CTL: Successfully finished commissioning step "SendAttestationRequest"
+          [1655374218.462320][35023:35028] CHIP:CTL: Successfully finished commissioning step 'SendAttestationRequest'
       disabled: true
 
     - label:
@@ -284,7 +284,7 @@ tests:
       verification: |
           Send the below command 2 times to create CSR NONCE value  in TH
 
-          echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
+          echo hex:$(hexdump -vn32 -e'4/4 "%08X" ' /dev/urandom)
           The generated CSRNONCE value is hex:F707BFC795117AAD94D5D95586B3B33984B475E00FFB5950BA21736FFB0FAFDE
 
           ./chip-tool generalcommissioning arm-fail-safe 500 900 1 0

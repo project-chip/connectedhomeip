@@ -43,7 +43,7 @@ limitations under the License.
         <server tick="false" init="false">true</server>
 
         <!-- Current cluster version -->
-        <globalAttribute side="either" code="0xFFFD" value="6" />
+        <globalAttribute side="either" code="0xFFFD" value="7" />
         <!-- Cluster feature map -->
         <globalAttribute side="server" code="0xFFFC" value="0x0001">
             <featureBit tag="PIN" bit="0">true</featureBit>
@@ -754,7 +754,7 @@ limitations under the License.
         <item value="0x8B" name="NotFound" />
     </enum>
 
-    <bitmap name="DoorLockFeature" type="BITMAP32">
+    <bitmap name="Feature" type="BITMAP32">
         <cluster code="0x0101" />
         <field name="PIN Credential" mask="0x01" />
         <field name="RFID Credential" mask="0x02" />
@@ -768,6 +768,7 @@ limitations under the License.
         <field name="Notification" mask="0x200" />
         <field name="Year Day Access Schedules" mask="0x400" />
         <field name="Holiday Schedules" mask="0x800" />
+        <field name="Unbolt" mask="0x1000" />
     </bitmap>
 
     <enum name="DoorLockSetPinOrIdStatus" type="ENUM8">

@@ -133,8 +133,8 @@ UART1.$name         = "CONFIG_UART_DEBUG";
 
 /* TRNG */
 TRNG1.$name     = "CONFIG_TRNG_0";
-TRNG2.$name     = "CONFIG_TRNG_1";
-TRNG3.$name     = "CONFIG_TRNG_APP";
+TRNG2.$name     = "CONFIG_TRNG_APP";
+TRNG3.$name     = "CONFIG_TRNG_THREAD";
 
 RTOS.name = "FreeRTOS";
 
@@ -152,6 +152,8 @@ ble.connUpdateParamsPeripheral.reqMaxConnInt               = 50;
 
 ble.advSet1.$name                                         = "ti_ble5stack_broadcaster_advertisement_set0";
 ble.advSet1.advParam1.$name                               = "ti_ble5stack_broadcaster_advertisement_params0";
+ble.advSet1.advParam1.primIntMin                    = 100;
+ble.advSet1.advParam1.primIntMax                    = 200;
 
 /* DMM */
 dmm.project                                          = "ti_thread_thermostat_remote_display";

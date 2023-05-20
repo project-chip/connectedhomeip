@@ -43,9 +43,9 @@ public:
     Delegate() : Delegate(false){};
     Delegate(bool featureMapContentPlatform) { mFeatureMapContentPlatform = featureMapContentPlatform; };
 
-    inline bool HasFeature(ApplicationLauncherFeature feature)
+    inline bool HasFeature(Feature feature)
     {
-        if (feature == ApplicationLauncherFeature::kApplicationPlatform)
+        if (feature == Feature::kApplicationPlatform)
         {
             return mFeatureMapContentPlatform;
         }
