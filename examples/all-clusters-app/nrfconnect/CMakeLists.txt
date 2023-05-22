@@ -59,6 +59,7 @@ target_sources(app PRIVATE
                main/ZclDoorLockCallbacks.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)

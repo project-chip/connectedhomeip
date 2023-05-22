@@ -2524,6 +2524,8 @@ server cluster TemperatureControl = 86 {
   readonly attribute int16s minTemperature = 1;
   readonly attribute int16s maxTemperature = 2;
   readonly attribute int16s step = 3;
+  readonly attribute int8u currentTemperatureLevelIndex = 4;
+  readonly attribute TemperatureLevelStruct supportedTemperatureLevels[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6498,6 +6500,17 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TemperatureControl {
+    ram      attribute currentTemperatureLevelIndex;
+    callback attribute supportedTemperatureLevels;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
 
