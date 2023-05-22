@@ -134,15 +134,6 @@ log-source-app/**/README
 minimal-mdns/README
 ```
 
-## Open IoT SDK examples
-
-```{toctree}
-:glob:
-:maxdepth: 1
-
-openiotsdk_examples
-```
-
 ## OTA Provider example
 
 ```{toctree}

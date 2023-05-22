@@ -114,6 +114,20 @@ CHIP_ERROR KVBlockDeviceStore::Init(void)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR KVBlockDeviceStore::Shutdown(void)
+{
+    if (!tdb)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    tdb->deinit();
+    delete tdb;
+    tdb = nullptr;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR KVBlockDeviceStore::ReadConfigValue(Key key, bool & val)
 {
     if (Init() != CHIP_NO_ERROR)
