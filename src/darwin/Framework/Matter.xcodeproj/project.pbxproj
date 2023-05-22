@@ -1522,7 +1522,6 @@
 					"$(CHIP_ROOT)/third_party/editline/repo/include",
 					"$(CHIP_ROOT)/src/include",
 					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/gen/include",
-					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
 					"$(CHIP_ROOT)/third_party/inipp/repo/inipp",
 					"$(CHIP_ROOT)/third_party/editline/include",
 					"$(CHIP_ROOT)/examples/chip-tool",
@@ -1571,7 +1570,6 @@
 					"$(CHIP_ROOT)/third_party/editline/repo/include",
 					"$(CHIP_ROOT)/src/include",
 					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/gen/include",
-					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
 					"$(SRCROOT)/darwin-framework-tool",
 					"$(CHIP_ROOT)/third_party/inipp/repo/inipp",
 					"$(CHIP_ROOT)/third_party/editline/include",
@@ -1678,6 +1676,7 @@
 					"$(inherited)",
 					"MTR_NEWLY_AVAILABLE=",
 					"MTR_NEWLY_DEPRECATED(message)=",
+					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(CHIP_ROOT)/src",
@@ -1692,8 +1691,6 @@
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/zzz_generated/",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
-					"$(CHIP_ROOT)/zzz_generated/controller-clusters",
-					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -1831,6 +1828,7 @@
 					"$(inherited)",
 					"MTR_NEWLY_AVAILABLE=",
 					"MTR_NEWLY_DEPRECATED(message)=",
+					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(CHIP_ROOT)/src",
@@ -1845,8 +1843,6 @@
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/zzz_generated/",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
-					"$(CHIP_ROOT)/zzz_generated/controller-clusters",
-					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

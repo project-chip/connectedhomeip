@@ -58,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                  fabricID:(NSNumber * _Nullable)fabricID
                                            validityPeriod:(NSDateInterval *)validityPeriod
                                                     error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_AVAILABLE;
+    API_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
 
 /**
  * As above, but defaults to no expiration time.
@@ -96,7 +96,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          fabricID:(NSNumber * _Nullable)fabricID
                                                    validityPeriod:(NSDateInterval *)validityPeriod
                                                             error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_AVAILABLE;
+    API_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
 
 /**
  * As above, but defaults to no expiration time.
@@ -142,7 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
                                            caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
                                                   validityPeriod:(NSDateInterval *)validityPeriod
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    MTR_NEWLY_AVAILABLE;
+    API_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
 
 /**
  * As above, but defaults to no expiration time.

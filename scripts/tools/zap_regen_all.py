@@ -90,10 +90,13 @@ class ZapDistinctOutput:
 class ZAPGenerateTarget:
 
     @staticmethod
-    def MatterIdlTarget(zap_config):
-        # NOTE: this assumes `src/app/zap-templates/matter-idl.json` is the
-        #       DEFAULT generation target and it needs no output_dir
-        return ZAPGenerateTarget(zap_config, template=None, output_dir=None)
+    def MatterIdlTarget(zap_config, client_side=False):
+        if client_side:
+            return ZAPGenerateTarget(zap_config, template="src/app/zap-templates/matter-idl-client.json", output_dir=None)
+        else:
+            # NOTE: this assumes `src/app/zap-templates/matter-idl-server.json` is the
+            #       DEFAULT generation target and it needs no output_dir
+            return ZAPGenerateTarget(zap_config, template=None, output_dir=None)
 
     def __init__(self, zap_config, template, output_dir=None):
         self.script = './scripts/tools/zap/generate.py'
@@ -347,7 +350,7 @@ def getGlobalTemplatesTargets():
             'zzz_generated', generate_subdir, 'zap-generated')
         targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
 
-    targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/data_model/controller-clusters.zap'))
+    targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/data_model/controller-clusters.zap', client_side=True))
 
     # This generates app headers for darwin only, for easier/clearer include
     # in .pbxproj files.

@@ -218,6 +218,6 @@ tests:
           [1645773318.752861][3938:3943] CHIP:DMG:         InteractionModelRevision = 1
           [1645773318.753043][3938:3943] CHIP:DMG: }
           [1645773318.753543][3938:3943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007DataVersion: 92121563
-          [1645773318.753724][3938:3943] CHIP:TOO:   LastConnectErrorValue: 0
+          [1645773318.753724][3938:3943] CHIP:TOO:   LastConnectErrorValue: null
           [1645773318.753985][3938:3943] CHIP:EM: Sending Standalone Ack for MessageCounter:15303417 on exchange 41937i
       disabled: true

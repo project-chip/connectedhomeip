@@ -38,10 +38,10 @@ tests:
       verification: |
           Build openthread POSIX cli app with RCP and have it join the thread network that the BR is part of.
 
-          If you don"t have the app, follow the below "Instructions to build the POSIX app"
+          If you don't have the app, follow the below "Instructions to build the POSIX app"
 
           if you have the RCP connected to the raspi, launch the ot-cli app with RCP
-          $ sudo ./build/posix/src/posix/ot-cli "spinel+hdlc+uart:///dev/ttyACM0?uart-baudrate=115200" -v
+          $ sudo ./build/posix/src/posix/ot-cli 'spinel+hdlc+uart:///dev/ttyACM0?uart-baudrate=115200' -v
           ./build/posix/src/posix/ot-cli[68007]: Running OPENTHREAD/thread-reference-20200818-1820-g095f530bd; POSIX; Jul 18 2022 22:44:35
           ./build/posix/src/posix/ot-cli[68007]: Thread version: 4
           ./build/posix/src/posix/ot-cli[68007]: Thread interface:
@@ -65,7 +65,7 @@ tests:
           6. ./bootstrap
           7. ./script/cmake-build posix
           8. follow the instructions to build the RCP dongle (or get the RCP image from README file in the test harness and flash it on the RCP)
-          8. ./build/posix/src/posix/ot-cli "spinel+hdlc+uart:///dev/ttyACM0?uart-baudrate=115200" -v
+          8. ./build/posix/src/posix/ot-cli 'spinel+hdlc+uart:///dev/ttyACM0?uart-baudrate=115200' -v
       disabled: true
 
     - label:

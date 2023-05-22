@@ -1271,6 +1271,17 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      };
                                      XCTAssertEqualObjects(result[MTRDataKey], expectedResult);
                                      XCTAssertNil(result[MTRErrorKey]);
+
+                                     // Now check our strong-typed parsing bits.
+                                     NSError * parseError;
+                                     __auto_type * response =
+                                         [[MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams alloc]
+                                             initWithResponseValue:result
+                                                             error:&parseError];
+                                     XCTAssertNil(parseError);
+                                     XCTAssertNotNil(response);
+                                     XCTAssertEqual(response.groupKeySetIDs.count, 1);
+                                     XCTAssertEqualObjects(response.groupKeySetIDs[0], @(0));
                                  }
                                  XCTAssertEqual([resultArray count], 1);
                              }
@@ -1495,6 +1506,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // nonexistent attribute
     [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
 
+    // Test if errors are properly received
+    XCTestExpectation * attributeReportErrorExpectation = [self expectationWithDescription:@"Attribute read error"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
+            if (attributeReponseValue[MTRErrorKey]) {
+                [attributeReportErrorExpectation fulfill];
+            }
+        }
+    };
+    // use the nonexistent attribute and expect read error
+    [device readAttributeWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID params:nil];
+    [self waitForExpectations:@[ attributeReportErrorExpectation ] timeout:10];
+
     // reset the onAttributeDataReceived to validate the following resubscribe test
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
         attributeReportsReceived += data.count;
@@ -1519,7 +1543,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                          subscriptionEstablished:^() {
                          }];
 
-    [self waitForExpectations:@[ subscriptionDroppedExpectation, resubscriptionExpectation ] timeout:60 enforceOrder:YES];
+    [self waitForExpectations:@[ subscriptionDroppedExpectation ] timeout:60];
+
+    // Check that device resets start time on subscription drop
+    XCTAssertNil(device.estimatedStartTime);
+
+    [self waitForExpectations:@[ resubscriptionExpectation ] timeout:60];
 
     // Now make sure we ignore later tests.  Ideally we would just unsubscribe
     // or remove the delegate, but there's no good way to do that.
@@ -1533,9 +1562,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // with data versions) during the resubscribe.
     XCTAssertEqual(attributeReportsReceived, 0);
     XCTAssertEqual(eventReportsReceived, 0);
-
-    // Check that device resets start time on subscription drop
-    XCTAssertNil(device.estimatedStartTime);
 }
 
 - (void)test018_SubscriptionErrorWhenNotResubscribing

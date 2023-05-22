@@ -18,7 +18,6 @@
 
 package chip.tlv
 
-import com.google.protobuf.ByteString
 import java.lang.Double.longBitsToDouble
 import java.lang.Float.intBitsToFloat
 
@@ -87,7 +86,7 @@ class TlvReader(bytes: ByteArray) : Iterable<Element> {
         is SignedIntType -> IntValue(valueBytes.fromLittleEndianToLong(isSigned = true))
         is UnsignedIntType -> UnsignedIntValue(valueBytes.fromLittleEndianToLong())
         is Utf8StringType -> Utf8StringValue(String(valueBytes, Charsets.UTF_8))
-        is ByteStringType -> ByteStringValue(ByteString.copyFrom(valueBytes))
+        is ByteStringType -> ByteStringValue(valueBytes)
         is BooleanType -> BooleanValue(elementType.value)
         is FloatType -> FloatValue(intBitsToFloat(valueBytes.fromLittleEndianToLong().toInt()))
         is DoubleType -> DoubleValue(longBitsToDouble(valueBytes.fromLittleEndianToLong()))
@@ -248,7 +247,7 @@ class TlvReader(bytes: ByteArray) : Iterable<Element> {
    *
    * @throws TlvParsingException if the element is not of the expected type or tag
    */
-  fun getByteString(tag: Tag): ByteString {
+  fun getByteString(tag: Tag): ByteArray {
     val value = nextElement().verifyTagAndGetValue(tag)
     require(value is ByteStringValue) {
       "Unexpected value $value at index $index (expected ByteStringValue)"

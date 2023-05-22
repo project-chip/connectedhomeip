@@ -54,7 +54,24 @@ namespace {{asUpperCamelCase name}} {
 namespace Structs {
 {{/first}}
 {{#if has_more_than_one_cluster}}
-namespace {{asUpperCamelCase name}} = Clusters::detail::Structs::{{asUpperCamelCase name}};
+namespace {{asUpperCamelCase name}} {
+
+using Fields = Clusters::detail::Structs::{{asUpperCamelCase name}}::Fields;
+
+struct Type : public Clusters::detail::Structs::{{asUpperCamelCase name}}::Type
+{
+};
+
+{{#if struct_contains_array}}
+struct DecodableType : public Clusters::detail::Structs::{{asUpperCamelCase name}}::DecodableType
+{
+};
+{{else}}
+using DecodableType = Type;
+{{/if}}
+
+} // namespace {{asUpperCamelCase name}}
+
 {{else}}
 {{> cluster_objects_struct header=true}}
 {{/if}}

@@ -107,5 +107,5 @@ the output folder for deploying.
 -   To run the tests:
 
     ```
-    python -m nl_test_runner.nl_test_runner -d /dev/ttyACM1 -f out/debug/chip-efr32-device_tests.s37 -o out.log
+    python -m nl_test_runner.nl_test_runner -d /dev/ttyACM1 -f out/debug/matter-silabs-device_tests.s37 -o out.log
     ```

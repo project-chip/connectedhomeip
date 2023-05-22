@@ -17,6 +17,10 @@
 
 #pragma once
 
+#include <lib/core/CHIPConfig.h>
+
+#if !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
+
 // include generated configuration information from AppBuilder.
 // ZA_GENERATED_HEADER is defined in the project file
 #ifdef ZA_GENERATED_HEADER
@@ -30,6 +34,8 @@
 #else
 #include <zap-generated/endpoint_config.h>
 #endif
+
+#endif // !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 
 // User options for plugin Binding Table Library
 // TODO: Make this a CHIP_CONFIG value.

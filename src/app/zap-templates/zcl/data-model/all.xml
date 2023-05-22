@@ -3,6 +3,7 @@
    <xi:include href="chip/access-control-cluster.xml" />
    <xi:include href="chip/account-login-cluster.xml" />
    <xi:include href="chip/administrator-commissioning-cluster.xml" />
+   <xi:include href="chip/air-quality-cluster.xml" />
    <xi:include href="chip/application-basic-cluster.xml" />
    <xi:include href="chip/application-launcher-cluster.xml" />
    <xi:include href="chip/audio-output-cluster.xml" />
@@ -14,7 +15,6 @@
    <xi:include href="chip/bridged-device-basic-information.xml" />
    <xi:include href="chip/chip-ota.xml" />
    <xi:include href="chip/chip-types.xml" />
-   <xi:include href="chip/client-monitoring-cluster.xml" />
    <xi:include href="chip/clusters-extensions.xml" />
    <xi:include href="chip/color-control-cluster.xml" />
    <xi:include href="chip/concentration-measurement-cluster.xml" />
@@ -23,8 +23,8 @@
    <xi:include href="chip/diagnostic-logs-cluster.xml" />
    <xi:include href="chip/door-lock-cluster.xml" />
    <xi:include href="chip/ethernet-network-diagnostics-cluster.xml" />
-   <xi:include href="chip/fan-control-cluster.xml" />   
-   <xi:include href="chip/fault-injection-cluster.xml" />   
+   <xi:include href="chip/fan-control-cluster.xml" />
+   <xi:include href="chip/fault-injection-cluster.xml" />
    <xi:include href="chip/fixed-label-cluster.xml" />
    <xi:include href="chip/flow-measurement-cluster.xml" />
    <xi:include href="chip/general-commissioning-cluster.xml" />
@@ -32,6 +32,7 @@
    <xi:include href="chip/global-attributes.xml" />
    <xi:include href="chip/groups-cluster.xml" />
    <xi:include href="chip/group-key-mgmt-cluster.xml" />
+   <xi:include href="chip/icd-management-cluster.xml" />
    <xi:include href="chip/identify-cluster.xml" />
    <xi:include href="chip/illuminance-measurement-cluster.xml" />
    <xi:include href="chip/level-control-cluster.xml" />
@@ -54,7 +55,9 @@
    <xi:include href="chip/pump-configuration-and-control-cluster.xml" />
    <xi:include href="chip/pwm-cluster.xml" />
    <xi:include href="chip/relative-humidity-measurement-cluster.xml" />
+   <xi:include href="chip/replacable-monitoring-cluster.xml.xml" />
    <xi:include href="chip/scene.xml" />
+   <xi:include href="chip/smoke-co-alarm-cluster.xml" />
    <xi:include href="chip/software-diagnostics-cluster.xml" />
    <xi:include href="chip/switch-cluster.xml" />
    <xi:include href="chip/target-navigator-cluster.xml" />
@@ -71,6 +74,8 @@
    <xi:include href="chip/wake-on-lan-cluster.xml" />
    <xi:include href="chip/wifi-network-diagnostics-cluster.xml" />
    <xi:include href="chip/window-covering.xml" />
+   <xi:include href="chip/temperature-control-cluster.xml" />
+   <xi:include href="chip/refrigerator-alarm.xml" />
    <xi:include href="chip/matter-devices.xml" />
    <xi:include href="draft/barrier-control.xml" />
    <xi:include href="draft/electrical-measurement-cluster.xml" />

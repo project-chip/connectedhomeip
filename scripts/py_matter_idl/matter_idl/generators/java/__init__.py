@@ -381,7 +381,11 @@ class EncodableValue:
 
     @property
     def is_bitmap(self):
-        self.context.is_bitmap_type(self.data_type.name)
+        return self.context.is_bitmap_type(self.data_type.name)
+
+    @property
+    def is_untyped_bitmap(self):
+        return self.context.is_untyped_bitmap_type(self.data_type.name)
 
     def clone(self):
         return EncodableValue(self.context, self.data_type, self.attrs)

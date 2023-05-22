@@ -15,13 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- 
+
 package chip.tlv
 
 /** Converts bytes in a Little Endian format into Long integer. */
 internal fun ByteArray.fromLittleEndianToLong(isSigned: Boolean = false): Long =
-  foldRightIndexed(0) { i, it, acc ->
-    (acc shl 8) or (if (i == lastIndex && isSigned) it.toLong() else (it.toLong() and 0xFF))
+  foldRightIndexed(0) { i, value, acc ->
+    (acc shl 8) or (if (i == lastIndex && isSigned) value.toLong() else (value.toLong() and 0xFF))
   }
 
 /** Converts Number into a byte array in a Little Endian format. */
