@@ -1589,13 +1589,14 @@ namespace RvcRunModeSelect {
 // Enum for ChangeToModeResponseStatus
 enum class ChangeToModeResponseStatus : uint8_t
 {
-    kBatteryLow         = 0x40,
-    kRobotStuck         = 0x41,
-    kBinMissing         = 0x42,
-    kBinFull            = 0x43,
-    kWaterTankMissing   = 0x44,
-    kWaterTankLidOpen   = 0x45,
-    kCleaningPadMissing = 0x46,
+    kStuck                 = 0x41,
+    kDustBinMissing        = 0x42,
+    kDustBinFull           = 0x43,
+    kWaterTankEmpty        = 0x44,
+    kWaterTankMissing      = 0x45,
+    kWaterTankLidOpen      = 0x46,
+    kMopCleaningPadMissing = 0x47,
+    kBatteryLow            = 0x48,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown

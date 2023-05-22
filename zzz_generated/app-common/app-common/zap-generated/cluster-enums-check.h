@@ -1351,13 +1351,14 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunModeSelect::Chang
     using EnumType = RvcRunModeSelect::ChangeToModeResponseStatus;
     switch (val)
     {
-    case EnumType::kBatteryLow:
-    case EnumType::kRobotStuck:
-    case EnumType::kBinMissing:
-    case EnumType::kBinFull:
+    case EnumType::kStuck:
+    case EnumType::kDustBinMissing:
+    case EnumType::kDustBinFull:
+    case EnumType::kWaterTankEmpty:
     case EnumType::kWaterTankMissing:
     case EnumType::kWaterTankLidOpen:
-    case EnumType::kCleaningPadMissing:
+    case EnumType::kMopCleaningPadMissing:
+    case EnumType::kBatteryLow:
         return val;
     default:
         return static_cast<EnumType>(0);

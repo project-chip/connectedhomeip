@@ -2938,13 +2938,14 @@ client cluster RefrigeratorAndTemperatureControlledCabinetModeSelect = 82 {
 /** This cluster is an alias of the Mode Select cluster which also defines a namespace for the running modes of the Robotic Vacuum Cleaner devices. */
 client cluster RvcRunModeSelect = 84 {
   enum ChangeToModeResponseStatus : ENUM8 {
-    kBatteryLow = 64;
-    kRobotStuck = 65;
-    kBinMissing = 66;
-    kBinFull = 67;
-    kWaterTankMissing = 68;
-    kWaterTankLidOpen = 69;
-    kCleaningPadMissing = 70;
+    kStuck = 65;
+    kDustBinMissing = 66;
+    kDustBinFull = 67;
+    kWaterTankEmpty = 68;
+    kWaterTankMissing = 69;
+    kWaterTankLidOpen = 70;
+    kMopCleaningPadMissing = 71;
+    kBatteryLow = 72;
   }
 
   enum SemanticTags : ENUM16 {

@@ -24160,13 +24160,14 @@ typedef NS_OPTIONS(uint32_t, MTRRefrigeratorAndTemperatureControlledCabinetModeS
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRRVCRunModeSelectChangeToModeResponseStatus) {
-    MTRRVCRunModeSelectChangeToModeResponseStatusBatteryLow MTR_NEWLY_AVAILABLE = 0x40,
-    MTRRVCRunModeSelectChangeToModeResponseStatusRobotStuck MTR_NEWLY_AVAILABLE = 0x41,
-    MTRRVCRunModeSelectChangeToModeResponseStatusBinMissing MTR_NEWLY_AVAILABLE = 0x42,
-    MTRRVCRunModeSelectChangeToModeResponseStatusBinFull MTR_NEWLY_AVAILABLE = 0x43,
-    MTRRVCRunModeSelectChangeToModeResponseStatusWaterTankMissing MTR_NEWLY_AVAILABLE = 0x44,
-    MTRRVCRunModeSelectChangeToModeResponseStatusWaterTankLidOpen MTR_NEWLY_AVAILABLE = 0x45,
-    MTRRVCRunModeSelectChangeToModeResponseStatusCleaningPadMissing MTR_NEWLY_AVAILABLE = 0x46,
+    MTRRVCRunModeSelectChangeToModeResponseStatusStuck MTR_NEWLY_AVAILABLE = 0x41,
+    MTRRVCRunModeSelectChangeToModeResponseStatusDustBinMissing MTR_NEWLY_AVAILABLE = 0x42,
+    MTRRVCRunModeSelectChangeToModeResponseStatusDustBinFull MTR_NEWLY_AVAILABLE = 0x43,
+    MTRRVCRunModeSelectChangeToModeResponseStatusWaterTankEmpty MTR_NEWLY_AVAILABLE = 0x44,
+    MTRRVCRunModeSelectChangeToModeResponseStatusWaterTankMissing MTR_NEWLY_AVAILABLE = 0x45,
+    MTRRVCRunModeSelectChangeToModeResponseStatusWaterTankLidOpen MTR_NEWLY_AVAILABLE = 0x46,
+    MTRRVCRunModeSelectChangeToModeResponseStatusMopCleaningPadMissing MTR_NEWLY_AVAILABLE = 0x47,
+    MTRRVCRunModeSelectChangeToModeResponseStatusBatteryLow MTR_NEWLY_AVAILABLE = 0x48,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRRVCRunModeSelectSemanticTags) {
