@@ -2732,7 +2732,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2746,7 +2746,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct alloc] init];
+    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
@@ -2763,7 +2763,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2779,7 +2779,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct alloc] init];
+    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct alloc] init];
 
     other.label = self.label;
     other.mode = self.mode;
@@ -2797,7 +2797,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRVCRunClusterSemanticTagStruct
+@implementation MTRRVCRunModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2811,7 +2811,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRRVCRunClusterSemanticTagStruct alloc] init];
+    auto other = [[MTRRVCRunModeSelectClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
@@ -2828,7 +2828,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRVCRunClusterModeOptionStruct
+@implementation MTRRVCRunModeSelectClusterModeOptionStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2844,7 +2844,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRRVCRunClusterModeOptionStruct alloc] init];
+    auto other = [[MTRRVCRunModeSelectClusterModeOptionStruct alloc] init];
 
     other.label = self.label;
     other.mode = self.mode;
@@ -2862,7 +2862,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRVCCleanClusterSemanticTagStruct
+@implementation MTRRVCCleanModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2876,7 +2876,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRRVCCleanClusterSemanticTagStruct alloc] init];
+    auto other = [[MTRRVCCleanModeSelectClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
@@ -2893,7 +2893,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRVCCleanClusterModeOptionStruct
+@implementation MTRRVCCleanModeSelectClusterModeOptionStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2909,7 +2909,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRRVCCleanClusterModeOptionStruct alloc] init];
+    auto other = [[MTRRVCCleanModeSelectClusterModeOptionStruct alloc] init];
 
     other.label = self.label;
     other.mode = self.mode;

@@ -2412,6 +2412,10 @@ namespace Description {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Description
 
+namespace StandardNamespace {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace StandardNamespace
+
 namespace SupportedModes {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace SupportedModes
@@ -2505,7 +2509,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace LaundryWasherModeSelect
 
-namespace RefrigeratorAndTemperatureControlledCabinet {
+namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
 namespace Attributes {
 
 namespace Description {
@@ -2553,9 +2557,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RefrigeratorAndTemperatureControlledCabinet
+} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
 
-namespace RvcRun {
+namespace RvcRunModeSelect {
 namespace Attributes {
 
 namespace Description {
@@ -2603,9 +2607,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RvcRun
+} // namespace RvcRunModeSelect
 
-namespace RvcClean {
+namespace RvcCleanModeSelect {
 namespace Attributes {
 
 namespace Description {
@@ -2653,7 +2657,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RvcClean
+} // namespace RvcCleanModeSelect
 
 namespace TemperatureControl {
 namespace Attributes {

@@ -1342,6 +1342,13 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // ch
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Description
 
+namespace StandardNamespace {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // enum16
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
+} // namespace StandardNamespace
+
 namespace CurrentMode {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
@@ -1414,7 +1421,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace LaundryWasherModeSelect
 
-namespace RefrigeratorAndTemperatureControlledCabinet {
+namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
 namespace Attributes {
 
 namespace Description {
@@ -1452,9 +1459,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RefrigeratorAndTemperatureControlledCabinet
+} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
 
-namespace RvcRun {
+namespace RvcRunModeSelect {
 namespace Attributes {
 
 namespace Description {
@@ -1492,9 +1499,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RvcRun
+} // namespace RvcRunModeSelect
 
-namespace RvcClean {
+namespace RvcCleanModeSelect {
 namespace Attributes {
 
 namespace Description {
@@ -1532,7 +1539,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RvcClean
+} // namespace RvcCleanModeSelect
 
 namespace TemperatureControl {
 namespace Attributes {

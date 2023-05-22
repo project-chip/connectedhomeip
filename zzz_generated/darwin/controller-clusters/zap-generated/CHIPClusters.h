@@ -385,32 +385,32 @@ public:
     ~LaundryWasherModeSelectCluster() {}
 };
 
-class DLL_EXPORT RefrigeratorAndTemperatureControlledCabinetCluster : public ClusterBase
+class DLL_EXPORT RefrigeratorAndTemperatureControlledCabinetModeSelectCluster : public ClusterBase
 {
 public:
-    RefrigeratorAndTemperatureControlledCabinetCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
-                                                       EndpointId endpoint) :
+    RefrigeratorAndTemperatureControlledCabinetModeSelectCluster(Messaging::ExchangeManager & exchangeManager,
+                                                                 const SessionHandle & session, EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~RefrigeratorAndTemperatureControlledCabinetCluster() {}
+    ~RefrigeratorAndTemperatureControlledCabinetModeSelectCluster() {}
 };
 
-class DLL_EXPORT RvcRunCluster : public ClusterBase
+class DLL_EXPORT RvcRunModeSelectCluster : public ClusterBase
 {
 public:
-    RvcRunCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    RvcRunModeSelectCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~RvcRunCluster() {}
+    ~RvcRunModeSelectCluster() {}
 };
 
-class DLL_EXPORT RvcCleanCluster : public ClusterBase
+class DLL_EXPORT RvcCleanModeSelectCluster : public ClusterBase
 {
 public:
-    RvcCleanCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+    RvcCleanModeSelectCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
         ClusterBase(exchangeManager, session, endpoint)
     {}
-    ~RvcCleanCluster() {}
+    ~RvcCleanModeSelectCluster() {}
 };
 
 class DLL_EXPORT DishwasherModeSelectCluster : public ClusterBase

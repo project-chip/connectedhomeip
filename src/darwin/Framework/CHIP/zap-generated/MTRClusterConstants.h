@@ -277,9 +277,9 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeBooleanStateID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
     MTRClusterIDTypeLaundryWasherModeSelectID MTR_NEWLY_AVAILABLE = 0x00000051,
-    MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetID MTR_NEWLY_AVAILABLE = 0x00000052,
-    MTRClusterIDTypeRVCRunID MTR_NEWLY_AVAILABLE = 0x00000054,
-    MTRClusterIDTypeRVCCleanID MTR_NEWLY_AVAILABLE = 0x00000055,
+    MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeSelectID MTR_NEWLY_AVAILABLE = 0x00000052,
+    MTRClusterIDTypeRVCRunModeSelectID MTR_NEWLY_AVAILABLE = 0x00000054,
+    MTRClusterIDTypeRVCCleanModeSelectID MTR_NEWLY_AVAILABLE = 0x00000055,
     MTRClusterIDTypeTemperatureControlID MTR_NEWLY_AVAILABLE = 0x00000056,
     MTRClusterIDTypeDishwasherModeSelectID MTR_NEWLY_AVAILABLE = 0x00000059,
     MTRClusterIDTypeAirQualityID MTR_NEWLY_AVAILABLE = 0x0000005B,
@@ -3667,6 +3667,10 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         "Please use MTRAttributeIDTypeClusterModeSelectAttributeDescriptionID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000000,
+    MTRClusterModeSelectAttributeStandardNamespaceID MTR_DEPRECATED(
+        "Please use MTRAttributeIDTypeClusterModeSelectAttributeStandardNamespaceID", ios(16.1, 16.4), macos(13.0, 13.3),
+        watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000001,
     MTRClusterModeSelectAttributeSupportedModesID MTR_DEPRECATED(
         "Please use MTRAttributeIDTypeClusterModeSelectAttributeSupportedModesID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -3705,6 +3709,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster ModeSelect attributes
     MTRAttributeIDTypeClusterModeSelectAttributeDescriptionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000000,
+    MTRAttributeIDTypeClusterModeSelectAttributeStandardNamespaceID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+    = 0x00000001,
     MTRAttributeIDTypeClusterModeSelectAttributeSupportedModesID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000002,
     MTRAttributeIDTypeClusterModeSelectAttributeCurrentModeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -3746,56 +3752,67 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterLaundryWasherModeSelectAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster RefrigeratorAndTemperatureControlledCabinet attributes
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeOnModeID MTR_NEWLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    // Cluster RefrigeratorAndTemperatureControlledCabinetModeSelect attributes
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeDescriptionID MTR_NEWLY_AVAILABLE
+    = 0x00000000,
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeSupportedModesID MTR_NEWLY_AVAILABLE
+    = 0x00000002,
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeCurrentModeID MTR_NEWLY_AVAILABLE
+    = 0x00000003,
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeStartUpModeID MTR_NEWLY_AVAILABLE
+    = 0x00000004,
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeOnModeID MTR_NEWLY_AVAILABLE
+    = 0x00000005,
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeGeneratedCommandListID
+        MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeEventListID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeEventListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeAttributeListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeFeatureMapID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster RVCRun attributes
-    MTRAttributeIDTypeClusterRVCRunAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRVCRunAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterRVCRunAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterRVCRunAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterRVCRunAttributeOnModeID MTR_NEWLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterRVCRunAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    // Cluster RVCRunModeSelect attributes
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeOnModeID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterRVCRunAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterRVCRunAttributeEventListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterRVCRunAttributeAttributeListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterRVCRunAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterRVCRunAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster RVCClean attributes
-    MTRAttributeIDTypeClusterRVCCleanAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRVCCleanAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterRVCCleanAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterRVCCleanAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterRVCCleanAttributeOnModeID MTR_NEWLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterRVCCleanAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterRVCCleanAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterRVCCleanAttributeEventListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterRVCCleanAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeEventListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeAttributeListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterRVCCleanAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterRVCCleanAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterRVCRunModeSelectAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster RVCCleanModeSelect attributes
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeDescriptionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeSupportedModesID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeCurrentModeID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeStartUpModeID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeOnModeID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeEventListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterRVCCleanModeSelectAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TemperatureControl attributes
@@ -9224,22 +9241,23 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterLaundryWasherModeSelectCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterLaundryWasherModeSelectCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
 
-    // Cluster RefrigeratorAndTemperatureControlledCabinet commands
-    MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE
+    // Cluster RefrigeratorAndTemperatureControlledCabinetModeSelect commands
+    MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectCommandChangeToModeID MTR_NEWLY_AVAILABLE
+    = 0x00000000,
+    MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE
     = 0x00000001,
-    MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE
+    MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeSelectCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE
     = 0x00000002,
 
-    // Cluster RVCRun commands
-    MTRCommandIDTypeClusterRVCRunCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterRVCRunCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterRVCRunCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
+    // Cluster RVCRunModeSelect commands
+    MTRCommandIDTypeClusterRVCRunModeSelectCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterRVCRunModeSelectCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterRVCRunModeSelectCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
 
-    // Cluster RVCClean commands
-    MTRCommandIDTypeClusterRVCCleanCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterRVCCleanCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterRVCCleanCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
+    // Cluster RVCCleanModeSelect commands
+    MTRCommandIDTypeClusterRVCCleanModeSelectCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterRVCCleanModeSelectCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterRVCCleanModeSelectCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster TemperatureControl commands
     MTRCommandIDTypeClusterTemperatureControlCommandSetTemperatureID MTR_NEWLY_AVAILABLE = 0x00000000,

@@ -6731,7 +6731,7 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 @end
-@implementation MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeParams
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6745,7 +6745,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeParams alloc] init];
+    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -6761,7 +6761,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeWithStatusParams
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeWithStatusParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6775,7 +6775,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeWithStatusParams alloc] init];
+    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeWithStatusParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -6791,7 +6791,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseParams
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6805,7 +6805,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseParams alloc] init];
+    auto other = [[MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -6828,7 +6828,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 
     using DecodableType
-        = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeResponse::DecodableType;
+        = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -6863,11 +6863,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseParams (InternalMethods)
+@implementation MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeResponse::DecodableType &)
-        decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::
+                                                    Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -6884,7 +6883,7 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 @end
-@implementation MTRRVCRunClusterChangeToModeParams
+@implementation MTRRVCRunModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6898,7 +6897,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRVCRunClusterChangeToModeParams alloc] init];
+    auto other = [[MTRRVCRunModeSelectClusterChangeToModeParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -6914,7 +6913,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRVCRunClusterChangeToModeWithStatusParams
+@implementation MTRRVCRunModeSelectClusterChangeToModeWithStatusParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6928,7 +6927,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRVCRunClusterChangeToModeWithStatusParams alloc] init];
+    auto other = [[MTRRVCRunModeSelectClusterChangeToModeWithStatusParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -6944,7 +6943,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRVCRunClusterChangeToModeResponseParams
+@implementation MTRRVCRunModeSelectClusterChangeToModeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6958,7 +6957,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRVCRunClusterChangeToModeResponseParams alloc] init];
+    auto other = [[MTRRVCRunModeSelectClusterChangeToModeResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -6980,7 +6979,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::RvcRun::Commands::ChangeToModeResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -7015,10 +7014,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRVCRunClusterChangeToModeResponseParams (InternalMethods)
+@implementation MTRRVCRunModeSelectClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcRun::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+    (const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -7035,7 +7034,7 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 @end
-@implementation MTRRVCCleanClusterChangeToModeParams
+@implementation MTRRVCCleanModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7049,7 +7048,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRVCCleanClusterChangeToModeParams alloc] init];
+    auto other = [[MTRRVCCleanModeSelectClusterChangeToModeParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7065,7 +7064,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRVCCleanClusterChangeToModeWithStatusParams
+@implementation MTRRVCCleanModeSelectClusterChangeToModeWithStatusParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7079,7 +7078,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRVCCleanClusterChangeToModeWithStatusParams alloc] init];
+    auto other = [[MTRRVCCleanModeSelectClusterChangeToModeWithStatusParams alloc] init];
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -7095,7 +7094,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRVCCleanClusterChangeToModeResponseParams
+@implementation MTRRVCCleanModeSelectClusterChangeToModeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7109,7 +7108,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRVCCleanClusterChangeToModeResponseParams alloc] init];
+    auto other = [[MTRRVCCleanModeSelectClusterChangeToModeResponseParams alloc] init];
 
     other.status = self.status;
     other.statusText = self.statusText;
@@ -7131,7 +7130,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::RvcClean::Commands::ChangeToModeResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -7166,10 +7165,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRVCCleanClusterChangeToModeResponseParams (InternalMethods)
+@implementation MTRRVCCleanModeSelectClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcClean::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+    (const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];

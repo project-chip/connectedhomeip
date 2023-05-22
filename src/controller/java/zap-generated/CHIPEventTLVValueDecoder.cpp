@@ -2432,8 +2432,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Id: {
-        using namespace app::Clusters::RefrigeratorAndTemperatureControlledCabinet;
+    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
+        using namespace app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect;
         switch (aPath.mEventId)
         {
         default:
@@ -2442,8 +2442,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::RvcRun::Id: {
-        using namespace app::Clusters::RvcRun;
+    case app::Clusters::RvcRunModeSelect::Id: {
+        using namespace app::Clusters::RvcRunModeSelect;
         switch (aPath.mEventId)
         {
         default:
@@ -2452,8 +2452,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::RvcClean::Id: {
-        using namespace app::Clusters::RvcClean;
+    case app::Clusters::RvcCleanModeSelect::Id: {
+        using namespace app::Clusters::RvcCleanModeSelect;
         switch (aPath.mEventId)
         {
         default:

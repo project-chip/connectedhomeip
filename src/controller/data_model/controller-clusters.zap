@@ -13628,7 +13628,7 @@
           "name": "Refrigerator And Temperature Controlled Cabinet",
           "code": 82,
           "mfgCode": null,
-          "define": "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER",
+          "define": "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -13688,7 +13688,7 @@
           "name": "Refrigerator And Temperature Controlled Cabinet",
           "code": 82,
           "mfgCode": null,
-          "define": "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER",
+          "define": "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [
@@ -13900,7 +13900,7 @@
           "name": "RVC Run",
           "code": 84,
           "mfgCode": null,
-          "define": "RVC_RUN_CLUSTER",
+          "define": "RVC_RUN_MODE_SELECT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -13960,7 +13960,7 @@
           "name": "RVC Run",
           "code": 84,
           "mfgCode": null,
-          "define": "RVC_RUN_CLUSTER",
+          "define": "RVC_RUN_MODE_SELECT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [
@@ -14172,7 +14172,7 @@
           "name": "RVC Clean",
           "code": 85,
           "mfgCode": null,
-          "define": "RVC_CLEAN_CLUSTER",
+          "define": "RVC_CLEAN_MODE_SELECT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -14232,7 +14232,7 @@
           "name": "RVC Clean",
           "code": 85,
           "mfgCode": null,
-          "define": "RVC_CLEAN_CLUSTER",
+          "define": "RVC_CLEAN_MODE_SELECT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [

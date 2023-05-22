@@ -693,39 +693,39 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct : NSObject <NSCopying>
+@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct : NSObject <NSCopying>
+@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCRunClusterSemanticTagStruct : NSObject <NSCopying>
+@interface MTRRVCRunModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCRunClusterModeOptionStruct : NSObject <NSCopying>
+@interface MTRRVCRunModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCCleanClusterSemanticTagStruct : NSObject <NSCopying>
+@interface MTRRVCCleanModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCCleanClusterModeOptionStruct : NSObject <NSCopying>
+@interface MTRRVCCleanModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;

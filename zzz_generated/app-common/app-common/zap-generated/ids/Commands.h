@@ -667,7 +667,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace Commands
 } // namespace LaundryWasherModeSelect
 
-namespace RefrigeratorAndTemperatureControlledCabinet {
+namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
 namespace Commands {
 
 namespace ChangeToMode {
@@ -683,9 +683,9 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace ChangeToModeResponse
 
 } // namespace Commands
-} // namespace RefrigeratorAndTemperatureControlledCabinet
+} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
 
-namespace RvcRun {
+namespace RvcRunModeSelect {
 namespace Commands {
 
 namespace ChangeToMode {
@@ -701,9 +701,9 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace ChangeToModeResponse
 
 } // namespace Commands
-} // namespace RvcRun
+} // namespace RvcRunModeSelect
 
-namespace RvcClean {
+namespace RvcCleanModeSelect {
 namespace Commands {
 
 namespace ChangeToMode {
@@ -719,7 +719,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace ChangeToModeResponse
 
 } // namespace Commands
-} // namespace RvcClean
+} // namespace RvcCleanModeSelect
 
 namespace TemperatureControl {
 namespace Commands {

@@ -231,25 +231,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseParams (InternalMethods)
+@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeResponse::DecodableType &)
-        decodableStruct;
-
-@end
-
-@interface MTRRVCRunClusterChangeToModeResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcRun::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::
+                                                    Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRRVCCleanClusterChangeToModeResponseParams (InternalMethods)
+@interface MTRRVCRunModeSelectClusterChangeToModeResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcClean::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+    (const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRRVCCleanModeSelectClusterChangeToModeResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
 
 @end
 

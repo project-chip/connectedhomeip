@@ -7726,6 +7726,19 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                            completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+- (void)readAttributeStandardNamespaceWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+- (void)subscribeAttributeStandardNamespaceWithParams:(MTRSubscribeParams *)params
+                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (void)readAttributeStandardNamespaceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                                 completion:
+                                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
 - (void)readAttributeSupportedModesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeSupportedModesWithParams:(MTRSubscribeParams *)params
@@ -8052,13 +8065,13 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Refrigerator And Temperature Controlled Cabinet
+ * Cluster Refrigerator And Temperature Controlled Cabinet Mode Select
  *
  * This cluster is an alias of the Mode Select cluster, defining additional semantics and
       namespaced enumerated values for refrigerator and temperature controlled cabinet devices.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRBaseClusterRefrigeratorAndTemperatureControlledCabinet : MTRCluster
+@interface MTRBaseClusterRefrigeratorAndTemperatureControlledCabinetModeSelect : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -8073,7 +8086,7 @@ MTR_NEWLY_AVAILABLE
  Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the
  CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response.
  */
-- (void)changeToModeWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeParams *)params
+- (void)changeToModeWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeParams *)params
                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 /**
  * Command ChangeToModeWithStatus
@@ -8083,10 +8096,11 @@ MTR_NEWLY_AVAILABLE
  NewMode field, see ChangeToMode command. On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
  */
 - (void)
-    changeToModeWithStatusWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeWithStatusParams *)params
+    changeToModeWithStatusWithParams:
+        (MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeWithStatusParams *)params
                           completion:
                               (void (^)(
-                                  MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseParams * _Nullable data,
+                                  MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams * _Nullable data,
                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeDescriptionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
@@ -8236,13 +8250,13 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster RVC Run
+ * Cluster RVC Run Mode Select
  *
  * This cluster is an alias of the Mode Select cluster which also defines a namespace for the running modes of the Robotic Vacuum
  * Cleaner devices.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRBaseClusterRVCRun : MTRCluster
+@interface MTRBaseClusterRVCRunModeSelect : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -8257,7 +8271,7 @@ MTR_NEWLY_AVAILABLE
  Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the
  CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response.
  */
-- (void)changeToModeWithParams:(MTRRVCRunClusterChangeToModeParams *)params
+- (void)changeToModeWithParams:(MTRRVCRunModeSelectClusterChangeToModeParams *)params
                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 /**
  * Command ChangeToModeWithStatus
@@ -8266,8 +8280,8 @@ MTR_NEWLY_AVAILABLE
  response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on
  NewMode field, see ChangeToMode command. On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
  */
-- (void)changeToModeWithStatusWithParams:(MTRRVCRunClusterChangeToModeWithStatusParams *)params
-                              completion:(void (^)(MTRRVCRunClusterChangeToModeResponseParams * _Nullable data,
+- (void)changeToModeWithStatusWithParams:(MTRRVCRunModeSelectClusterChangeToModeWithStatusParams *)params
+                              completion:(void (^)(MTRRVCRunModeSelectClusterChangeToModeResponseParams * _Nullable data,
                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeDescriptionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
@@ -8417,13 +8431,13 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster RVC Clean
+ * Cluster RVC Clean Mode Select
  *
  * This cluster is an alias of the Mode Select cluster which also defines a namespace for the
       cleaning type of the Robotic Vacuum Cleaner devices.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRBaseClusterRVCClean : MTRCluster
+@interface MTRBaseClusterRVCCleanModeSelect : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -8438,7 +8452,7 @@ MTR_NEWLY_AVAILABLE
  Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the
  CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response.
  */
-- (void)changeToModeWithParams:(MTRRVCCleanClusterChangeToModeParams *)params
+- (void)changeToModeWithParams:(MTRRVCCleanModeSelectClusterChangeToModeParams *)params
                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 /**
  * Command ChangeToModeWithStatus
@@ -8447,8 +8461,8 @@ MTR_NEWLY_AVAILABLE
  response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on
  NewMode field, see ChangeToMode command. On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
  */
-- (void)changeToModeWithStatusWithParams:(MTRRVCCleanClusterChangeToModeWithStatusParams *)params
-                              completion:(void (^)(MTRRVCCleanClusterChangeToModeResponseParams * _Nullable data,
+- (void)changeToModeWithStatusWithParams:(MTRRVCCleanModeSelectClusterChangeToModeWithStatusParams *)params
+                              completion:(void (^)(MTRRVCCleanModeSelectClusterChangeToModeResponseParams * _Nullable data,
                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeDescriptionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
@@ -24135,49 +24149,49 @@ typedef NS_OPTIONS(uint32_t, MTRLaundryWasherModeSelectModeSelectFeature) {
     MTRLaundryWasherModeSelectModeSelectFeatureExtendedStatus MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_ENUM(uint16_t, MTRRefrigeratorAndTemperatureControlledCabinetSemanticTags) {
-    MTRRefrigeratorAndTemperatureControlledCabinetSemanticTagsRapidCool MTR_NEWLY_AVAILABLE = 0x4000,
-    MTRRefrigeratorAndTemperatureControlledCabinetSemanticTagsRapidFreeze MTR_NEWLY_AVAILABLE = 0x4001,
+typedef NS_ENUM(uint16_t, MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSemanticTags) {
+    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSemanticTagsRapidCool MTR_NEWLY_AVAILABLE = 0x4000,
+    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSemanticTagsRapidFreeze MTR_NEWLY_AVAILABLE = 0x4001,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRRefrigeratorAndTemperatureControlledCabinetModeSelectFeature) {
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectFeatureOnOff MTR_NEWLY_AVAILABLE = 0x1,
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectFeatureExtendedStatus MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRRefrigeratorAndTemperatureControlledCabinetModeSelectModeSelectFeature) {
+    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectModeSelectFeatureOnOff MTR_NEWLY_AVAILABLE = 0x1,
+    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectModeSelectFeatureExtendedStatus MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRRVCRunChangeToModeResponseStatus) {
-    MTRRVCRunChangeToModeResponseStatusBatteryLow MTR_NEWLY_AVAILABLE = 0x40,
-    MTRRVCRunChangeToModeResponseStatusRobotStuck MTR_NEWLY_AVAILABLE = 0x41,
-    MTRRVCRunChangeToModeResponseStatusBinMissing MTR_NEWLY_AVAILABLE = 0x42,
-    MTRRVCRunChangeToModeResponseStatusBinFull MTR_NEWLY_AVAILABLE = 0x43,
-    MTRRVCRunChangeToModeResponseStatusWaterTankMissing MTR_NEWLY_AVAILABLE = 0x44,
-    MTRRVCRunChangeToModeResponseStatusWaterTankLidOpen MTR_NEWLY_AVAILABLE = 0x45,
-    MTRRVCRunChangeToModeResponseStatusCleaningPadMissing MTR_NEWLY_AVAILABLE = 0x46,
+typedef NS_ENUM(uint8_t, MTRRVCRunModeSelectChangeToModeResponseStatus) {
+    MTRRVCRunModeSelectChangeToModeResponseStatusBatteryLow MTR_NEWLY_AVAILABLE = 0x40,
+    MTRRVCRunModeSelectChangeToModeResponseStatusRobotStuck MTR_NEWLY_AVAILABLE = 0x41,
+    MTRRVCRunModeSelectChangeToModeResponseStatusBinMissing MTR_NEWLY_AVAILABLE = 0x42,
+    MTRRVCRunModeSelectChangeToModeResponseStatusBinFull MTR_NEWLY_AVAILABLE = 0x43,
+    MTRRVCRunModeSelectChangeToModeResponseStatusWaterTankMissing MTR_NEWLY_AVAILABLE = 0x44,
+    MTRRVCRunModeSelectChangeToModeResponseStatusWaterTankLidOpen MTR_NEWLY_AVAILABLE = 0x45,
+    MTRRVCRunModeSelectChangeToModeResponseStatusCleaningPadMissing MTR_NEWLY_AVAILABLE = 0x46,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_ENUM(uint16_t, MTRRVCRunSemanticTags) {
-    MTRRVCRunSemanticTagsIdle MTR_NEWLY_AVAILABLE = 0x4000,
-    MTRRVCRunSemanticTagsCleaning MTR_NEWLY_AVAILABLE = 0x4001,
+typedef NS_ENUM(uint16_t, MTRRVCRunModeSelectSemanticTags) {
+    MTRRVCRunModeSelectSemanticTagsIdle MTR_NEWLY_AVAILABLE = 0x4000,
+    MTRRVCRunModeSelectSemanticTagsCleaning MTR_NEWLY_AVAILABLE = 0x4001,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRRVCRunModeSelectFeature) {
-    MTRRVCRunModeSelectFeatureOnOff MTR_NEWLY_AVAILABLE = 0x1,
-    MTRRVCRunModeSelectFeatureExtendedStatus MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRRVCRunModeSelectModeSelectFeature) {
+    MTRRVCRunModeSelectModeSelectFeatureOnOff MTR_NEWLY_AVAILABLE = 0x1,
+    MTRRVCRunModeSelectModeSelectFeatureExtendedStatus MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRRVCCleanChangeToModeResponseStatus) {
-    MTRRVCCleanChangeToModeResponseStatusCleaningInProgress MTR_NEWLY_AVAILABLE = 0x40,
+typedef NS_ENUM(uint8_t, MTRRVCCleanModeSelectChangeToModeResponseStatus) {
+    MTRRVCCleanModeSelectChangeToModeResponseStatusCleaningInProgress MTR_NEWLY_AVAILABLE = 0x40,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_ENUM(uint16_t, MTRRVCCleanSemanticTags) {
-    MTRRVCCleanSemanticTagsDeepClean MTR_NEWLY_AVAILABLE = 0x4000,
-    MTRRVCCleanSemanticTagsVacuum MTR_NEWLY_AVAILABLE = 0x4001,
-    MTRRVCCleanSemanticTagsMop MTR_NEWLY_AVAILABLE = 0x4002,
+typedef NS_ENUM(uint16_t, MTRRVCCleanModeSelectSemanticTags) {
+    MTRRVCCleanModeSelectSemanticTagsDeepClean MTR_NEWLY_AVAILABLE = 0x4000,
+    MTRRVCCleanModeSelectSemanticTagsVacuum MTR_NEWLY_AVAILABLE = 0x4001,
+    MTRRVCCleanModeSelectSemanticTagsMop MTR_NEWLY_AVAILABLE = 0x4002,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRRVCCleanModeSelectFeature) {
-    MTRRVCCleanModeSelectFeatureOnOff MTR_NEWLY_AVAILABLE = 0x1,
-    MTRRVCCleanModeSelectFeatureExtendedStatus MTR_NEWLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint32_t, MTRRVCCleanModeSelectModeSelectFeature) {
+    MTRRVCCleanModeSelectModeSelectFeatureOnOff MTR_NEWLY_AVAILABLE = 0x1,
+    MTRRVCCleanModeSelectModeSelectFeatureExtendedStatus MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRTemperatureControlFeature) {
@@ -35670,6 +35684,27 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                  completionHandler:
                                      (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler
     MTR_DEPRECATED("Please use readAttributeDescriptionWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4),
+        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+
+- (void)readAttributeStandardNamespaceWithCompletionHandler:
+    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+    MTR_DEPRECATED("Please use readAttributeStandardNamespaceWithCompletion:", ios(16.1, 16.4), macos(13.0, 13.3),
+        watchos(9.1, 9.4), tvos(16.1, 16.4));
+- (void)subscribeAttributeStandardNamespaceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(MTRSubscribeParams * _Nullable)params
+                                   subscriptionEstablished:
+                                       (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_DEPRECATED("Please use subscribeAttributeStandardNamespaceWithParams:subscriptionEstablished:", ios(16.1, 16.4),
+        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
++ (void)readAttributeStandardNamespaceWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                endpoint:(NSNumber *)endpoint
+                                                   queue:(dispatch_queue_t)queue
+                                       completionHandler:
+                                           (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+    MTR_DEPRECATED("Please use readAttributeStandardNamespaceWithAttributeCache:endpoint:queue:completion:", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)readAttributeSupportedModesWithCompletionHandler:

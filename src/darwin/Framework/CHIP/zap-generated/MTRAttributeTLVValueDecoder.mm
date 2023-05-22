@@ -8784,6 +8784,21 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(
         value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
         return value;
     }
+    case Attributes::StandardNamespace::Id: {
+        using TypeInfo = Attributes::StandardNamespace::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+        }
+        return value;
+    }
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -9246,10 +9261,10 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeSelectCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledCabinetCluster(
+static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledCabinetModeSelectCluster(
     AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::RefrigeratorAndTemperatureControlledCabinet;
+    using namespace Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect;
     switch (aAttributeId) {
     case Attributes::Description::Id: {
         using TypeInfo = Attributes::Description::TypeInfo;
@@ -9275,8 +9290,8 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRRefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct * newElement_0;
-                newElement_0 = [MTRRefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct new];
+                MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct * newElement_0;
+                newElement_0 = [MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct new];
                 newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                               length:entry_0.label.size()
                                                             encoding:NSUTF8StringEncoding];
@@ -9286,8 +9301,8 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
                     auto iter_2 = entry_0.semanticTags.begin();
                     while (iter_2.Next()) {
                         auto & entry_2 = iter_2.GetValue();
-                        MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct * newElement_2;
-                        newElement_2 = [MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct new];
+                        MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct * newElement_2;
+                        newElement_2 = [MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct new];
                         newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                         [array_2 addObject:newElement_2];
@@ -9485,9 +9500,10 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRVCRunCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForRVCRunModeSelectCluster(
+    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::RvcRun;
+    using namespace Clusters::RvcRunModeSelect;
     switch (aAttributeId) {
     case Attributes::Description::Id: {
         using TypeInfo = Attributes::Description::TypeInfo;
@@ -9513,8 +9529,8 @@ static id _Nullable DecodeAttributeValueForRVCRunCluster(AttributeId aAttributeI
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRRVCRunClusterModeOptionStruct * newElement_0;
-                newElement_0 = [MTRRVCRunClusterModeOptionStruct new];
+                MTRRVCRunModeSelectClusterModeOptionStruct * newElement_0;
+                newElement_0 = [MTRRVCRunModeSelectClusterModeOptionStruct new];
                 newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                               length:entry_0.label.size()
                                                             encoding:NSUTF8StringEncoding];
@@ -9524,8 +9540,8 @@ static id _Nullable DecodeAttributeValueForRVCRunCluster(AttributeId aAttributeI
                     auto iter_2 = entry_0.semanticTags.begin();
                     while (iter_2.Next()) {
                         auto & entry_2 = iter_2.GetValue();
-                        MTRRVCRunClusterSemanticTagStruct * newElement_2;
-                        newElement_2 = [MTRRVCRunClusterSemanticTagStruct new];
+                        MTRRVCRunModeSelectClusterSemanticTagStruct * newElement_2;
+                        newElement_2 = [MTRRVCRunModeSelectClusterSemanticTagStruct new];
                         newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                         [array_2 addObject:newElement_2];
@@ -9723,9 +9739,10 @@ static id _Nullable DecodeAttributeValueForRVCRunCluster(AttributeId aAttributeI
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRVCCleanCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForRVCCleanModeSelectCluster(
+    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::RvcClean;
+    using namespace Clusters::RvcCleanModeSelect;
     switch (aAttributeId) {
     case Attributes::Description::Id: {
         using TypeInfo = Attributes::Description::TypeInfo;
@@ -9751,8 +9768,8 @@ static id _Nullable DecodeAttributeValueForRVCCleanCluster(AttributeId aAttribut
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRRVCCleanClusterModeOptionStruct * newElement_0;
-                newElement_0 = [MTRRVCCleanClusterModeOptionStruct new];
+                MTRRVCCleanModeSelectClusterModeOptionStruct * newElement_0;
+                newElement_0 = [MTRRVCCleanModeSelectClusterModeOptionStruct new];
                 newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                               length:entry_0.label.size()
                                                             encoding:NSUTF8StringEncoding];
@@ -9762,8 +9779,8 @@ static id _Nullable DecodeAttributeValueForRVCCleanCluster(AttributeId aAttribut
                     auto iter_2 = entry_0.semanticTags.begin();
                     while (iter_2.Next()) {
                         auto & entry_2 = iter_2.GetValue();
-                        MTRRVCCleanClusterSemanticTagStruct * newElement_2;
-                        newElement_2 = [MTRRVCCleanClusterSemanticTagStruct new];
+                        MTRRVCCleanModeSelectClusterSemanticTagStruct * newElement_2;
+                        newElement_2 = [MTRRVCCleanModeSelectClusterSemanticTagStruct new];
                         newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                         [array_2 addObject:newElement_2];
@@ -23664,14 +23681,15 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::LaundryWasherModeSelect::Id: {
         return DecodeAttributeValueForLaundryWasherModeSelectCluster(aPath.mAttributeId, aReader, aError);
     }
-    case Clusters::RefrigeratorAndTemperatureControlledCabinet::Id: {
-        return DecodeAttributeValueForRefrigeratorAndTemperatureControlledCabinetCluster(aPath.mAttributeId, aReader, aError);
+    case Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
+        return DecodeAttributeValueForRefrigeratorAndTemperatureControlledCabinetModeSelectCluster(
+            aPath.mAttributeId, aReader, aError);
     }
-    case Clusters::RvcRun::Id: {
-        return DecodeAttributeValueForRVCRunCluster(aPath.mAttributeId, aReader, aError);
+    case Clusters::RvcRunModeSelect::Id: {
+        return DecodeAttributeValueForRVCRunModeSelectCluster(aPath.mAttributeId, aReader, aError);
     }
-    case Clusters::RvcClean::Id: {
-        return DecodeAttributeValueForRVCCleanCluster(aPath.mAttributeId, aReader, aError);
+    case Clusters::RvcCleanModeSelect::Id: {
+        return DecodeAttributeValueForRVCCleanModeSelectCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::TemperatureControl::Id: {
         return DecodeAttributeValueForTemperatureControlCluster(aPath.mAttributeId, aReader, aError);

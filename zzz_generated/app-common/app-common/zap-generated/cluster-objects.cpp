@@ -11457,6 +11457,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::Description::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, description));
         break;
+    case Attributes::StandardNamespace::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, standardNamespace));
+        break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
@@ -11668,7 +11671,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace LaundryWasherModeSelect
-namespace RefrigeratorAndTemperatureControlledCabinet {
+namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
 namespace Structs {} // namespace Structs
 
 namespace Commands {
@@ -11837,8 +11840,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace RefrigeratorAndTemperatureControlledCabinet
-namespace RvcRun {
+} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
+namespace RvcRunModeSelect {
 namespace Structs {} // namespace Structs
 
 namespace Commands {
@@ -12007,8 +12010,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace RvcRun
-namespace RvcClean {
+} // namespace RvcRunModeSelect
+namespace RvcCleanModeSelect {
 namespace Structs {} // namespace Structs
 
 namespace Commands {
@@ -12177,7 +12180,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace RvcClean
+} // namespace RvcCleanModeSelect
 namespace TemperatureControl {
 namespace Structs {
 namespace TemperatureLevelStruct {
@@ -24916,21 +24919,21 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::RefrigeratorAndTemperatureControlledCabinet::Id: {
+    case Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
         switch (aCommand)
         {
         default:
             return false;
         }
     }
-    case Clusters::RvcRun::Id: {
+    case Clusters::RvcRunModeSelect::Id: {
         switch (aCommand)
         {
         default:
             return false;
         }
     }
-    case Clusters::RvcClean::Id: {
+    case Clusters::RvcCleanModeSelect::Id: {
         switch (aCommand)
         {
         default:

@@ -1949,7 +1949,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::LaundryWasherModeSelec
 
 CHIP_ERROR ComplexArgumentParser::Setup(
     const char * label,
-    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::SemanticTagStruct::Type & request,
+    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::SemanticTagStruct::Type & request,
     Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1974,14 +1974,15 @@ CHIP_ERROR ComplexArgumentParser::Setup(
 }
 
 void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::SemanticTagStruct::Type & request)
+    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::SemanticTagStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.mfgCode);
     ComplexArgumentParser::Finalize(request.value);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(
-    const char * label, chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::ModeOptionStruct::Type & request,
+    const char * label,
+    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::Type & request,
     Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2011,14 +2012,15 @@ CHIP_ERROR ComplexArgumentParser::Setup(
 }
 
 void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::ModeOptionStruct::Type & request)
+    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.label);
     ComplexArgumentParser::Finalize(request.mode);
     ComplexArgumentParser::Finalize(request.semanticTags);
 }
 
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::RvcRun::Structs::SemanticTagStruct::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::RvcRunModeSelect::Structs::SemanticTagStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2042,13 +2044,14 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::RvcRun::Structs::SemanticTagStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::RvcRunModeSelect::Structs::SemanticTagStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.mfgCode);
     ComplexArgumentParser::Finalize(request.value);
 }
 
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2077,7 +2080,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.label);
     ComplexArgumentParser::Finalize(request.mode);
@@ -2085,7 +2088,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::RvcRun::Structs::ModeO
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::RvcClean::Structs::SemanticTagStruct::Type & request,
+                                        chip::app::Clusters::RvcCleanModeSelect::Structs::SemanticTagStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2109,14 +2112,14 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::RvcClean::Structs::SemanticTagStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::RvcCleanModeSelect::Structs::SemanticTagStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.mfgCode);
     ComplexArgumentParser::Finalize(request.value);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::Type & request,
+                                        chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2145,7 +2148,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.label);
     ComplexArgumentParser::Finalize(request.mode);

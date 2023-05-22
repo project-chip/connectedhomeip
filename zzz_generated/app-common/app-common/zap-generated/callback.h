@@ -377,29 +377,29 @@ void emberAfModeSelectClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfLaundryWasherModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Refrigerator And Temperature Controlled Cabinet Cluster Init
+/** @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfRefrigeratorAndTemperatureControlledCabinetClusterInitCallback(chip::EndpointId endpoint);
+void emberAfRefrigeratorAndTemperatureControlledCabinetModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief RVC Run Cluster Init
+/** @brief RVC Run Mode Select Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfRvcRunClusterInitCallback(chip::EndpointId endpoint);
+void emberAfRvcRunModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief RVC Clean Cluster Init
+/** @brief RVC Clean Mode Select Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfRvcCleanClusterInitCallback(chip::EndpointId endpoint);
+void emberAfRvcCleanModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Temperature Control Cluster Init
  *
@@ -4085,43 +4085,43 @@ void emberAfLaundryWasherModeSelectClusterServerTickCallback(chip::EndpointId en
 void emberAfLaundryWasherModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Refrigerator And Temperature Controlled Cabinet Cluster
+// Refrigerator And Temperature Controlled Cabinet Mode Select Cluster
 //
 
-/** @brief Refrigerator And Temperature Controlled Cabinet Cluster Server Init
+/** @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfRefrigeratorAndTemperatureControlledCabinetClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfRefrigeratorAndTemperatureControlledCabinetModeSelectClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Refrigerator And Temperature Controlled Cabinet Cluster Server Shutdown
+/** @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster Server Shutdown
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterRefrigeratorAndTemperatureControlledCabinetClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterRefrigeratorAndTemperatureControlledCabinetModeSelectClusterServerShutdownCallback(chip::EndpointId endpoint);
 
-/** @brief Refrigerator And Temperature Controlled Cabinet Cluster Client Init
+/** @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfRefrigeratorAndTemperatureControlledCabinetClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfRefrigeratorAndTemperatureControlledCabinetModeSelectClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Refrigerator And Temperature Controlled Cabinet Cluster Server Attribute Changed
+/** @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterRefrigeratorAndTemperatureControlledCabinetClusterServerAttributeChangedCallback(
+void MatterRefrigeratorAndTemperatureControlledCabinetModeSelectClusterServerAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Refrigerator And Temperature Controlled Cabinet Cluster Server Pre Attribute Changed
+/** @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -4130,10 +4130,11 @@ void MatterRefrigeratorAndTemperatureControlledCabinetClusterServerAttributeChan
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status MatterRefrigeratorAndTemperatureControlledCabinetClusterServerPreAttributeChangedCallback(
+chip::Protocols::InteractionModel::Status
+MatterRefrigeratorAndTemperatureControlledCabinetModeSelectClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Refrigerator And Temperature Controlled Cabinet Cluster Client Pre Attribute Changed
+/** @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -4142,62 +4143,63 @@ chip::Protocols::InteractionModel::Status MatterRefrigeratorAndTemperatureContro
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status MatterRefrigeratorAndTemperatureControlledCabinetClusterClientPreAttributeChangedCallback(
+chip::Protocols::InteractionModel::Status
+MatterRefrigeratorAndTemperatureControlledCabinetModeSelectClusterClientPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Refrigerator And Temperature Controlled Cabinet Cluster Server Tick
+/** @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfRefrigeratorAndTemperatureControlledCabinetClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfRefrigeratorAndTemperatureControlledCabinetModeSelectClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Refrigerator And Temperature Controlled Cabinet Cluster Client Tick
+/** @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfRefrigeratorAndTemperatureControlledCabinetClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfRefrigeratorAndTemperatureControlledCabinetModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// RVC Run Cluster
+// RVC Run Mode Select Cluster
 //
 
-/** @brief RVC Run Cluster Server Init
+/** @brief RVC Run Mode Select Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfRvcRunClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfRvcRunModeSelectClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief RVC Run Cluster Server Shutdown
+/** @brief RVC Run Mode Select Cluster Server Shutdown
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterRvcRunClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterRvcRunModeSelectClusterServerShutdownCallback(chip::EndpointId endpoint);
 
-/** @brief RVC Run Cluster Client Init
+/** @brief RVC Run Mode Select Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfRvcRunClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfRvcRunModeSelectClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief RVC Run Cluster Server Attribute Changed
+/** @brief RVC Run Mode Select Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterRvcRunClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterRvcRunModeSelectClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief RVC Run Cluster Server Pre Attribute Changed
+/** @brief RVC Run Mode Select Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -4207,10 +4209,10 @@ void MatterRvcRunClusterServerAttributeChangedCallback(const chip::app::Concrete
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterRvcRunClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterRvcRunModeSelectClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief RVC Run Cluster Client Pre Attribute Changed
+/** @brief RVC Run Mode Select Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -4220,62 +4222,62 @@ MatterRvcRunClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAt
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterRvcRunClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterRvcRunModeSelectClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief RVC Run Cluster Server Tick
+/** @brief RVC Run Mode Select Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfRvcRunClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfRvcRunModeSelectClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief RVC Run Cluster Client Tick
+/** @brief RVC Run Mode Select Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfRvcRunClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfRvcRunModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// RVC Clean Cluster
+// RVC Clean Mode Select Cluster
 //
 
-/** @brief RVC Clean Cluster Server Init
+/** @brief RVC Clean Mode Select Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfRvcCleanClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfRvcCleanModeSelectClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief RVC Clean Cluster Server Shutdown
+/** @brief RVC Clean Mode Select Cluster Server Shutdown
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterRvcCleanClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterRvcCleanModeSelectClusterServerShutdownCallback(chip::EndpointId endpoint);
 
-/** @brief RVC Clean Cluster Client Init
+/** @brief RVC Clean Mode Select Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfRvcCleanClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfRvcCleanModeSelectClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief RVC Clean Cluster Server Attribute Changed
+/** @brief RVC Clean Mode Select Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterRvcCleanClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterRvcCleanModeSelectClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief RVC Clean Cluster Server Pre Attribute Changed
+/** @brief RVC Clean Mode Select Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -4284,11 +4286,10 @@ void MatterRvcCleanClusterServerAttributeChangedCallback(const chip::app::Concre
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status
-MatterRvcCleanClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterRvcCleanModeSelectClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief RVC Clean Cluster Client Pre Attribute Changed
+/** @brief RVC Clean Mode Select Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -4297,25 +4298,24 @@ MatterRvcCleanClusterServerPreAttributeChangedCallback(const chip::app::Concrete
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status
-MatterRvcCleanClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterRvcCleanModeSelectClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief RVC Clean Cluster Server Tick
+/** @brief RVC Clean Mode Select Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfRvcCleanClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfRvcCleanModeSelectClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief RVC Clean Cluster Client Tick
+/** @brief RVC Clean Mode Select Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfRvcCleanClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfRvcCleanModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Temperature Control Cluster
@@ -8378,42 +8378,43 @@ bool emberAfLaundryWasherModeSelectClusterChangeToModeWithStatusCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeWithStatus::DecodableType & commandData);
 /**
- * @brief Refrigerator And Temperature Controlled Cabinet Cluster ChangeToMode Command callback (from client)
+ * @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster ChangeToMode Command callback (from client)
  */
-bool emberAfRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeCallback(
+bool emberAfRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToMode::DecodableType & commandData);
-/**
- * @brief Refrigerator And Temperature Controlled Cabinet Cluster ChangeToModeWithStatus Command callback (from client)
- */
-bool emberAfRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeWithStatusCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeWithStatus::DecodableType &
+    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToMode::DecodableType &
         commandData);
 /**
- * @brief RVC Run Cluster ChangeToMode Command callback (from client)
+ * @brief Refrigerator And Temperature Controlled Cabinet Mode Select Cluster ChangeToModeWithStatus Command callback (from client)
  */
-bool emberAfRvcRunClusterChangeToModeCallback(
+bool emberAfRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeWithStatusCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcRun::Commands::ChangeToMode::DecodableType & commandData);
+    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeWithStatus::
+        DecodableType & commandData);
 /**
- * @brief RVC Run Cluster ChangeToModeWithStatus Command callback (from client)
+ * @brief RVC Run Mode Select Cluster ChangeToMode Command callback (from client)
  */
-bool emberAfRvcRunClusterChangeToModeWithStatusCallback(
+bool emberAfRvcRunModeSelectClusterChangeToModeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcRun::Commands::ChangeToModeWithStatus::DecodableType & commandData);
+    const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToMode::DecodableType & commandData);
 /**
- * @brief RVC Clean Cluster ChangeToMode Command callback (from client)
+ * @brief RVC Run Mode Select Cluster ChangeToModeWithStatus Command callback (from client)
  */
-bool emberAfRvcCleanClusterChangeToModeCallback(
+bool emberAfRvcRunModeSelectClusterChangeToModeWithStatusCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcClean::Commands::ChangeToMode::DecodableType & commandData);
+    const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeWithStatus::DecodableType & commandData);
 /**
- * @brief RVC Clean Cluster ChangeToModeWithStatus Command callback (from client)
+ * @brief RVC Clean Mode Select Cluster ChangeToMode Command callback (from client)
  */
-bool emberAfRvcCleanClusterChangeToModeWithStatusCallback(
+bool emberAfRvcCleanModeSelectClusterChangeToModeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RvcClean::Commands::ChangeToModeWithStatus::DecodableType & commandData);
+    const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToMode::DecodableType & commandData);
+/**
+ * @brief RVC Clean Mode Select Cluster ChangeToModeWithStatus Command callback (from client)
+ */
+bool emberAfRvcCleanModeSelectClusterChangeToModeWithStatusCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeWithStatus::DecodableType & commandData);
 /**
  * @brief Temperature Control Cluster SetTemperature Command callback (from client)
  */

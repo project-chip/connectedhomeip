@@ -1574,11 +1574,12 @@ public class ChipStructs {
     }
   }
 
-  public static class RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct {
+  public static
+  class RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct(
+    public RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct(
         Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
@@ -1587,7 +1588,8 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct {\n");
+      output.append(
+          "RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1599,17 +1601,20 @@ public class ChipStructs {
     }
   }
 
-  public static class RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct {
+  public static class RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
     public ArrayList<
-            ChipStructs.RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct>
+            ChipStructs
+                .RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct>
         semanticTags;
 
-    public RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct(
+    public RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct>
+        ArrayList<
+                ChipStructs
+                    .RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct>
             semanticTags) {
       this.label = label;
       this.mode = mode;
@@ -1619,7 +1624,8 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct {\n");
+      output.append(
+          "RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct {\n");
       output.append("\tlabel: ");
       output.append(label);
       output.append("\n");
@@ -1634,11 +1640,11 @@ public class ChipStructs {
     }
   }
 
-  public static class RvcRunClusterSemanticTagStruct {
+  public static class RvcRunModeSelectClusterSemanticTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public RvcRunClusterSemanticTagStruct(Integer mfgCode, Integer value) {
+    public RvcRunModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1646,7 +1652,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("RvcRunClusterSemanticTagStruct {\n");
+      output.append("RvcRunModeSelectClusterSemanticTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1658,15 +1664,15 @@ public class ChipStructs {
     }
   }
 
-  public static class RvcRunClusterModeOptionStruct {
+  public static class RvcRunModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.RvcRunClusterSemanticTagStruct> semanticTags;
+    public ArrayList<ChipStructs.RvcRunModeSelectClusterSemanticTagStruct> semanticTags;
 
-    public RvcRunClusterModeOptionStruct(
+    public RvcRunModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.RvcRunClusterSemanticTagStruct> semanticTags) {
+        ArrayList<ChipStructs.RvcRunModeSelectClusterSemanticTagStruct> semanticTags) {
       this.label = label;
       this.mode = mode;
       this.semanticTags = semanticTags;
@@ -1675,7 +1681,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("RvcRunClusterModeOptionStruct {\n");
+      output.append("RvcRunModeSelectClusterModeOptionStruct {\n");
       output.append("\tlabel: ");
       output.append(label);
       output.append("\n");
@@ -1690,11 +1696,11 @@ public class ChipStructs {
     }
   }
 
-  public static class RvcCleanClusterSemanticTagStruct {
+  public static class RvcCleanModeSelectClusterSemanticTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public RvcCleanClusterSemanticTagStruct(Integer mfgCode, Integer value) {
+    public RvcCleanModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1702,7 +1708,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("RvcCleanClusterSemanticTagStruct {\n");
+      output.append("RvcCleanModeSelectClusterSemanticTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1714,15 +1720,15 @@ public class ChipStructs {
     }
   }
 
-  public static class RvcCleanClusterModeOptionStruct {
+  public static class RvcCleanModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.RvcCleanClusterSemanticTagStruct> semanticTags;
+    public ArrayList<ChipStructs.RvcCleanModeSelectClusterSemanticTagStruct> semanticTags;
 
-    public RvcCleanClusterModeOptionStruct(
+    public RvcCleanModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.RvcCleanClusterSemanticTagStruct> semanticTags) {
+        ArrayList<ChipStructs.RvcCleanModeSelectClusterSemanticTagStruct> semanticTags) {
       this.label = label;
       this.mode = mode;
       this.semanticTags = semanticTags;
@@ -1731,7 +1737,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("RvcCleanClusterModeOptionStruct {\n");
+      output.append("RvcCleanModeSelectClusterModeOptionStruct {\n");
       output.append("\tlabel: ");
       output.append(label);
       output.append("\n");

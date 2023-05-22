@@ -8346,9 +8346,10 @@ void MTRLaundryWasherModeSelectAttributeListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::ModeOptionStruct::DecodableType> & value)
+        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::DecodableType> &
+        value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8356,8 +8357,8 @@ void MTRRefrigeratorAndTemperatureControlledCabinetSupportedModesListAttributeCa
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRRefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct * newElement_0;
-            newElement_0 = [MTRRefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct new];
+            MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct * newElement_0;
+            newElement_0 = [MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct new];
             newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                           length:entry_0.label.size()
                                                         encoding:NSUTF8StringEncoding];
@@ -8367,8 +8368,8 @@ void MTRRefrigeratorAndTemperatureControlledCabinetSupportedModesListAttributeCa
                 auto iter_2 = entry_0.semanticTags.begin();
                 while (iter_2.Next()) {
                     auto & entry_2 = iter_2.GetValue();
-                    MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct * newElement_2;
-                    newElement_2 = [MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct new];
+                    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct * newElement_2;
+                    newElement_2 = [MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct new];
                     newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                     [array_2 addObject:newElement_2];
@@ -8392,7 +8393,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetSupportedModesListAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetSupportedModesListAttributeCallbackSubscriptionBridge::
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -8408,7 +8409,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetSupportedModesListAttributeCa
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8431,7 +8432,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetGeneratedCommandListListAttri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetGeneratedCommandListListAttributeCallbackSubscriptionBridge::
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -8447,7 +8448,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetGeneratedCommandListListAttri
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8470,7 +8471,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetAcceptedCommandListListAttrib
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetAcceptedCommandListListAttributeCallbackSubscriptionBridge::
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -8486,7 +8487,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetAcceptedCommandListListAttrib
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetEventListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8509,7 +8510,8 @@ void MTRRefrigeratorAndTemperatureControlledCabinetEventListListAttributeCallbac
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8524,7 +8526,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetEventListListAttributeCallbac
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8547,7 +8549,8 @@ void MTRRefrigeratorAndTemperatureControlledCabinetAttributeListListAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8562,8 +8565,9 @@ void MTRRefrigeratorAndTemperatureControlledCabinetAttributeListListAttributeCal
     }
 }
 
-void MTRRVCRunSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::DecodableType> & value)
+void MTRRVCRunModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType> &
+        value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8571,8 +8575,8 @@ void MTRRVCRunSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * cont
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRRVCRunClusterModeOptionStruct * newElement_0;
-            newElement_0 = [MTRRVCRunClusterModeOptionStruct new];
+            MTRRVCRunModeSelectClusterModeOptionStruct * newElement_0;
+            newElement_0 = [MTRRVCRunModeSelectClusterModeOptionStruct new];
             newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                           length:entry_0.label.size()
                                                         encoding:NSUTF8StringEncoding];
@@ -8582,8 +8586,8 @@ void MTRRVCRunSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * cont
                 auto iter_2 = entry_0.semanticTags.begin();
                 while (iter_2.Next()) {
                     auto & entry_2 = iter_2.GetValue();
-                    MTRRVCRunClusterSemanticTagStruct * newElement_2;
-                    newElement_2 = [MTRRVCRunClusterSemanticTagStruct new];
+                    MTRRVCRunModeSelectClusterSemanticTagStruct * newElement_2;
+                    newElement_2 = [MTRRVCRunModeSelectClusterSemanticTagStruct new];
                     newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                     [array_2 addObject:newElement_2];
@@ -8607,7 +8611,7 @@ void MTRRVCRunSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * cont
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCRunSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCRunModeSelectSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8622,7 +8626,7 @@ void MTRRVCRunSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRRVCRunGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8645,7 +8649,7 @@ void MTRRVCRunGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCRunGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8660,7 +8664,7 @@ void MTRRVCRunGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRRVCRunAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8683,7 +8687,7 @@ void MTRRVCRunAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCRunAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8698,7 +8702,7 @@ void MTRRVCRunAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRRVCRunEventListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCRunModeSelectEventListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8721,7 +8725,7 @@ void MTRRVCRunEventListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCRunEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCRunModeSelectEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8736,7 +8740,7 @@ void MTRRVCRunEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRRVCRunAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCRunModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8759,7 +8763,7 @@ void MTRRVCRunAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCRunAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCRunModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8774,8 +8778,9 @@ void MTRRVCRunAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRRVCCleanSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::DecodableType> & value)
+void MTRRVCCleanModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType> &
+        value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8783,8 +8788,8 @@ void MTRRVCCleanSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * co
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRRVCCleanClusterModeOptionStruct * newElement_0;
-            newElement_0 = [MTRRVCCleanClusterModeOptionStruct new];
+            MTRRVCCleanModeSelectClusterModeOptionStruct * newElement_0;
+            newElement_0 = [MTRRVCCleanModeSelectClusterModeOptionStruct new];
             newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                           length:entry_0.label.size()
                                                         encoding:NSUTF8StringEncoding];
@@ -8794,8 +8799,8 @@ void MTRRVCCleanSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * co
                 auto iter_2 = entry_0.semanticTags.begin();
                 while (iter_2.Next()) {
                     auto & entry_2 = iter_2.GetValue();
-                    MTRRVCCleanClusterSemanticTagStruct * newElement_2;
-                    newElement_2 = [MTRRVCCleanClusterSemanticTagStruct new];
+                    MTRRVCCleanModeSelectClusterSemanticTagStruct * newElement_2;
+                    newElement_2 = [MTRRVCCleanModeSelectClusterSemanticTagStruct new];
                     newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                     [array_2 addObject:newElement_2];
@@ -8819,7 +8824,7 @@ void MTRRVCCleanSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * co
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCCleanSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCCleanModeSelectSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8834,7 +8839,7 @@ void MTRRVCCleanSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRRVCCleanGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8857,7 +8862,7 @@ void MTRRVCCleanGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCCleanGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8872,7 +8877,7 @@ void MTRRVCCleanGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRRVCCleanAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8895,7 +8900,7 @@ void MTRRVCCleanAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCCleanAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8910,7 +8915,7 @@ void MTRRVCCleanAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRRVCCleanEventListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCCleanModeSelectEventListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8933,7 +8938,7 @@ void MTRRVCCleanEventListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCCleanEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCCleanModeSelectEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8948,7 +8953,7 @@ void MTRRVCCleanEventListListAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRRVCCleanAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCCleanModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -8971,7 +8976,7 @@ void MTRRVCCleanAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCCleanAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCCleanModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17810,10 +17815,11 @@ void MTRLaundryWasherModeSelectClusterChangeToModeResponseCallbackBridge::OnSucc
     DispatchSuccess(context, response);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeResponse::DecodableType & data)
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::
+        DecodableType & data)
 {
-    auto * response = [MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseParams new];
+    auto * response = [MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams new];
     CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
     if (err != CHIP_NO_ERROR) {
         OnFailureFn(context, err);
@@ -17822,10 +17828,10 @@ void MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseCa
     DispatchSuccess(context, response);
 };
 
-void MTRRVCRunClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::RvcRun::Commands::ChangeToModeResponse::DecodableType & data)
+void MTRRVCRunModeSelectClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType & data)
 {
-    auto * response = [MTRRVCRunClusterChangeToModeResponseParams new];
+    auto * response = [MTRRVCRunModeSelectClusterChangeToModeResponseParams new];
     CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
     if (err != CHIP_NO_ERROR) {
         OnFailureFn(context, err);
@@ -17834,10 +17840,10 @@ void MTRRVCRunClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void MTRRVCCleanClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::RvcClean::Commands::ChangeToModeResponse::DecodableType & data)
+void MTRRVCCleanModeSelectClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType & data)
 {
-    auto * response = [MTRRVCCleanClusterChangeToModeResponseParams new];
+    auto * response = [MTRRVCCleanModeSelectClusterChangeToModeResponseParams new];
     CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
     if (err != CHIP_NO_ERROR) {
         OnFailureFn(context, err);
@@ -21628,15 +21634,15 @@ void MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubsc
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::SemanticTags value)
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::SemanticTags value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagsAttributeCallbackSubscriptionBridge::
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -21652,8 +21658,10 @@ void MTRRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagsAttributeC
     }
 }
 
-void MTRNullableRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::SemanticTags> & value)
+void MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
+    void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::SemanticTags> &
+        value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21664,7 +21672,7 @@ void MTRNullableRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagsAt
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagsAttributeCallbackSubscriptionBridge::
+void MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -21680,15 +21688,15 @@ void MTRNullableRefrigeratorAndTemperatureControlledCabinetClusterSemanticTagsAt
     }
 }
 
-void MTRRVCRunClusterChangeToModeResponseStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RvcRun::ChangeToModeResponseStatus value)
+void MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RvcRunModeSelect::ChangeToModeResponseStatus value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCRunClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21703,8 +21711,8 @@ void MTRRVCRunClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableRVCRunClusterChangeToModeResponseStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRun::ChangeToModeResponseStatus> & value)
+void MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRunModeSelect::ChangeToModeResponseStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21715,7 +21723,7 @@ void MTRNullableRVCRunClusterChangeToModeResponseStatusAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRVCRunClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21730,15 +21738,15 @@ void MTRNullableRVCRunClusterChangeToModeResponseStatusAttributeCallbackSubscrip
     }
 }
 
-void MTRRVCRunClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RvcRun::SemanticTags value)
+void MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RvcRunModeSelect::SemanticTags value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCRunClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21753,8 +21761,8 @@ void MTRRVCRunClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRNullableRVCRunClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRun::SemanticTags> & value)
+void MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRunModeSelect::SemanticTags> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21765,7 +21773,7 @@ void MTRNullableRVCRunClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRVCRunClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21780,15 +21788,15 @@ void MTRNullableRVCRunClusterSemanticTagsAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRRVCCleanClusterChangeToModeResponseStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RvcClean::ChangeToModeResponseStatus value)
+void MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RvcCleanModeSelect::ChangeToModeResponseStatus value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCCleanClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21803,8 +21811,8 @@ void MTRRVCCleanClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableRVCCleanClusterChangeToModeResponseStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcClean::ChangeToModeResponseStatus> & value)
+void MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::RvcCleanModeSelect::ChangeToModeResponseStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21815,7 +21823,7 @@ void MTRNullableRVCCleanClusterChangeToModeResponseStatusAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRVCCleanClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21830,15 +21838,15 @@ void MTRNullableRVCCleanClusterChangeToModeResponseStatusAttributeCallbackSubscr
     }
 }
 
-void MTRRVCCleanClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RvcClean::SemanticTags value)
+void MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RvcCleanModeSelect::SemanticTags value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRVCCleanClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21853,8 +21861,8 @@ void MTRRVCCleanClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRNullableRVCCleanClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcClean::SemanticTags> & value)
+void MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcCleanModeSelect::SemanticTags> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21865,7 +21873,7 @@ void MTRNullableRVCCleanClusterSemanticTagsAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRVCCleanClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

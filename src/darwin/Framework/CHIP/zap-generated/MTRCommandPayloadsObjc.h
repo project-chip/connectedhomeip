@@ -4210,7 +4210,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeParams : NSObject <NSCopying>
+@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeParams : NSObject <NSCopying>
 
 @property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
 /**
@@ -4240,7 +4240,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeWithStatusParams : NSObject <NSCopying>
+@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeWithStatusParams : NSObject <NSCopying>
 
 @property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
 /**
@@ -4270,14 +4270,95 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseParams : NSObject <NSCopying>
+@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy) NSString * _Nullable statusText MTR_NEWLY_AVAILABLE;
 
 /**
- * Initialize an MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseParams with a response-value dictionary
+ * Initialize an MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams with a response-value
+ * dictionary of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRRVCRunModeSelectClusterChangeToModeParams : NSObject <NSCopying>
+
+@property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRRVCRunModeSelectClusterChangeToModeWithStatusParams : NSObject <NSCopying>
+
+@property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+
+/**
+ * Controls how much time, in seconds, we will allow for the server to process the command.
+ *
+ * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
+ *
+ * If nil, the framework will try to select an appropriate timeout value itself.
+ */
+@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRRVCRunModeSelectClusterChangeToModeResponseParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull status MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSString * _Nullable statusText MTR_NEWLY_AVAILABLE;
+
+/**
+ * Initialize an MTRRVCRunModeSelectClusterChangeToModeResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -4291,7 +4372,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCRunClusterChangeToModeParams : NSObject <NSCopying>
+@interface MTRRVCCleanModeSelectClusterChangeToModeParams : NSObject <NSCopying>
 
 @property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
 /**
@@ -4321,7 +4402,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCRunClusterChangeToModeWithStatusParams : NSObject <NSCopying>
+@interface MTRRVCCleanModeSelectClusterChangeToModeWithStatusParams : NSObject <NSCopying>
 
 @property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
 /**
@@ -4351,95 +4432,14 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCRunClusterChangeToModeResponseParams : NSObject <NSCopying>
+@interface MTRRVCCleanModeSelectClusterChangeToModeResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy) NSString * _Nullable statusText MTR_NEWLY_AVAILABLE;
 
 /**
- * Initialize an MTRRVCRunClusterChangeToModeResponseParams with a response-value dictionary
- * of the sort that MTRDeviceResponseHandler would receive.
- *
- * Will return nil and hand out an error if the response-value dictionary is not
- * a command data response or is not the right command response.
- *
- * Will return nil and hand out an error if the data response does not match the known
- * schema for this command.
- */
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRRVCCleanClusterChangeToModeParams : NSObject <NSCopying>
-
-@property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-/**
- * Controls how much time, in seconds, we will allow for the server to process the command.
- *
- * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
- *
- * If nil, the framework will try to select an appropriate timeout value itself.
- */
-@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRRVCCleanClusterChangeToModeWithStatusParams : NSObject <NSCopying>
-
-@property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode MTR_NEWLY_AVAILABLE;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-/**
- * Controls how much time, in seconds, we will allow for the server to process the command.
- *
- * The command will then time out if that much time, plus an allowance for retransmits due to network failures, passes.
- *
- * If nil, the framework will try to select an appropriate timeout value itself.
- */
-@property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRRVCCleanClusterChangeToModeResponseParams : NSObject <NSCopying>
-
-@property (nonatomic, copy) NSNumber * _Nonnull status MTR_NEWLY_AVAILABLE;
-
-@property (nonatomic, copy) NSString * _Nullable statusText MTR_NEWLY_AVAILABLE;
-
-/**
- * Initialize an MTRRVCCleanClusterChangeToModeResponseParams with a response-value dictionary
+ * Initialize an MTRRVCCleanModeSelectClusterChangeToModeResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not

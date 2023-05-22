@@ -1562,7 +1562,7 @@ enum class ModeSelectFeature : uint32_t
 };
 } // namespace LaundryWasherModeSelect
 
-namespace RefrigeratorAndTemperatureControlledCabinet {
+namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
 
 // Enum for SemanticTags
 enum class SemanticTags : uint16_t
@@ -1582,9 +1582,9 @@ enum class ModeSelectFeature : uint32_t
     kOnOff          = 0x1,
     kExtendedStatus = 0x2,
 };
-} // namespace RefrigeratorAndTemperatureControlledCabinet
+} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
 
-namespace RvcRun {
+namespace RvcRunModeSelect {
 
 // Enum for ChangeToModeResponseStatus
 enum class ChangeToModeResponseStatus : uint8_t
@@ -1621,9 +1621,9 @@ enum class ModeSelectFeature : uint32_t
     kOnOff          = 0x1,
     kExtendedStatus = 0x2,
 };
-} // namespace RvcRun
+} // namespace RvcRunModeSelect
 
-namespace RvcClean {
+namespace RvcCleanModeSelect {
 
 // Enum for ChangeToModeResponseStatus
 enum class ChangeToModeResponseStatus : uint8_t
@@ -1655,7 +1655,7 @@ enum class ModeSelectFeature : uint32_t
     kOnOff          = 0x1,
     kExtendedStatus = 0x2,
 };
-} // namespace RvcClean
+} // namespace RvcCleanModeSelect
 
 namespace TemperatureControl {
 

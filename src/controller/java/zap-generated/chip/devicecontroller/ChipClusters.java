@@ -13609,6 +13609,14 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
+    public interface StandardNamespaceAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
     public interface SupportedModesAttributeCallback {
       void onSuccess(List<ChipStructs.ModeSelectClusterModeOptionStruct> valueList);
 
@@ -13672,6 +13680,15 @@ public class ChipClusters {
     public void subscribeDescriptionAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readStandardNamespaceAttribute(StandardNamespaceAttributeCallback callback) {
+      readStandardNamespaceAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeStandardNamespaceAttribute(
+        StandardNamespaceAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeStandardNamespaceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedModesAttribute(SupportedModesAttributeCallback callback) {
@@ -13788,6 +13805,15 @@ public class ChipClusters {
     private native void subscribeDescriptionAttribute(
         long chipClusterPtr,
         CharStringAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readStandardNamespaceAttribute(
+        long chipClusterPtr, StandardNamespaceAttributeCallback callback);
+
+    private native void subscribeStandardNamespaceAttribute(
+        long chipClusterPtr,
+        StandardNamespaceAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
@@ -14193,10 +14219,12 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class RefrigeratorAndTemperatureControlledCabinetCluster extends BaseChipCluster {
+  public static class RefrigeratorAndTemperatureControlledCabinetModeSelectCluster
+      extends BaseChipCluster {
     public static final long CLUSTER_ID = 82L;
 
-    public RefrigeratorAndTemperatureControlledCabinetCluster(long devicePtr, int endpointId) {
+    public RefrigeratorAndTemperatureControlledCabinetModeSelectCluster(
+        long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -14241,7 +14269,9 @@ public class ChipClusters {
 
     public interface SupportedModesAttributeCallback {
       void onSuccess(
-          List<ChipStructs.RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct>
+          List<
+                  ChipStructs
+                      .RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct>
               valueList);
 
       void onError(Exception ex);
@@ -14510,10 +14540,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class RvcRunCluster extends BaseChipCluster {
+  public static class RvcRunModeSelectCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 84L;
 
-    public RvcRunCluster(long devicePtr, int endpointId) {
+    public RvcRunModeSelectCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -14557,7 +14587,7 @@ public class ChipClusters {
     }
 
     public interface SupportedModesAttributeCallback {
-      void onSuccess(List<ChipStructs.RvcRunClusterModeOptionStruct> valueList);
+      void onSuccess(List<ChipStructs.RvcRunModeSelectClusterModeOptionStruct> valueList);
 
       void onError(Exception ex);
 
@@ -14825,10 +14855,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class RvcCleanCluster extends BaseChipCluster {
+  public static class RvcCleanModeSelectCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 85L;
 
-    public RvcCleanCluster(long devicePtr, int endpointId) {
+    public RvcCleanModeSelectCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -14872,7 +14902,7 @@ public class ChipClusters {
     }
 
     public interface SupportedModesAttributeCallback {
-      void onSuccess(List<ChipStructs.RvcCleanClusterModeOptionStruct> valueList);
+      void onSuccess(List<ChipStructs.RvcCleanModeSelectClusterModeOptionStruct> valueList);
 
       void onError(Exception ex);
 

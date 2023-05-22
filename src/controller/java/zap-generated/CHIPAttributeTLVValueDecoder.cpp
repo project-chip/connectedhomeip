@@ -11873,6 +11873,28 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
             return value;
         }
+        case Attributes::StandardNamespace::Id: {
+            using TypeInfo = Attributes::StandardNamespace::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                std::string valueClassName     = "java/lang/Integer";
+                std::string valueCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                               cppValue.Value(), value);
+            }
+            return value;
+        }
         case Attributes::SupportedModes::Id: {
             using TypeInfo = Attributes::SupportedModes::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -12448,8 +12470,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Id: {
-        using namespace app::Clusters::RefrigeratorAndTemperatureControlledCabinet;
+    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
+        using namespace app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect;
         switch (aPath.mAttributeId)
         {
         case Attributes::Description::Id: {
@@ -12511,13 +12533,14 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jclass semanticTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
                         env,
-                        "chip/devicecontroller/ChipStructs$RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct",
+                        "chip/devicecontroller/"
+                        "ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct",
                         semanticTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(
-                            Zcl,
-                            "Could not find class ChipStructs$RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct");
+                        ChipLogError(Zcl,
+                                     "Could not find class "
+                                     "ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct");
                         return nullptr;
                     }
                     jmethodID semanticTagStructStructCtor_3 =
@@ -12526,7 +12549,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     {
                         ChipLogError(Zcl,
                                      "Could not find "
-                                     "ChipStructs$RefrigeratorAndTemperatureControlledCabinetClusterSemanticTagStruct constructor");
+                                     "ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct "
+                                     "constructor");
                         return nullptr;
                     }
 
@@ -12537,21 +12561,25 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass modeOptionStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct",
+                    env,
+                    "chip/devicecontroller/"
+                    "ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct",
                     modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(
-                        Zcl, "Could not find class ChipStructs$RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct");
-                    return nullptr;
-                }
-                jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(
-                    modeOptionStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
-                if (modeOptionStructStructCtor_1 == nullptr)
-                {
                     ChipLogError(Zcl,
-                                 "Could not find ChipStructs$RefrigeratorAndTemperatureControlledCabinetClusterModeOptionStruct "
-                                 "constructor");
+                                 "Could not find class "
+                                 "ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct");
+                    return nullptr;
+                }
+                jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(
+                    modeOptionStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
+                if (modeOptionStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(
+                        Zcl,
+                        "Could not find ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct "
+                        "constructor");
                     return nullptr;
                 }
 
@@ -12752,8 +12780,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::RvcRun::Id: {
-        using namespace app::Clusters::RvcRun;
+    case app::Clusters::RvcRunModeSelect::Id: {
+        using namespace app::Clusters::RvcRunModeSelect;
         switch (aPath.mAttributeId)
         {
         case Attributes::Description::Id: {
@@ -12814,17 +12842,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     jclass semanticTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
-                        env, "chip/devicecontroller/ChipStructs$RvcRunClusterSemanticTagStruct", semanticTagStructStructClass_3);
+                        env, "chip/devicecontroller/ChipStructs$RvcRunModeSelectClusterSemanticTagStruct",
+                        semanticTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$RvcRunClusterSemanticTagStruct");
+                        ChipLogError(Zcl, "Could not find class ChipStructs$RvcRunModeSelectClusterSemanticTagStruct");
                         return nullptr;
                     }
                     jmethodID semanticTagStructStructCtor_3 =
                         env->GetMethodID(semanticTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
                     if (semanticTagStructStructCtor_3 == nullptr)
                     {
-                        ChipLogError(Zcl, "Could not find ChipStructs$RvcRunClusterSemanticTagStruct constructor");
+                        ChipLogError(Zcl, "Could not find ChipStructs$RvcRunModeSelectClusterSemanticTagStruct constructor");
                         return nullptr;
                     }
 
@@ -12835,17 +12864,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass modeOptionStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$RvcRunClusterModeOptionStruct", modeOptionStructStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$RvcRunModeSelectClusterModeOptionStruct",
+                    modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$RvcRunClusterModeOptionStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$RvcRunModeSelectClusterModeOptionStruct");
                     return nullptr;
                 }
                 jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(
                     modeOptionStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
                 if (modeOptionStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$RvcRunClusterModeOptionStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$RvcRunModeSelectClusterModeOptionStruct constructor");
                     return nullptr;
                 }
 
@@ -13046,8 +13076,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::RvcClean::Id: {
-        using namespace app::Clusters::RvcClean;
+    case app::Clusters::RvcCleanModeSelect::Id: {
+        using namespace app::Clusters::RvcCleanModeSelect;
         switch (aPath.mAttributeId)
         {
         case Attributes::Description::Id: {
@@ -13108,17 +13138,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     jclass semanticTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
-                        env, "chip/devicecontroller/ChipStructs$RvcCleanClusterSemanticTagStruct", semanticTagStructStructClass_3);
+                        env, "chip/devicecontroller/ChipStructs$RvcCleanModeSelectClusterSemanticTagStruct",
+                        semanticTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$RvcCleanClusterSemanticTagStruct");
+                        ChipLogError(Zcl, "Could not find class ChipStructs$RvcCleanModeSelectClusterSemanticTagStruct");
                         return nullptr;
                     }
                     jmethodID semanticTagStructStructCtor_3 =
                         env->GetMethodID(semanticTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
                     if (semanticTagStructStructCtor_3 == nullptr)
                     {
-                        ChipLogError(Zcl, "Could not find ChipStructs$RvcCleanClusterSemanticTagStruct constructor");
+                        ChipLogError(Zcl, "Could not find ChipStructs$RvcCleanModeSelectClusterSemanticTagStruct constructor");
                         return nullptr;
                     }
 
@@ -13129,17 +13160,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass modeOptionStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$RvcCleanClusterModeOptionStruct", modeOptionStructStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$RvcCleanModeSelectClusterModeOptionStruct",
+                    modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$RvcCleanClusterModeOptionStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$RvcCleanModeSelectClusterModeOptionStruct");
                     return nullptr;
                 }
                 jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(
                     modeOptionStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
                 if (modeOptionStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$RvcCleanClusterModeOptionStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$RvcCleanModeSelectClusterModeOptionStruct constructor");
                     return nullptr;
                 }
 

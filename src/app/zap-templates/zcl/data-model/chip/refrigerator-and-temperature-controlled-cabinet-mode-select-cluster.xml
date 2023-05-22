@@ -17,27 +17,21 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="ChangeToModeResponseStatus" type="ENUM8">
-    <cluster code="0x0055"/>
-    <item value="0x40" name="CleaningInProgress"/>
-  </enum>
-
   <enum name="SemanticTags" type="ENUM16">
-    <cluster code="0x0055"/>
-    <item value="0x4000" name="DeepClean"/>
-    <item value="0x4001" name="Vacuum"/>
-    <item value="0x4002" name="Mop"/>
+    <cluster code="0x0052"/>
+    <item value="0x4000" name="RapidCool"/>
+    <item value="0x4001" name="RapidFreeze"/>
   </enum>
 
   <cluster>
     <domain>General</domain>
-    <name>RVC Clean</name>
-    <code>0x0055</code>
-    <define>RVC_CLEAN_CLUSTER</define>
+    <name>Refrigerator And Temperature Controlled Cabinet Mode Select</name>
+    <code>0x0052</code>
+    <define>REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <description>This cluster is an alias of the Mode Select cluster which also defines a namespace for the
-      cleaning type of the Robotic Vacuum Cleaner devices.</description>
+    <description>This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for refrigerator and temperature controlled cabinet devices.</description>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false" isNullable="false" length="64">Description</attribute>

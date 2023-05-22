@@ -76,10 +76,10 @@
             "pump-configuration-and-control-client"
         ],
         "PWM_CLUSTER": [],
-        "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER": [],
+        "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER": [],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
-        "RVC_CLEAN_CLUSTER": [],
-        "RVC_RUN_CLUSTER": [],
+        "RVC_CLEAN_MODE_SELECT_CLUSTER": [],
+        "RVC_RUN_MODE_SELECT_CLUSTER": [],
         "SCENES_CLUSTER": [],
         "SMOKE_CO_ALARM_CLUSTER": [],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": [],
@@ -184,12 +184,12 @@
             "pump-configuration-and-control-server"
         ],
         "PWM_CLUSTER": [],
-        "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER": [
+        "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER": [
             "mode-select-server"
         ],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
-        "RVC_CLEAN_CLUSTER": ["mode-select-server"],
-        "RVC_RUN_CLUSTER": ["mode-select-server"],
+        "RVC_CLEAN_MODE_SELECT_CLUSTER": ["mode-select-server"],
+        "RVC_RUN_MODE_SELECT_CLUSTER": ["mode-select-server"],
         "SCENES_CLUSTER": ["scenes"],
         "SMOKE_CO_ALARM_CLUSTER": [],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],

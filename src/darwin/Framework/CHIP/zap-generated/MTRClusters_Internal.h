@@ -206,17 +206,17 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterRefrigeratorAndTemperatureControlledCabinet ()
+@interface MTRClusterRefrigeratorAndTemperatureControlledCabinetModeSelect ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterRVCRun ()
+@interface MTRClusterRVCRunModeSelect ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterRVCClean ()
+@interface MTRClusterRVCCleanModeSelect ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end

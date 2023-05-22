@@ -55,10 +55,10 @@
    <xi:include href="chip/proxy-valid-cluster.xml" />
    <xi:include href="chip/pump-configuration-and-control-cluster.xml" />
    <xi:include href="chip/pwm-cluster.xml" />
-   <xi:include href="chip/refrigerator-and-temperature-controlled-cabinet-cluster.xml" />
+   <xi:include href="chip/refrigerator-and-temperature-controlled-cabinet-mode-select-cluster.xml" />
    <xi:include href="chip/relative-humidity-measurement-cluster.xml" />
-   <xi:include href="chip/rvc-clean-cluster.xml"  />
-   <xi:include href="chip/rvc-run-cluster.xml" />
+   <xi:include href="chip/rvc-clean-mode-select-cluster.xml"  />
+   <xi:include href="chip/rvc-run-mode-select-cluster.xml" />
    <xi:include href="chip/replacable-monitoring-cluster.xml.xml" />
    <xi:include href="chip/scene.xml" />
    <xi:include href="chip/smoke-co-alarm-cluster.xml" />

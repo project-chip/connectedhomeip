@@ -246,36 +246,39 @@ static void Finalize(chip::app::Clusters::LaundryWasherModeSelect::Structs::Mode
 
 static CHIP_ERROR
 Setup(const char * label,
-      chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::SemanticTagStruct::Type & request,
+      chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::SemanticTagStruct::Type & request,
       Json::Value & value);
 
-static void Finalize(chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::SemanticTagStruct::Type & request);
+static void
+Finalize(chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::SemanticTagStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::ModeOptionStruct::Type & request,
+static CHIP_ERROR
+Setup(const char * label,
+      chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::Type & request,
+      Json::Value & value);
+
+static void
+Finalize(chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcRunModeSelect::Structs::SemanticTagStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::ModeOptionStruct::Type & request);
+static void Finalize(chip::app::Clusters::RvcRunModeSelect::Structs::SemanticTagStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcRun::Structs::SemanticTagStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::RvcRun::Structs::SemanticTagStruct::Type & request);
+static void Finalize(chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcCleanModeSelect::Structs::SemanticTagStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::Type & request);
+static void Finalize(chip::app::Clusters::RvcCleanModeSelect::Structs::SemanticTagStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcClean::Structs::SemanticTagStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::RvcClean::Structs::SemanticTagStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::Type & request);
+static void Finalize(chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request,

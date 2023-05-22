@@ -75,9 +75,9 @@
 | IcdManagement                                                       | 0x0046 |
 | ModeSelect                                                          | 0x0050 |
 | LaundryWasherModeSelect                                             | 0x0051 |
-| RefrigeratorAndTemperatureControlledCabinet                         | 0x0052 |
-| RvcRun                                                              | 0x0054 |
-| RvcClean                                                            | 0x0055 |
+| RefrigeratorAndTemperatureControlledCabinetModeSelect               | 0x0052 |
+| RvcRunModeSelect                                                    | 0x0054 |
+| RvcCleanModeSelect                                                  | 0x0055 |
 | TemperatureControl                                                  | 0x0056 |
 | DishwasherModeSelect                                                | 0x0059 |
 | AirQuality                                                          | 0x005B |
@@ -3999,6 +3999,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Description                                                       | 0x0000 |
+| * StandardNamespace                                                 | 0x0001 |
 | * SupportedModes                                                    | 0x0002 |
 | * CurrentMode                                                       | 0x0003 |
 | * StartUpMode                                                       | 0x0004 |
@@ -4160,7 +4161,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster RefrigeratorAndTemperatureControlledCabinet                 | 0x0052 |
+| Cluster RefrigeratorAndTemperatureControlledCabinetModeSelect       | 0x0052 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
@@ -4185,10 +4186,10 @@ private:
 /*
  * Command ChangeToMode
  */
-class RefrigeratorAndTemperatureControlledCabinetChangeToMode : public ClusterCommand
+class RefrigeratorAndTemperatureControlledCabinetModeSelectChangeToMode : public ClusterCommand
 {
 public:
-    RefrigeratorAndTemperatureControlledCabinetChangeToMode(CredentialIssuerCommands * credsIssuerConfig) :
+    RefrigeratorAndTemperatureControlledCabinetModeSelectChangeToMode(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("change-to-mode", credsIssuerConfig)
     {
         AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
@@ -4210,16 +4211,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToMode::Type mRequest;
+    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToMode::Type mRequest;
 };
 
 /*
  * Command ChangeToModeWithStatus
  */
-class RefrigeratorAndTemperatureControlledCabinetChangeToModeWithStatus : public ClusterCommand
+class RefrigeratorAndTemperatureControlledCabinetModeSelectChangeToModeWithStatus : public ClusterCommand
 {
 public:
-    RefrigeratorAndTemperatureControlledCabinetChangeToModeWithStatus(CredentialIssuerCommands * credsIssuerConfig) :
+    RefrigeratorAndTemperatureControlledCabinetModeSelectChangeToModeWithStatus(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("change-to-mode-with-status", credsIssuerConfig)
     {
         AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
@@ -4241,11 +4242,11 @@ public:
     }
 
 private:
-    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeWithStatus::Type mRequest;
+    chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeWithStatus::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster RvcRun                                                      | 0x0054 |
+| Cluster RvcRunModeSelect                                            | 0x0054 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
@@ -4270,10 +4271,10 @@ private:
 /*
  * Command ChangeToMode
  */
-class RvcRunChangeToMode : public ClusterCommand
+class RvcRunModeSelectChangeToMode : public ClusterCommand
 {
 public:
-    RvcRunChangeToMode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("change-to-mode", credsIssuerConfig)
+    RvcRunModeSelectChangeToMode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("change-to-mode", credsIssuerConfig)
     {
         AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
         ClusterCommand::AddArguments();
@@ -4294,16 +4295,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::RvcRun::Commands::ChangeToMode::Type mRequest;
+    chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToMode::Type mRequest;
 };
 
 /*
  * Command ChangeToModeWithStatus
  */
-class RvcRunChangeToModeWithStatus : public ClusterCommand
+class RvcRunModeSelectChangeToModeWithStatus : public ClusterCommand
 {
 public:
-    RvcRunChangeToModeWithStatus(CredentialIssuerCommands * credsIssuerConfig) :
+    RvcRunModeSelectChangeToModeWithStatus(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("change-to-mode-with-status", credsIssuerConfig)
     {
         AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
@@ -4325,11 +4326,11 @@ public:
     }
 
 private:
-    chip::app::Clusters::RvcRun::Commands::ChangeToModeWithStatus::Type mRequest;
+    chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeWithStatus::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster RvcClean                                                    | 0x0055 |
+| Cluster RvcCleanModeSelect                                          | 0x0055 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ChangeToMode                                                      |   0x00 |
@@ -4354,10 +4355,11 @@ private:
 /*
  * Command ChangeToMode
  */
-class RvcCleanChangeToMode : public ClusterCommand
+class RvcCleanModeSelectChangeToMode : public ClusterCommand
 {
 public:
-    RvcCleanChangeToMode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("change-to-mode", credsIssuerConfig)
+    RvcCleanModeSelectChangeToMode(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode", credsIssuerConfig)
     {
         AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
         ClusterCommand::AddArguments();
@@ -4378,16 +4380,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::RvcClean::Commands::ChangeToMode::Type mRequest;
+    chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToMode::Type mRequest;
 };
 
 /*
  * Command ChangeToModeWithStatus
  */
-class RvcCleanChangeToModeWithStatus : public ClusterCommand
+class RvcCleanModeSelectChangeToModeWithStatus : public ClusterCommand
 {
 public:
-    RvcCleanChangeToModeWithStatus(CredentialIssuerCommands * credsIssuerConfig) :
+    RvcCleanModeSelectChangeToModeWithStatus(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("change-to-mode-with-status", credsIssuerConfig)
     {
         AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
@@ -4409,7 +4411,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::RvcClean::Commands::ChangeToModeWithStatus::Type mRequest;
+    chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeWithStatus::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -13377,6 +13379,7 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -13390,6 +13393,9 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "standard-namespace", 0, UINT16_MAX,
+                                                                              Attributes::StandardNamespace::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -13414,6 +13420,7 @@ void registerClusterModeSelect(Commands & commands, CredentialIssuerCommands * c
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "standard-namespace", Attributes::StandardNamespace::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -13507,19 +13514,20 @@ void registerClusterLaundryWasherModeSelect(Commands & commands, CredentialIssue
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterRefrigeratorAndTemperatureControlledCabinet(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterRefrigeratorAndTemperatureControlledCabinetModeSelect(Commands & commands,
+                                                                          CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet;
+    using namespace chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect;
 
-    const char * clusterName = "RefrigeratorAndTemperatureControlledCabinet";
+    const char * clusterName = "RefrigeratorAndTemperatureControlledCabinetModeSelect";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                                //
-        make_unique<RefrigeratorAndTemperatureControlledCabinetChangeToMode>(credsIssuerConfig),           //
-        make_unique<RefrigeratorAndTemperatureControlledCabinetChangeToModeWithStatus>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                                                          //
+        make_unique<RefrigeratorAndTemperatureControlledCabinetModeSelectChangeToMode>(credsIssuerConfig),           //
+        make_unique<RefrigeratorAndTemperatureControlledCabinetModeSelectChangeToModeWithStatus>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -13539,7 +13547,7 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinet(Commands & comma
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::ModeOptionStruct::Type>>>(
+            const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -13581,19 +13589,19 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinet(Commands & comma
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterRvcRun(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterRvcRunModeSelect(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::RvcRun;
+    using namespace chip::app::Clusters::RvcRunModeSelect;
 
-    const char * clusterName = "RvcRun";
+    const char * clusterName = "RvcRunModeSelect";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),           //
-        make_unique<RvcRunChangeToMode>(credsIssuerConfig),           //
-        make_unique<RvcRunChangeToModeWithStatus>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                     //
+        make_unique<RvcRunModeSelectChangeToMode>(credsIssuerConfig),           //
+        make_unique<RvcRunModeSelectChangeToModeWithStatus>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -13613,7 +13621,7 @@ void registerClusterRvcRun(Commands & commands, CredentialIssuerCommands * creds
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -13655,19 +13663,19 @@ void registerClusterRvcRun(Commands & commands, CredentialIssuerCommands * creds
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterRvcClean(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterRvcCleanModeSelect(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::RvcClean;
+    using namespace chip::app::Clusters::RvcCleanModeSelect;
 
-    const char * clusterName = "RvcClean";
+    const char * clusterName = "RvcCleanModeSelect";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),             //
-        make_unique<RvcCleanChangeToMode>(credsIssuerConfig),           //
-        make_unique<RvcCleanChangeToModeWithStatus>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                       //
+        make_unique<RvcCleanModeSelectChangeToMode>(credsIssuerConfig),           //
+        make_unique<RvcCleanModeSelectChangeToModeWithStatus>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -13687,7 +13695,7 @@ void registerClusterRvcClean(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -19081,9 +19089,9 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterIcdManagement(commands, credsIssuerConfig);
     registerClusterModeSelect(commands, credsIssuerConfig);
     registerClusterLaundryWasherModeSelect(commands, credsIssuerConfig);
-    registerClusterRefrigeratorAndTemperatureControlledCabinet(commands, credsIssuerConfig);
-    registerClusterRvcRun(commands, credsIssuerConfig);
-    registerClusterRvcClean(commands, credsIssuerConfig);
+    registerClusterRefrigeratorAndTemperatureControlledCabinetModeSelect(commands, credsIssuerConfig);
+    registerClusterRvcRunModeSelect(commands, credsIssuerConfig);
+    registerClusterRvcCleanModeSelect(commands, credsIssuerConfig);
     registerClusterTemperatureControl(commands, credsIssuerConfig);
     registerClusterDishwasherModeSelect(commands, credsIssuerConfig);
     registerClusterAirQuality(commands, credsIssuerConfig);

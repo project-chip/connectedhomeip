@@ -2097,6 +2097,7 @@ client cluster ModeSelect = 80 {
   }
 
   readonly attribute char_string<64> description = 0;
+  readonly attribute optional nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
@@ -2168,6 +2169,7 @@ server cluster ModeSelect = 80 {
   }
 
   readonly attribute char_string<64> description = 0;
+  readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute nullable int8u startUpMode = 4;
@@ -3688,6 +3690,7 @@ endpoint 0 {
 
   server cluster ModeSelect {
     ram      attribute description;
+    callback attribute standardNamespace;
     callback attribute supportedModes default = 255;
     ram      attribute currentMode;
     ram      attribute startUpMode;

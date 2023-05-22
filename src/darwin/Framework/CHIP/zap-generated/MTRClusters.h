@@ -2748,6 +2748,9 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+- (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params
+    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
@@ -2856,28 +2859,29 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster Refrigerator And Temperature Controlled Cabinet
+ * Cluster Refrigerator And Temperature Controlled Cabinet Mode Select
  *    This cluster is an alias of the Mode Select cluster, defining additional semantics and
       namespaced enumerated values for refrigerator and temperature controlled cabinet devices.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterRefrigeratorAndTemperatureControlledCabinet : MTRCluster
+@interface MTRClusterRefrigeratorAndTemperatureControlledCabinetModeSelect : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)changeToModeWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeParams *)params
+- (void)changeToModeWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)
-    changeToModeWithStatusWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeWithStatusParams *)params
+    changeToModeWithStatusWithParams:
+        (MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeWithStatusParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                           completion:
                               (void (^)(
-                                  MTRRefrigeratorAndTemperatureControlledCabinetClusterChangeToModeResponseParams * _Nullable data,
+                                  MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseParams * _Nullable data,
                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
@@ -2918,25 +2922,25 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster RVC Run
+ * Cluster RVC Run Mode Select
  *    This cluster is an alias of the Mode Select cluster which also defines a namespace for the running modes of the Robotic Vacuum
  * Cleaner devices.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterRVCRun : MTRCluster
+@interface MTRClusterRVCRunModeSelect : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)changeToModeWithParams:(MTRRVCRunClusterChangeToModeParams *)params
+- (void)changeToModeWithParams:(MTRRVCRunModeSelectClusterChangeToModeParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)changeToModeWithStatusWithParams:(MTRRVCRunClusterChangeToModeWithStatusParams *)params
+- (void)changeToModeWithStatusWithParams:(MTRRVCRunModeSelectClusterChangeToModeWithStatusParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                              completion:(void (^)(MTRRVCRunClusterChangeToModeResponseParams * _Nullable data,
+                              completion:(void (^)(MTRRVCRunModeSelectClusterChangeToModeResponseParams * _Nullable data,
                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
@@ -2977,25 +2981,25 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * Cluster RVC Clean
+ * Cluster RVC Clean Mode Select
  *    This cluster is an alias of the Mode Select cluster which also defines a namespace for the
       cleaning type of the Robotic Vacuum Cleaner devices.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRClusterRVCClean : MTRCluster
+@interface MTRClusterRVCCleanModeSelect : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)changeToModeWithParams:(MTRRVCCleanClusterChangeToModeParams *)params
+- (void)changeToModeWithParams:(MTRRVCCleanModeSelectClusterChangeToModeParams *)params
                 expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
          expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)changeToModeWithStatusWithParams:(MTRRVCCleanClusterChangeToModeWithStatusParams *)params
+- (void)changeToModeWithStatusWithParams:(MTRRVCCleanModeSelectClusterChangeToModeWithStatusParams *)params
                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                              completion:(void (^)(MTRRVCCleanClusterChangeToModeResponseParams * _Nullable data,
+                              completion:(void (^)(MTRRVCCleanModeSelectClusterChangeToModeResponseParams * _Nullable data,
                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;

@@ -155,13 +155,13 @@ public final class ChipIdLookup {
       return "LaundryWasherModeSelect";
     }
     if (clusterId == 82L) {
-      return "RefrigeratorAndTemperatureControlledCabinet";
+      return "RefrigeratorAndTemperatureControlledCabinetModeSelect";
     }
     if (clusterId == 84L) {
-      return "RvcRun";
+      return "RvcRunModeSelect";
     }
     if (clusterId == 85L) {
-      return "RvcClean";
+      return "RvcCleanModeSelect";
     }
     if (clusterId == 86L) {
       return "TemperatureControl";
@@ -2013,6 +2013,9 @@ public final class ChipIdLookup {
     if (clusterId == 80L) {
       if (attributeId == 0L) {
         return "Description";
+      }
+      if (attributeId == 1L) {
+        return "StandardNamespace";
       }
       if (attributeId == 2L) {
         return "SupportedModes";

@@ -557,7 +557,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Refrigerator And Temperature Controlled Cabinet (client) */ \
+      /* Endpoint: 1, Cluster: Refrigerator And Temperature Controlled Cabinet Mode Select (client) */ \
       .clusterId = 0x00000052, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -570,7 +570,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: RVC Run (client) */ \
+      /* Endpoint: 1, Cluster: RVC Run Mode Select (client) */ \
       .clusterId = 0x00000054, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
@@ -583,7 +583,7 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: RVC Clean (client) */ \
+      /* Endpoint: 1, Cluster: RVC Clean Mode Select (client) */ \
       .clusterId = 0x00000055, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \

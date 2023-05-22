@@ -1771,7 +1771,8 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::SemanticTagStruct::DecodableType & value)
+    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::SemanticTagStruct::DecodableType &
+        value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1797,7 +1798,8 @@ CHIP_ERROR DataModelLogger::LogValue(
 
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::ModeOptionStruct::DecodableType & value)
+    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::DecodableType &
+        value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1830,7 +1832,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::RvcRun::Structs::SemanticTagStruct::DecodableType & value)
+                                     const chip::app::Clusters::RvcRunModeSelect::Structs::SemanticTagStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1855,7 +1857,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::DecodableType & value)
+                                     const chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1887,8 +1889,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::RvcClean::Structs::SemanticTagStruct::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::RvcCleanModeSelect::Structs::SemanticTagStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1912,8 +1915,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -4665,9 +4669,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeResponse::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -4676,7 +4680,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const RvcRun::Commands::ChangeToModeResponse::DecodableType & value)
+                                     const RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -4685,7 +4689,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const RvcClean::Commands::ChangeToModeResponse::DecodableType & value)
+                                     const RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -7936,6 +7940,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Description", 1, value);
         }
+        case ModeSelect::Attributes::StandardNamespace::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StandardNamespace", 1, value);
+        }
         case ModeSelect::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -8052,62 +8061,62 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case RefrigeratorAndTemperatureControlledCabinet::Id: {
+    case RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
         switch (path.mAttributeId)
         {
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::Description::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::Description::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Description", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::SupportedModes::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Structs::ModeOptionStruct::DecodableType>
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::
+                                                    Structs::ModeOptionStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::CurrentMode::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::CurrentMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::StartUpMode::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::StartUpMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpMode", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::OnMode::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::OnMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OnMode", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::GeneratedCommandList::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::AcceptedCommandList::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::EventList::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::AttributeList::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::FeatureMap::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case RefrigeratorAndTemperatureControlledCabinet::Attributes::ClusterRevision::Id: {
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -8115,60 +8124,61 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case RvcRun::Id: {
+    case RvcRunModeSelect::Id: {
         switch (path.mAttributeId)
         {
-        case RvcRun::Attributes::Description::Id: {
+        case RvcRunModeSelect::Attributes::Description::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Description", 1, value);
         }
-        case RvcRun::Attributes::SupportedModes::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRun::Structs::ModeOptionStruct::DecodableType> value;
+        case RvcRunModeSelect::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case RvcRun::Attributes::CurrentMode::Id: {
+        case RvcRunModeSelect::Attributes::CurrentMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case RvcRun::Attributes::StartUpMode::Id: {
+        case RvcRunModeSelect::Attributes::StartUpMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpMode", 1, value);
         }
-        case RvcRun::Attributes::OnMode::Id: {
+        case RvcRunModeSelect::Attributes::OnMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OnMode", 1, value);
         }
-        case RvcRun::Attributes::GeneratedCommandList::Id: {
+        case RvcRunModeSelect::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case RvcRun::Attributes::AcceptedCommandList::Id: {
+        case RvcRunModeSelect::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case RvcRun::Attributes::EventList::Id: {
+        case RvcRunModeSelect::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case RvcRun::Attributes::AttributeList::Id: {
+        case RvcRunModeSelect::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case RvcRun::Attributes::FeatureMap::Id: {
+        case RvcRunModeSelect::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case RvcRun::Attributes::ClusterRevision::Id: {
+        case RvcRunModeSelect::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -8176,60 +8186,61 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case RvcClean::Id: {
+    case RvcCleanModeSelect::Id: {
         switch (path.mAttributeId)
         {
-        case RvcClean::Attributes::Description::Id: {
+        case RvcCleanModeSelect::Attributes::Description::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Description", 1, value);
         }
-        case RvcClean::Attributes::SupportedModes::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::RvcClean::Structs::ModeOptionStruct::DecodableType> value;
+        case RvcCleanModeSelect::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case RvcClean::Attributes::CurrentMode::Id: {
+        case RvcCleanModeSelect::Attributes::CurrentMode::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case RvcClean::Attributes::StartUpMode::Id: {
+        case RvcCleanModeSelect::Attributes::StartUpMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpMode", 1, value);
         }
-        case RvcClean::Attributes::OnMode::Id: {
+        case RvcCleanModeSelect::Attributes::OnMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OnMode", 1, value);
         }
-        case RvcClean::Attributes::GeneratedCommandList::Id: {
+        case RvcCleanModeSelect::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case RvcClean::Attributes::AcceptedCommandList::Id: {
+        case RvcCleanModeSelect::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case RvcClean::Attributes::EventList::Id: {
+        case RvcCleanModeSelect::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case RvcClean::Attributes::AttributeList::Id: {
+        case RvcCleanModeSelect::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case RvcClean::Attributes::FeatureMap::Id: {
+        case RvcCleanModeSelect::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case RvcClean::Attributes::ClusterRevision::Id: {
+        case RvcCleanModeSelect::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -12993,33 +13004,33 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
-    case RefrigeratorAndTemperatureControlledCabinet::Id: {
+    case RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
         switch (path.mCommandId)
         {
-        case RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeResponse::Id: {
-            RefrigeratorAndTemperatureControlledCabinet::Commands::ChangeToModeResponse::DecodableType value;
+        case RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::Id: {
+            RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }
         }
         break;
     }
-    case RvcRun::Id: {
+    case RvcRunModeSelect::Id: {
         switch (path.mCommandId)
         {
-        case RvcRun::Commands::ChangeToModeResponse::Id: {
-            RvcRun::Commands::ChangeToModeResponse::DecodableType value;
+        case RvcRunModeSelect::Commands::ChangeToModeResponse::Id: {
+            RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }
         }
         break;
     }
-    case RvcClean::Id: {
+    case RvcCleanModeSelect::Id: {
         switch (path.mCommandId)
         {
-        case RvcClean::Commands::ChangeToModeResponse::Id: {
-            RvcClean::Commands::ChangeToModeResponse::DecodableType value;
+        case RvcCleanModeSelect::Commands::ChangeToModeResponse::Id: {
+            RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }

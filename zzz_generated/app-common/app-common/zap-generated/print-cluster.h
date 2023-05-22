@@ -299,24 +299,25 @@
 #define CHIP_PRINTCLUSTER_LAUNDRY_WASHER_MODE_SELECT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER_SERVER) ||                                           \
-    defined(ZCL_USING_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER                                                  \
-    { chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinet::Id, "Refrigerator And Temperature Controlled Cabinet" },
+#if defined(ZCL_USING_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_SERVER) ||                               \
+    defined(ZCL_USING_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER                                      \
+    { chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id,                                              \
+      "Refrigerator And Temperature Controlled Cabinet Mode Select" },
 #else
-#define CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER
+#define CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_RVC_RUN_CLUSTER_SERVER) || defined(ZCL_USING_RVC_RUN_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_RVC_RUN_CLUSTER { chip::app::Clusters::RvcRun::Id, "RVC Run" },
+#if defined(ZCL_USING_RVC_RUN_MODE_SELECT_CLUSTER_SERVER) || defined(ZCL_USING_RVC_RUN_MODE_SELECT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_RVC_RUN_MODE_SELECT_CLUSTER { chip::app::Clusters::RvcRunModeSelect::Id, "RVC Run Mode Select" },
 #else
-#define CHIP_PRINTCLUSTER_RVC_RUN_CLUSTER
+#define CHIP_PRINTCLUSTER_RVC_RUN_MODE_SELECT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_RVC_CLEAN_CLUSTER_SERVER) || defined(ZCL_USING_RVC_CLEAN_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_RVC_CLEAN_CLUSTER { chip::app::Clusters::RvcClean::Id, "RVC Clean" },
+#if defined(ZCL_USING_RVC_CLEAN_MODE_SELECT_CLUSTER_SERVER) || defined(ZCL_USING_RVC_CLEAN_MODE_SELECT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_RVC_CLEAN_MODE_SELECT_CLUSTER { chip::app::Clusters::RvcCleanModeSelect::Id, "RVC Clean Mode Select" },
 #else
-#define CHIP_PRINTCLUSTER_RVC_CLEAN_CLUSTER
+#define CHIP_PRINTCLUSTER_RVC_CLEAN_MODE_SELECT_CLUSTER
 #endif
 
 #if defined(ZCL_USING_TEMPERATURE_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_TEMPERATURE_CONTROL_CLUSTER_CLIENT)
@@ -660,9 +661,9 @@
     CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_LAUNDRY_WASHER_MODE_SELECT_CLUSTER                                                                           \
-    CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_CLUSTER                                                      \
-    CHIP_PRINTCLUSTER_RVC_RUN_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_RVC_CLEAN_CLUSTER                                                                                            \
+    CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER                                          \
+    CHIP_PRINTCLUSTER_RVC_RUN_MODE_SELECT_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_RVC_CLEAN_MODE_SELECT_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_DISHWASHER_MODE_SELECT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
@@ -710,4 +711,4 @@
     CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER
 
-#define MAX_CLUSTER_NAME_LENGTH 47
+#define MAX_CLUSTER_NAME_LENGTH 59

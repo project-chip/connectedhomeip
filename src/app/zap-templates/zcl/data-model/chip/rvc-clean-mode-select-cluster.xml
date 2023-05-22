@@ -18,30 +18,26 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <enum name="ChangeToModeResponseStatus" type="ENUM8">
-    <cluster code="0x0054"/>
-    <item value="0x40" name="BatteryLow"/>
-    <item value="0x41" name="RobotStuck"/>
-    <item value="0x42" name="BinMissing"/>
-    <item value="0x43" name="BinFull"/>
-    <item value="0x44" name="WaterTankMissing"/>
-    <item value="0x45" name="WaterTankLidOpen"/>
-    <item value="0x46" name="CleaningPadMissing"/>
+    <cluster code="0x0055"/>
+    <item value="0x40" name="CleaningInProgress"/>
   </enum>
 
   <enum name="SemanticTags" type="ENUM16">
-    <cluster code="0x0054"/>
-    <item value="0x4000" name="Idle"/>
-    <item value="0x4001" name="Cleaning"/>
+    <cluster code="0x0055"/>
+    <item value="0x4000" name="DeepClean"/>
+    <item value="0x4001" name="Vacuum"/>
+    <item value="0x4002" name="Mop"/>
   </enum>
 
   <cluster>
     <domain>General</domain>
-    <name>RVC Run</name>
-    <code>0x0054</code>
-    <define>RVC_RUN_CLUSTER</define>
+    <name>RVC Clean Mode Select</name>
+    <code>0x0055</code>
+    <define>RVC_CLEAN_MODE_SELECT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <description>This cluster is an alias of the Mode Select cluster which also defines a namespace for the running modes of the Robotic Vacuum Cleaner devices.</description>
+    <description>This cluster is an alias of the Mode Select cluster which also defines a namespace for the
+      cleaning type of the Robotic Vacuum Cleaner devices.</description>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="MODE_DESCRIPTION" type="CHAR_STRING"                                     writable="false" optional="false" isNullable="false" length="64">Description</attribute>

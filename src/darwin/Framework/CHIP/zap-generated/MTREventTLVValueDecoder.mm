@@ -1564,10 +1564,10 @@ static id _Nullable DecodeEventPayloadForLaundryWasherModeSelectCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForRefrigeratorAndTemperatureControlledCabinetCluster(
+static id _Nullable DecodeEventPayloadForRefrigeratorAndTemperatureControlledCabinetModeSelectCluster(
     EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::RefrigeratorAndTemperatureControlledCabinet;
+    using namespace Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect;
     switch (aEventId) {
     default: {
         break;
@@ -1577,9 +1577,9 @@ static id _Nullable DecodeEventPayloadForRefrigeratorAndTemperatureControlledCab
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForRVCRunCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForRVCRunModeSelectCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::RvcRun;
+    using namespace Clusters::RvcRunModeSelect;
     switch (aEventId) {
     default: {
         break;
@@ -1589,9 +1589,9 @@ static id _Nullable DecodeEventPayloadForRVCRunCluster(EventId aEventId, TLV::TL
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForRVCCleanCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForRVCCleanModeSelectCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::RvcClean;
+    using namespace Clusters::RvcCleanModeSelect;
     switch (aEventId) {
     default: {
         break;
@@ -2952,14 +2952,14 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::LaundryWasherModeSelect::Id: {
         return DecodeEventPayloadForLaundryWasherModeSelectCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::RefrigeratorAndTemperatureControlledCabinet::Id: {
-        return DecodeEventPayloadForRefrigeratorAndTemperatureControlledCabinetCluster(aPath.mEventId, aReader, aError);
+    case Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
+        return DecodeEventPayloadForRefrigeratorAndTemperatureControlledCabinetModeSelectCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::RvcRun::Id: {
-        return DecodeEventPayloadForRVCRunCluster(aPath.mEventId, aReader, aError);
+    case Clusters::RvcRunModeSelect::Id: {
+        return DecodeEventPayloadForRVCRunModeSelectCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::RvcClean::Id: {
-        return DecodeEventPayloadForRVCCleanCluster(aPath.mEventId, aReader, aError);
+    case Clusters::RvcCleanModeSelect::Id: {
+        return DecodeEventPayloadForRVCCleanModeSelectCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::TemperatureControl::Id: {
         return DecodeEventPayloadForTemperatureControlCluster(aPath.mEventId, aReader, aError);
