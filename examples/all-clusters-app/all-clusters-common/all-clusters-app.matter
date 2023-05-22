@@ -6507,6 +6507,17 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster TemperatureControl {
+    ram      attribute currentTemperatureLevelIndex;
+    callback attribute supportedTemperatureLevels;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster RelativeHumidityMeasurement {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue default = 0;
