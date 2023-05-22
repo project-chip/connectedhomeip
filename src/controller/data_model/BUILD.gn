@@ -220,8 +220,6 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/WindowCoveringClient-ReadImpl.cpp",
       "jni/ZeoliteFilterMonitoringClient-ReadImpl.cpp",
       "jni/ZeoliteFilterMonitoringClient-InvokeSubscribeImpl.cpp",
-      "jni/MediaInputClient-ReadImpl.cpp",
-      "jni/MediaInputClient-InvokeSubscribeImpl.cpp",
       "jni/LowPowerClient-ReadImpl.cpp",
       "jni/LowPowerClient-InvokeSubscribeImpl.cpp",
       "jni/KeypadInputClient-ReadImpl.cpp",
