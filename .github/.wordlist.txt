@@ -564,6 +564,7 @@ FW
 gbl
 gcloud
 GDB
+gdbgui
 gdbserver
 GeneralCommissioning
 GeneralDiagnostics
