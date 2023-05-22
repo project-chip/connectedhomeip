@@ -46,6 +46,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
     return KVStoreConfig::Init();
 }
 
+CHIP_ERROR KeyValueStoreManagerImpl::Shutdown(void)
+{
+    return KVStoreConfig::Shutdown();
+}
+
 CHIP_ERROR
 KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset)
 {
