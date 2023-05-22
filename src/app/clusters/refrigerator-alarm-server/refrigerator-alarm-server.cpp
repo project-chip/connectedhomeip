@@ -17,8 +17,8 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 
@@ -30,39 +30,32 @@ using namespace chip::app::Clusters::RefrigeratorAlarm::Attributes;
 using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
-static Status resetHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, const chip::BitMask<AlarmMap> alarms, const chip::Optional<chip::BitMask<AlarmMap>> mask);
+static Status resetHandler(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const BitMask<AlarmMap> & alarms,
+                           const Optional<BitMask<AlarmMap>> & mask);
 
-static Status resetHandler(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, const chip::BitMask<AlarmMap> alarms, const chip::Optional<chip::BitMask<AlarmMap>> mask)
+static Status resetHandler(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const BitMask<AlarmMap> & alarms,
+                           const Optional<BitMask<AlarmMap>> & mask)
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
     EmberAfStatus status;
     chip::BitMask<AlarmMap> state = 0;
-    status = State::Get(endpoint, &state);
+    status                        = State::Get(endpoint, &state);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         return Status::Failure;
     }
-    
-    uint32_t alarmValue = alarms.Raw();
-    uint32_t stateValue = state.Raw();
 
-    // Flip the bits of alarms (i.e. ~alarms)
-    alarmValue = 0xFFFF ^ alarmValue;
-
-    // Reset state from active to inactive
-    stateValue = stateValue & alarmValue;
-
-    state.SetRaw(stateValue);
+    state.Clear(alarms);
     status = State::Set(endpoint, state);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         return Status::Failure;
     }
 
-    if(mask.HasValue())
+    if (mask.HasValue())
     {
-        status = Mask::Set(endpoint, mask.Value());        
+        status = Mask::Set(endpoint, mask.Value());
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             return Status::Failure;
@@ -70,13 +63,13 @@ static Status resetHandler(app::CommandHandler * commandObj, const app::Concrete
     }
 
     return Status::Success;
-
 }
 /**********************************************************
  * Callbacks Implementation
  *********************************************************/
 
-bool emberAfRefrigeratorAlarmClusterResetCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath, const Commands::Reset::DecodableType & commandData)
+bool emberAfRefrigeratorAlarmClusterResetCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                  const Commands::Reset::DecodableType & commandData)
 {
     auto & alarms = commandData.alarms;
     auto & mask   = commandData.mask;
