@@ -34,8 +34,8 @@
 #endif
 
 #ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-#include <app/InteractionModelEngine.h>
 #include "ICDUtil.h"
+#include <app/InteractionModelEngine.h>
 #endif
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
